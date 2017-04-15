@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/packages
+/.vs
+/TitanBot2/bin
+/TitanBot2Core/bin
+/TitanBotConsole/bin
+/TitanBot2Core/obj
+/TitanBotConsole/obj
