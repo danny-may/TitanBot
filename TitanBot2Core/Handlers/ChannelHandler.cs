@@ -1,21 +1,26 @@
 ﻿using Discord.WebSocket;
 using System.Threading.Tasks;
+using TitanBot2.Common;
 
 namespace TitanBot2.Handlers
 {
     public class ChannelHandler
     {
         private DiscordSocketClient _client;
+        private TitanBot _bot;
 
-        public void Install(DiscordSocketClient c)
+        public void Install(TitanBot b)
         {
-            _client = c;
+            _client = b._client;
+            _bot = b;
 
             _client.ChannelCreated += HandleCreatedAsync;
             _client.ChannelDestroyed += HandleDestroyedAsync;
             _client.ChannelUpdated += HandleUpdatedAsync;
             _client.RecipientAdded += HandleRecipientAddedAsync;
             _client.RecipientRemoved += HandleRecipientRemovedAsync;
+
+            _bot.Log(new LogEntry(LogType.Handler, "Installed successfully", "ChannelHandler"));
         }
 
         public void Uninstall()
@@ -28,6 +33,9 @@ namespace TitanBot2.Handlers
             _client.RecipientRemoved -= HandleRecipientRemovedAsync;
 
             _client = null;
+            _bot = null;
+            
+            _bot.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "ChannelHandler"));
         }
 
         private async Task HandleCreatedAsync(SocketChannel channel)

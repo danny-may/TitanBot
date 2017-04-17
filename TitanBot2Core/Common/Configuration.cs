@@ -9,10 +9,22 @@ namespace TitanBot2.Common
         [JsonIgnore]
         public static string FileName { get; private set; } = "config/configuration.json";
         public ulong[] Owners { get; set; }
-        public string Prefix { get; set; } = "!";
+        public string Prefix { get; set; } = "t$";
         public string Token { get; set; } = "";
+        public string ShutdownReason { get; set; } = null;
 
-        public static void EnsureExists()
+        private static Configuration _instance;
+        public static Configuration Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = Load();
+                return _instance;
+            }
+        }
+
+        private static void EnsureExists()
         {
             string file = Path.Combine(AppContext.BaseDirectory, FileName);
             if (!File.Exists(file))
@@ -30,17 +42,19 @@ namespace TitanBot2.Common
         public void SaveJson()
         {
             string file = Path.Combine(AppContext.BaseDirectory, FileName);
-            File.WriteAllText(file, ToJson());
+            File.WriteAllText(file, JsonConvert.SerializeObject(this, Formatting.Indented));
+        }
+
+        public static void Reload()
+        {
+            _instance = null;
         }
         
-        public static Configuration Load()
+        private static Configuration Load()
         {
             EnsureExists();
             string file = Path.Combine(AppContext.BaseDirectory, FileName);
             return JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(file));
         }
-        
-        public string ToJson()
-            => JsonConvert.SerializeObject(this, Formatting.Indented);
     }
 }

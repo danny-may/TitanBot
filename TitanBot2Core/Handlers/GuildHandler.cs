@@ -1,15 +1,18 @@
 ﻿using Discord.WebSocket;
 using System.Threading.Tasks;
+using TitanBot2.Common;
 
 namespace TitanBot2.Handlers
 {
     public class GuildHandler
     {
         private DiscordSocketClient _client;
+        private TitanBot _bot;
 
-        public void Install(DiscordSocketClient c)
+        public void Install(TitanBot b)
         {
-            _client = c;
+            _client = b._client;
+            _bot = b;
 
             _client.GuildAvailable += HandleAvailableAsync;
             _client.GuildUnavailable += HandleUnavailableAsync;
@@ -19,6 +22,8 @@ namespace TitanBot2.Handlers
             _client.RoleCreated += HandleRoleCreateAsync;
             _client.RoleDeleted += HandleRoleDeletedAsync;
             _client.RoleUpdated += HandleRoleUpdateddAsync;
+
+            _bot.Log(new LogEntry(LogType.Handler, "Installed successfully", "GuildHandler"));
         }
 
         public void Uninstall()
@@ -33,6 +38,9 @@ namespace TitanBot2.Handlers
             _client.RoleUpdated -= HandleRoleUpdateddAsync;
 
             _client = null;
+            _bot = null;
+
+            _bot.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "GuildHandler"));
         }
 
         private async Task HandleAvailableAsync(SocketGuild guild)

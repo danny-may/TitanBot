@@ -19,11 +19,11 @@ namespace TitanBotConsole
         {
             _bot = new TitanBot();
 
-            _bot.Log += l => Console.Out.WriteLineAsync(l.ToString());
+            _bot.LogEntryAdded += o => Console.Out.WriteLineAsync(o.ToString());
 
             if (!await _bot.StartAsync())
             {
-                var config = Configuration.Load();
+                var config = Configuration.Instance;
                 Console.WriteLine("Please enter the bot token to use:");
                 config.Token = Console.ReadLine();
                 config.SaveJson();

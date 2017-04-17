@@ -9,7 +9,7 @@ namespace TitanBot2
 {
     public class TitanBot
     {
-        private DiscordSocketClient _client;
+        public DiscordSocketClient _client;
         private GuildHandler _GHandle;
         private MessageHandler _MHandle;
         private UserHandler _UHandle;
@@ -20,7 +20,10 @@ namespace TitanBot2
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                MessageCacheSize = 1000
+                MessageCacheSize = 1000,
+                AlwaysDownloadUsers = true,
+
+                WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance
             });
 
             _GHandle = new GuildHandler();
@@ -28,18 +31,18 @@ namespace TitanBot2
             _UHandle = new UserHandler();
             _CHandle = new ChannelHandler();
 
-            _client.Log += l => Log?.Invoke(l);
-            _client.LoggedIn += () => LoggedIn?.Invoke();
-            _client.LoggedOut += () => LoggedOut?.Invoke();
-            _client.Connected += () => Connected?.Invoke();
-            _client.Disconnected += e => Disconnected?.Invoke(e);
-            _client.LatencyUpdated += (o, n) => LatencyUpdated?.Invoke(o, n);
-            _client.Ready += () => Ready?.Invoke();
+            _client.Log += l => Log(LogEntry.FromClientLog(l));
+            _client.LoggedIn += () => LoggedIn?.Invoke() ?? Task.CompletedTask;
+            _client.LoggedOut += () => LoggedOut?.Invoke() ?? Task.CompletedTask;
+            _client.Connected += () => Connected?.Invoke() ?? Task.CompletedTask;
+            _client.Disconnected += e => Disconnected?.Invoke(e) ?? Task.CompletedTask;
+            _client.LatencyUpdated += (o, n) => LatencyUpdated?.Invoke(o, n) ?? Task.CompletedTask;
+            _client.Ready += () => Ready?.Invoke() ?? Task.CompletedTask;
         }
 
         public async Task<bool> StartAsync()
         {
-            var config = Configuration.Load();
+            var config = Configuration.Instance;
 
             if (string.IsNullOrWhiteSpace(config.Token))
                 return false;
@@ -47,10 +50,10 @@ namespace TitanBot2
             await _client.LoginAsync(TokenType.Bot, config.Token);
             await _client.StartAsync();
 
-            _CHandle.Install(_client);
-            _GHandle.Install(_client);
-            _MHandle.Install(_client);
-            _UHandle.Install(_client);
+            _CHandle.Install(this);
+            _GHandle.Install(this);
+            _MHandle.Install(this);
+            _UHandle.Install(this);
 
             return true;
         }
@@ -65,7 +68,14 @@ namespace TitanBot2
             _UHandle.Uninstall();
         }
 
-        public event Func<LogMessage, Task> Log;
+        internal Task Log(LogEntry entry)
+        {
+            return (LogEntryAdded?.Invoke(entry) ?? Task.CompletedTask);
+        }
+        internal Task Log(Exception ex, string source)
+            => Log(LogEntry.FromException(ex, source));
+
+        public event Func<LogEntry, Task> LogEntryAdded;
         public event Func<Task> LoggedIn;
         public event Func<Task> LoggedOut;
         public event Func<Task> Connected;

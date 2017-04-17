@@ -1,15 +1,18 @@
 ﻿using Discord.WebSocket;
 using System.Threading.Tasks;
+using TitanBot2.Common;
 
 namespace TitanBot2.Handlers
 {
     public class UserHandler
     {
         private DiscordSocketClient _client;
+        private TitanBot _bot;
 
-        public void Install(DiscordSocketClient c)
+        public void Install(TitanBot b)
         {
-            _client = c;
+            _client = b._client;
+            _bot = b;
 
             _client.UserBanned += HandleBannedAsync;
             _client.UserJoined += HandleJoinAsync;
@@ -17,6 +20,8 @@ namespace TitanBot2.Handlers
             _client.UserUnbanned += HandleUnbanAsync;
             _client.UserUpdated += HandleUpdateAsync;
             _client.GuildMemberUpdated += HandleGUpdateAsync;
+
+            _bot.Log(new LogEntry(LogType.Handler, "Installed successfully", "UserHandler"));
         }
 
         public void Uninstall()
@@ -29,6 +34,9 @@ namespace TitanBot2.Handlers
             _client.GuildMemberUpdated -= HandleGUpdateAsync;
 
             _client = null;
+            _bot = null;
+
+            _bot.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "UserHandler"));
         }
 
         private async Task HandleBannedAsync(SocketUser user, SocketGuild guild)
