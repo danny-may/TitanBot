@@ -19,7 +19,7 @@ namespace TitanBotConsole
         {
             _bot = new TitanBot();
 
-            _bot.LogEntryAdded += o => Console.Out.WriteLineAsync(o.ToString());
+            _bot.Logger.HandleLog += e => Console.Out.WriteLineAsync(e.ToString());
 
             if (!await _bot.StartAsync())
             {

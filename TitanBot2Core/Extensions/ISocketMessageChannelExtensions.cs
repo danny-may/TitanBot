@@ -9,7 +9,7 @@ namespace TitanBot2.Extensions
 {
     public static class ISocketMessageChannelExtensions
     {
-        public static async Task<IUserMessage> SendMessageAsync(this IMessageChannel channel, string text, Func<Exception, Task> handler = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public static async Task<IUserMessage> SendMessageAsync(this IMessageChannel channel, string text, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             try
             {
@@ -24,7 +24,7 @@ namespace TitanBot2.Extensions
                         sw.Flush();
                     }
                     ms.Position = 0;
-                    return await channel.SendFileAsync(ms, "Output.txt", $"{Resources.Str.ErrorText} I tried to send a message that was too long!", isTTS, options);
+                    return await channel.SendFileAsync(ms, "Output.txt", $"{Res.Str.ErrorText} I tried to send a message that was too long!", isTTS, options);
                 }
             }
             catch (HttpException ex)
@@ -36,7 +36,24 @@ namespace TitanBot2.Extensions
 
         public static async Task<IUserMessage> SendMessageAsync(this IMessageChannel channel, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            return await channel.SendMessageAsync(text, ex => Task.CompletedTask, isTTS, embed, options);
+            return await channel.SendMessageAsync(text, null, isTTS, embed, options);
+        }
+
+        public static async Task ModifyAsync(this IUserMessage msg, Action<MessageProperties> func, Func<Exception, Task> handler, RequestOptions options = null)
+        {
+            try
+            {
+                await msg.ModifyAsync(func, options);
+            }
+            catch (Exception ex)
+            {
+                await (handler?.Invoke(ex) ?? Task.CompletedTask);
+            }
+        }
+
+        public static async Task ModifyAsync(this IUserMessage msg, Action<MessageProperties> func, RequestOptions options = null)
+        {
+            await msg.ModifyAsync(func, null, options);
         }
     }
 }

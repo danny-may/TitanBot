@@ -11,7 +11,7 @@ namespace TitanBot2.Handlers
 
         public void Install(TitanBot b)
         {
-            _client = b._client;
+            _client = b.Client;
             _bot = b;
 
             _client.UserBanned += HandleBannedAsync;
@@ -21,7 +21,7 @@ namespace TitanBot2.Handlers
             _client.UserUpdated += HandleUpdateAsync;
             _client.GuildMemberUpdated += HandleGUpdateAsync;
 
-            _bot.Log(new LogEntry(LogType.Handler, "Installed successfully", "UserHandler"));
+            b.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "UserHandler"));
         }
 
         public void Uninstall()
@@ -33,10 +33,12 @@ namespace TitanBot2.Handlers
             _client.UserUpdated -= HandleUpdateAsync;
             _client.GuildMemberUpdated -= HandleGUpdateAsync;
 
+            _bot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "UserHandler"));
+
             _client = null;
             _bot = null;
 
-            _bot.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "UserHandler"));
+            
         }
 
         private async Task HandleBannedAsync(SocketUser user, SocketGuild guild)

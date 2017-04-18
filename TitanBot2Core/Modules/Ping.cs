@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using System.Threading.Tasks;
 using TitanBot2.Common;
+using TitanBot2.Extensions;
 
 namespace TitanBot2.Modules
 {
@@ -9,7 +10,8 @@ namespace TitanBot2.Modules
         [Command("ping")]
         public async Task PingAsync()
         {
-            await ReplyAsync($"{Resources.Str.SuccessText} | {Context.Client.Latency}ms", ex => Context.TitanBot.Log(ex, "PingCommand"));
+            var msg = await ReplyAsync($"{Res.Str.SuccessText} | ~{Context.Client.Latency} ms", ex => Context.Logger.Log(ex, "PingCmd"));
+            await msg.ModifyAsync(m => m.Content = $"{Res.Str.SuccessText} | {(msg.Timestamp - Context.Message.Timestamp).TotalMilliseconds} ms", ex => Context.Logger.Log(ex, "PingCmd"));
         }
     }
 }

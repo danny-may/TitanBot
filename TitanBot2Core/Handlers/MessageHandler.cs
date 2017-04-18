@@ -16,7 +16,7 @@ namespace TitanBot2.Handlers
 
         public async void Install(TitanBot b)
         {
-            _client = b._client;
+            _client = b.Client;
             _bot = b;
             _cmds = new CommandService();
 
@@ -29,7 +29,7 @@ namespace TitanBot2.Handlers
             _client.ReactionRemoved += HandleReactionRemoveAsync;
             _client.ReactionsCleared += HandleReactionClearedAsync;
 
-            await _bot.Log(new LogEntry(LogType.Handler, "Installed successfully", "MessageHandler"));
+            await b.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "MessageHandler"));
         }
 
         public void Uninstall()
@@ -41,9 +41,10 @@ namespace TitanBot2.Handlers
             _client.ReactionRemoved -= HandleReactionRemoveAsync;
             _client.ReactionsCleared -= HandleReactionClearedAsync;
 
+            _bot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "MessageHandler"));
+
             _cmds = null;
             _client = null;
-            _bot.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "MessageHandler"));
             _bot = null;
         }
 
@@ -85,10 +86,10 @@ namespace TitanBot2.Handlers
 
             var context = new TitanbotCmdContext(_bot, msg);
             
-            int argPos = 0;
-            if (context.CheckCommand(ref argPos))
+            var argPos = await context.CheckCommand();
+            if (argPos != null)
             {
-                var result = await _cmds.ExecuteAsync(context, argPos);
+                var result = await _cmds.ExecuteAsync(context, argPos.Value);
 
                 if (!result.IsSuccess)
                     switch (result.Error)
@@ -104,7 +105,7 @@ namespace TitanBot2.Handlers
                         case CommandError.ParseFailed:
                             break;
                         case CommandError.UnknownCommand:
-                            await msg.Channel.SendMessageAsync($"{Resources.Str.ErrorText} That is not a recognised command.", ex => _bot.Log(ex, "CheckAndRunCommands"));
+                            await msg.Channel.SendMessageAsync($"{Res.Str.ErrorText} That is not a recognised command.", ex => _bot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
                         case CommandError.UnmetPrecondition:
                             break;

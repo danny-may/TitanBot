@@ -20,7 +20,7 @@ namespace TitanBot2.Common
             {
                 if (_instance == null)
                     _instance = Load();
-                return _instance;
+                return (Configuration)_instance.MemberwiseClone();
             }
         }
 
@@ -43,6 +43,7 @@ namespace TitanBot2.Common
         {
             string file = Path.Combine(AppContext.BaseDirectory, FileName);
             File.WriteAllText(file, JsonConvert.SerializeObject(this, Formatting.Indented));
+            _instance = this;
         }
 
         public static void Reload()

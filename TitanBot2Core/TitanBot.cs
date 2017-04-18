@@ -3,13 +3,16 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using TitanBot2.Common;
+using TitanBot2.Database;
 using TitanBot2.Handlers;
 
 namespace TitanBot2
 {
     public class TitanBot
     {
-        public DiscordSocketClient _client;
+        public DiscordSocketClient Client { get; }
+        public Logger Logger { get; }
+
         private GuildHandler _GHandle;
         private MessageHandler _MHandle;
         private UserHandler _UHandle;
@@ -17,9 +20,8 @@ namespace TitanBot2
 
         public TitanBot()
         {
-            _client = new DiscordSocketClient(new DiscordSocketConfig
+            Client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 1000,
                 AlwaysDownloadUsers = true,
 
@@ -31,13 +33,17 @@ namespace TitanBot2
             _UHandle = new UserHandler();
             _CHandle = new ChannelHandler();
 
-            _client.Log += l => Log(LogEntry.FromClientLog(l));
-            _client.LoggedIn += () => LoggedIn?.Invoke() ?? Task.CompletedTask;
-            _client.LoggedOut += () => LoggedOut?.Invoke() ?? Task.CompletedTask;
-            _client.Connected += () => Connected?.Invoke() ?? Task.CompletedTask;
-            _client.Disconnected += e => Disconnected?.Invoke(e) ?? Task.CompletedTask;
-            _client.LatencyUpdated += (o, n) => LatencyUpdated?.Invoke(o, n) ?? Task.CompletedTask;
-            _client.Ready += () => Ready?.Invoke() ?? Task.CompletedTask;
+            Logger = new Logger();
+
+            Client.Log += l => Logger.Log(l);
+            Client.LoggedIn += () => LoggedIn?.Invoke() ?? Task.CompletedTask;
+            Client.LoggedOut += () => LoggedOut?.Invoke() ?? Task.CompletedTask;
+            Client.Connected += () => Connected?.Invoke() ?? Task.CompletedTask;
+            Client.Disconnected += e => Disconnected?.Invoke(e) ?? Task.CompletedTask;
+            Client.LatencyUpdated += (o, n) => LatencyUpdated?.Invoke(o, n) ?? Task.CompletedTask;
+            Client.Ready += () => Ready?.Invoke() ?? Task.CompletedTask;
+
+            TitanbotDatabase.DefaultExceptionHandler += ex => Logger.Log(ex, "Database");
         }
 
         public async Task<bool> StartAsync()
@@ -47,8 +53,8 @@ namespace TitanBot2
             if (string.IsNullOrWhiteSpace(config.Token))
                 return false;
 
-            await _client.LoginAsync(TokenType.Bot, config.Token);
-            await _client.StartAsync();
+            await Client.LoginAsync(TokenType.Bot, config.Token);
+            await Client.StartAsync();
 
             _CHandle.Install(this);
             _GHandle.Install(this);
@@ -60,22 +66,14 @@ namespace TitanBot2
 
         public async Task StopAsync()
         {
-            await _client.LogoutAsync();
+            await Client.LogoutAsync();
 
             _CHandle.Uninstall();
             _GHandle.Uninstall();
             _MHandle.Uninstall();
             _UHandle.Uninstall();
         }
-
-        internal Task Log(LogEntry entry)
-        {
-            return (LogEntryAdded?.Invoke(entry) ?? Task.CompletedTask);
-        }
-        internal Task Log(Exception ex, string source)
-            => Log(LogEntry.FromException(ex, source));
-
-        public event Func<LogEntry, Task> LogEntryAdded;
+        
         public event Func<Task> LoggedIn;
         public event Func<Task> LoggedOut;
         public event Func<Task> Connected;

@@ -1,0 +1,32 @@
+﻿using LiteDB;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using TitanBot2.Database.Models;
+
+namespace TitanBot2.Database
+{
+    public class DbConnection : LiteDatabase
+    {
+        internal DbConnection(ConnectionString connectionString, BsonMapper mapper = null) : base(connectionString, mapper)
+        {
+        }
+
+        internal DbConnection(string connectionString, BsonMapper mapper = null) : base(connectionString, mapper)
+        {
+        }
+
+        internal DbConnection(Stream stream, BsonMapper mapper = null, string password = null) : base(stream, mapper, password)
+        {
+        }
+
+        internal DbConnection(IDiskService diskService, BsonMapper mapper = null, string password = null, TimeSpan? timeout = default(TimeSpan?), int cacheSize = 5000, Logger log = null) : base(diskService, mapper, password, timeout, cacheSize, log)
+        {
+        }
+
+        public LiteCollection<Guild> GuildTable { get { return GetCollection<Guild>(); } }
+    }
+}

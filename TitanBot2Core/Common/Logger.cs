@@ -1,8 +1,26 @@
 ﻿using Discord;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace TitanBot2.Common
 {
+    public class Logger
+    {
+        public event Func<LogEntry, Task> HandleLog;
+
+        internal Task Log(LogEntry entry)
+            => HandleLog?.Invoke(entry) ?? Task.CompletedTask;
+
+        internal Task Log(Exception ex, string source)
+            => Log(new LogEntry(LogType.Exception, ex.ToString(), source));
+
+        internal Task Log(LogMessage msg)
+            => Log(new LogEntry(LogType.Client, msg.Message, msg.Source));
+    }
+
     public class LogEntry
     {
         public DateTime Time { get; private set; }
@@ -30,7 +48,7 @@ namespace TitanBot2.Common
         }
 
         internal LogEntry(string type, string description, string source)
-            :this(LogType.Other, description, source)
+            : this(LogType.Other, description, source)
         {
             typeText = type;
         }
@@ -38,16 +56,6 @@ namespace TitanBot2.Common
         public override string ToString()
         {
             return $"[{Time.ToString("HH:mm:ss")}][{TypeText}][{Source}]\t{Description}";
-        }
-
-        public static LogEntry FromException(Exception ex, string source)
-        {
-            return new LogEntry(LogType.Exception, ex.ToString(), source);
-        }
-
-        public static LogEntry FromClientLog(LogMessage msg)
-        {
-            return new LogEntry(LogType.Client, msg.Message, msg.Source);
         }
     }
 
