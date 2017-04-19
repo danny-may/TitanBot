@@ -4,10 +4,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using TitanBot2.Common;
+using System.Collections.Generic;
 
 namespace TitanBot2.Extensions
 {
-    public static class ISocketMessageChannelExtensions
+    public static class IMessageChannelExtensions
     {
         public static async Task<IUserMessage> SendMessageAsync(this IMessageChannel channel, string text, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
@@ -55,5 +56,15 @@ namespace TitanBot2.Extensions
         {
             await msg.ModifyAsync(func, null, options);
         }
+
+        public static async Task SendToAll(this IEnumerable<IMessageChannel> channels, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        {
+            foreach (var channel in channels)
+            {
+                await SendMessageAsync(channel, text, isTTS, embed, options);
+            }
+        }
+
+
     }
 }

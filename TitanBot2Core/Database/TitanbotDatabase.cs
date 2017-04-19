@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Database.Models;
 using System.Collections.Concurrent;
+using TitanBot2.Database.Extensions;
 
 namespace TitanBot2.Database
 {
@@ -101,14 +102,15 @@ namespace TitanBot2.Database
 
         public static async Task QueryAsync(Action<DbConnection> query, Func<Exception, Task> handler)
         {
-            await Instance.QueueQuery<object>(db => { query(db); return null; }, handler);
+            await Instance.QueueQuery<object>(db => { query(db); return null; }, handler ?? DefaultExceptionHandler);
         }
 
         public static async Task<T> QueryAsync<T>(Func<DbConnection, T> query, Func<Exception, Task> handler)
         {
-            return await Instance.QueueQuery(query, handler);
+            return await Instance.QueueQuery(query, handler ?? DefaultExceptionHandler);
         }
 
         public static GuildExtensions Guilds { get; } = new GuildExtensions();
+        public static CmdPermExtensions CmdPerms { get; } = new CmdPermExtensions();
     }
 }

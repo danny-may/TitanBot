@@ -28,5 +28,6 @@ namespace TitanBot2.Database
         }
 
         public LiteCollection<Guild> GuildTable { get { return GetCollection<Guild>(); } }
+        public LiteCollection<CmdPerm> CmdPermTable { get { return GetCollection<CmdPerm>(); } }
     }
 }

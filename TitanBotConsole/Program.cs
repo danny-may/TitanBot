@@ -20,6 +20,7 @@ namespace TitanBotConsole
             _bot = new TitanBot();
 
             _bot.Logger.HandleLog += e => Console.Out.WriteLineAsync(e.ToString());
+            _bot.LoggedOut += async () => Environment.Exit(0);
 
             if (!await _bot.StartAsync())
             {

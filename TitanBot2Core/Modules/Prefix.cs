@@ -1,11 +1,8 @@
 ﻿using Discord.Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Database;
+using TitanBot2.Modules.Preconditions;
 
 namespace TitanBot2.Modules
 {
@@ -27,7 +24,7 @@ namespace TitanBot2.Modules
         }
 
         [Command("prefix")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireCustomPermission(8)]
         [RequireContext(ContextType.Guild)]
         public async Task SetPrefixAsync(string prefix)
         {

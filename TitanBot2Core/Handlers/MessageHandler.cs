@@ -1,10 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
+using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Handlers
 {
@@ -21,6 +23,7 @@ namespace TitanBot2.Handlers
             _cmds = new CommandService();
 
             await _cmds.AddModulesAsync(Assembly.GetExecutingAssembly());
+            _cmds.AddTypeReader<TimeSpan>(new BetterTimespanTypeReader());
 
             _client.MessageReceived += HandleRecieveAsync;
             _client.MessageDeleted += HandleDeleteAsync;
@@ -108,6 +111,7 @@ namespace TitanBot2.Handlers
                             await msg.Channel.SendMessageAsync($"{Res.Str.ErrorText} That is not a recognised command.", ex => _bot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
                         case CommandError.UnmetPrecondition:
+                            await msg.Channel.SendMessageAsync($"{Res.Str.ErrorText} {result.ErrorReason}");
                             break;
                     }
             }

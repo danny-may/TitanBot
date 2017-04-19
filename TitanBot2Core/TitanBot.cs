@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Database;
 using TitanBot2.Handlers;
+using TitanBot2.Extensions;
+using System.Collections.Generic;
 
 namespace TitanBot2
 {
@@ -43,6 +45,8 @@ namespace TitanBot2
             Client.LatencyUpdated += (o, n) => LatencyUpdated?.Invoke(o, n) ?? Task.CompletedTask;
             Client.Ready += () => Ready?.Invoke() ?? Task.CompletedTask;
 
+            Ready += OnReady;
+
             TitanbotDatabase.DefaultExceptionHandler += ex => Logger.Log(ex, "Database");
         }
 
@@ -64,14 +68,38 @@ namespace TitanBot2
             return true;
         }
 
-        public async Task StopAsync()
+        public async Task StopAsync(TimeSpan? delay = null, string reason = null)
         {
+            var inst = Configuration.Instance;
+            inst.ShutdownReason = reason;
+            inst.SaveJson();
+
+            IEnumerable<ulong> deadChannels;
+            if (delay != null)
+            {
+                deadChannels = await TitanbotDatabase.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
+                await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(delay, reason));
+                await Task.Delay(delay.Value);
+            }
+
+            deadChannels = await TitanbotDatabase.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
+            await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(null, reason));
+
             await Client.LogoutAsync();
 
             _CHandle.Uninstall();
             _GHandle.Uninstall();
             _MHandle.Uninstall();
             _UHandle.Uninstall();
+        }
+
+        private async Task OnReady()
+        {
+            var aliveChannels = await TitanbotDatabase.Guilds.GetAliveChannels(ex => Logger.Log(ex, "StartAsync"));
+            await Client.SendToAll(aliveChannels, "", embed: Res.Embeds.BuildAliveNotification(Configuration.Instance.ShutdownReason));
+            var inst = Configuration.Instance;
+            inst.ShutdownReason = "Unexpected Crash";
+            inst.SaveJson();
         }
         
         public event Func<Task> LoggedIn;
