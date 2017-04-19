@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using TitanBot2.Database;
 using System.Linq;
 using TitanBot2.Extensions;
+using TitanBot2.Common;
 
-namespace TitanBot2.Modules.Preconditions
+namespace TitanBot2.Preconditions
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class RequireCustomPermissionAttribute : PreconditionAttribute
     {
         private ulong DefaultPerm { get; }
@@ -37,7 +38,7 @@ namespace TitanBot2.Modules.Preconditions
                 guildUser.HasAll(cmdPerm?.permissionId ?? DefaultPerm))
                 return PreconditionResult.FromSuccess();
 
-            return PreconditionResult.FromError("You do not have the required permissions to access this command");
+            return PreconditionResult.FromError($"{context.User.Mention} You do not have the required permissions to use that command");
                 
         }
     }

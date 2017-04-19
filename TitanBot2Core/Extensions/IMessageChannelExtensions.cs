@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Net;
+using Discord.WebSocket;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace TitanBot2.Extensions
 {
     public static class IMessageChannelExtensions
     {
-        public static async Task<IUserMessage> SendMessageAsync(this IMessageChannel channel, string text, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             try
             {
@@ -35,12 +36,12 @@ namespace TitanBot2.Extensions
             }
         }
 
-        public static async Task<IUserMessage> SendMessageAsync(this IMessageChannel channel, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            return await channel.SendMessageAsync(text, null, isTTS, embed, options);
+            return await channel.SendMessageSafeAsync(text, null, isTTS, embed, options);
         }
 
-        public static async Task ModifyAsync(this IUserMessage msg, Action<MessageProperties> func, Func<Exception, Task> handler, RequestOptions options = null)
+        public static async Task ModifySafeAsync(this IUserMessage msg, Action<MessageProperties> func, Func<Exception, Task> handler, RequestOptions options = null)
         {
             try
             {
@@ -52,19 +53,20 @@ namespace TitanBot2.Extensions
             }
         }
 
-        public static async Task ModifyAsync(this IUserMessage msg, Action<MessageProperties> func, RequestOptions options = null)
+        public static async Task ModifySafeAsync(this IUserMessage msg, Action<MessageProperties> func, RequestOptions options = null)
         {
-            await msg.ModifyAsync(func, null, options);
+            await msg.ModifySafeAsync(func, null, options);
         }
 
         public static async Task SendToAll(this IEnumerable<IMessageChannel> channels, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             foreach (var channel in channels)
             {
-                await SendMessageAsync(channel, text, isTTS, embed, options);
+                await SendMessageSafeAsync(channel, text, isTTS, embed, options);
             }
         }
 
-
+        public static bool UserHasPermission(this IGuildChannel channel, IGuildUser user, ChannelPermission permission)
+            => user.GetPermissions(channel).Has(permission);
     }
 }

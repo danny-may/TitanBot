@@ -112,5 +112,6 @@ namespace TitanBot2.Database
 
         public static GuildExtensions Guilds { get; } = new GuildExtensions();
         public static CmdPermExtensions CmdPerms { get; } = new CmdPermExtensions();
+        public static TimerExtensions Timers { get; } = new TimerExtensions();
     }
 }

@@ -23,7 +23,7 @@ namespace TitanBot2.Handlers
             _cmds = new CommandService();
 
             await _cmds.AddModulesAsync(Assembly.GetExecutingAssembly());
-            _cmds.AddTypeReader<TimeSpan>(new BetterTimespanTypeReader());
+            //_cmds.AddTypeReader<TimeSpan>(new BetterTimespanTypeReader());
 
             _client.MessageReceived += HandleRecieveAsync;
             _client.MessageDeleted += HandleDeleteAsync;
@@ -84,7 +84,7 @@ namespace TitanBot2.Handlers
         private async Task CheckAndRunCommands(SocketMessage s)
         {
             var msg = s as SocketUserMessage;
-            if (msg == null || msg.Author.IsBot)
+            if (msg == null || (msg.Author.IsBot && msg.Author.Id != 134133271750639616))
                 return;
 
             var context = new TitanbotCmdContext(_bot, msg);
@@ -108,10 +108,10 @@ namespace TitanBot2.Handlers
                         case CommandError.ParseFailed:
                             break;
                         case CommandError.UnknownCommand:
-                            await msg.Channel.SendMessageAsync($"{Res.Str.ErrorText} That is not a recognised command.", ex => _bot.Logger.Log(ex, "CheckAndRunCommands"));
+                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} That is not a recognised command.", ex => _bot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
                         case CommandError.UnmetPrecondition:
-                            await msg.Channel.SendMessageAsync($"{Res.Str.ErrorText} {result.ErrorReason}");
+                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} {result.ErrorReason}");
                             break;
                     }
             }

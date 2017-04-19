@@ -78,12 +78,12 @@ namespace TitanBot2
             if (delay != null)
             {
                 deadChannels = await TitanbotDatabase.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
-                await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(delay, reason));
+                await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(Client.CurrentUser, delay, reason));
                 await Task.Delay(delay.Value);
             }
 
             deadChannels = await TitanbotDatabase.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
-            await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(null, reason));
+            await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(Client.CurrentUser, null, reason));
 
             await Client.LogoutAsync();
 
@@ -96,7 +96,7 @@ namespace TitanBot2
         private async Task OnReady()
         {
             var aliveChannels = await TitanbotDatabase.Guilds.GetAliveChannels(ex => Logger.Log(ex, "StartAsync"));
-            await Client.SendToAll(aliveChannels, "", embed: Res.Embeds.BuildAliveNotification(Configuration.Instance.ShutdownReason));
+            await Client.SendToAll(aliveChannels, "", embed: Res.Embeds.BuildAliveNotification(Client.CurrentUser, Configuration.Instance.ShutdownReason));
             var inst = Configuration.Instance;
             inst.ShutdownReason = "Unexpected Crash";
             inst.SaveJson();

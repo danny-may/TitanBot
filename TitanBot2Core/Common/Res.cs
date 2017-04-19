@@ -27,9 +27,9 @@ namespace TitanBot2.Common
 
         public static class Embeds
         {
-            public static Embed BuildAliveNotification(string reason)
+            public static Embed BuildAliveNotification(IUser bot, string reason)
             {
-                var builder = GetBaseNotification();
+                var builder = GetBaseNotification(bot);
                 builder.Title = "Online";
                 builder.Description = "---------------";
                 builder.AddInlineField("Offline Reason", reason ?? "None");
@@ -38,9 +38,9 @@ namespace TitanBot2.Common
                 return builder.Build();
             }
 
-            public static Embed BuildDeadNotification(TimeSpan? delay, string reason)
+            public static Embed BuildDeadNotification(IUser bot, TimeSpan? delay, string reason)
             {
-                var builder = GetBaseNotification();
+                var builder = GetBaseNotification(bot);
                 builder.Title = $"Shutting down";
                 builder.Description = "---------------";
                 builder.AddInlineField("Time until shutdown", delay?.ToString() ?? "Now");
@@ -50,7 +50,7 @@ namespace TitanBot2.Common
                 return builder.Build();
             }
 
-            public static EmbedBuilder GetBaseNotification()
+            public static EmbedBuilder GetBaseNotification(IUser bot)
             {
                 return new EmbedBuilder
                 {
@@ -58,6 +58,11 @@ namespace TitanBot2.Common
                     {
                         Name = "Bot Notification",
                         IconUrl = Res.Emoji.Information_source
+                    },
+                    Footer = new EmbedFooterBuilder
+                    {
+                        IconUrl = bot.GetAvatarUrl(),
+                        Text = bot.Username
                     },
                     Timestamp = DateTime.Now,
                 };

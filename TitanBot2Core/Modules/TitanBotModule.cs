@@ -7,16 +7,16 @@ using TitanBot2.Extensions;
 
 namespace TitanBot2.Modules
 {
-    public class TitanBotModule : ModuleBase<TitanbotCmdContext>
+    public abstract class TitanBotModule : ModuleBase<TitanbotCmdContext>
     {
         protected override Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            return Context.Channel.SendMessageAsync(message, ex => Context.Logger.Log(ex, "TitanBotModule"), isTTS, embed, options);
+            return Context.Channel.SendMessageSafeAsync(message, ex => Context.Logger.Log(ex, "TitanBotModule"), isTTS, embed, options);
         }
 
         protected Task<IUserMessage> ReplyAsync(string message, Func<Exception, Task> handler = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            return Context.Channel.SendMessageAsync(message, handler, isTTS, embed, options);
+            return Context.Channel.SendMessageSafeAsync(message, handler, isTTS, embed, options);
         }
     }
 }

@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace TitanBot2.Modules
 {
-    public class Shutdown : TitanBotModule
+    [Name("Shutdown")]
+    public class ShutdownModule : TitanBotModule
     {
         [Command("shutdown")]
         [RequireOwner]

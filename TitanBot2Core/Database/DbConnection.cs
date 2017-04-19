@@ -1,9 +1,5 @@
 ﻿using LiteDB;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using TitanBot2.Database.Models;
 
@@ -29,5 +25,6 @@ namespace TitanBot2.Database
 
         public LiteCollection<Guild> GuildTable { get { return GetCollection<Guild>(); } }
         public LiteCollection<CmdPerm> CmdPermTable { get { return GetCollection<CmdPerm>(); } }
+        public LiteCollection<Timer> TimerTable { get { return GetCollection<Timer>(); } }
     }
 }

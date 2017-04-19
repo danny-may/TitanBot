@@ -2,11 +2,13 @@
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Database;
-using TitanBot2.Modules.Preconditions;
+using TitanBot2.Preconditions;
 
 namespace TitanBot2.Modules
 {
-    public class Prefix : TitanBotModule
+
+    [Name("Prefix")]
+    public class PrefixModule : TitanBotModule
     {
         [Command("prefix")]
         public async Task GetPrefixAsync()
