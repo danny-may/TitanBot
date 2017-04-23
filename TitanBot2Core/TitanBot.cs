@@ -3,16 +3,20 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using TitanBot2.Common;
-using TitanBot2.Database;
 using TitanBot2.Handlers;
 using TitanBot2.Extensions;
 using System.Collections.Generic;
+using TitanBot2.Services.Database;
+using TitanBot2.Services.Scheduler;
 
 namespace TitanBot2
 {
     public class TitanBot
     {
-        public DiscordSocketClient Client { get; }
+        private DiscordSocketClient Client { get; }
+        private TitanbotDatabase Database { get; }
+        private TimerService TimerService { get; set; }
+        private TitanbotDependencies Dependencies { get; }
         public Logger Logger { get; }
 
         private GuildHandler _GHandle;
@@ -36,6 +40,17 @@ namespace TitanBot2
             _CHandle = new ChannelHandler();
 
             Logger = new Logger();
+            Database = new TitanbotDatabase("database/TitanBot2.db");
+            Dependencies = new TitanbotDependencies()
+            {
+                Client = Client,
+                Database = Database,
+                Logger = Logger,
+                TitanBot = this
+            };
+
+            TimerService = new TimerService(Dependencies);
+            Dependencies.TimerService = TimerService;
 
             Client.Log += l => Logger.Log(l);
             Client.LoggedIn += () => LoggedIn?.Invoke() ?? Task.CompletedTask;
@@ -47,7 +62,7 @@ namespace TitanBot2
 
             Ready += OnReady;
 
-            TitanbotDatabase.DefaultExceptionHandler += ex => Logger.Log(ex, "Database");
+            Database.DefaultExceptionHandler += ex => Logger.Log(ex, "Database");
         }
 
         public async Task<bool> StartAsync()
@@ -57,13 +72,16 @@ namespace TitanBot2
             if (string.IsNullOrWhiteSpace(config.Token))
                 return false;
 
+            Database.Initialise();
+            TimerService.Initialise();
+
             await Client.LoginAsync(TokenType.Bot, config.Token);
             await Client.StartAsync();
 
-            _CHandle.Install(this);
-            _GHandle.Install(this);
-            _MHandle.Install(this);
-            _UHandle.Install(this);
+            await _CHandle.Install(Dependencies);
+            await _GHandle.Install(Dependencies);
+            await _MHandle.Install(Dependencies);
+            await _UHandle.Install(Dependencies);
 
             return true;
         }
@@ -77,25 +95,28 @@ namespace TitanBot2
             IEnumerable<ulong> deadChannels;
             if (delay != null)
             {
-                deadChannels = await TitanbotDatabase.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
+                deadChannels = await Database.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
                 await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(Client.CurrentUser, delay, reason));
                 await Task.Delay(delay.Value);
             }
 
-            deadChannels = await TitanbotDatabase.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
+            deadChannels = await Database.Guilds.GetDeadChannels(ex => Logger.Log(ex, "StopAsync"));
             await Client.SendToAll(deadChannels, "", embed: Res.Embeds.BuildDeadNotification(Client.CurrentUser, null, reason));
 
             await Client.LogoutAsync();
 
-            _CHandle.Uninstall();
-            _GHandle.Uninstall();
-            _MHandle.Uninstall();
-            _UHandle.Uninstall();
+            await _CHandle.Uninstall();
+            await _GHandle.Uninstall();
+            await _MHandle.Uninstall();
+            await _UHandle.Uninstall();
+
+            await Database.StopAsync();
+            await TimerService.StopAsync();
         }
 
         private async Task OnReady()
         {
-            var aliveChannels = await TitanbotDatabase.Guilds.GetAliveChannels(ex => Logger.Log(ex, "StartAsync"));
+            var aliveChannels = await Database.Guilds.GetAliveChannels(ex => Logger.Log(ex, "StartAsync"));
             await Client.SendToAll(aliveChannels, "", embed: Res.Embeds.BuildAliveNotification(Client.CurrentUser, Configuration.Instance.ShutdownReason));
             var inst = Configuration.Instance;
             inst.ShutdownReason = "Unexpected Crash";

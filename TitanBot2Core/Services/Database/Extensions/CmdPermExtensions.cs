@@ -1,23 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TitanBot2.Database.Models;
+using TitanBot2.Services.Database.Models;
 
-namespace TitanBot2.Database.Extensions
+namespace TitanBot2.Services.Database.Extensions
 {
-    public class CmdPermExtensions
+    public class CmdPermExtensions : DatabaseExtension
     {
-        internal CmdPermExtensions() { }
+        public CmdPermExtensions(TitanbotDatabase db) : base(db) { }
 
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command)
-            => await TitanbotDatabase.QueryAsync(conn => conn.CmdPermTable.FindOne(c => c.guildId == guildid && c.commandname == command));
+            => await Database.QueryAsync(conn => conn.CmdPermTable.FindOne(c => c.guildId == guildid && c.commandname == command));
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command, Func<Exception, Task> handler)
-            => await TitanbotDatabase.QueryAsync(conn => conn.CmdPermTable.FindOne(c => c.guildId == guildid && c.commandname == command), handler);
+            => await Database.QueryAsync(conn => conn.CmdPermTable.FindOne(c => c.guildId == guildid && c.commandname == command), handler);
 
         public async Task SetCmdPerm(ulong guildid, string command, ulong[] roleIds = null, ulong? permission = null)
-            => await SetCmdPerm(guildid, command, null, roleIds, permission);
+            => await this.SetCmdPerm(guildid, command, null, roleIds, permission);
         public async Task SetCmdPerm(ulong guildid, string command, Func<Exception, Task> handler, ulong[] roleIds = null, ulong? permission = null)
         {
             var newPerm = new CmdPerm
@@ -28,9 +25,9 @@ namespace TitanBot2.Database.Extensions
                 roleIds = roleIds
             };
 
-            var current = await GetCmdPerm(guildid, command);
+            var current = await this.GetCmdPerm(guildid, command);
 
-            await TitanbotDatabase.QueryAsync(conn =>
+            await Database.QueryAsync(conn =>
             {
                 if (current != null)
                     conn.CmdPermTable.Delete(current.entryId);

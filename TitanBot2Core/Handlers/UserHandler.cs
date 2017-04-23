@@ -4,41 +4,34 @@ using TitanBot2.Common;
 
 namespace TitanBot2.Handlers
 {
-    public class UserHandler
+    public class UserHandler : HandlerBase
     {
-        private DiscordSocketClient _client;
-        private TitanBot _bot;
 
-        public void Install(TitanBot b)
+        public override async Task Install(TitanbotDependencies args)
         {
-            _client = b.Client;
-            _bot = b;
+            await base.Install(args);
 
-            _client.UserBanned += HandleBannedAsync;
-            _client.UserJoined += HandleJoinAsync;
-            _client.UserLeft += HandleLeaveAsync;
-            _client.UserUnbanned += HandleUnbanAsync;
-            _client.UserUpdated += HandleUpdateAsync;
-            _client.GuildMemberUpdated += HandleGUpdateAsync;
+            Client.UserBanned += HandleBannedAsync;
+            Client.UserJoined += HandleJoinAsync;
+            Client.UserLeft += HandleLeaveAsync;
+            Client.UserUnbanned += HandleUnbanAsync;
+            Client.UserUpdated += HandleUpdateAsync;
+            Client.GuildMemberUpdated += HandleGUpdateAsync;
 
-            b.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "UserHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "UserHandler"));
         }
 
-        public void Uninstall()
+        public override async Task Uninstall()
         {
-            _client.UserBanned -= HandleBannedAsync;
-            _client.UserJoined -= HandleJoinAsync;
-            _client.UserLeft -= HandleLeaveAsync;
-            _client.UserUnbanned -= HandleUnbanAsync;
-            _client.UserUpdated -= HandleUpdateAsync;
-            _client.GuildMemberUpdated -= HandleGUpdateAsync;
+            Client.UserBanned -= HandleBannedAsync;
+            Client.UserJoined -= HandleJoinAsync;
+            Client.UserLeft -= HandleLeaveAsync;
+            Client.UserUnbanned -= HandleUnbanAsync;
+            Client.UserUpdated -= HandleUpdateAsync;
+            Client.GuildMemberUpdated -= HandleGUpdateAsync;
 
-            _bot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "UserHandler"));
-
-            _client = null;
-            _bot = null;
-
-            
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "UserHandler"));
+            await base.Uninstall();
         }
 
         private async Task HandleBannedAsync(SocketUser user, SocketGuild guild)

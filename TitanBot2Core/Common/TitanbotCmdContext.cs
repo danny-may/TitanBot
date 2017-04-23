@@ -1,21 +1,32 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
 using System.Threading.Tasks;
-using TitanBot2.Database;
-using TitanBot2.Extensions;
+using TitanBot2.Handlers;
+using TitanBot2.Services.Database;
+using TitanBot2.Services.Scheduler;
 
 namespace TitanBot2.Common
 {
     public class TitanbotCmdContext : SocketCommandContext
     {
-        public TitanBot TitanBot { get; }
         public Logger Logger { get; }
+        public TitanBot TitanBot { get; }
+        public TitanbotDatabase Database { get; }
+        public string Prefix { get; private set; }
+        public TimerService TimerService { get; }
 
-        public TitanbotCmdContext(TitanBot bot, SocketUserMessage msg) : base(bot.Client, msg)
+        public TitanbotDependencies Dependencies { get; }
+
+        public TitanbotCmdContext(TitanbotDependencies args, SocketUserMessage msg) : base(args.Client, msg)
         {
-            TitanBot = bot;
+            TitanBot = args.TitanBot;
+            Database = args.Database;
+            TimerService = args.TimerService;
             Logger = TitanBot.Logger;
+
+            Dependencies = args;
         }
 
         public async Task<int?> CheckCommand()
@@ -44,17 +55,22 @@ namespace TitanBot2.Common
             }
             if (Channel is IGuildChannel)
             {
-                var blockPrefix = await TitanbotDatabase.Guilds.GetPrefix((Channel as IGuildChannel).GuildId);
-                if (Message.HasStringPrefix(blockPrefix, ref argPos))
+                try
                 {
-                    Prefix = blockPrefix;
-                    return argPos;
+                    var blockPrefix = await Database.Guilds.GetPrefix((Channel as IGuildChannel).GuildId);
+                    if (Message.HasStringPrefix(blockPrefix, ref argPos))
+                    {
+                        Prefix = blockPrefix;
+                        return argPos;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Logger.Log(ex, "CheckCommand");
                 }
             }
 
             return null;
         }
-
-        public string Prefix { get; private set; }
     }
 }

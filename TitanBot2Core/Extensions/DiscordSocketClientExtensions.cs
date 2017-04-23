@@ -24,5 +24,40 @@ namespace TitanBot2.Extensions
 
             }
         }
+
+        public static IMessageChannel GetMessageChannelSafe(this DiscordSocketClient client, ulong channelId)
+        {
+            return client.ChannelExists(channelId) ? client.GetChannel(channelId) as IMessageChannel : null;
+        }
+
+        public static async Task<IMessage> GetMessageSafe(this DiscordSocketClient client, ulong channelId, ulong messageId)
+        {
+            var channel = client.GetChannel(channelId) as IMessageChannel;
+            if (channel == null)
+                return null;
+            try
+            {
+                var message = await channel.GetMessageAsync(messageId);
+
+                return message;
+            }
+            catch (NullReferenceException ex)
+            {
+                return null;
+            }
+        }
+
+        public static bool ChannelExists(this DiscordSocketClient client, ulong channelid)
+        {
+            return AllChannels(client).Select(c => c.Id).Contains(channelid);
+        }
+
+        public static IEnumerable<IChannel> AllChannels(this DiscordSocketClient client)
+        {
+            return client.Guilds.SelectMany(g => g.Channels).Cast<IChannel>()
+                         .Concat(client.DMChannels)
+                         .Concat(client.PrivateChannels)
+                         .Concat(client.GroupChannels);
+        }
     }
 }

@@ -4,39 +4,34 @@ using TitanBot2.Common;
 
 namespace TitanBot2.Handlers
 {
-    public class ChannelHandler
+    public class ChannelHandler : HandlerBase
     {
-        private DiscordSocketClient _client;
-        private TitanBot _bot;
 
-        public void Install(TitanBot b)
+        public override async Task Install(TitanbotDependencies args)
         {
-            _client = b.Client;
-            _bot = b;
+            await base.Install(args);
 
-            _client.ChannelCreated += HandleCreatedAsync;
-            _client.ChannelDestroyed += HandleDestroyedAsync;
-            _client.ChannelUpdated += HandleUpdatedAsync;
-            _client.RecipientAdded += HandleRecipientAddedAsync;
-            _client.RecipientRemoved += HandleRecipientRemovedAsync;
+            Client.ChannelCreated += HandleCreatedAsync;
+            Client.ChannelDestroyed += HandleDestroyedAsync;
+            Client.ChannelUpdated += HandleUpdatedAsync;
+            Client.RecipientAdded += HandleRecipientAddedAsync;
+            Client.RecipientRemoved += HandleRecipientRemovedAsync;
 
-            b.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "ChannelHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "ChannelHandler"));
         }
 
-        public void Uninstall()
+        public override async Task Uninstall()
         {
-            _client.ChannelCreated -= HandleCreatedAsync;
-            _client.ChannelDestroyed -= HandleDestroyedAsync;
-            _client.ChannelUpdated -= HandleUpdatedAsync;
+            Client.ChannelCreated -= HandleCreatedAsync;
+            Client.ChannelDestroyed -= HandleDestroyedAsync;
+            Client.ChannelUpdated -= HandleUpdatedAsync;
 
-            _client.RecipientAdded -= HandleRecipientAddedAsync;
-            _client.RecipientRemoved -= HandleRecipientRemovedAsync;
+            Client.RecipientAdded -= HandleRecipientAddedAsync;
+            Client.RecipientRemoved -= HandleRecipientRemovedAsync;
 
-            _bot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "ChannelHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "ChannelHandler"));
 
-            _client = null;
-            _bot = null;
-            
+            await base.Uninstall();
         }
 
         private async Task HandleCreatedAsync(SocketChannel channel)

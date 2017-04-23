@@ -1,11 +1,10 @@
-﻿using Discord.Commands;
-using Discord;
+﻿using Discord;
+using Discord.Commands;
 using System;
-using System.Threading.Tasks;
-using TitanBot2.Database;
 using System.Linq;
-using TitanBot2.Extensions;
+using System.Threading.Tasks;
 using TitanBot2.Common;
+using TitanBot2.Extensions;
 
 namespace TitanBot2.Preconditions
 {
@@ -31,7 +30,7 @@ namespace TitanBot2.Preconditions
             if (context.Guild.OwnerId == context.User.Id)
                 return PreconditionResult.FromSuccess();
 
-            var cmdPerm = await TitanbotDatabase.CmdPerms.GetCmdPerm(context.Guild.Id, command.Name);
+            var cmdPerm = await (context as TitanbotCmdContext).Database.CmdPerms.GetCmdPerm(context.Guild.Id, command.Name);
             var guildUser = context.User as IGuildUser;
 
             if (guildUser.RoleIds.Any(r => cmdPerm?.roleIds?.Contains(r) ?? false) ||

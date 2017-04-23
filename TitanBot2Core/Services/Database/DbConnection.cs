@@ -1,9 +1,9 @@
 ﻿using LiteDB;
 using System;
 using System.IO;
-using TitanBot2.Database.Models;
+using TitanBot2.Services.Database.Models;
 
-namespace TitanBot2.Database
+namespace TitanBot2.Services.Database
 {
     public class DbConnection : LiteDatabase
     {

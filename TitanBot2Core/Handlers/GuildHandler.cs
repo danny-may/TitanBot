@@ -1,53 +1,45 @@
 ﻿using Discord.WebSocket;
 using System.Threading.Tasks;
 using TitanBot2.Common;
-using TitanBot2.Database;
 
 namespace TitanBot2.Handlers
 {
-    public class GuildHandler
+    public class GuildHandler : HandlerBase
     {
-        private DiscordSocketClient _client;
-        private TitanBot _bot;
-
-        public void Install(TitanBot b)
+        public override async Task Install(TitanbotDependencies args)
         {
-            _client = b.Client;
-            _bot = b;
+            await base.Install(args);
 
-            _client.GuildAvailable += HandleAvailableAsync;
-            _client.GuildUnavailable += HandleUnavailableAsync;
-            _client.GuildUpdated += HandleUpdatedAsync;
-            _client.JoinedGuild += HandleJoinAsync;
-            _client.LeftGuild += HandleLeftAsync;
-            _client.RoleCreated += HandleRoleCreateAsync;
-            _client.RoleDeleted += HandleRoleDeletedAsync;
-            _client.RoleUpdated += HandleRoleUpdateddAsync;
+            Client.GuildAvailable += HandleAvailableAsync;
+            Client.GuildUnavailable += HandleUnavailableAsync;
+            Client.GuildUpdated += HandleUpdatedAsync;
+            Client.JoinedGuild += HandleJoinAsync;
+            Client.LeftGuild += HandleLeftAsync;
+            Client.RoleCreated += HandleRoleCreateAsync;
+            Client.RoleDeleted += HandleRoleDeletedAsync;
+            Client.RoleUpdated += HandleRoleUpdateddAsync;
 
-            b.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "GuildHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "GuildHandler"));
         }
 
-        public void Uninstall()
+        public override async Task Uninstall()
         {
-            _client.GuildAvailable -= HandleAvailableAsync;
-            _client.GuildUnavailable -= HandleUnavailableAsync;
-            _client.GuildUpdated -= HandleUpdatedAsync;
-            _client.JoinedGuild -= HandleJoinAsync;
-            _client.LeftGuild -= HandleLeftAsync;
-            _client.RoleCreated -= HandleRoleCreateAsync;
-            _client.RoleDeleted -= HandleRoleDeletedAsync;
-            _client.RoleUpdated -= HandleRoleUpdateddAsync;
+            Client.GuildAvailable -= HandleAvailableAsync;
+            Client.GuildUnavailable -= HandleUnavailableAsync;
+            Client.GuildUpdated -= HandleUpdatedAsync;
+            Client.JoinedGuild -= HandleJoinAsync;
+            Client.LeftGuild -= HandleLeftAsync;
+            Client.RoleCreated -= HandleRoleCreateAsync;
+            Client.RoleDeleted -= HandleRoleDeletedAsync;
+            Client.RoleUpdated -= HandleRoleUpdateddAsync;
 
-            _bot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "GuildHandler"));
-
-            _client = null;
-            _bot = null;
-
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "GuildHandler"));
+            await base.Uninstall();
         }
 
         private async Task HandleAvailableAsync(SocketGuild guild)
         {
-            await TitanbotDatabase.Guilds.EnsureExists(guild.Id);
+            await Database.Guilds.EnsureExists(guild.Id);
         }
 
         private async Task HandleUnavailableAsync(SocketGuild guild)
@@ -62,7 +54,7 @@ namespace TitanBot2.Handlers
 
         private async Task HandleJoinAsync(SocketGuild guild)
         {
-            await TitanbotDatabase.Guilds.EnsureExists(guild.Id);
+            await Database.Guilds.EnsureExists(guild.Id);
         }
 
         private async Task HandleLeftAsync(SocketGuild guild)

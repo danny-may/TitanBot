@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LiteDB;
+﻿using LiteDB;
 
-namespace TitanBot2.Database.Models
+namespace TitanBot2.Services.Database.Models
 {
     public class CmdPerm
     {

@@ -10,45 +10,39 @@ using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Handlers
 {
-    public class MessageHandler
+    public class MessageHandler : HandlerBase
     {
-        private DiscordSocketClient _client;
         private CommandService _cmds;
-        private TitanBot _bot;
 
-        public async void Install(TitanBot b)
+        public override async Task Install(TitanbotDependencies args)
         {
-            _client = b.Client;
-            _bot = b;
+            await base.Install(args);
+
             _cmds = new CommandService();
 
             await _cmds.AddModulesAsync(Assembly.GetExecutingAssembly());
-            //_cmds.AddTypeReader<TimeSpan>(new BetterTimespanTypeReader());
 
-            _client.MessageReceived += HandleRecieveAsync;
-            _client.MessageDeleted += HandleDeleteAsync;
-            _client.MessageUpdated += HandleUpdateAsync;
-            _client.ReactionAdded += HandleReactionAddAsync;
-            _client.ReactionRemoved += HandleReactionRemoveAsync;
-            _client.ReactionsCleared += HandleReactionClearedAsync;
+            Client.MessageReceived += HandleRecieveAsync;
+            Client.MessageDeleted += HandleDeleteAsync;
+            Client.MessageUpdated += HandleUpdateAsync;
+            Client.ReactionAdded += HandleReactionAddAsync;
+            Client.ReactionRemoved += HandleReactionRemoveAsync;
+            Client.ReactionsCleared += HandleReactionClearedAsync;
 
-            await b.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "MessageHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "MessageHandler"));
         }
 
-        public void Uninstall()
+        public override async Task Uninstall()
         {
-            _client.MessageReceived -= HandleRecieveAsync;
-            _client.MessageDeleted -= HandleDeleteAsync;
-            _client.MessageUpdated -= HandleUpdateAsync;
-            _client.ReactionAdded -= HandleReactionAddAsync;
-            _client.ReactionRemoved -= HandleReactionRemoveAsync;
-            _client.ReactionsCleared -= HandleReactionClearedAsync;
+            Client.MessageReceived -= HandleRecieveAsync;
+            Client.MessageDeleted -= HandleDeleteAsync;
+            Client.MessageUpdated -= HandleUpdateAsync;
+            Client.ReactionAdded -= HandleReactionAddAsync;
+            Client.ReactionRemoved -= HandleReactionRemoveAsync;
+            Client.ReactionsCleared -= HandleReactionClearedAsync;
 
-            _bot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "MessageHandler"));
-
-            _cmds = null;
-            _client = null;
-            _bot = null;
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "MessageHandler"));
+            await base.Uninstall();
         }
 
         private async Task HandleRecieveAsync(SocketMessage msg)
@@ -87,7 +81,7 @@ namespace TitanBot2.Handlers
             if (msg == null || (msg.Author.IsBot && msg.Author.Id != 134133271750639616))
                 return;
 
-            var context = new TitanbotCmdContext(_bot, msg);
+            var context = new TitanbotCmdContext(Dependencies, msg);
             
             var argPos = await context.CheckCommand();
             if (argPos != null)
@@ -98,20 +92,16 @@ namespace TitanBot2.Handlers
                     switch (result.Error)
                     {
                         case CommandError.BadArgCount:
-                            break;
-                        case CommandError.Exception:
-                            break;
-                        case CommandError.MultipleMatches:
-                            break;
-                        case CommandError.ObjectNotFound:
+                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} You havent supplied enough arguments!", ex => TitanBot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
                         case CommandError.ParseFailed:
+                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} One or more of those arguments were not recognised", ex => TitanBot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
                         case CommandError.UnknownCommand:
-                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} That is not a recognised command.", ex => _bot.Logger.Log(ex, "CheckAndRunCommands"));
+                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} That is not a recognised command.", ex => TitanBot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
-                        case CommandError.UnmetPrecondition:
-                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} {result.ErrorReason}");
+                        default:
+                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} {result.ErrorReason}", ex => TitanBot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
                     }
             }
