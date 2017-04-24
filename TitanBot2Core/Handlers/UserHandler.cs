@@ -18,7 +18,7 @@ namespace TitanBot2.Handlers
             Client.UserUpdated += HandleUpdateAsync;
             Client.GuildMemberUpdated += HandleGUpdateAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "UserHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "User"));
         }
 
         public override async Task Uninstall()
@@ -30,7 +30,7 @@ namespace TitanBot2.Handlers
             Client.UserUpdated -= HandleUpdateAsync;
             Client.GuildMemberUpdated -= HandleGUpdateAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "UserHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "User"));
             await base.Uninstall();
         }
 

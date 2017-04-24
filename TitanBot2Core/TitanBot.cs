@@ -8,6 +8,7 @@ using TitanBot2.Extensions;
 using System.Collections.Generic;
 using TitanBot2.Services.Database;
 using TitanBot2.Services.Scheduler;
+using TitanBot2.Services;
 
 namespace TitanBot2
 {
@@ -17,6 +18,7 @@ namespace TitanBot2
         private TitanbotDatabase Database { get; }
         private TimerService TimerService { get; set; }
         private TitanbotDependencies Dependencies { get; }
+        private CachedWebService WebService { get; }
         public Logger Logger { get; }
 
         private GuildHandler _GHandle;
@@ -30,6 +32,7 @@ namespace TitanBot2
             {
                 MessageCacheSize = 1000,
                 AlwaysDownloadUsers = true,
+                LogLevel = LogSeverity.Debug,
 
                 WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance
             });
@@ -38,17 +41,19 @@ namespace TitanBot2
             _MHandle = new MessageHandler();
             _UHandle = new UserHandler();
             _CHandle = new ChannelHandler();
-
+            
             Logger = new Logger();
             Database = new TitanbotDatabase("database/TitanBot2.db");
+            WebService = new CachedWebService();
             Dependencies = new TitanbotDependencies()
             {
                 Client = Client,
                 Database = Database,
                 Logger = Logger,
-                TitanBot = this
+                TitanBot = this,
+                WebSerivce = WebService
             };
-
+            
             TimerService = new TimerService(Dependencies);
             Dependencies.TimerService = TimerService;
 

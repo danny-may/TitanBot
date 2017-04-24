@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using TitanBot2.Handlers;
+using TitanBot2.Services;
 using TitanBot2.Services.Database;
 using TitanBot2.Services.Scheduler;
 
@@ -16,6 +17,7 @@ namespace TitanBot2.Common
         public TitanbotDatabase Database { get; }
         public string Prefix { get; private set; }
         public TimerService TimerService { get; }
+        public CachedWebService WebService { get; }
 
         public TitanbotDependencies Dependencies { get; }
 
@@ -25,6 +27,7 @@ namespace TitanBot2.Common
             Database = args.Database;
             TimerService = args.TimerService;
             Logger = TitanBot.Logger;
+            WebService = Dependencies.WebSerivce;
 
             Dependencies = args;
         }

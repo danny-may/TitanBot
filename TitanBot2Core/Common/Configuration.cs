@@ -34,7 +34,7 @@ namespace TitanBot2.Common
                     Directory.CreateDirectory(path);
 
                 var config = new Configuration();
-                
+
                 config.SaveJson();
             }
         }

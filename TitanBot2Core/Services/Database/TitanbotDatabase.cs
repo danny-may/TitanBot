@@ -6,7 +6,7 @@ using TitanBot2.Services.Database.Extensions;
 
 namespace TitanBot2.Services.Database
 {
-    public partial class TitanbotDatabase : ServiceBase
+    public partial class TitanbotDatabase : ThreadedService
     {
         private string FileName { get; set; }
 

@@ -19,7 +19,7 @@ namespace TitanBot2.Handlers
             Client.RoleDeleted += HandleRoleDeletedAsync;
             Client.RoleUpdated += HandleRoleUpdateddAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "GuildHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "Guild"));
         }
 
         public override async Task Uninstall()
@@ -33,7 +33,7 @@ namespace TitanBot2.Handlers
             Client.RoleDeleted -= HandleRoleDeletedAsync;
             Client.RoleUpdated -= HandleRoleUpdateddAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "GuildHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "Guild"));
             await base.Uninstall();
         }
 

@@ -17,7 +17,7 @@ namespace TitanBot2.Handlers
             Client.RecipientAdded += HandleRecipientAddedAsync;
             Client.RecipientRemoved += HandleRecipientRemovedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "ChannelHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "Channel"));
         }
 
         public override async Task Uninstall()
@@ -29,7 +29,7 @@ namespace TitanBot2.Handlers
             Client.RecipientAdded -= HandleRecipientAddedAsync;
             Client.RecipientRemoved -= HandleRecipientRemovedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "ChannelHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "Channel"));
 
             await base.Uninstall();
         }

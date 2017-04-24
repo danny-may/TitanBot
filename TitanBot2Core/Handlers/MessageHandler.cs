@@ -29,7 +29,7 @@ namespace TitanBot2.Handlers
             Client.ReactionRemoved += HandleReactionRemoveAsync;
             Client.ReactionsCleared += HandleReactionClearedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "MessageHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Installed successfully", "Message"));
         }
 
         public override async Task Uninstall()
@@ -41,7 +41,7 @@ namespace TitanBot2.Handlers
             Client.ReactionRemoved -= HandleReactionRemoveAsync;
             Client.ReactionsCleared -= HandleReactionClearedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "MessageHandler"));
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Uninstalled successfully", "Message"));
             await base.Uninstall();
         }
 

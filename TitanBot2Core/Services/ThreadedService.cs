@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace TitanBot2.Services
 {
-    public abstract class ServiceBase
+    public abstract class ThreadedService
     {
         protected Task MainLoop { get; private set; }
         protected CancellationTokenSource TokenSource { get; private set; }
         protected int CycleDelay { get; set; } = 10;
 
-        protected ServiceBase()
+        protected ThreadedService()
         {
 
         }

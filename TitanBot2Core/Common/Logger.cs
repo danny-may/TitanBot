@@ -18,7 +18,7 @@ namespace TitanBot2.Common
             => Log(new LogEntry(LogType.Exception, ex.ToString(), source));
 
         internal Task Log(LogMessage msg)
-            => Log(new LogEntry(LogType.Client, msg.Message, msg.Source));
+            => Log(new LogEntry(LogType.Client, msg.Message ?? msg.Exception.Message, msg.Source));
     }
 
     public class LogEntry

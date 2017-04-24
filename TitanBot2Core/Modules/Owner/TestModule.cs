@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TitanBot2.Extensions;
 using TitanBot2.Services.Database.Models;
 using TitanBot2.Services.Scheduler;
 
@@ -19,23 +20,16 @@ namespace TitanBot2.Modules.Owner
             [Remarks("Does something probably")]
             public async Task TestAsync()
             {
-                await Context.Database.QueryAsync(conn =>
-                {
-                    conn.GetCollection<Timer>().Insert(new Timer
-                    {
-                        GuildId = Context.Guild?.Id ?? Context.Channel.Id,
-                        UserId = Context.User.Id,
-                        ChannelId = Context.Channel.Id,
-                        MessageId = Context.Message.Id,
-                        Callback = EventCallback.TitanLordNow,
-                        To = DateTime.Now,
-                        From = DateTime.Now,
-                        SecondInterval = 1
-                    });
-                });
+                var url = "http://www.google.com";
+                var req1 = Context.WebService.Get(url);
+                var req2 = Context.WebService.Get(url);
 
-                var userTimers = await Context.Database.QueryAsync(conn =>
-                conn.GetCollection<Timer>().Find(t => t.UserId == Context.User.Id));
+                Task.WaitAll(req1, req2);
+
+                var data1 = await req1;
+                var data2 = await req1;
+
+                await Context.Channel.SendMessageSafeAsync($"{data1.Length}\n{data2.Length}");
             }
         }
     }

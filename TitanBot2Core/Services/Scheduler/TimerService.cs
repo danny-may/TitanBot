@@ -10,7 +10,7 @@ using TitanBot2.Services.Database.Models;
 
 namespace TitanBot2.Services.Scheduler
 {
-    public class TimerService : ServiceBase
+    public class TimerService : ThreadedService
     {
         private TitanbotDatabase _database { get; }
         private TitanbotDependencies _dependencies { get; }

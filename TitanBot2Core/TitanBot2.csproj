@@ -31,25 +31,32 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Discord.Net.Commands, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Commands.1.0.0-rc2-00703\lib\netstandard1.3\Discord.Net.Commands.dll</HintPath>
+      <HintPath>..\packages\Discord.Net.Commands.1.0.0-rc2-00705\lib\netstandard1.3\Discord.Net.Commands.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Discord.Net.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Core.1.0.0-rc2-00703\lib\netstandard1.3\Discord.Net.Core.dll</HintPath>
+      <HintPath>..\packages\Discord.Net.Core.1.0.0-rc2-00705\lib\netstandard1.3\Discord.Net.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Discord.Net.Providers.WS4Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Providers.WS4Net.1.0.0-rc2-00703\lib\net45\Discord.Net.Providers.WS4Net.dll</HintPath>
+      <HintPath>..\packages\Discord.Net.Providers.WS4Net.1.0.0-rc2-00705\lib\net45\Discord.Net.Providers.WS4Net.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Discord.Net.Rest, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Rest.1.0.0-rc2-00703\lib\netstandard1.3\Discord.Net.Rest.dll</HintPath>
+      <HintPath>..\packages\Discord.Net.Rest.1.0.0-rc2-00705\lib\netstandard1.3\Discord.Net.Rest.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Discord.Net.Rpc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Rpc.1.0.0-rc2-00703\lib\netstandard1.3\Discord.Net.Rpc.dll</HintPath>
+      <HintPath>..\packages\Discord.Net.Rpc.1.0.0-rc2-00705\lib\netstandard1.3\Discord.Net.Rpc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Discord.Net.Webhook, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Webhook.1.0.0-rc2-00703\lib\netstandard1.3\Discord.Net.Webhook.dll</HintPath>
+      <HintPath>..\packages\Discord.Net.Webhook.1.0.0-rc2-00705\lib\netstandard1.3\Discord.Net.Webhook.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Discord.Net.WebSocket, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.WebSocket.1.0.0-rc2-00703\lib\netstandard1.3\Discord.Net.WebSocket.dll</HintPath>
+      <HintPath>..\packages\Discord.Net.WebSocket.1.0.0-rc2-00705\lib\netstandard1.3\Discord.Net.WebSocket.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="LiteDB, Version=3.1.0.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
       <HintPath>..\packages\LiteDB.3.1.0\lib\net35\LiteDB.dll</HintPath>
@@ -75,8 +82,9 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SuperSocket.ClientEngine, Version=0.8.0.6, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SuperSocket.ClientEngine.Core.0.8.0.6\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
+    <Reference Include="SuperSocket.ClientEngine, Version=0.8.0.8, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SuperSocket.ClientEngine.Core.0.8.0.8\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -132,11 +140,13 @@
       <HintPath>..\packages\System.Net.Http.4.3.1\lib\net46\System.Net.Http.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Net.NameResolution, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Net.NameResolution.4.0.0\lib\net46\System.Net.NameResolution.dll</HintPath>
+    <Reference Include="System.Net.NameResolution, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.NameResolution.4.3.0\lib\net46\System.Net.NameResolution.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Net.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Net.Security.4.0.0\lib\net46\System.Net.Security.dll</HintPath>
+    <Reference Include="System.Net.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Security.4.3.0\lib\net46\System.Net.Security.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Sockets, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Sockets.4.3.0\lib\net46\System.Net.Sockets.dll</HintPath>
@@ -218,6 +228,7 @@
     <Compile Include="Common\TitanbotDependencies.cs" />
     <Compile Include="Extensions\SocketGuildExtensions.cs" />
     <Compile Include="Handlers\HandlerBase.cs" />
+    <Compile Include="Services\CachedWebService.cs" />
     <Compile Include="Services\Database\Extensions\CmdPermExtensions.cs" />
     <Compile Include="Services\Database\Extensions\DatabaseExtension.cs" />
     <Compile Include="Services\Database\Extensions\GuildExtensions.cs" />
@@ -257,7 +268,7 @@
     <Compile Include="Services\Scheduler\Callbacks.cs" />
     <Compile Include="Services\Scheduler\TimerContext.cs" />
     <Compile Include="Services\Scheduler\TimerService.cs" />
-    <Compile Include="Services\ServiceBase.cs" />
+    <Compile Include="Services\ThreadedService.cs" />
     <Compile Include="TypeReaders\BetterTimespanTypeReader.cs" />
     <Compile Include="TitanBot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
