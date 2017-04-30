@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TitanBot2.TypeReaders
 {
     public class BetterTimespanTypeReader : TypeReader
-    {
+    {   
         public override Task<TypeReaderResult> Read(ICommandContext context, string input)
         {
             var days = 0;

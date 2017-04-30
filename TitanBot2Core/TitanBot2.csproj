@@ -230,6 +230,7 @@
     <Compile Include="Extensions\BeautifyExtensions.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\SocketGuildExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Handlers\HandlerBase.cs" />
     <Compile Include="Models\Artifact.cs" />
     <Compile Include="Models\Enums\BonusType.cs" />

@@ -19,7 +19,7 @@ namespace TitanBot2.Extensions
                                 .Cast<IMessageChannel>()
                                 .SendToAll(text, isTTS, embed, options);
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -41,7 +41,7 @@ namespace TitanBot2.Extensions
 
                 return message;
             }
-            catch (NullReferenceException ex)
+            catch (NullReferenceException)
             {
                 return null;
             }

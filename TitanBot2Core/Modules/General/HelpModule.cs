@@ -14,6 +14,7 @@ namespace TitanBot2.Modules.General
     {
         [Group("Help")]
         [Summary("Displays help for the bot commands")]
+        [RequireCustomPermission(0)]
         public class HelpModule : TitanBotModule
         {
             private CommandService _service;
@@ -25,7 +26,6 @@ namespace TitanBot2.Modules.General
 
             [Command(RunMode = RunMode.Async)]
             [Remarks("Displays a list of all the commands available to you")]
-            [RequireCustomPermission(0)]
             public async Task HelpAsync()
             {
                 var prefixes = await Context.GetPrefixes();
@@ -80,7 +80,6 @@ namespace TitanBot2.Modules.General
 
             [Command(RunMode = RunMode.Async)]
             [Remarks("Displays help information for the given command")]
-            [RequireCustomPermission(0)]
             public async Task HelpAsync(string command)
             {
                 var cmds = _service.Commands.Where(c => c.Aliases.Select(a => a.Split(' ').FirstOrDefault() ?? "")
@@ -98,7 +97,7 @@ namespace TitanBot2.Modules.General
                     categories = "No categories!";
 
                 var usage = string.Join("\n", cmds.Where(c => c.Remarks != null)
-                                                  .Select(c => $"`{Context.Prefix}{c.Aliases.First()} {string.Join(" ", c.Parameters.Select(p => p.ToHelpString()))}` - {c.Remarks}"));
+                                                  .Select(c => $"```{Context.Prefix}{c.Aliases.First()} {string.Join(" ", c.Parameters.Select(p => p.ToHelpString()))}``` - {c.Remarks}"));
                 if (string.IsNullOrWhiteSpace(usage))
                     usage = "No usage available!";
 

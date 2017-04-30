@@ -17,7 +17,7 @@ namespace TitanBot2.Extensions
             var magnitude = (int)Math.Floor(Math.Log10(value)) / 3;
             string postfix;
 
-            if (magnitude < postfixes.Length - 1)
+            if (magnitude > postfixes.Length - 1)
                 postfix = "abcdefghijklmnopqrstuvwxyz"[(magnitude - (postfixes.Length)) / 26].ToString() +
                           "abcdefghijklmnopqrstuvwxyz"[(magnitude - (postfixes.Length)) % 26].ToString();
             else

@@ -60,7 +60,7 @@ namespace TitanBot2.Modules.Clan
                 var clanBonus = Calculator.ClanBonus(guildData.TitanLord.CQ);
                 var advStart = Calculator.AdvanceStart(guildData.TitanLord.CQ);
 
-                var latestTimer = await Context.Database.Timers.GetLatest(Context.Guild.Id, EventCallback.TitanLordTick, true);
+                var latestTimer = await Context.Database.Timers.GetLatest(Context.Guild.Id, EventCallback.TitanLordNow, true);
 
                 var builder = new EmbedBuilder
                 {
@@ -69,6 +69,7 @@ namespace TitanBot2.Modules.Clan
                         IconUrl = Res.Emoji.Information_source,
                         Name = "Titan Lord data updated!"
                     },
+                    ThumbnailUrl = "https://cdn.discordapp.com/attachments/275257967937454080/308047011289235456/emoji.png",
                     Color = System.Drawing.Color.DarkOrange.ToDiscord(),
                     Timestamp = DateTime.Now,
                 };
@@ -76,7 +77,7 @@ namespace TitanBot2.Modules.Clan
                 builder.AddField("New Clan Quest", guildData.TitanLord.CQ);
                 builder.AddField("New bonus", clanBonus.Beautify());
                 builder.AddField("Next Titan Lord HP", bossHp.Beautify());
-                builder.AddField("Time to kill", DateTime.Now.Add(time).AddHours(-6) - latestTimer.To);
+                builder.AddField("Time to kill", (DateTime.Now.Add(time).AddHours(-6) - latestTimer.To).Value.Beautify());
 
                 await ReplyAsync("", embed: builder.Build());
             }
@@ -121,16 +122,28 @@ namespace TitanBot2.Modules.Clan
             public async Task DeadAsync()
                 => await TitanLordInAsync(new TimeSpan(6, 0, 0));
 
+            [Command("When")]
+            [Remarks("States how long until the next titan Lord")]
+            public async Task WhenAsync()
+            {
+                var activeTimer = await Context.Database.Timers.GetLatest(Context.Guild.Id, EventCallback.TitanLordNow);
+
+                if (activeTimer == null)
+                    await ReplyAsync($"{Res.Str.ErrorText} There are no timers currently running");
+                else
+                    await ReplyAsync($"{Res.Str.ErrorText} There will be a TitanLord in {(activeTimer.To.Value - DateTime.Now).Beautify()}");
+            }
+
             [Command("In")]
             [Remarks("Sets a timer running for the given time for alerting when the boss is up.")]
             public async Task TitanLordInAsync([OverrideTypeReader(typeof(BetterTimespanTypeReader))]TimeSpan time)
             {
-                var roundRunning = await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordRound);
-                var timerRunning = await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordNow);
+                var roundsRunning = (await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordRound)).Count();
+                var timersRunning = (await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordNow)).Count();
 
                 await CompleteExisting();
 
-                if (roundRunning.Count() > 0 && timerRunning.Count() == 0)
+                if (roundsRunning > 0 && timersRunning == 0)
                     await NewBoss(time);
 
                 var timeNow = DateTime.Now;

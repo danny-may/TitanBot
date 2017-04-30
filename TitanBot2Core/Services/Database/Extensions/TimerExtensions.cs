@@ -43,9 +43,9 @@ namespace TitanBot2.Services.Database.Extensions
         public Task<Timer> GetLatest(ulong guildid, EventCallback callback, bool includeInactive = false)
         {
             if (includeInactive)
-                return Database.QueryAsync(conn => conn.TimerTable.Find(t => t.GuildId == guildid && t.Callback == callback).OrderBy(t => t.To ?? DateTime.Now).Last());
+                return Database.QueryAsync(conn => conn.TimerTable.Find(t => t.GuildId == guildid && t.Callback == callback).OrderBy(t => t.To ?? DateTime.Now).LastOrDefault());
             else
-                return Database.QueryAsync(conn => conn.TimerTable.Find(t => t.GuildId == guildid && t.Callback == callback && t.Active).OrderBy(t => t.To ?? DateTime.Now).Last());
+                return Database.QueryAsync(conn => conn.TimerTable.Find(t => t.GuildId == guildid && t.Callback == callback && t.Active).OrderBy(t => t.To ?? DateTime.Now).LastOrDefault());
         }
 
         public async Task Complete(IEnumerable<Timer> timers)
@@ -53,6 +53,7 @@ namespace TitanBot2.Services.Database.Extensions
             foreach (var timer in timers)
             {
                 timer.Complete = true;
+                timer.To = DateTime.Now;
             }
 
             await Database.Timers.Update(timers);

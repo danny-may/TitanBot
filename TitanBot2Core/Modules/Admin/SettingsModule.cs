@@ -10,6 +10,7 @@ using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Preconditions;
 using TitanBot2.Services.Database.Models;
+using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Modules.Admin
 {
@@ -35,6 +36,31 @@ namespace TitanBot2.Modules.Admin
                     Setting.BoolDefault("PinTimer", "Titan Lord", g => g.TitanLord.PinTimer, (g,v) => g.TitanLord.PinTimer = v, "NOTE: Wont pin if it doesnt have permission"),
                     Setting.ChannelDefault("TimerChannel", "Titan Lord", g => g.TitanLord.Channel ?? 0, (g,v) => g.TitanLord.Channel = v),
                     Setting.Default("CustomPrefix", "General", g => g.Prefix, (g,s) => $"Please use `{Context.Prefix}prefix <new prefix>` to set the prefix"),
+                    new Setting
+                    {
+                        Key = "PrePings",
+                        Group = "Titan Lord",
+                        Get = g => string.Join(", ", g.TitanLord.PrePings.Select(p => new TimeSpan(0, 0, p).Beautify())),
+                        Set = (g, s) =>
+                        {
+                            var reader = new BetterTimespanTypeReader();
+                            var ints = s.Split(' ', true)
+                                        .Select(t => reader.Read(Context, t).GetAwaiter().GetResult()) 
+                                        .Where(r => r.IsSuccess)
+                                        .SelectMany(r => r.Values)
+                                        .Select(t => t.Value as TimeSpan?)
+                                        .Where(t => t != null)
+                                        .Cast<TimeSpan>()
+                                        .Select(t => (int)t.TotalSeconds);
+
+                            if (ints.Count() == 0)
+                                return "Invalid times specified.";
+
+                            g.TitanLord.PrePings = ints.ToArray();
+
+                            return null;
+                        }
+                    }
                 };
             }
 
