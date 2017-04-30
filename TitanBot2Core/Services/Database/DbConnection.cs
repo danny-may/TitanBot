@@ -26,5 +26,7 @@ namespace TitanBot2.Services.Database
         public LiteCollection<Guild> GuildTable { get { return GetCollection<Guild>(); } }
         public LiteCollection<CmdPerm> CmdPermTable { get { return GetCollection<CmdPerm>(); } }
         public LiteCollection<Timer> TimerTable { get { return GetCollection<Timer>(); } }
+        public LiteCollection<User> UserTable { get { return GetCollection<User>(); } }
+        public LiteCollection<Excuse> ExcuseTable { get { return GetCollection<Excuse>(); } }
     }
 }

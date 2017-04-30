@@ -48,7 +48,7 @@ namespace TitanBot2.Extensions
         public static string ToHelpString(this ParameterInfo parameter)
         {
             string template;
-            if (parameter.IsOptional)
+            if (parameter.IsOptional || parameter.IsMultiple)
                 template = "[{0}]";
             else
                 template = "<{0}>";

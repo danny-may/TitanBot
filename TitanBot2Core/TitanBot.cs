@@ -21,6 +21,7 @@ namespace TitanBot2
         private CachedWebClient WebService { get; }
         private TT2DataService TT2DataService { get; }
         public Logger Logger { get; }
+        public IUser Owner { get; private set; }
 
         private GuildHandler _GHandle;
         private MessageHandler _MHandle;
@@ -124,13 +125,15 @@ namespace TitanBot2
 
         private async Task OnReady()
         {
+            Owner = (await Client.GetApplicationInfoAsync()).Owner;
+
             var aliveChannels = await Database.Guilds.GetAliveChannels(ex => Logger.Log(ex, "StartAsync"));
             await Client.SendToAll(aliveChannels, "", embed: Res.Embeds.BuildAliveNotification(Client.CurrentUser, Configuration.Instance.ShutdownReason));
             var inst = Configuration.Instance;
             inst.ShutdownReason = "Unexpected Crash";
             inst.SaveJson();
         }
-        
+
         public event Func<Task> LoggedIn;
         public event Func<Task> LoggedOut;
         public event Func<Task> Connected;

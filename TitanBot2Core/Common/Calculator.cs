@@ -27,6 +27,7 @@ namespace TitanBot2.Common
         public static double AdvanceStart(int clanQuest)
             => Math.Min((double)clanQuest / 1000, 0.5);
 
-
+        public static int AttacksNeeded(int clanLevel, int attackers, int maxStage, int tapsPerAttack)
+            => (int)Math.Ceiling((TitanLordHp(clanLevel) / attackers) / (Math.Max(50, maxStage) * tapsPerAttack + Math.Max(50, maxStage) * 90 * 2));
     }
 }

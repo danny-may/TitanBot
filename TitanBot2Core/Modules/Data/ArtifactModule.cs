@@ -9,6 +9,7 @@ using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Models;
 using TitanBot2.Models.Enums;
+using TitanBot2.Preconditions;
 
 namespace TitanBot2.Modules.Data
 {
@@ -16,6 +17,7 @@ namespace TitanBot2.Modules.Data
     {
         [Group("Artifacts"), Alias("Artifact")]
         [Summary("Displays info about a given artifact")]
+        [RequireCustomPermission(0)]
         public class ArtifactModule : TitanBotModule
         {
             [Command(RunMode = RunMode.Async)]

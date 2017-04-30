@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
 using TitanBot2.Services.Database.Extensions;
+using TitanBot2.Services.Database.Models;
 
 namespace TitanBot2.Services.Database
 {
@@ -17,6 +18,8 @@ namespace TitanBot2.Services.Database
         public GuildExtensions Guilds { get; }
         public CmdPermExtensions CmdPerms { get; }
         public TimerExtensions Timers { get; }
+        public UserExtensions Users { get; }
+        public ExcuseExtension Excuses { get; }
 
         public TitanbotDatabase(string target)
         {
@@ -24,6 +27,8 @@ namespace TitanBot2.Services.Database
             Guilds = new GuildExtensions(this);
             CmdPerms = new CmdPermExtensions(this);
             Timers = new TimerExtensions(this);
+            Users = new UserExtensions(this);
+            Excuses = new ExcuseExtension(this);
         }
 
         public override void Initialise()

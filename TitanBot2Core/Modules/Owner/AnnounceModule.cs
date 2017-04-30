@@ -42,14 +42,9 @@ namespace TitanBot2.Modules.Owner
 
                 foreach (var guild in guilds)
                 {
-                    if (guild.DefaultChannel.UserHasPermission(Context.Guild.GetUser(Context.Client.CurrentUser.Id), ChannelPermission.SendMessages))
-                        await guild.DefaultChannel.SendMessageSafeAsync(guild.Owner.Mention, embed: builder.Build());
-                    else
-                    {
-                        var dmChannel = (IDMChannel)Context.Client.DMChannels.SingleOrDefault(c => c.Recipient.Id == guild.Owner.Id) ??
-                            await guild.Owner.CreateDMChannelAsync();
-                        await dmChannel.SendMessageSafeAsync($"I was unable to send this message in the default channel of {guild.Name} (#{guild.DefaultChannel.Name})", embed: builder.Build());
-                    }
+                    var dmChannel = (IDMChannel)Context.Client.DMChannels.SingleOrDefault(c => c.Recipient.Id == guild.Owner.Id) ??
+                        await guild.Owner.CreateDMChannelAsync();
+                    await dmChannel.SendMessageSafeAsync($"This announcement was sent to you because you are the owner of the {guild.Name} server, which I am also on.", embed: builder.Build());
                 }
 
                 await Task.Delay(20000);

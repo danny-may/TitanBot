@@ -22,9 +22,9 @@ namespace TitanBot2.Preconditions
 
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {
-            var owner = (await context.Client.GetApplicationInfoAsync()).Owner.Id;
+            var owner = (context as TitanbotCmdContext)?.TitanBot?.Owner ?? (await context.Client.GetApplicationInfoAsync()).Owner;
 
-            if (context.User.Id == owner || context.Channel is IDMChannel || context.Channel is IGroupChannel)
+            if (context.User.Id == owner.Id || context.Channel is IDMChannel || context.Channel is IGroupChannel)
                 return PreconditionResult.FromSuccess();
 
             if (context.Guild.OwnerId == context.User.Id)
@@ -38,8 +38,16 @@ namespace TitanBot2.Preconditions
 
             var cmdPerm = await (context as TitanbotCmdContext).Database.CmdPerms.GetCmdPerm(context.Guild.Id, command.Name);
 
-            if (guildUser.RoleIds.Any(r => cmdPerm?.roleIds?.Contains(r) ?? false) ||
-                guildUser.HasAll(cmdPerm?.permissionId ?? DefaultPerm))
+            if (cmdPerm?.permissionId == null && cmdPerm?.roleIds == null)
+            {
+                if (guildUser.HasAll(cmdPerm?.permissionId ?? DefaultPerm))
+                    return PreconditionResult.FromSuccess();
+            }
+
+            if (cmdPerm?.roleIds != null && guildUser.RoleIds.Any(r => cmdPerm?.roleIds?.Contains(r) ?? false))
+                return PreconditionResult.FromSuccess();
+
+            if (cmdPerm?.permissionId != null && guildUser.HasAll(cmdPerm?.permissionId ?? DefaultPerm))
                 return PreconditionResult.FromSuccess();
 
             return PreconditionResult.FromError($"{context.User.Mention} You do not have the required permissions to use that command");

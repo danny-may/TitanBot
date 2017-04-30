@@ -16,7 +16,6 @@ namespace TitanBot2.Extensions
             {
                 var guildPrefix = await context.Database.Guilds.GetPrefix(context.Guild.Id);
                 if (guildPrefix != Configuration.Instance.Prefix)
-                {
                     return new string[]
                     {
                         Configuration.Instance.Prefix,
@@ -24,7 +23,13 @@ namespace TitanBot2.Extensions
                         context.Client.CurrentUser.Username,
                         context.Client.CurrentUser.Mention
                     };
-                }
+                else
+                    return new string[]
+                    {
+                        Configuration.Instance.Prefix,
+                        context.Client.CurrentUser.Username,
+                        context.Client.CurrentUser.Mention
+                    };
             }
             return new string[] { };
         }

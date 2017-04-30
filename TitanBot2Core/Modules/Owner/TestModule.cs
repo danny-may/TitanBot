@@ -20,16 +20,7 @@ namespace TitanBot2.Modules.Owner
             [Remarks("Does something probably")]
             public async Task TestAsync()
             {
-                var url = "http://www.google.com";
-                var req1 = Context.WebClient.GetString(url);
-                var req2 = Context.WebClient.GetString(url);
-
-                Task.WaitAll(req1, req2);
-
-                var data1 = await req1;
-                var data2 = await req1;
-
-                await Context.Channel.SendMessageSafeAsync($"{data1.Length}\n{data2.Length}");
+                
             }
         }
     }
