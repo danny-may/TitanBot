@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace TitanBot2.Common
@@ -12,6 +13,11 @@ namespace TitanBot2.Common
         public string Prefix { get; set; } = "t$";
         public string Token { get; set; } = "";
         public string ShutdownReason { get; set; } = null;
+        public Dictionary<string, float> Versions { get; set; }
+            = new Dictionary<string, float>
+            {
+                { "/ArtifactInfo.csv", 1.0f }
+            };
 
         private static Configuration _instance;
         public static Configuration Instance

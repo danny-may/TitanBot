@@ -17,7 +17,8 @@ namespace TitanBot2.Common
         public TitanbotDatabase Database { get; }
         public string Prefix { get; private set; }
         public TimerService TimerService { get; }
-        public CachedWebService WebService { get; }
+        public CachedWebClient WebClient { get; }
+        public TT2DataService TT2DataService { get; }
 
         public TitanbotDependencies Dependencies { get; }
 
@@ -27,7 +28,8 @@ namespace TitanBot2.Common
             Database = args.Database;
             TimerService = args.TimerService;
             Logger = TitanBot.Logger;
-            WebService = Dependencies.WebSerivce;
+            WebClient = args.WebClient;
+            TT2DataService = args.TT2DataService;
 
             Dependencies = args;
         }

@@ -4,7 +4,7 @@ using TitanBot2.Services.Database.Models;
 
 namespace TitanBot2.Services.Database.Extensions
 {
-    public class CmdPermExtensions : DatabaseExtension
+    public class CmdPermExtensions : DatabaseExtension<CmdPerm>
     {
         public CmdPermExtensions(TitanbotDatabase db) : base(db) { }
 

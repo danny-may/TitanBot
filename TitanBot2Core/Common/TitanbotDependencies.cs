@@ -17,6 +17,7 @@ namespace TitanBot2.Common
         public TitanbotDatabase Database { get; set; }
         public TimerService TimerService { get; set; }
         public Logger Logger { get; set; }
-        public CachedWebService WebSerivce { get; set; }
+        public CachedWebClient WebClient { get; set; }
+        public TT2DataService TT2DataService { get; set; }
     }
 }

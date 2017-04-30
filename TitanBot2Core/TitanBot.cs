@@ -18,7 +18,8 @@ namespace TitanBot2
         private TitanbotDatabase Database { get; }
         private TimerService TimerService { get; set; }
         private TitanbotDependencies Dependencies { get; }
-        private CachedWebService WebService { get; }
+        private CachedWebClient WebService { get; }
+        private TT2DataService TT2DataService { get; }
         public Logger Logger { get; }
 
         private GuildHandler _GHandle;
@@ -44,14 +45,16 @@ namespace TitanBot2
             
             Logger = new Logger();
             Database = new TitanbotDatabase("database/TitanBot2.db");
-            WebService = new CachedWebService();
+            WebService = new CachedWebClient();
+            TT2DataService = new TT2DataService(WebService);
             Dependencies = new TitanbotDependencies()
             {
                 Client = Client,
                 Database = Database,
                 Logger = Logger,
                 TitanBot = this,
-                WebSerivce = WebService
+                WebClient = WebService,
+                TT2DataService = TT2DataService
             };
             
             TimerService = new TimerService(Dependencies);

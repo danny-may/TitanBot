@@ -10,6 +10,7 @@ namespace TitanBot2.Services.Database.Models
         [BsonId]
         public int Id { get; set; }
         public bool Complete { get; set; }
+        public bool Cancelled { get; set; }
         public ulong? GuildId { get; set; }
         public ulong UserId { get; set; }
         public ulong MessageId { get; set; }
@@ -33,5 +34,8 @@ namespace TitanBot2.Services.Database.Models
                 _custArgs = value.ToString();
             }
         }
+
+        
+        public bool Active { get { return !(Complete || Cancelled); } }
     }
 }

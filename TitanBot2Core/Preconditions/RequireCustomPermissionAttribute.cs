@@ -30,8 +30,13 @@ namespace TitanBot2.Preconditions
             if (context.Guild.OwnerId == context.User.Id)
                 return PreconditionResult.FromSuccess();
 
-            var cmdPerm = await (context as TitanbotCmdContext).Database.CmdPerms.GetCmdPerm(context.Guild.Id, command.Name);
+            var guildData = await (context as TitanbotCmdContext).Database.Guilds.GetGuild(context.Guild.Id);
             var guildUser = context.User as IGuildUser;
+
+            if (guildUser.HasAll(guildData.PermOverride))
+                return PreconditionResult.FromSuccess();
+
+            var cmdPerm = await (context as TitanbotCmdContext).Database.CmdPerms.GetCmdPerm(context.Guild.Id, command.Name);
 
             if (guildUser.RoleIds.Any(r => cmdPerm?.roleIds?.Contains(r) ?? false) ||
                 guildUser.HasAll(cmdPerm?.permissionId ?? DefaultPerm))

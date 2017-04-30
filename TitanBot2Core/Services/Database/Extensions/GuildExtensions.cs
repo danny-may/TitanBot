@@ -8,7 +8,7 @@ using TitanBot2.Services.Database.Models;
 namespace TitanBot2.Services.Database.Extensions
 {
 
-    public class GuildExtensions : DatabaseExtension
+    public class GuildExtensions : DatabaseExtension<Guild>
     {
         public GuildExtensions(TitanbotDatabase db) : base(db) { }
 

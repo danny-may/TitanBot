@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Csv, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Csv.1.0.11\lib\dotnet\Csv.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Net.Commands, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Net.Commands.1.0.0-rc2-00705\lib\netstandard1.3\Discord.Net.Commands.dll</HintPath>
       <Private>True</Private>
@@ -84,7 +87,6 @@
     </Reference>
     <Reference Include="SuperSocket.ClientEngine, Version=0.8.0.8, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SuperSocket.ClientEngine.Core.0.8.0.8\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -142,11 +144,9 @@
     </Reference>
     <Reference Include="System.Net.NameResolution, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.NameResolution.4.3.0\lib\net46\System.Net.NameResolution.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Security.4.3.0\lib\net46\System.Net.Security.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Sockets, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Sockets.4.3.0\lib\net46\System.Net.Sockets.dll</HintPath>
@@ -216,19 +216,29 @@
     <Reference Include="System.Xml.XPath.XDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Xml.XPath.XDocument.4.3.0\lib\net46\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
-    <Reference Include="WebSocket4Net, Version=0.15.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebSocket4Net.0.15.0-beta6\lib\net45\WebSocket4Net.dll</HintPath>
+    <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Calculator.cs" />
     <Compile Include="Common\Configuration.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="Common\Res.cs" />
     <Compile Include="Common\TitanbotCmdContext.cs" />
     <Compile Include="Common\TitanbotDependencies.cs" />
+    <Compile Include="Extensions\BeautifyExtensions.cs" />
+    <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\SocketGuildExtensions.cs" />
     <Compile Include="Handlers\HandlerBase.cs" />
-    <Compile Include="Services\CachedWebService.cs" />
+    <Compile Include="Models\Artifact.cs" />
+    <Compile Include="Models\Enums\BonusType.cs" />
+    <Compile Include="Models\Enums\EquipmentClass.cs" />
+    <Compile Include="Models\Enums\HelperType.cs" />
+    <Compile Include="Modules\Admin\SettingsModule.cs" />
+    <Compile Include="Modules\Data\ArtifactModule.cs" />
+    <Compile Include="Modules\Data\DataModule.cs" />
+    <Compile Include="Services\CachedWebClient.cs" />
     <Compile Include="Services\Database\Extensions\CmdPermExtensions.cs" />
     <Compile Include="Services\Database\Extensions\DatabaseExtension.cs" />
     <Compile Include="Services\Database\Extensions\GuildExtensions.cs" />
@@ -269,6 +279,7 @@
     <Compile Include="Services\Scheduler\TimerContext.cs" />
     <Compile Include="Services\Scheduler\TimerService.cs" />
     <Compile Include="Services\ThreadedService.cs" />
+    <Compile Include="Services\TT2DataService.cs" />
     <Compile Include="TypeReaders\BetterTimespanTypeReader.cs" />
     <Compile Include="TitanBot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
