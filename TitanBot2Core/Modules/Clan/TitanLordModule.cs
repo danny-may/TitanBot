@@ -196,7 +196,7 @@ namespace TitanBot2.Modules.Clan
 
                 var message = await tlChannel.SendMessageSafeAsync("Loading Timer...");
 
-                if ((Context.User as IGuildUser).GuildPermissions.Has(GuildPermission.ManageMessages))
+                if (guildData.TitanLord.PinTimer && (Context.User as IGuildUser).GuildPermissions.Has(GuildPermission.ManageMessages))
                     await message.PinAsync();
 
                 var custArgs = new JObject();
