@@ -22,6 +22,15 @@ namespace TitanBot2.Modules.Owner
                     case "timer":
                         await Context.Database.Timers.Drop();
                         break;
+                    case "cmdperm":
+                        await Context.Database.CmdPerms.Drop();
+                        break;
+                    case "guild":
+                        await Context.Database.Guilds.Drop();
+                        break;
+                    case "excuse":
+                        await Context.Database.Excuses.Drop();
+                        break;
                     default:
                         await ReplyAsync($"{Res.Str.ErrorText} Unknown table `{table}`");
                         return;
