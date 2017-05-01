@@ -7,7 +7,7 @@
     <ProjectGuid>{1F000E63-3DEE-4FC8-873F-776BE91F70B6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TitanBot2Core</RootNamespace>
+    <RootNamespace>TitanBot2</RootNamespace>
     <AssemblyName>TitanBot2Core</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

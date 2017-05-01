@@ -4,7 +4,7 @@ using TitanBot2.Common;
 using TitanBot2.Modules;
 using TitanBot2.Preconditions;
 
-namespace TitanBot2Core.Modules.General
+namespace TitanBot2.Modules.General
 {
     public partial class GeneralModule
     {
