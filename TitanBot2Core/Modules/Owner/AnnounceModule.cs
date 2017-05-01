@@ -38,7 +38,7 @@ namespace TitanBot2.Modules.Owner
 
                 var guilds = Context.Client.Guilds;
 
-                await Context.Channel.SendMessageAsync($"{Res.Str.SuccessText} I will notify all my users!");
+                await Context.Channel.SendMessageSafeAsync($"{Res.Str.SuccessText} I will notify all my users!");
 
                 foreach (var guild in guilds)
                 {

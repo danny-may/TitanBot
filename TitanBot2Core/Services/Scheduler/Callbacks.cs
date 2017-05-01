@@ -25,7 +25,7 @@ namespace TitanBot2.Services.Scheduler
 
             var messageText = FormatString(guildData.TitanLord?.NowText, new TimeSpan(0), context.User);
 
-            var message = await tlChannel.SendMessageAsync(messageText);
+            var message = await tlChannel.SendMessageSafeAsync(messageText);
 
             var tickMessageId = (ulong?)context.Timer.CustArgs[timerMessageId];
             var tickMessageChannelId = (ulong?)context.Timer.CustArgs[timerMessageChannelId];

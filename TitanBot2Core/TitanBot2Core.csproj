@@ -256,6 +256,7 @@
     <Compile Include="Modules\Data\DataModule.cs" />
     <Compile Include="Modules\General\GeneralModule.cs" />
     <Compile Include="Modules\General\HelpModule.cs" />
+    <Compile Include="Modules\General\InviteModule.cs" />
     <Compile Include="Modules\General\PingModule.cs" />
     <Compile Include="Modules\General\PrefixModule.cs" />
     <Compile Include="Modules\Owner\AnnounceModule.cs" />

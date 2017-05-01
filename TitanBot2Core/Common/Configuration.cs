@@ -13,6 +13,7 @@ namespace TitanBot2.Common
         public string Prefix { get; set; } = "t$";
         public string Token { get; set; } = "";
         public string ShutdownReason { get; set; } = null;
+        public ulong InvitePermissions { get; set; } = 
         public Dictionary<string, float> Versions { get; set; }
             = new Dictionary<string, float>
             {

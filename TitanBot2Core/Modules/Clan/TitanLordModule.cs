@@ -131,7 +131,7 @@ namespace TitanBot2.Modules.Clan
                 if (activeTimer == null)
                     await ReplyAsync($"{Res.Str.ErrorText} There are no timers currently running");
                 else
-                    await ReplyAsync($"{Res.Str.ErrorText} There will be a TitanLord in {(activeTimer.To.Value - DateTime.Now).Beautify()}");
+                    await ReplyAsync($"{Res.Str.SuccessText} There will be a TitanLord in {(activeTimer.To.Value - DateTime.Now).Beautify()}");
             }
 
             [Command("In")]
