@@ -55,7 +55,7 @@ namespace TitanBot2.Modules.Admin
                 return validCommands;
             }
 
-            [Command("SetRole")]
+            [Command("SetRole", RunMode = RunMode.Async)]
             [Remarks("Sets the roles that are allowed to use the comma separated commands")]
             public async Task SetRoleAsync(string cmds, params SocketRole[] roles)
             {
@@ -75,7 +75,7 @@ namespace TitanBot2.Modules.Admin
                 await ReplyAsync($"{Res.Str.SuccessText} Roles set successfully!");
             }
 
-            [Command("SetPerm")]
+            [Command("SetPerm", RunMode = RunMode.Async)]
             [Remarks("Sets the permission required to use the comma separated commands")]
             public async Task SetPermAsync(string cmds, ulong permission)
             {
@@ -92,7 +92,7 @@ namespace TitanBot2.Modules.Admin
                 await ReplyAsync($"{Res.Str.SuccessText} Permissions set successfully!");
             }
 
-            [Command("ResetCommand")]
+            [Command("ResetCommand", RunMode = RunMode.Async)]
             [Remarks("Resets the role/permission requirements for the given command")]
             public async Task ResetCommandAsync(string cmds)
             {

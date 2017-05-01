@@ -17,7 +17,7 @@ namespace TitanBot2.Modules.Data
         [RequireCustomPermission(0)]
         public class Claim : TitanBotModule
         {
-            [Command]
+            [Command(RunMode = RunMode.Async)]
             public async Task ClaimAsync(string supportCode)
             {
                 var supportCodeOwned = await Context.Database.Users.Find(supportCode);

@@ -18,8 +18,7 @@ namespace TitanBot2.Modules.Data
         [RequireCustomPermission(0)]
         public class ClanStatsModule : TitanBotModule
         {
-            [Command]
-            [Remarks("")]
+            [Command(RunMode = RunMode.Async)]
             public async Task ClanStatsAsync(uint clanLevel, int averageMS = 3500, int tapsPerCq = 500, params int[] attackers)
             {
                 var absLevel = (int)clanLevel;

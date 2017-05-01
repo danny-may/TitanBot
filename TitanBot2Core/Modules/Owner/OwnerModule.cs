@@ -9,10 +9,5 @@ namespace TitanBot2.Modules.Owner
     [RequireOwner]
     public partial class OwnerModule : TitanBotModule
     {
-        [Command("Test", RunMode = RunMode.Async)]
-        public async Task TestAsync([OverrideTypeReader(typeof(BetterTimespanTypeReader))]TimeSpan time)
-        {
-            await ReplyAsync(time.ToString());
-        }
     }
 }

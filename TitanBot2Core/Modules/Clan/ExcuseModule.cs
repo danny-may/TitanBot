@@ -19,7 +19,7 @@ namespace TitanBot2.Modules.Clan
         [RequireCustomPermission(0)]
         public class ExcuseModule : TitanBotModule
         {
-            [Command]
+            [Command(RunMode = RunMode.Async)]
             [Remarks("Displays an excuse for you, or the user you specified.")]
             public async Task ExcuseMeAsync(IUser user = null)
             {
@@ -46,7 +46,7 @@ namespace TitanBot2.Modules.Clan
                 await ReplyAsync($"<@{user.Id}> didnt attack the boss because: ", embed: builder);
             }
 
-            [Command("Add")]
+            [Command("Add", RunMode = RunMode.Async)]
             [Remarks("Adds a new excuse for it to randomly choose from.")]
             public async Task AddExcuseAsync([Remainder]string text)
             {
@@ -63,7 +63,7 @@ namespace TitanBot2.Modules.Clan
                 await ReplyAsync($"{Res.Str.SuccessText} Added the excuse as #{excuseId}");
             }
 
-            [Command("Remove")]
+            [Command("Remove", RunMode = RunMode.Async)]
             [Remarks("Removes an excuse you created")]
             public async Task RemoveExcuseAsync(int id)
             {

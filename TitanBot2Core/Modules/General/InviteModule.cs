@@ -13,7 +13,7 @@ namespace TitanBot2Core.Modules.General
         [RequireCustomPermission(0)]
         public class InviteModule : TitanBotModule
         {
-            [Command]
+            [Command(RunMode = RunMode.Async)]
             public async Task InviteAsync()
             {
                 await ReplyAsync($"{Res.Str.InfoText} Want to invite me to your guild? Click this link!\n<https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions={Configuration.Instance.InvitePermissions}>");

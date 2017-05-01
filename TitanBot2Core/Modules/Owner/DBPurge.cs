@@ -14,7 +14,7 @@ namespace TitanBot2.Modules.Owner
         [Summary("Deletes all data from a given table")]
         public class DBPurge : TitanBotModule
         {
-            [Command]
+            [Command(RunMode = RunMode.Async)]
             public async Task PurgeAsync(string table)
             {
                 switch (table.ToLower())

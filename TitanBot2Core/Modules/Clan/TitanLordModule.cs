@@ -82,7 +82,7 @@ namespace TitanBot2.Modules.Clan
                 await ReplyAsync("", embed: builder.Build());
             }
 
-            [Command("Now")]
+            [Command("Now", RunMode = RunMode.Async)]
             [Remarks("Notifys everyone that the Titan Lord is ready to be killed right now, and starts hourly pings.")]
             public async Task TitanLordNowAsync()
             {
@@ -109,7 +109,7 @@ namespace TitanBot2.Modules.Clan
                 await ReplyAsync($"{Res.Str.SuccessText} Ill let everyone know now!");
             }
 
-            [Command("Stop")]
+            [Command("Stop", RunMode = RunMode.Async)]
             [Remarks("Stops any currently running timers")]
             public async Task StopAsync()
             {
@@ -117,12 +117,12 @@ namespace TitanBot2.Modules.Clan
                 await ReplyAsync($"{Res.Str.SuccessText} Stopped all existing timers");
             }
 
-            [Command("Dead")]
+            [Command("Dead", RunMode = RunMode.Async)]
             [Remarks("Sets a timer for 6 hours")]
             public async Task DeadAsync()
                 => await TitanLordInAsync(new TimeSpan(6, 0, 0));
 
-            [Command("When")]
+            [Command("When", RunMode = RunMode.Async)]
             [Remarks("States how long until the next titan Lord")]
             public async Task WhenAsync()
             {
@@ -134,7 +134,7 @@ namespace TitanBot2.Modules.Clan
                     await ReplyAsync($"{Res.Str.SuccessText} There will be a TitanLord in {(activeTimer.To.Value - DateTime.Now).Beautify()}");
             }
 
-            [Command("In")]
+            [Command("In", RunMode = RunMode.Async)]
             [Remarks("Sets a timer running for the given time for alerting when the boss is up.")]
             public async Task TitanLordInAsync([OverrideTypeReader(typeof(BetterTimespanTypeReader))]TimeSpan time)
             {
