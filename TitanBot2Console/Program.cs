@@ -35,7 +35,6 @@ namespace TitanBot2Console
             _bot.LoggedOut += async () =>
             {
                 await Log("Logged out");
-                await Console.In.ReadLineAsync();
                 Environment.Exit(0);
             };
 
