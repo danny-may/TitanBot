@@ -59,6 +59,7 @@ namespace TitanBot2.Modules.Admin
             [Remarks("Sets the roles that are allowed to use the comma separated commands")]
             public async Task SetRoleAsync(string cmds, params SocketRole[] roles)
             {
+
                 var validCommands = await GetCommands(cmds);
 
                 if (validCommands == null)

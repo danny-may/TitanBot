@@ -34,7 +34,7 @@ namespace TitanBot2
             {
                 MessageCacheSize = 1000,
                 AlwaysDownloadUsers = true,
-                LogLevel = LogSeverity.Debug,
+                LogLevel = LogSeverity.Info,
 
                 WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance
             });
@@ -47,6 +47,8 @@ namespace TitanBot2
             Logger = new Logger();
             Database = new TitanbotDatabase("database/TitanBot2.db");
             WebService = new CachedWebClient();
+            WebService.DefaultExceptionHandler += ex => Logger.Log(ex, "WebCache");
+            WebService.LogWebRequest += (uri, msg) => Logger.Log(new LogEntry(LogType.Service, $"{msg} - URI: {uri}", "WebCache"));
             TT2DataService = new TT2DataService(WebService);
             Dependencies = new TitanbotDependencies()
             {

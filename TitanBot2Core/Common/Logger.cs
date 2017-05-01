@@ -66,6 +66,7 @@ namespace TitanBot2.Common
         Exception,
         Client,
         Handler,
+        Service,
         Other
     }
 }

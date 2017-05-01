@@ -9,7 +9,7 @@ using TitanBot2.Extensions;
 namespace TitanBot2.Modules
 {
     public abstract class TitanBotModule : ModuleBase<TitanbotCmdContext>
-    {
+    { 
         protected override Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             return Context.Channel.SendMessageSafeAsync(message, ex => Context.Logger.Log(ex, "TitanBotModule"), isTTS, embed, options);

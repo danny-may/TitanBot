@@ -86,7 +86,11 @@ namespace TitanBot2.Handlers
             var argPos = await context.CheckCommand();
             if (argPos != null)
             {
+                await TitanBot.Logger.Log(new LogEntry(LogType.Handler, $"Enter ExecuteAsync | {context.Message.Content} | {context.User.Id} | {context.Channel.Id}", "Commands"));
+
                 var result = await _cmds.ExecuteAsync(context, argPos.Value);
+
+                await TitanBot.Logger.Log(new LogEntry(LogType.Handler, "Exit ExecuteAsync", "Commands"));
 
                 if (!result.IsSuccess)
                     switch (result.Error)

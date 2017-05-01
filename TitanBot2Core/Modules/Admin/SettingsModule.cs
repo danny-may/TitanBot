@@ -64,7 +64,7 @@ namespace TitanBot2.Modules.Admin
                 };
             }
 
-            [Command("list", RunMode = RunMode.Async)]
+            [Command("List")]
             [Remarks("Lists all the available settings and their values.")]
             public async Task ListSettingsAsync()
             {
@@ -90,7 +90,7 @@ namespace TitanBot2.Modules.Admin
                 await ReplyAsync("", embed: embed.Build());
             }
 
-            [Command("set", RunMode = RunMode.Async)]
+            [Command("Set")]
             [Remarks("Sets the given setting to the given value")]
             public async Task SetSettingAsync(string key, [Remainder]string value)
             {

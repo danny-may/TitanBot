@@ -13,7 +13,7 @@ namespace TitanBot2Console
     class Program
     {
         private TitanBot _bot;
-        private string logPath = "/logs/Log_" + DateTime.Now.ToString("yyyy.mm.dd_hh.mm.ss") + ".txt";
+        private string logPath = "logs/Log_" + DateTime.Now.ToString("yyyy.mm.dd_hh.mm.ss") + ".txt";
         private object _syncObj = new object();
 
         static void Main(string[] args)
@@ -68,7 +68,7 @@ namespace TitanBot2Console
                     if (!Directory.Exists(path))
                         Directory.CreateDirectory(path);
                 }
-                File.AppendAllText(file, text);
+                File.AppendAllText(file, text + "\n");
             }
         }
 

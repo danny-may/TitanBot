@@ -54,6 +54,7 @@ namespace TitanBot2.Handlers
 
         private async Task HandleJoinAsync(SocketGuild guild)
         {
+            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, $"Joined {guild.Name} ({guild.Id})", "Guild"));
             await Database.Guilds.EnsureExists(guild.Id);
         }
 

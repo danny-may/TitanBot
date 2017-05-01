@@ -12,7 +12,8 @@ namespace TitanBot2.Services
         private IDictionary<Uri, CacheObject> _cache
             = new ConcurrentDictionary<Uri, CacheObject>();
         public int DefaultFreshness { get; set; } = 3600;
-        public Func<Exception, Task> DefaultExceptionHandler;
+        public event Func<Exception, Task> DefaultExceptionHandler;
+        public event Func<Uri, string, Task> LogWebRequest;
 
         public CachedWebClient()
         {
@@ -27,7 +28,10 @@ namespace TitanBot2.Services
         public async Task<string> GetString(Uri url, int freshness)
         {
             if (!_cache.ContainsKey(url))
+            {
                 _cache.Add(url, new CacheObject(url));
+                _cache[url].LogWebRequest += Log;
+            }
 
             return Encoding.Default.GetString(await _cache[url].Get(freshness));
         }
@@ -41,9 +45,17 @@ namespace TitanBot2.Services
         public Task<byte[]> GetBytes(Uri url, int freshness)
         {
             if (!_cache.ContainsKey(url))
+            {
                 _cache.Add(url, new CacheObject(url));
+                _cache[url].LogWebRequest += Log;
+            }
 
             return _cache[url].Get(freshness);
+        }
+
+        private async Task Log(Uri url, string message)
+        {
+            await (LogWebRequest?.Invoke(url, message) ?? Task.CompletedTask);
         }
 
         internal class CacheObject
@@ -52,6 +64,7 @@ namespace TitanBot2.Services
             private DateTime _lastUpdate { get; set; } = DateTime.MinValue;
             private byte[] _data { get; set; }
             private Task _webQueryTask { get; set; }
+            public event Func<Uri, string, Task> LogWebRequest;
 
             public CacheObject(string url) : this(new Uri(url)) { }
             public CacheObject(Uri url)
@@ -59,10 +72,16 @@ namespace TitanBot2.Services
                 _location = url;
             }
 
+            private void Log(string message)
+            {
+                LogWebRequest?.Invoke(_location, message);
+            }
+
             public async Task<byte[]> Get(int freshness)
             {
                 if (_lastUpdate.AddSeconds(freshness) < DateTime.Now)
                 {
+                    Log("Updating WebCache");
                     bool queryOwner = false;
                     if (_webQueryTask == null)
                     {
@@ -72,12 +91,15 @@ namespace TitanBot2.Services
                             using (var wc = new WebClient())
                             {
                                 _data = wc.DownloadData(_location);
+                                Log("Download Complete");
                             }
                             _lastUpdate = DateTime.Now;
 
                         });
                         _webQueryTask.Start();
                     }
+
+                    Log("Waiting for download");
 
                     await _webQueryTask;
                     if (queryOwner)

@@ -58,7 +58,11 @@ namespace TitanBot2.Services.Scheduler
             }
             processed = processed.Where(t => t.To.HasValue && t.To.Value < loopTime).ToList();
             if (processed.Count() > 0)
+            {
                 await _database.Timers.Complete(processed.ToArray());
+                var totalTimers = await _database.Timers.Get(loopTime);
+                await _dependencies.Logger.Log(new LogEntry(LogType.Service, $"{processed.Count} timers completed. Total Pool: {totalTimers.Count()}", "Scheduler"));
+            }
         }
 
         public void AddCallback(EventCallback type, Func<TimerContext, Task> callback)
