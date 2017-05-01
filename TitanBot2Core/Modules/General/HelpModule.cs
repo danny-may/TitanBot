@@ -96,7 +96,7 @@ namespace TitanBot2.Modules.General
                 if (string.IsNullOrWhiteSpace(categories))
                     categories = "No categories!";
 
-                var usage = string.Join("\n", cmds.Select(c => $"```{Context.Prefix}{c.Aliases.First()} {string.Join(" ", c.Parameters.Select(p => p.ToHelpString()))}```" + (c.Remarks == null ? "" : $" - {c.Remarks}")));
+                var usage = string.Join("\n", cmds.Where(c => c.Remarks != "FALSE").Select(c => $"```{Context.Prefix}{c.Aliases.First()} {string.Join(" ", c.Parameters.Select(p => p.ToHelpString()))}```" + (c.Remarks == null ? "" : $" - {c.Remarks}")));
                 if (string.IsNullOrWhiteSpace(usage))
                     usage = "No usage available!";
 

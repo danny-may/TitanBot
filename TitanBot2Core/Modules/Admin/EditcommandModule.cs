@@ -55,6 +55,13 @@ namespace TitanBot2.Modules.Admin
                 return validCommands;
             }
 
+            [Command(RunMode = RunMode.Async)]
+            [Remarks("FALSE")]
+            public async Task DefaultCommand()
+            {
+                await ReplyAsync($"{Res.Str.ErrorText} You havent supplied enough arguments. Please use `{Context.Prefix}help <command>` for usage info");
+            }
+
             [Command("SetRole", RunMode = RunMode.Async)]
             [Remarks("Sets the roles that are allowed to use the comma separated commands")]
             public async Task SetRoleAsync(string cmds, params SocketRole[] roles)

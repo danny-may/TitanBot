@@ -82,6 +82,13 @@ namespace TitanBot2.Modules.Clan
                 await ReplyAsync("", embed: builder.Build());
             }
 
+            [Command(RunMode = RunMode.Async)]
+            [Remarks("FALSE")]
+            public async Task DefaultCommand()
+            {
+                await ReplyAsync($"{Res.Str.ErrorText} You havent supplied enough arguments. Please use `{Context.Prefix}help <command>` for usage info");
+            }
+
             [Command("Now", RunMode = RunMode.Async)]
             [Remarks("Notifys everyone that the Titan Lord is ready to be killed right now, and starts hourly pings.")]
             public async Task TitanLordNowAsync()
@@ -188,6 +195,9 @@ namespace TitanBot2.Modules.Clan
                     tlChannel = Context.Guild.GetTextChannel(guildData.TitanLord.Channel.Value) ?? tlChannel;
 
                 var message = await tlChannel.SendMessageSafeAsync("Loading Timer...");
+
+                if ((Context.User as IGuildUser).GuildPermissions.Has(GuildPermission.ManageMessages))
+                    await message.PinAsync();
 
                 var custArgs = new JObject();
 

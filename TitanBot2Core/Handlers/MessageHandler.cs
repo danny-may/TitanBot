@@ -96,7 +96,7 @@ namespace TitanBot2.Handlers
                     switch (result.Error)
                     {
                         case CommandError.BadArgCount:
-                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} You havent supplied enough arguments!", ex => TitanBot.Logger.Log(ex, "CheckAndRunCommands"));
+                            await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} You havent supplied enough arguments! Please use `{msg.Content.Substring(0, argPos.Value)}help <command>` for usage info", ex => TitanBot.Logger.Log(ex, "CheckAndRunCommands"));
                             break;
                         case CommandError.ParseFailed:
                             await msg.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} One or more of those arguments were not recognised", ex => TitanBot.Logger.Log(ex, "CheckAndRunCommands"));

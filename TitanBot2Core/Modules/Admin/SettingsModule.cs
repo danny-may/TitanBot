@@ -64,6 +64,13 @@ namespace TitanBot2.Modules.Admin
                 };
             }
 
+            [Command(RunMode = RunMode.Async)]
+            [Remarks("FALSE")]
+            public async Task DefaultCommand()
+            {
+                await ReplyAsync($"{Res.Str.ErrorText} You havent supplied enough arguments. Please use `{Context.Prefix}help <command>` for usage info");
+            }
+
             [Command("List")]
             [Remarks("Lists all the available settings and their values.")]
             public async Task ListSettingsAsync()
