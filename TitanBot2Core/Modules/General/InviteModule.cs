@@ -6,7 +6,7 @@ using TitanBot2.Preconditions;
 
 namespace TitanBot2Core.Modules.General
 {
-    public partial class General
+    public partial class GeneralModule
     {
         [Group("Invite")]
         [Summary("Gets an invite link to get Titanbot to join your guild too.")]
