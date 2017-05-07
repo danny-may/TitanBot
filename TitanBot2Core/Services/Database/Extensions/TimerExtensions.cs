@@ -16,6 +16,9 @@ namespace TitanBot2.Services.Database.Extensions
         public async Task Add(IEnumerable<Timer> timers)
             => await Database.QueryAsync(conn => conn.TimerTable.Insert(timers));
 
+        public Task<IEnumerable<Timer>> GetActive()
+            => Database.QueryAsync(conn => conn.TimerTable.Find(t => t.Active && t.From < DateTime.Now));
+
         public Task<IEnumerable<Timer>> Get(ulong guildid, bool includeInactive = false)
         {
             if (includeInactive)

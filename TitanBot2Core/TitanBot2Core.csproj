@@ -216,11 +216,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Data\Artifact.cs" />
+    <Compile Include="Commands\Data\Claim.cs" />
+    <Compile Include="Commands\General\Help.cs" />
+    <Compile Include="Commands\General\Info.cs" />
+    <Compile Include="Commands\General\Invite.cs" />
+    <Compile Include="Commands\General\Ping.cs" />
+    <Compile Include="Commands\General\Prefix.cs" />
+    <Compile Include="Common\PerformanceMonitor.cs" />
+    <Compile Include="Extensions\IUserMessageExtensions.cs" />
+    <Compile Include="Services\CommandService\Command.cs" />
     <Compile Include="Common\Calculator.cs" />
     <Compile Include="Common\Configuration.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="Common\Res.cs" />
-    <Compile Include="Common\TitanbotCmdContext.cs" />
+    <Compile Include="Services\CommandService\TitanbotCmdContext.cs" />
     <Compile Include="Common\TitanbotDependencies.cs" />
     <Compile Include="Extensions\BeautifyExtensions.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
@@ -234,11 +244,11 @@
     <Compile Include="Extensions\ModuleInfoExtensions.cs" />
     <Compile Include="Extensions\SocketGuildExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Handlers\ChannelHandler.cs" />
-    <Compile Include="Handlers\GuildHandler.cs" />
-    <Compile Include="Handlers\HandlerBase.cs" />
-    <Compile Include="Handlers\MessageHandler.cs" />
-    <Compile Include="Handlers\UserHandler.cs" />
+    <Compile Include="DiscordHandlers\ChannelHandler.cs" />
+    <Compile Include="DiscordHandlers\GuildHandler.cs" />
+    <Compile Include="DiscordHandlers\HandlerBase.cs" />
+    <Compile Include="DiscordHandlers\MessageHandler.cs" />
+    <Compile Include="DiscordHandlers\UserHandler.cs" />
     <Compile Include="Models\Artifact.cs" />
     <Compile Include="Models\Enums\BonusType.cs" />
     <Compile Include="Models\Enums\EquipmentClass.cs" />
@@ -269,6 +279,9 @@
     <Compile Include="Preconditions\RequireCustomPermissionAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CachedWebClient.cs" />
+    <Compile Include="Services\CommandService\CommandCheckResponse.cs" />
+    <Compile Include="Services\CommandService\CommandInfo.cs" />
+    <Compile Include="Services\CommandService\TitanBotCommandService.cs" />
     <Compile Include="Services\Database\DbConnection.cs" />
     <Compile Include="Services\Database\Extensions\CmdPermExtensions.cs" />
     <Compile Include="Services\Database\Extensions\DatabaseExtension.cs" />
@@ -282,13 +295,19 @@
     <Compile Include="Services\Database\Models\Timer.cs" />
     <Compile Include="Services\Database\Models\User.cs" />
     <Compile Include="Services\Database\TitanbotDatabase.cs" />
-    <Compile Include="Services\Scheduler\Callbacks.cs" />
+    <Compile Include="Services\Scheduler\Callback.cs" />
     <Compile Include="Services\Scheduler\TimerContext.cs" />
     <Compile Include="Services\Scheduler\TimerService.cs" />
     <Compile Include="Services\ThreadedService.cs" />
     <Compile Include="Services\TT2DataService.cs" />
+    <Compile Include="TimerCallbacks\TitanLordCallbacks.cs" />
     <Compile Include="TitanBot.cs" />
+    <Compile Include="TypeReaders\ArtifactTypeReader.cs" />
     <Compile Include="TypeReaders\BetterTimespanTypeReader.cs" />
+    <Compile Include="TypeReaders\IntTypeReader.cs" />
+    <Compile Include="TypeReaders\TypeReader.cs" />
+    <Compile Include="TypeReaders\TypeReaderCollection.cs" />
+    <Compile Include="TypeReaders\TypeReaderResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -298,6 +317,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

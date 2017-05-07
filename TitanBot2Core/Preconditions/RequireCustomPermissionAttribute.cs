@@ -3,8 +3,8 @@ using Discord.Commands;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot2.Common;
 using TitanBot2.Extensions;
+using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.Preconditions
 {
@@ -20,7 +20,7 @@ namespace TitanBot2.Preconditions
 
         public RequireCustomPermissionAttribute() : this(0) { }
 
-        public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
+        public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, Discord.Commands.CommandInfo command, IDependencyMap map)
         {
             var owner = (context as TitanbotCmdContext)?.TitanBot?.Owner ?? (await context.Client.GetApplicationInfoAsync()).Owner;
 

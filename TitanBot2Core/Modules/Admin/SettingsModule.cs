@@ -43,20 +43,20 @@ namespace TitanBot2.Modules.Admin
                         Get = g => string.Join(", ", g.TitanLord.PrePings.Select(p => new TimeSpan(0, 0, p).Beautify())),
                         Set = (g, s) =>
                         {
-                            var reader = new BetterTimespanTypeReader();
-                            var ints = s.Split(' ', true)
-                                        .Select(t => reader.Read(Context, t).GetAwaiter().GetResult()) 
-                                        .Where(r => r.IsSuccess)
-                                        .SelectMany(r => r.Values)
-                                        .Select(t => t.Value as TimeSpan?)
-                                        .Where(t => t != null)
-                                        .Cast<TimeSpan>()
-                                        .Select(t => (int)t.TotalSeconds);
-
-                            if (ints.Count() == 0)
-                                return "Invalid times specified.";
-
-                            g.TitanLord.PrePings = ints.ToArray();
+                            //var reader = new BetterTimespanTypeReader();
+                            //var ints = s.Split(' ', true)
+                            //            .Select(t => reader.Read(Context, t).GetAwaiter().GetResult()) 
+                            //            .Where(r => r.IsSuccess)
+                            //            .SelectMany(r => r.Values)
+                            //            .Select(t => t.Value as TimeSpan?)
+                            //            .Where(t => t != null)
+                            //            .Cast<TimeSpan>()
+                            //            .Select(t => (int)t.TotalSeconds);
+                            //
+                            //if (ints.Count() == 0)
+                            //    return "Invalid times specified.";
+                            //
+                            //g.TitanLord.PrePings = ints.ToArray();
 
                             return null;
                         }

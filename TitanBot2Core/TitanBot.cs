@@ -3,12 +3,13 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using TitanBot2.Common;
-using TitanBot2.Handlers;
+using TitanBot2.DiscordHandlers;
 using TitanBot2.Extensions;
 using System.Collections.Generic;
 using TitanBot2.Services.Database;
 using TitanBot2.Services.Scheduler;
 using TitanBot2.Services;
+using System.Reflection;
 
 namespace TitanBot2
 {
@@ -48,7 +49,7 @@ namespace TitanBot2
             Database = new TitanbotDatabase("database/TitanBot2.db");
             WebService = new CachedWebClient();
             WebService.DefaultExceptionHandler += ex => Logger.Log(ex, "WebCache");
-            WebService.LogWebRequest += (uri, msg) => Logger.Log(new LogEntry(LogType.Service, $"{msg} - URI: {uri}", "WebCache"));
+            WebService.LogWebRequest += (uri, msg) => Logger.Log(new LogEntry(LogType.Service, LogSeverity.Info, $"{msg} - URI: {uri}", "WebCache"));
             TT2DataService = new TT2DataService(WebService);
             Dependencies = new TitanbotDependencies()
             {
@@ -61,6 +62,7 @@ namespace TitanBot2
             };
             
             TimerService = new TimerService(Dependencies);
+            TimerService.Install(Assembly.GetExecutingAssembly()).GetAwaiter().GetResult();
             Dependencies.TimerService = TimerService;
 
             Client.Log += l => Logger.Log(l);

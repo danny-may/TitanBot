@@ -66,13 +66,13 @@ namespace TitanBot2.Services.Database
             if (query == null)
                 return result;
 
-            var task = new Task(async db =>
+            var task = new Task(async () =>
             {
-                using (var t = (db as DbConnection).BeginTrans())
+                using (var t = _db.BeginTrans())
                 {
                     try
                     {
-                        result = query(db as DbConnection);
+                        result = query(_db);
                         t.Commit();
                     }
                     catch (Exception ex)
@@ -81,7 +81,7 @@ namespace TitanBot2.Services.Database
                         await (handler?.Invoke(ex) ?? Task.CompletedTask);
                     }
                 }
-            }, _db);
+            });
 
             _queryQueue.Enqueue(task);
 

@@ -1,7 +1,6 @@
-﻿using Discord.Commands;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TitanBot2.Common;
-using TitanBot2.Services.Database;
+using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.Extensions
 {
@@ -31,7 +30,13 @@ namespace TitanBot2.Extensions
                         context.Client.CurrentUser.Mention
                     };
             }
-            return new string[] { };
+            return new string[]
+            {
+                Configuration.Instance.Prefix,
+                context.Client.CurrentUser.Username,
+                context.Client.CurrentUser.Mention,
+                ""
+            };
         }
     }
 }

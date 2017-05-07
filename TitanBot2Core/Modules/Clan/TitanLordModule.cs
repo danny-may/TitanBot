@@ -13,6 +13,7 @@ using TitanBot2.Services.Database.Models;
 using TitanBot2.TypeReaders;
 using Newtonsoft.Json.Linq;
 using TitanBot2.Common;
+using TitanBot2.TimerCallbacks;
 
 namespace TitanBot2.Modules.Clan
 {
@@ -32,8 +33,8 @@ namespace TitanBot2.Modules.Clan
 
                 foreach (var timer in existingTimers)
                 {
-                    var tickMessageId = (ulong?)timer.CustArgs[Callbacks.timerMessageId];
-                    var tickMessageChannelId = (ulong?)timer.CustArgs[Callbacks.timerMessageChannelId];
+                    var tickMessageId = (ulong?)timer.CustArgs[TitanLordCallbacks.timerMessageId];
+                    var tickMessageChannelId = (ulong?)timer.CustArgs[TitanLordCallbacks.timerMessageChannelId];
 
                     if (tickMessageId == null || tickMessageChannelId == null)
                         continue;
@@ -109,7 +110,7 @@ namespace TitanBot2.Modules.Clan
                     To = time.AddDays(1)
                 };
 
-                await Callbacks.TitanLordNow(new TimerContext(Context.Dependencies, timer, DateTime.Now));
+                //await TitanLordCallbacks.TitanLordNow(new TimerContext(Context.Dependencies, timer, DateTime.Now));
 
                 await Context.Database.Timers.Add(timer);
 
@@ -143,7 +144,7 @@ namespace TitanBot2.Modules.Clan
 
             [Command("In", RunMode = RunMode.Async)]
             [Remarks("Sets a timer running for the given time for alerting when the boss is up.")]
-            public async Task TitanLordInAsync([OverrideTypeReader(typeof(BetterTimespanTypeReader))]TimeSpan time)
+            public async Task TitanLordInAsync(TimeSpan time)
             {
                 var roundsRunning = (await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordRound)).Count();
                 var timersRunning = (await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordNow)).Count();
@@ -201,8 +202,8 @@ namespace TitanBot2.Modules.Clan
 
                 var custArgs = new JObject();
 
-                custArgs.Add(Callbacks.timerMessageId, message.Id);
-                custArgs.Add(Callbacks.timerMessageChannelId, tlChannel.Id);
+                custArgs.Add(TitanLordCallbacks.timerMessageId, message.Id);
+                custArgs.Add(TitanLordCallbacks.timerMessageChannelId, tlChannel.Id);
 
                 tickTimer.CustArgs = custArgs;
                 nowTimer.CustArgs = custArgs;

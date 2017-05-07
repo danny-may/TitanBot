@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Common;
@@ -18,6 +20,8 @@ namespace TitanBot2.Services.Scheduler
         private IDictionary<EventCallback, ConcurrentBag<Func<TimerContext, Task>>> _callbacks { get; }
             = new ConcurrentDictionary<EventCallback, ConcurrentBag<Func<TimerContext, Task>>>();
 
+        private object _lock = new object();
+
         public TimerService(TitanbotDependencies dependencies)
         {
             _database = dependencies.Database;
@@ -25,11 +29,34 @@ namespace TitanBot2.Services.Scheduler
             CycleDelay = 1000;
         }
 
+        public Task Install(Assembly assembly)
+        {
+            return Task.Run(() =>
+            {
+                lock (_lock)
+                {
+                    var callbackQuery = assembly.GetTypes()
+                                            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(Callback)));
+
+                    var grouped = callbackQuery.Select(h => Activator.CreateInstance(h) as Callback).GroupBy(c => c.Handles);
+
+                    foreach (var group in grouped)
+                    {
+                        if (!_callbacks.ContainsKey(group.Key))
+                            _callbacks.Add(group.Key, new ConcurrentBag<Func<TimerContext, Task>>());
+
+                        foreach (var callback in group)
+                        {
+                            _callbacks[group.Key].Add(callback.Execute);
+                        }
+                    }
+                }
+            });
+        }
+
         public override void Initialise()
         {
             base.Initialise();
-
-            RegisterCallbacks();
         }
 
         protected override async Task Main(DateTime loopTime)
@@ -61,7 +88,7 @@ namespace TitanBot2.Services.Scheduler
             {
                 await _database.Timers.Complete(processed.ToArray());
                 var totalTimers = await _database.Timers.Get(loopTime);
-                await _dependencies.Logger.Log(new LogEntry(LogType.Service, $"{processed.Count} timers completed. Total Pool: {totalTimers.Count()}", "Scheduler"));
+                await _dependencies.Logger.Log(new LogEntry(LogType.Service, LogSeverity.Info, $"{processed.Count} timers completed. Total Pool: {totalTimers.Count()}", "Scheduler"));
             }
         }
 
@@ -70,13 +97,6 @@ namespace TitanBot2.Services.Scheduler
             if (!_callbacks.ContainsKey(type))
                 _callbacks.Add(type, new ConcurrentBag<Func<TimerContext, Task>>());
             _callbacks[type].Add(callback);
-        }
-
-        public void RegisterCallbacks()
-        {
-            AddCallback(EventCallback.TitanLordNow, Callbacks.TitanLordNow);
-            AddCallback(EventCallback.TitanLordRound, Callbacks.TitanLordNextRound);
-            AddCallback(EventCallback.TitanLordTick, Callbacks.TitanLordTick);
         }
 
         public async Task AddTimers(IEnumerable<Timer> timers)

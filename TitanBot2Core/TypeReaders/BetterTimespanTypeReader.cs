@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TitanBot2.TypeReaders
 {
-    public class BetterTimespanTypeReader : TypeReader
+    public class BetterTimespanTypeReader : Discord.Commands.TypeReader
     {   
         public override Task<TypeReaderResult> Read(ICommandContext context, string input)
         {

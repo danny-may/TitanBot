@@ -75,9 +75,9 @@ namespace TitanBot2.Modules.Admin
                 foreach (var command in validCommands)
                 {
                     if (roles.Length == 0)
-                        await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, null);
+                        await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, null, null);
                     else
-                        await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, roles.Select(r => r.Id).ToArray(), null);
+                        await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, roles.Select(r => r.Id).ToArray(), null);
                 }
 
                 await ReplyAsync($"{Res.Str.SuccessText} Roles set successfully!");
@@ -94,7 +94,7 @@ namespace TitanBot2.Modules.Admin
 
                 foreach (var command in validCommands)
                 {
-                    await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, permission);
+                    await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, null, permission);
                 }
 
                 await ReplyAsync($"{Res.Str.SuccessText} Permissions set successfully!");
@@ -111,7 +111,7 @@ namespace TitanBot2.Modules.Admin
 
                 foreach (var command in validCommands)
                 {
-                    await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, null);
+                    await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, null, null);
                 }
 
                 await ReplyAsync($"{Res.Str.SuccessText} Permissions reset successfully!");

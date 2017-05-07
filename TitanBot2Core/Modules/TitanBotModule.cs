@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using TitanBot2.Common;
 using TitanBot2.Extensions;
+using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.Modules
 {

@@ -81,7 +81,7 @@ namespace TitanBot2.Models
 
         public static int? FindArtifact(string name)
         {
-            return ArtifactNames.Where(v => v.Key.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower())
+            return ArtifactNames.Where(v => v.Key.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower() || v.Value.ToString() == name)
                                 .Select(v => v.Value)
                                 .Cast<int?>()
                                 .FirstOrDefault();

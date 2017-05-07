@@ -9,6 +9,7 @@ namespace TitanBot2.Services.Database.Models
         public ulong guildId { get; set; }
         public string commandname { get; set; }
         public ulong[] roleIds { get; set; }
+        public ulong[] blackListed { get; set; }
         public ulong? permissionId { get; set; }
     }
 }

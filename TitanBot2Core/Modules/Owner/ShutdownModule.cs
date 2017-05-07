@@ -13,7 +13,7 @@ namespace TitanBot2.Modules.Owner
         {
             [Command(RunMode = RunMode.Async)]
             [Remarks("Shuts the bot down after the given time and with the given reason")]
-            public Task ShutdownAsync([OverrideTypeReader(typeof(BetterTimespanTypeReader))]TimeSpan time = new TimeSpan(), [Remainder]string reason = null)
+            public Task ShutdownAsync(TimeSpan time = new TimeSpan(), [Remainder]string reason = null)
                 => Context.TitanBot.StopAsync(time, reason);
         }
     }
