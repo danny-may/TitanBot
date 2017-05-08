@@ -13,6 +13,7 @@ namespace TitanBot2.Extensions
             var current = new StringBuilder();
             var isEscaped = false;
             var isQuoted = false;
+            var isArray = false;
             foreach (var c in message.Content.Substring(argPos))
             {
                 if (isEscaped)
@@ -24,14 +25,18 @@ namespace TitanBot2.Extensions
                 {
                     switch (c)
                     {
-                        case '"':
-                            isQuoted = !isQuoted;
-                            break;
                         case '\\':
                             isEscaped = true;
                             break;
+                        case ',':
+                            isArray = true;
+                            current.Append(c);
+                            break;
+                        case '"':
+                            isQuoted = !isQuoted;
+                            break;
                         case ' ':
-                            if (isQuoted)
+                            if (isQuoted || isArray)
                                 current.Append(c);
                             else
                             {
@@ -41,6 +46,7 @@ namespace TitanBot2.Extensions
                             break;
                         default:
                             current.Append(c);
+                            isArray = false;
                             break;
                     }
                 }

@@ -216,20 +216,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\Data\Artifact.cs" />
-    <Compile Include="Commands\Data\Claim.cs" />
-    <Compile Include="Commands\General\Help.cs" />
-    <Compile Include="Commands\General\Info.cs" />
-    <Compile Include="Commands\General\Invite.cs" />
-    <Compile Include="Commands\General\Ping.cs" />
-    <Compile Include="Commands\General\Prefix.cs" />
+    <Compile Include="Commands\Admin\EditCommand.cs" />
+    <Compile Include="Commands\Clan\ExcuseCommand.cs" />
+    <Compile Include="Commands\Clan\TitanLordCommand.cs" />
+    <Compile Include="Commands\Data\ArtifactsCommand.cs" />
+    <Compile Include="Commands\Data\ClaimCommand.cs" />
+    <Compile Include="Commands\Data\ClanStatsCommand.cs" />
+    <Compile Include="Commands\General\HelpCommand.cs" />
+    <Compile Include="Commands\General\InfoCommand.cs" />
+    <Compile Include="Commands\General\InviteCommand.cs" />
+    <Compile Include="Commands\General\PingCommand.cs" />
+    <Compile Include="Commands\General\PrefixCommand.cs" />
     <Compile Include="Common\PerformanceMonitor.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IUserMessageExtensions.cs" />
+    <Compile Include="Services\CommandService\CallCollection.cs" />
     <Compile Include="Services\CommandService\Command.cs" />
     <Compile Include="Common\Calculator.cs" />
     <Compile Include="Common\Configuration.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="Common\Res.cs" />
+    <Compile Include="Services\CommandService\CommandCall.cs" />
     <Compile Include="Services\CommandService\TitanbotCmdContext.cs" />
     <Compile Include="Common\TitanbotDependencies.cs" />
     <Compile Include="Extensions\BeautifyExtensions.cs" />
@@ -302,12 +309,18 @@
     <Compile Include="Services\TT2DataService.cs" />
     <Compile Include="TimerCallbacks\TitanLordCallbacks.cs" />
     <Compile Include="TitanBot.cs" />
-    <Compile Include="TypeReaders\ArtifactTypeReader.cs" />
-    <Compile Include="TypeReaders\BetterTimespanTypeReader.cs" />
-    <Compile Include="TypeReaders\IntTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\ArtifactTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\TimeSpanTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\ChannelTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\EnumTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\MessageTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\PrimitiveReader.cs" />
+    <Compile Include="TypeReaders\Readers\RoleTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\UserTypeReader.cs" />
     <Compile Include="TypeReaders\TypeReader.cs" />
     <Compile Include="TypeReaders\TypeReaderCollection.cs" />
-    <Compile Include="TypeReaders\TypeReaderResponse.cs" />
+    <Compile Include="TypeReaders\TypeReaderResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

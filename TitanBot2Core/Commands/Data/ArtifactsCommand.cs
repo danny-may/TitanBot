@@ -13,42 +13,21 @@ using TitanBot2.Models.Enums;
 
 namespace TitanBot2.Commands.Data
 {
-    public class Artifacts : Command
+    public class ArtifactsCommand : Command
     {
-        public Artifacts(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ArtifactsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
+            Calls.AddNew(a => ShowArtifactAsync((Artifact)a[0]))
+                 .WithArgTypes(typeof(Artifact));
+            Calls.AddNew(a => ShowArtifactAsync((Artifact)a[0], 1, (int)a[1]))
+                 .WithArgTypes(typeof(Artifact), typeof(int));
+            Calls.AddNew(a => ShowArtifactAsync((Artifact)a[0], (int)a[1], (int)a[2]))
+                 .WithArgTypes(typeof(Artifact), typeof(int), typeof(int));
+            Alias.Add("Arts");
+            Alias.Add("Artifact");
         }
 
-        protected override async Task RunAsync()
-        {
-            var artifact = await ReadAndReplyError<Artifact>(0);
-            if (!artifact.IsSuccess)
-                return;
-
-            if (Context.Arguments.Length == 1)
-            {
-                await ShowArtifact(artifact.Value);
-                return;
-            }
-
-            var arg2 = await ReadAndReplyError<int>(1);
-            if (!arg2.IsSuccess)
-                return;
-
-            if (Context.Arguments.Length == 2)
-            {
-                await ShowArtifact(artifact.Value, 1, arg2.Value);
-                return;
-            }
-
-            var arg3 = await ReadAndReplyError<int>(2);
-            if (!arg3.IsSuccess)
-                return;
-
-            await ShowArtifact(artifact.Value, arg2.Value, arg3.Value);
-        }
-
-        private async Task ShowArtifact(Artifact artifact)
+        private async Task ShowArtifactAsync(Artifact artifact)
         {
             var builder = new EmbedBuilder
             {
@@ -81,8 +60,11 @@ namespace TitanBot2.Commands.Data
             await ReplyAsync("", embed: builder.Build());
         }
 
-        private async Task ShowArtifact(Artifact artifact, int startLevel, int endLevel)
+        private async Task ShowArtifactAsync(Artifact artifact, int from, int to)
         {
+            var startLevel = Math.Min(from, to);
+            var endLevel = Math.Max(from, to);
+
             var builder = new EmbedBuilder
             {
                 Author = new EmbedAuthorBuilder
@@ -114,22 +96,6 @@ namespace TitanBot2.Commands.Data
             builder.AddInlineField($"Cost of lv {endLevel}", ((int)artifact.CostOfLevel(endLevel)).Beautify() + " relics");
 
             await ReplyAsync("", embed: builder.Build());
-        }
-
-        protected override async Task<CommandCheckResponse> CheckArguments()
-        {
-            if (Context.Arguments.Length == 0)
-                return CommandCheckResponse.FromError("Not enough arguments");
-            if (Context.Arguments.Length > 3)
-                return CommandCheckResponse.FromError("Too many arguments");
-            if (Artifact.FindArtifact(Context.Arguments[0]) == null)
-                return CommandCheckResponse.FromError($"Unknown artifact `{Context.Arguments[0]}`");
-            if (Context.Arguments.Length > 1 && !(await Readers.Read<int>(Context, Context.Arguments[1])).IsSuccess)
-                return CommandCheckResponse.FromError($"`{Context.Arguments[1]}` is not an integer");
-            if (Context.Arguments.Length > 2 && !(await Readers.Read<int>(Context, Context.Arguments[2])).IsSuccess)
-                return CommandCheckResponse.FromError($"`{Context.Arguments[2]}` is not an integer");
-
-            return CommandCheckResponse.FromSuccess();
         }
     }
 }

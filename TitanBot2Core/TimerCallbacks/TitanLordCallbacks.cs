@@ -15,12 +15,10 @@ namespace TitanBot2.TimerCallbacks
         public const string timerMessageId = "timerMessageId";
         public const string timerMessageChannelId = "timerMessageChannelId";
 
-        public class TitanLordTick : Callback
+        public class TitanLordNow : Callback
         {
-            public TitanLordTick()
-            {
-                Handles = EventCallback.TitanLordTick;
-            }
+            public override EventCallback Handles => EventCallback.TitanLordNow;
+
             public override async Task Execute(TimerContext context)
             {
                 if (context.Guild == null)
@@ -44,12 +42,10 @@ namespace TitanBot2.TimerCallbacks
             }
         }
 
-        public class TitanLordNow : Callback
+        public class TitanLordTick : Callback
         {
-            public TitanLordNow()
-            {
-                Handles = EventCallback.TitanLordNow;
-            }
+            public override EventCallback Handles => EventCallback.TitanLordTick;
+
             public override async Task Execute(TimerContext context)
             {
                 if (context.Guild == null)
@@ -89,10 +85,8 @@ namespace TitanBot2.TimerCallbacks
 
         public class TitanLordRound : Callback
         {
-            public TitanLordRound()
-            {
-                Handles = EventCallback.TitanLordRound;
-            }
+            public override EventCallback Handles => EventCallback.TitanLordRound;
+
             public override async Task Execute(TimerContext context)
             {
                 if (context.Guild == null)

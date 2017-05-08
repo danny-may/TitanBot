@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
+using DC = Discord.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +15,13 @@ namespace TitanBot2.Services.CommandService
     {
         public string Group { get; protected set; }
         public string Name { get; protected set; }
-        public string[] Alias { get; protected set; } = new string[0];
+        public List<string> Alias { get; protected set; } = new List<string>();
         public string Description { get; protected set; }
-        public string[] Usage { get; protected set; } = new string[0];
+        public List<string> Usage { get; protected set; } = new List<string>();
         public bool RequireOwner { get; protected set; } = false;
-        public ContextType RequiredContexts { get; protected set; } = ContextType.DM | ContextType.Group | ContextType.Guild;
+        public DC.ContextType RequiredContexts { get; protected set; } = DC.ContextType.DM | DC.ContextType.Group | DC.ContextType.Guild;
         public ulong DefaultPermission { get; protected set; } = 0;
-        public Dictionary<string, Func<Task>> SubCommands { get; protected set; } = new Dictionary<string, Func<Task>>();
+        public CallCollection Calls = new CallCollection();
         protected TypeReaderCollection Readers { get; set; }
 
         protected CommandCheckResponse CheckResult { get; private set; }
@@ -32,25 +32,36 @@ namespace TitanBot2.Services.CommandService
         {
             Context = context;
             Readers = readers;
+
+            Group = GetType().Namespace.Split('.').Last();
+            Name = GetType().Name;
+            if (Name.EndsWith("Command"))
+                Name = Name.Substring(0, Name.Length - "Command".Length);
         }
 
-        public async Task ExecuteAsync(TypeReaderCollection readers)
+        public async Task ExecuteAsync()
         {
             var start = DateTime.Now;
             await Context.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Debug, $"Enter Command | mId: {Context.Message.Id} | uId: {Context.User.Id} | cId: {Context.Channel.Id}", "Commands"));
 
             try
             {
-                if (Context.Arguments.Length > 0)
-                {
-                    var subCommand = SubCommands.FirstOrDefault(c => Regex.IsMatch(Context.Arguments.First(), c.Key, RegexOptions.IgnoreCase));
-                    if (subCommand.Value != null)
-                        await subCommand.Value();
+                var executionContexts = Calls.Select(c => c.BuildExecutionContext(Context.Arguments)).Where(c => c != null).ToArray();
+
+                await Task.WhenAll(executionContexts.Select(e => e.Parse(Readers, Context)));
+
+                var canProceed = executionContexts.Where(e => e.IsSuccess);
+                var failed = executionContexts.Where(e => !e.IsSuccess);
+
+                if (canProceed.Count() > 0)
+                    await canProceed.First().Execute(Context);
+                else if (failed.Count() == 1)
+                    if (failed.First().Results.Count(r => !r.IsSuccess) > 1)
+                        await ReplyAsync($"{Res.Str.ErrorText} Multiple errors:\n" + string.Join("\n", failed.First().Results.Where(r => !r.IsSuccess).Select(r => r.Message)));
                     else
-                        await RunAsync();
-                }
+                        await ReplyAsync($"{Res.Str.ErrorText} {failed.First().Results.First(r => !r.IsSuccess).Message}");
                 else
-                    await RunAsync();
+                    await ReplyAsync($"{Res.Str.ErrorText} The arguments you gave could not be matched to a method. Please use `{Context.Prefix}help {Name}` for more info");
             }
             catch (Exception ex)
             {
@@ -60,8 +71,6 @@ namespace TitanBot2.Services.CommandService
             await Context.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Debug, $"Exit Command  | mId: {Context.Message.Id} | {(DateTime.Now - start).TotalMilliseconds}ms", "Commands"));
         }
 
-        protected abstract Task RunAsync();
-
         public virtual async Task<CommandCheckResponse> CheckCommandAsync()
         {
             var results = new List<CommandCheckResponse>();
@@ -70,7 +79,6 @@ namespace TitanBot2.Services.CommandService
             if (RequireOwner)
                 results.Add(await CheckOwner());
             results.Add(await CheckPermissions(DefaultPermission));
-            results.Add(await CheckArguments());
 
             if (results.Any(r => !r.IsSuccess))
                 return CommandCheckResponse.FromError(string.Join("\n", results.Where(r => !r.IsSuccess).Select(r => r.Message)));
@@ -78,20 +86,15 @@ namespace TitanBot2.Services.CommandService
             return CommandCheckResponse.FromSuccess();
         }
 
-        protected virtual Task<CommandCheckResponse> CheckArguments()
-        {
-            return Task.FromResult(CommandCheckResponse.FromSuccess());
-        }
-
-        protected virtual Task<CommandCheckResponse> CheckContexts(ContextType contexts)
+        protected virtual Task<CommandCheckResponse> CheckContexts(DC.ContextType contexts)
         {
             bool isValid = false;
 
-            if ((contexts & ContextType.Guild) != 0)
+            if ((contexts & DC.ContextType.Guild) != 0)
                 isValid = isValid || Context.Channel is IGuildChannel;
-            if ((contexts & ContextType.DM) != 0)
+            if ((contexts & DC.ContextType.DM) != 0)
                 isValid = isValid || Context.Channel is IDMChannel;
-            if ((contexts & ContextType.Group) != 0)
+            if ((contexts & DC.ContextType.Group) != 0)
                 isValid = isValid || Context.Channel is IGroupChannel;
 
             if (isValid)
@@ -114,7 +117,7 @@ namespace TitanBot2.Services.CommandService
                         return CommandCheckResponse.FromError("Command can only be run by the owner of the bot");
                     return CommandCheckResponse.FromSuccess();
                 default:
-                    return CommandCheckResponse.FromError($"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");
+                    return CommandCheckResponse.FromError($"{nameof(TokenType)} applications do not have an owner");
             }
         }
 
@@ -169,17 +172,17 @@ namespace TitanBot2.Services.CommandService
             return Context.Channel.SendMessageSafeAsync(message, handler, isTTS, embed, options);
         }
 
-        protected async Task<TypeReaderResponse<T>> ReadAndReplyError<T>(int argId)
+        protected async Task<TypeReaderResult> ReadAndReplyError<T>(int argId)
         {
             if (Context.Arguments.Length <= argId)
             {
                 await ReplyAsync($"{Res.Str.ErrorText} Missing argument #{argId + 1}");
-                return TypeReaderResponse.FromError<T>($"Missing argument #{argId + 1}");
+                return TypeReaders.TypeReaderResult.FromError($"Missing argument #{argId + 1}");
             }
 
             string value = Context.Arguments[argId];
 
-            var res = await Readers.Read<T>(Context, value);
+            var res = await Readers.Read(typeof(T), Context, value);
             if (!res.IsSuccess)
                 await ReplyAsync($"{Res.Str.ErrorText} {res.Message}");
             return res;

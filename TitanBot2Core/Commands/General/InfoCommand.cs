@@ -12,18 +12,16 @@ using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.General
 {
-    public class Info : Command
+    public class InfoCommand : Command
     {
-        public Info(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public InfoCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Description = "Displays some technical information about me";
-            Usage = new string[]
-            {
-                "`{0}` - Displays the info"
-            };
+            Usage.Add("`{0}` - Displays the info");
+            Calls.AddNew(a => ShowInfoAsync());
         }
 
-        protected override async Task RunAsync()
+        protected async Task ShowInfoAsync()
         {
             var guildCount = Context.Client.Guilds.Count;
             var channelCount = Context.Client.Guilds.Sum(g => g.Channels.Count);
@@ -63,8 +61,6 @@ namespace TitanBot2.Commands.General
                    .AddInlineField("Uptime", (DateTime.Now - startTime).Beautify());
 
             await ReplyAsync("", embed: builder.Build());
-
-            throw new Exception("test");
         }
     }
 }

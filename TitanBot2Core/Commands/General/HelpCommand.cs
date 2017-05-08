@@ -11,20 +11,19 @@ using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.General
 {
-    public class Help : Command
+    public class HelpCommand : Command
     {
-        public Help(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public HelpCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
-            SubCommands.Add(".*", HelpAsync);
+            Calls.AddNew(a => AllHelpAsync());
+            Calls.AddNew(a => HelpAsync((string)a[0]))
+                 .WithArgTypes(typeof(string));
             Description = "Displays help for any command";
-            Usage = new string[]
-            {
-                "`{0}` - Displays a list of all commands",
-                "`{0} <command>` - Displays help for a specific command"
-            };
+            Usage.Add("`{0}` - Displays a list of all commands");
+            Usage.Add("`{0} <command>` - Displays help for a specific command");
         }
 
-        protected override async Task RunAsync()
+        protected async Task AllHelpAsync()
         {
             var prefixes = await Context.GetPrefixes();
             var builder = new EmbedBuilder()
@@ -51,10 +50,16 @@ namespace TitanBot2.Commands.General
             await ReplyAsync("", embed: builder);
         }
 
-        private async Task HelpAsync()
+        private async Task HelpAsync(string name)
         {
-            var searching = Context.Arguments.First().ToLower();
-            var command = Context.CommandService.Commands.SingleOrDefault(c => c.Name.ToLower() == searching);
+            var searching = name.ToLower();
+            var command = Context.CommandService.Commands.SingleOrDefault(c => c.Alias.Select(a => a.ToLower()).Contains(searching));
+
+            if (command == null)
+            {
+                await ReplyAsync($"{Res.Str.ErrorText} `{name}` is not a recognised command. Use `{Context.Prefix}help` for a list of all available commands");
+                return;
+            }
 
             var usage = string.Join("\n", command.Usage.Select(u => string.Format(u, Context.Prefix + searching)));
             if (string.IsNullOrWhiteSpace(usage))
@@ -79,22 +84,12 @@ namespace TitanBot2.Commands.General
                 }
             };
 
-            builder.AddField("Usage", usage);
+            builder.AddField("Group", group);
             if (!string.IsNullOrWhiteSpace(aliases))
                 builder.AddField("Aliases", aliases);
-            builder.AddField("Group", group);
-
+            builder.AddField("Usage", usage);
 
             await ReplyAsync("", embed: builder.Build());
-        }
-
-        protected override async Task<CommandCheckResponse> CheckArguments()
-        {
-            if (Context.Arguments.Length == 0)
-                return CommandCheckResponse.FromSuccess();
-            if (Context.Arguments.Length == 1 && Context.CommandService.Commands.SingleOrDefault(c => c.Name.ToLower() == Context.Arguments.First().ToLower()) != null)
-                return CommandCheckResponse.FromSuccess();
-            return CommandCheckResponse.FromError("The command `" + Context.Arguments.First() + "` was not recognised.");
         }
     }
 }

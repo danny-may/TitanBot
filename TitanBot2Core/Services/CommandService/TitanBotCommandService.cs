@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
+using TitanBot2.Models;
 using TitanBot2.Services.CommandService;
 using TitanBot2.TypeReaders;
+using TitanBot2.TypeReaders.Readers;
 
 namespace TitanBot2.Services
 {
@@ -29,10 +31,13 @@ namespace TitanBot2.Services
                                             .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(Command)));
                     foreach (var type in commandQuery)
                     {
-                        _commands.AddRange(CommandInfo.FromType(type));
+                        var cmdInfo = CommandInfo.FromType(type);
+                        if (cmdInfo != null)
+                            _commands.Add(cmdInfo);
                     }
 
-                    _readers.Install(assembly);
+                    _readers.AddTypeReader<Artifact>(new ArtifactTypeReader());
+                    _readers.AddTypeReader<TimeSpan>(new TimeSpanTypeReader());
                 }
             });
         }
@@ -44,15 +49,13 @@ namespace TitanBot2.Services
 
             context.CommandService = this;
 
-            var matches = Commands.Where(c => c.Name.Trim().ToLower() == context.Command.Trim().ToLower());
-
-            var cmdInfos = matches.GroupBy(m => m.CommandType);
+            var cmdInfos = Commands.Where(c => c.Alias.Select(a => a.ToLower()).Contains(context.Command.ToLower()));
             
             var responses = new Dictionary<Command, CommandCheckResponse>();
 
             foreach (var cmdInfo in cmdInfos)
             {
-                var command = cmdInfo.First().CreateInstance(context, _readers);
+                var command = cmdInfo.CreateInstance(context, _readers);
                 responses.Add(command, await command.CheckCommandAsync());
             }
 
@@ -73,7 +76,7 @@ namespace TitanBot2.Services
             else
                 try
                 {
-                    Task.Run(() => successCommand.ExecuteAsync(_readers));
+                    Task.Run(() => successCommand.ExecuteAsync());
                 }
                 catch (Exception ex)
                 {

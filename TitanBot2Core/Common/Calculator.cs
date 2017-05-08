@@ -11,7 +11,7 @@ namespace TitanBot2.Common
         private static int[] BossAttackCosts { get; } = new int[] { 0, 5, 25, 50, 75, 100, 125, 150 };
 
         public static double TitanLordHp(int clanQuest)
-            => 150000 + Math.Pow(clanQuest - 1, 0.9) * 900000;
+            => 1500000 + Math.Pow(clanQuest - 1, 0.9) * 900000;
 
         public static double ClanBonus(int clanQuest)
             => 100 * 
@@ -25,7 +25,7 @@ namespace TitanBot2.Common
             => Enumerable.Range(0, attacks).Sum(v => AttackCost(v));
 
         public static double AdvanceStart(int clanQuest)
-            => Math.Min((double)clanQuest / 1000, 0.5);
+            => Math.Min(0.5, Math.Min((double)clanQuest, 200) / 1000 + Math.Max((double)clanQuest - 200, 0) / 2000);
 
         public static int AttacksNeeded(int clanLevel, int attackers, int maxStage, int tapsPerAttack)
             => (int)Math.Ceiling((TitanLordHp(clanLevel) / attackers) / (Math.Max(50, maxStage) * tapsPerAttack + Math.Max(50, maxStage) * 90 * 2));

@@ -10,9 +10,9 @@ namespace TitanBot2.Services.CommandService
         public Type CommandType { get; private set; }
         public string Group { get; private set; }
         public string Name { get; private set; }
-        public string[] Alias { get; private set; }
+        public List<string> Alias { get; private set; }
         public string Description { get; private set; }
-        public string[] Usage { get; private set; }
+        public List<string> Usage { get; private set; }
 
         private CommandInfo()
         {
@@ -24,7 +24,7 @@ namespace TitanBot2.Services.CommandService
             return Activator.CreateInstance(CommandType, context, readers) as Command;
         }
 
-        public static CommandInfo[] FromType(Type t)
+        public static CommandInfo FromType(Type t)
         {
             if (t.IsSubclassOf(typeof(Command)) && t.IsClass && !t.IsAbstract)
             {
@@ -32,26 +32,26 @@ namespace TitanBot2.Services.CommandService
                 {
                     var obj = Activator.CreateInstance(t, null as TitanbotCmdContext, null as TypeReaderCollection) as Command;
                     if (obj == null)
-                        return new CommandInfo[0];
+                        return null;
 
                     var names = new List<string>();
                     names.Add(obj.Name ?? t.Name);
-                    names.AddRange(obj.Alias ?? new string[0]);
+                    names.AddRange(obj.Alias ?? new List<string>());
 
-                    return names.Select(n => new CommandInfo
+                    return new CommandInfo
                     {
-                        Name = n,
+                        Name = obj.Name,
+                        Alias = obj.Alias.Concat(new List<string> { obj.Name }).ToList(),
                         CommandType = t,
-                        Group = obj.Group ?? t.Namespace.Split('.').Last(),
-                        Alias = obj.Alias.Concat(new string[] { obj.Name }).ToArray(),
                         Description = obj.Description,
+                        Group = obj.Group,
                         Usage = obj.Usage
-                    }).ToArray();
+                    };
 
                 } catch { }
             }
 
-            return new CommandInfo[0];
+            return null;
         }
     }
 }

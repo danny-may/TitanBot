@@ -2,12 +2,13 @@
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TitanBot2.Services.CommandService;
 
-namespace TitanBot2.TypeReaders
+namespace TitanBot2.TypeReaders.Readers
 {
-    public class BetterTimespanTypeReader : Discord.Commands.TypeReader
+    public class TimeSpanTypeReader : TypeReader
     {   
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResult> Read(TitanbotCmdContext context, string input)
         {
             var days = 0;
             var hours = 0;
@@ -82,7 +83,7 @@ namespace TitanBot2.TypeReaders
             }
             else
             {
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Input could not be parsed as a TimeSpan"));
+                return Task.FromResult(TypeReaderResult.FromError("Input could not be parsed as a TimeSpan"));
             }
         }
     }

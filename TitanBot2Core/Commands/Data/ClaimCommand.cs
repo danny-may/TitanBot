@@ -10,21 +10,18 @@ using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Data
 {
-    public class Claim : Command
+    public class ClaimCommand : Command
     {
-        public Claim(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ClaimCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Description = "Claims a support code. Not currently used for anything, but will be used later for API calls";
-            Usage = new string[]
-            {
-                "`{0} <support code>` - Claims a support code as your own."
-            };
+            Usage.Add("`{0} <support code>` - Claims a support code as your own.");
+            Calls.AddNew(a => ClaimCodeAsync((string)a[0]))
+                 .WithArgTypes(typeof(string));
         }
 
-        protected override async Task RunAsync()
+        protected async Task ClaimCodeAsync(string supportCode)
         {
-            var supportCode = Context.Arguments.FirstOrDefault();
-
             if (supportCode == null)
             {
                 await ReplyAsync($"{Res.Str.ErrorText} You must supply a support code!");
