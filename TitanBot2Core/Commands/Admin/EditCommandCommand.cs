@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using DC = Discord.Commands;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,13 @@ namespace TitanBot2.Commands.Admin
                  .WithSubCommand("SetPerm");
             Calls.AddNew(a => ResetCommandAsync((string[])a[0]))
                  .WithArgTypes(typeof(string[]))
-                 .WithSubCommand("ResetCommand");
+                 .WithSubCommand("Reset");
+            DefaultPermission = 8;
+            Usage.Add("`{0} setrole <commands..> <roles..>` - Sets a list of roles required to use each command supplied");
+            Usage.Add("`{0} setperm <commands..> <permission>` - Sets a permission required to use each command supplied");
+            Usage.Add("`{0} reset <commands..>` - Resets the roles and permissions required to use each command supplied");
+            Description = "Used to allow people with varying roles or permissions to use different commands.";
+            RequiredContexts = DC.ContextType.Guild;
         }
 
         public IEnumerable<CommandInfo> FindCommands(string[] cmds)
@@ -43,7 +50,7 @@ namespace TitanBot2.Commands.Admin
                     await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, roles.Select(r => r.Id).ToArray(), null);
             }
             
-            await ReplyAsync($"{Res.Str.SuccessText} Roles set successfully!");
+            await ReplyAsync("Roles set successfully!", ReplyType.Success);
         }
 
         public async Task SetPermAsync(string[] cmds, ulong permission)
@@ -58,7 +65,7 @@ namespace TitanBot2.Commands.Admin
                 await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, null, permission);
             }
 
-            await ReplyAsync($"{Res.Str.SuccessText} Permissions set successfully!");
+            await ReplyAsync("Permissions set successfully!", ReplyType.Success);
         }
 
         public async Task ResetCommandAsync(string[] cmds)
@@ -73,7 +80,7 @@ namespace TitanBot2.Commands.Admin
                 await Context.Database.CmdPerms.SetCmdPerm(Context.Guild.Id, command.Name, null, null, null);
             }
 
-            await ReplyAsync($"{Res.Str.SuccessText} Permissions reset successfully!");
+            await ReplyAsync("Permissions reset successfully!", ReplyType.Success);
         }
     }
 }

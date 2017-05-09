@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TitanBot2.Services
@@ -12,6 +13,7 @@ namespace TitanBot2.Services
         private IDictionary<Uri, CacheObject> _cache
             = new ConcurrentDictionary<Uri, CacheObject>();
         public int DefaultFreshness { get; set; } = 3600;
+        public int RequestTimeout { get; set; } = 10000;
         public event Func<Exception, Task> DefaultExceptionHandler;
         public event Func<Uri, string, Task> LogWebRequest;
 
@@ -27,13 +29,12 @@ namespace TitanBot2.Services
             => GetString(new Uri(url), freshness);
         public async Task<string> GetString(Uri url, int freshness)
         {
-            if (!_cache.ContainsKey(url))
-            {
-                _cache.Add(url, new CacheObject(url));
-                _cache[url].LogWebRequest += Log;
-            }
+            var data = await GetBytes(url, freshness);
 
-            return Encoding.Default.GetString(await _cache[url].Get(freshness));
+            if (data == null)
+                return null;
+            else
+                return Encoding.Default.GetString(data);
         }
 
         public Task<byte[]> GetBytes(string url)
@@ -50,7 +51,7 @@ namespace TitanBot2.Services
                 _cache[url].LogWebRequest += Log;
             }
 
-            return _cache[url].Get(freshness);
+            return _cache[url].Get(freshness, RequestTimeout);
         }
 
         private async Task Log(Uri url, string message)
@@ -77,7 +78,7 @@ namespace TitanBot2.Services
                 LogWebRequest?.Invoke(_location, message);
             }
 
-            public async Task<byte[]> Get(int freshness)
+            public async Task<byte[]> Get(int freshness, int timeout)
             {
                 if (_lastUpdate.AddSeconds(freshness) < DateTime.Now)
                 {
@@ -86,10 +87,19 @@ namespace TitanBot2.Services
                     if (_webQueryTask == null)
                     {
                         queryOwner = true;
+
+                        _data = null;
+                        
                         _webQueryTask = new Task(() =>
                         {
                             using (var wc = new WebClient())
                             {
+                                Task.Run(async () =>
+                                {
+                                    await Task.Delay(timeout);
+                                    if (wc != null)
+                                        wc.CancelAsync();
+                                });
                                 _data = wc.DownloadData(_location);
                                 Log("Download Complete");
                             }
@@ -101,7 +111,17 @@ namespace TitanBot2.Services
 
                     Log("Waiting for download");
 
-                    await _webQueryTask;
+                    try
+                    {
+                        await _webQueryTask;
+                    }
+                    catch (WebException ex)
+                    {
+                        if (ex.Status != WebExceptionStatus.RequestCanceled)
+                            throw;
+                        else
+                            Log("Download cancelled");
+                    }
                     if (queryOwner)
                         _webQueryTask = null;
                 }

@@ -21,8 +21,8 @@ namespace TitanBot2.Commands.General
 
         protected async Task SendPongAsync()
         {
-            var msg = await ReplyAsync($"{Res.Str.SuccessText} | ~{Context.Client.Latency} ms", ex => Context.Logger.Log(ex, "PingCmd"));
-            await msg.ModifySafeAsync(m => m.Content = $"{Res.Str.SuccessText} | {(msg.Timestamp - Context.Message.Timestamp).TotalMilliseconds} ms", ex => Context.Logger.Log(ex, "PingCmd"));
+            var msg = await ReplyAsync($"| ~{Context.Client.Latency} ms", ReplyType.Success);
+            await msg.ModifySafeAsync(m => m.Content = $"{Res.Str.SuccessText} | {(msg.Timestamp - Context.Message.Timestamp).TotalMilliseconds} ms");
         }
     }
 }

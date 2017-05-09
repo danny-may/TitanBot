@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using System.Collections.Generic;
+using System.Net;
 
 namespace TitanBot2.Extensions
 {
@@ -13,27 +14,39 @@ namespace TitanBot2.Extensions
     {
         public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            try
+            Exception latest = null;
+            for (int i = 0; i < 5; i++)
             {
-                if (text.Length < 2000)
-                    return await channel.SendMessageAsync(text, isTTS, embed, options);
-
-                using (var ms = new MemoryStream())
+                try
                 {
-                    using (var sw = new StreamWriter(ms))
+                    if (text.Length < 2000)
+                        return await channel.SendMessageAsync(text, isTTS, embed, options);
+
+                    using (var ms = new MemoryStream())
                     {
-                        sw.Write(text);
-                        sw.Flush();
+                        using (var sw = new StreamWriter(ms))
+                        {
+                            sw.Write(text);
+                            sw.Flush();
+                        }
+                        ms.Position = 0;
+                        return await channel.SendFileAsync(ms, "Output.txt", $"{Res.Str.ErrorText} I tried to send a message that was too long!", isTTS, options);
                     }
-                    ms.Position = 0;
-                    return await channel.SendFileAsync(ms, "Output.txt", $"{Res.Str.ErrorText} I tried to send a message that was too long!", isTTS, options);
+                }
+                catch (HttpException ex)
+                {
+                    latest = ex;
+                    if (ex.HttpCode != (HttpStatusCode)500)
+                        break;
+                }
+                catch (Exception ex)
+                {
+                    latest = ex;
+                    break;
                 }
             }
-            catch (HttpException ex)
-            {
-                await (handler?.Invoke(ex) ?? Task.CompletedTask);
-                return null;
-            }
+            await (handler?.Invoke(latest) ?? Task.CompletedTask);
+            return null;
         }
 
         public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)

@@ -26,11 +26,21 @@ namespace TitanBot2.Commands.Clan
             Calls.AddNew(a => RemoveExcuseAsync((int)a[0]))
                  .WithArgTypes(typeof(int))
                  .WithSubCommand("Remove");
+            Usage.Add("`{0} [user]` - Gets an excuse for why that person (or yourself) didnt attack the boss");
+            Usage.Add("`{0} add <text>` - Adds an excuse to the pool of available excuses");
+            Usage.Add("`{0} remove <id>` - Removes an excuse you made by ID");
+            Description = "Missed the boss? Or did someone else? Use this to get a water-tight excuse whenever you need!";
         }
 
         public async Task ExcuseUserAsync(IUser user = null)
         {
             user = user ?? Context.User;
+
+            if (user?.Id == Context.Client.CurrentUser.Id)
+            {
+                await ReplyAsync("Haha! You must be mistaken, I never miss a Titan Lord attack.");
+                return;
+            }
 
             var excuse = await Context.Database.Excuses.GetRandom();
             var submitter = Context.Client.GetUser(excuse.CreatorId);
@@ -65,7 +75,7 @@ namespace TitanBot2.Commands.Clan
 
             var excuseId = excuse.ExcuseNo;
 
-            await ReplyAsync($"{Res.Str.SuccessText} Added the excuse as #{excuseId}");
+            await ReplyAsync($"Added the excuse as #{excuseId}", ReplyType.Success);
         }
 
         public async Task RemoveExcuseAsync(int id)
@@ -74,19 +84,19 @@ namespace TitanBot2.Commands.Clan
 
             if (excuse == null)
             {
-                await ReplyAsync($"{Res.Str.ErrorText} There is no excuse with that ID");
+                await ReplyAsync("There is no excuse with that ID", ReplyType.Error);
                 return;
             }
 
             if (Context.User.Id != Context.TitanBot.Owner.Id && Context.User.Id != excuse.CreatorId)
             {
-                await ReplyAsync($"{Res.Str.ErrorText} You do not own this excuse.");
+                await ReplyAsync("You do not own this excuse.", ReplyType.Error);
                 return;
             }
 
             await Context.Database.Excuses.Delete(excuse);
 
-            await ReplyAsync($"{Res.Str.SuccessText} Removed excuse #{excuse.ExcuseNo}");
+            await ReplyAsync($"Removed excuse #{excuse.ExcuseNo}", ReplyType.Success);
         }
     }
 }

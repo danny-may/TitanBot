@@ -20,7 +20,7 @@ namespace TitanBot2.Commands.General
 
         protected async Task GetInviteAsync()
         {
-            await ReplyAsync($"{Res.Str.InfoText} Want to invite me to your guild? Click this link!\n<https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions={Configuration.Instance.InvitePermissions}>");
+            await ReplyAsync($"Want to invite me to your guild? Click this link!\n<https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions={Configuration.Instance.InvitePermissions}>", ReplyType.Error);
         }
     }
 }

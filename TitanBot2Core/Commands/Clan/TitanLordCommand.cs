@@ -35,7 +35,13 @@ namespace TitanBot2.Commands.Clan
                  .WithArgTypes(typeof(TimeSpan));
             Alias.Add("TL");
             Alias.Add("Boss");
-
+            Usage.Add("`{0} in <time>` - Sets a Titan Lord timer running for the given period.");
+            Usage.Add("`{0} dead` - Sets a Titan Lord timer running for 6 hours.");
+            Usage.Add("`{0} stop` - Stops any currently running timers.");
+            Usage.Add("`{0} when` - Gets the time until the Titan Lord is ready to be killed");
+            Usage.Add("`{0} info` - Gets information about the clans current level");
+            Usage.Add("`{0} now` - Alerts everyone that the Titan Lord is ready to be killed right now");
+            Description = "Used for Titan Lord timers and management";
         }
 
         private async Task TitanLordInAsync(TimeSpan time)
@@ -104,7 +110,7 @@ namespace TitanBot2.Commands.Clan
 
             await Context.TimerService.AddTimers(new Timer[] { tickTimer, nowTimer, roundTimer });
 
-            await ReplyAsync($"{Res.Str.SuccessText} Started a timer for **{time}**");
+            await ReplyAsync($"Started a timer for **{time}**", ReplyType.Success);
         }
 
         private async Task TitanLordNowAsync()
@@ -145,9 +151,9 @@ namespace TitanBot2.Commands.Clan
             var activeTimer = await Context.Database.Timers.GetLatest(Context.Guild.Id, EventCallback.TitanLordNow);
 
             if (activeTimer == null)
-                await ReplyAsync($"{Res.Str.ErrorText} There are no timers currently running");
+                await ReplyAsync("There are no timers currently running", ReplyType.Error);
             else
-                await ReplyAsync($"{Res.Str.SuccessText} There will be a TitanLord in {(activeTimer.To.Value - DateTime.Now).Beautify()}");
+                await ReplyAsync($"There will be a TitanLord in {(activeTimer.To.Value - DateTime.Now).Beautify()}", ReplyType.Success);
         }
 
         private async Task TitanLordInfoAsync()
@@ -160,7 +166,7 @@ namespace TitanBot2.Commands.Clan
         private async Task TitanLordStopAsync()
         {
             await CompleteExisting();
-            await ReplyAsync($"{Res.Str.SuccessText} Stopped all existing timers");
+            await ReplyAsync("Stopped all existing timers", ReplyType.Success);
         }
 
         private async Task CompleteExisting(bool titanLordTicks = true, bool titanLordRounds = true, bool titanLordNows = true)

@@ -216,7 +216,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\Admin\EditCommand.cs" />
+    <Compile Include="Commands\Admin\EditCommandCommand.cs" />
+    <Compile Include="Commands\Admin\NotifyCommand.cs" />
+    <Compile Include="Commands\Admin\SettingsCommand.cs" />
     <Compile Include="Commands\Clan\ExcuseCommand.cs" />
     <Compile Include="Commands\Clan\TitanLordCommand.cs" />
     <Compile Include="Commands\Data\ArtifactsCommand.cs" />
@@ -227,6 +229,11 @@
     <Compile Include="Commands\General\InviteCommand.cs" />
     <Compile Include="Commands\General\PingCommand.cs" />
     <Compile Include="Commands\General\PrefixCommand.cs" />
+    <Compile Include="Commands\Owner\AnnounceCommand.cs" />
+    <Compile Include="Commands\Owner\DBPurgeCommand.cs" />
+    <Compile Include="Commands\Owner\ExecCommand.cs" />
+    <Compile Include="Commands\Owner\ShutdownCommand.cs" />
+    <Compile Include="Commands\Owner\TestCommand.cs" />
     <Compile Include="Common\PerformanceMonitor.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IUserMessageExtensions.cs" />
@@ -260,29 +267,6 @@
     <Compile Include="Models\Enums\BonusType.cs" />
     <Compile Include="Models\Enums\EquipmentClass.cs" />
     <Compile Include="Models\Enums\HelperType.cs" />
-    <Compile Include="Modules\Admin\AdminModule.cs" />
-    <Compile Include="Modules\Admin\EditcommandModule.cs" />
-    <Compile Include="Modules\Admin\NotifyModule.cs" />
-    <Compile Include="Modules\Admin\SettingsModule.cs" />
-    <Compile Include="Modules\Clan\ClanModule.cs" />
-    <Compile Include="Modules\Clan\ExcuseModule.cs" />
-    <Compile Include="Modules\Clan\TitanLordModule.cs" />
-    <Compile Include="Modules\Data\ArtifactModule.cs" />
-    <Compile Include="Modules\Data\Claim.cs" />
-    <Compile Include="Modules\Data\ClanStatsModule.cs" />
-    <Compile Include="Modules\Data\DataModule.cs" />
-    <Compile Include="Modules\General\GeneralModule.cs" />
-    <Compile Include="Modules\General\HelpModule.cs" />
-    <Compile Include="Modules\General\InviteModule.cs" />
-    <Compile Include="Modules\General\PingModule.cs" />
-    <Compile Include="Modules\General\PrefixModule.cs" />
-    <Compile Include="Modules\Owner\AnnounceModule.cs" />
-    <Compile Include="Modules\Owner\DBPurge.cs" />
-    <Compile Include="Modules\Owner\ExecModule.cs" />
-    <Compile Include="Modules\Owner\OwnerModule.cs" />
-    <Compile Include="Modules\Owner\ShutdownModule.cs" />
-    <Compile Include="Modules\Owner\TestModule.cs" />
-    <Compile Include="Modules\TitanBotModule.cs" />
     <Compile Include="Preconditions\RequireCustomPermissionAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CachedWebClient.cs" />

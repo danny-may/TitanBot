@@ -25,6 +25,8 @@ namespace TitanBot2.Commands.Data
                  .WithArgTypes(typeof(Artifact), typeof(int), typeof(int));
             Alias.Add("Arts");
             Alias.Add("Artifact");
+            Usage.Add("`{0} <artifact> [from] [to]` - Shows stats for a given artifact on the given levels.");
+            Description = "Displays data about any artifact ";
         }
 
         private async Task ShowArtifactAsync(Artifact artifact)

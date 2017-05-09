@@ -51,7 +51,7 @@ namespace TitanBot2.TypeReaders
         {
             var readers = GetCustomTypeReaders(type) ?? new ConcurrentDictionary<Type, TypeReader>();
             var defaultReader = GetDefaultTypeReader(type);
-            if (defaultReader != null)
+            if (defaultReader != null && !readers.Keys.Contains(type))
                 readers.Add(type, defaultReader);
 
             return readers;

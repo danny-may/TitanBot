@@ -57,7 +57,7 @@ namespace TitanBot2.Commands.General
 
             if (command == null)
             {
-                await ReplyAsync($"{Res.Str.ErrorText} `{name}` is not a recognised command. Use `{Context.Prefix}help` for a list of all available commands");
+                await ReplyAsync($"`{name}` is not a recognised command. Use `{Context.Prefix}help` for a list of all available commands", ReplyType.Error);
                 return;
             }
 

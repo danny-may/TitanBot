@@ -30,9 +30,9 @@ namespace TitanBot2.Commands.General
             var prefixes = await Context.GetPrefixes();
 
             if (prefixes.Length > 0)
-                await ReplyAsync($"{Res.Str.InfoText} Your available prefixes are {string.Join(", ", prefixes)}");
+                await ReplyAsync($"Your available prefixes are {string.Join(", ", prefixes)}", ReplyType.Error);
             else
-                await ReplyAsync($"{Res.Str.InfoText} You do not require prefixes in this channel");
+                await ReplyAsync("You do not require prefixes in this channel", ReplyType.Error);
         }
 
         private async Task SetPrefixAsync(string newPrefix)
@@ -40,7 +40,7 @@ namespace TitanBot2.Commands.General
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
             guildData.Prefix = newPrefix.ToLower();
             await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData));
-            await ReplyAsync($"{Res.Str.SuccessText} Your guilds prefix has been set to `{guildData.Prefix}`");
+            await ReplyAsync($"Your guilds prefix has been set to `{guildData.Prefix}`", ReplyType.Success);
         }
 
         protected override Task<CommandCheckResponse> CheckPermissions(ulong defaultPerm)

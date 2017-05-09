@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.TypeReaders;
+using Discord.WebSocket;
 
 namespace TitanBot2.Services.CommandService
 {
@@ -23,6 +24,9 @@ namespace TitanBot2.Services.CommandService
         public ulong DefaultPermission { get; protected set; } = 0;
         public CallCollection Calls = new CallCollection();
         protected TypeReaderCollection Readers { get; set; }
+
+        private bool HasReplied;
+        private IUserMessage awaitMessage;
 
         protected CommandCheckResponse CheckResult { get; private set; }
 
@@ -46,6 +50,15 @@ namespace TitanBot2.Services.CommandService
 
             try
             {
+                new Task(async () =>
+                {
+                    await Task.Delay(1000);
+                    if (!HasReplied)
+                    {
+                        awaitMessage = await Context.Channel.SendMessageSafeAsync("This seems to be taking longer than expected... ");
+                    }
+                }).Start();
+
                 var executionContexts = Calls.Select(c => c.BuildExecutionContext(Context.Arguments)).Where(c => c != null).ToArray();
 
                 await Task.WhenAll(executionContexts.Select(e => e.Parse(Readers, Context)));
@@ -57,11 +70,11 @@ namespace TitanBot2.Services.CommandService
                     await canProceed.First().Execute(Context);
                 else if (failed.Count() == 1)
                     if (failed.First().Results.Count(r => !r.IsSuccess) > 1)
-                        await ReplyAsync($"{Res.Str.ErrorText} Multiple errors:\n" + string.Join("\n", failed.First().Results.Where(r => !r.IsSuccess).Select(r => r.Message)));
+                        await ReplyAsync("Multiple errors:\n" + string.Join("\n", failed.First().Results.Where(r => !r.IsSuccess).Select(r => r.Message)), ReplyType.Error);
                     else
-                        await ReplyAsync($"{Res.Str.ErrorText} {failed.First().Results.First(r => !r.IsSuccess).Message}");
+                        await ReplyAsync($"{failed.First().Results.First(r => !r.IsSuccess).Message}", ReplyType.Error);
                 else
-                    await ReplyAsync($"{Res.Str.ErrorText} The arguments you gave could not be matched to a method. Please use `{Context.Prefix}help {Name}` for more info");
+                    await ReplyAsync($"The arguments you gave could not be matched to a method. Please use `{Context.Prefix}help {Name}` for more info", ReplyType.Error);
             }
             catch (Exception ex)
             {
@@ -163,20 +176,52 @@ namespace TitanBot2.Services.CommandService
         }
 
         protected Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-        {
-            return Context.Channel.SendMessageSafeAsync(message, ex => Context.Logger.Log(ex, "TitanBotModule"), isTTS, embed, options);
-        }
+            => ReplyAsync(message, ReplyType.None, null, isTTS, embed, options);
+
+        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            => ReplyAsync(message, replyType, null, isTTS, embed, options);
 
         protected Task<IUserMessage> ReplyAsync(string message, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-        {
-            return Context.Channel.SendMessageSafeAsync(message, handler, isTTS, embed, options);
+            => ReplyAsync(message, ReplyType.None, handler, isTTS, embed, options);
+
+        protected async Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        { 
+            HasReplied = true;
+            if (awaitMessage != null)
+            {
+                var temp = awaitMessage;
+                awaitMessage = null;
+                await temp.DeleteAsync();
+            }
+            switch (replyType)
+            {
+                case ReplyType.Success:
+                    message = Res.Str.SuccessText + " " + message;
+                    break;
+                case ReplyType.Error:
+                    message = Res.Str.ErrorText + " " + message;
+                    break;
+                case ReplyType.Info:
+                    message = Res.Str.InfoText + " " + message;
+                    break;
+                default:
+                    break;
+            }
+            return await Context.Channel.SendMessageSafeAsync(message, async e => {
+                try
+                {
+                    await Context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} There was an error when trying to handle your command! `{e.GetType()}`");
+                } catch { }
+                await Context.Logger.Log(e, $"Command: {Name}");
+                await (handler?.Invoke(e) ?? Task.CompletedTask);
+            }, isTTS, embed, options);
         }
 
         protected async Task<TypeReaderResult> ReadAndReplyError<T>(int argId)
         {
             if (Context.Arguments.Length <= argId)
             {
-                await ReplyAsync($"{Res.Str.ErrorText} Missing argument #{argId + 1}");
+                await ReplyAsync($"Missing argument #{argId + 1}", ReplyType.Error);
                 return TypeReaders.TypeReaderResult.FromError($"Missing argument #{argId + 1}");
             }
 
@@ -184,8 +229,16 @@ namespace TitanBot2.Services.CommandService
 
             var res = await Readers.Read(typeof(T), Context, value);
             if (!res.IsSuccess)
-                await ReplyAsync($"{Res.Str.ErrorText} {res.Message}");
+                await ReplyAsync(res.Message, ReplyType.Error);
             return res;
+        }
+
+        protected enum ReplyType
+        {
+            Success,
+            Error,
+            Info,
+            None
         }
     }
 }
