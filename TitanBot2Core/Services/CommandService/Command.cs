@@ -46,7 +46,7 @@ namespace TitanBot2.Services.CommandService
         public async Task ExecuteAsync()
         {
             var start = DateTime.Now;
-            await Context.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Debug, $"Enter Command | mId: {Context.Message.Id} | uId: {Context.User.Id} | cId: {Context.Channel.Id}", "Commands"));
+            await Context.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Debug, $"Enter Command: {Name} | mId: {Context.Message.Id} | uId: {Context.User.Id} | cId: {Context.Channel.Id}", "Commands"));
 
             try
             {
@@ -81,7 +81,7 @@ namespace TitanBot2.Services.CommandService
                 await Context.Logger.Log(ex, "Command:" +(Name ?? GetType().Name));
             }
 
-            await Context.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Debug, $"Exit Command  | mId: {Context.Message.Id} | {(DateTime.Now - start).TotalMilliseconds}ms", "Commands"));
+            await Context.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Debug, $"Exit Command: {Name} | mId: {Context.Message.Id} | {(DateTime.Now - start).TotalMilliseconds}ms", "Commands"));
         }
 
         public virtual async Task<CommandCheckResponse> CheckCommandAsync()
