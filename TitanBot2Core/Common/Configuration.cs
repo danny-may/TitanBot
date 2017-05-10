@@ -14,6 +14,7 @@ namespace TitanBot2.Common
         public string Token { get; set; } = "";
         public string ShutdownReason { get; set; } = null;
         public ulong InvitePermissions { get; set; } = 8;
+        public HighScoreSheetRef HighScoreSettings { get; set; } = new HighScoreSheetRef();
         public Dictionary<string, float> Versions { get; set; }
             = new Dictionary<string, float>
             {
@@ -63,6 +64,20 @@ namespace TitanBot2.Common
             EnsureExists();
             string file = Path.Combine(AppContext.BaseDirectory, FileName);
             return JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(file));
+        }
+
+        public class HighScoreSheetRef
+        {
+            public int DataStartRow { get; set; } = 4;
+            public int RankingCol { get; set; } = 0;
+            public int NameCol { get; set; } = 1;
+            public int ClanCol { get; set; } = 2;
+            public int RankMsCol { get; set; } = 3;
+            public int SimMSCol { get; set; } = 4;
+            public int RankRelCol { get; set; } = 5;
+            public int TotalRelicsCol { get; set; } = 6;
+            public int RawADCol { get; set; } = 7;
+            public int FullADCol { get; set; } = 8;
         }
     }
 }

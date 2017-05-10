@@ -38,5 +38,11 @@ namespace TitanBot2.Extensions
                     yield return data.Skip(i).First();
             }
         }
+
+        public static IEnumerable<T1> TakeMax<T1>(this IEnumerable<T1> value, int count)
+        {
+            count = Math.Min(count, value.Count());
+            return value.Take(count);
+        }
     }
 }

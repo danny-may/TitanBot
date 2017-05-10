@@ -38,7 +38,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Discord.WebSocket;
 using TitanBot2;
-using TitanBot2.Modules;
+using TitanBot2.Commands;
 using TitanBot2.Extensions;
 using TitanBot2.Services.Database;
 using TitanBot2.Services.Database.Extensions;

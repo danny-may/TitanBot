@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Common;
+using TitanBot2.Extensions;
 using TitanBot2.Models;
 using TitanBot2.Models.Enums;
 
@@ -15,8 +16,9 @@ namespace TitanBot2.Services
     public class TT2DataService
     {
         private CachedWebClient WebClient { get; }
-        private string _ghStaticUrl = "https://s3.amazonaws.com/tt2-static/info_files/";
-        private string _artifactFileLocation = "/ArtifactInfo.csv";
+        private static readonly string _ghStaticUrl = "https://s3.amazonaws.com/tt2-static/info_files/";
+        private static readonly string _artifactFileLocation = "/ArtifactInfo.csv";
+        private static readonly string _highScoreSheet = "https://docs.google.com/spreadsheets/d/13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY/export?format=csv&id=13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY&gid=4642011";
 
 
         public TT2DataService(CachedWebClient client)
@@ -64,6 +66,18 @@ namespace TitanBot2.Services
             artifact.Image = new Bitmap(new MemoryStream(imageBytes));
 
             return artifact;
+        }
+
+        public async Task<HighScoreSheet> GetHighScores()
+        {
+            var data = await WebClient.GetString(_highScoreSheet);
+
+            var sheet = new HighScoreSheet(CsvReader.ReadFromText(data, new CsvOptions
+            {
+                HeaderMode = HeaderMode.HeaderAbsent
+            }));
+
+            return sheet;
         }
     }
 }

@@ -67,8 +67,14 @@ namespace TitanBot2.TypeReaders.Readers
                 value = str;
                 return true;
             };
+            parserBuilder[typeof(Uri)] = (TryParseDelegate<Uri>)delegate (string str, out Uri value)
+            {
+                return Uri.TryCreate(str, UriKind.Absolute, out value);
+            };
             return parserBuilder.ToImmutable();
         }
+
+
 
         public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)_parsers.Value[typeof(T)];
         public static Delegate Get(Type type) => _parsers.Value[type];
