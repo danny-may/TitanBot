@@ -1,15 +1,15 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.DiscordHandlers;
 using TitanBot2.Extensions;
-using System.Collections.Generic;
+using TitanBot2.Services;
 using TitanBot2.Services.Database;
 using TitanBot2.Services.Scheduler;
-using TitanBot2.Services;
-using System.Reflection;
 
 namespace TitanBot2
 {

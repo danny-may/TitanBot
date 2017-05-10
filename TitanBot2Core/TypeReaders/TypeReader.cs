@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders

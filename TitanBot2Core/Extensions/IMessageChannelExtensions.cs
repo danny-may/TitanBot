@@ -1,12 +1,11 @@
 ﻿using Discord;
 using Discord.Net;
-using Discord.WebSocket;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using TitanBot2.Common;
-using System.Collections.Generic;
-using System.Net;
 
 namespace TitanBot2.Extensions
 {

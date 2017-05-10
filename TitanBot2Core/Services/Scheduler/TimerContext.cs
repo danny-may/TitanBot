@@ -1,11 +1,6 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Services.Database;
 using TitanBot2.Services.Database.Models;

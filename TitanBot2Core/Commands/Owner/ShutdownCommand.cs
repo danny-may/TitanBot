@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
 using TitanBot2.TypeReaders;
@@ -28,15 +25,21 @@ namespace TitanBot2.Commands.Owner
         }
 
         public Task ShutdownAsync()
-                => Context.TitanBot.StopAsync();
+                => ShutDown();
 
         public Task ShutdownAsync(TimeSpan time)
-                => Context.TitanBot.StopAsync(time);
+                => ShutDown(time);
 
         public Task ShutdownAsync(string reason)
-                => Context.TitanBot.StopAsync(reason: reason);
+                => ShutDown(reason: reason);
 
         public Task ShutdownAsync(TimeSpan time, string reason)
-                => Context.TitanBot.StopAsync(time, reason);
+                => ShutDown(time, reason);
+
+        private async Task ShutDown(TimeSpan? time = null, string reason = null)
+        {
+            await ReplyAsync("Starting shut down sequence!");
+            Context.TitanBot.StopAsync(time, reason);
+        }
     }
 }

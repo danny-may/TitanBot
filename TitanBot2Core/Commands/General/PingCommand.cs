@@ -1,6 +1,4 @@
-﻿using Discord.Commands;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;

@@ -78,6 +78,11 @@ namespace TitanBot2.Services.CommandService
             }
             catch (Exception ex)
             {
+                try
+                {
+                    await ReplyAsync($"Exception thrown: `{ex.GetType()}`", ReplyType.Error);
+                }
+                catch { }
                 await Context.Logger.Log(ex, "Command:" +(Name ?? GetType().Name));
             }
 

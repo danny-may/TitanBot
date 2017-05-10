@@ -1,11 +1,7 @@
 ﻿using Csv;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TitanBot2.Common;
-using TitanBot2.Extensions;
 
 namespace TitanBot2.Models
 {

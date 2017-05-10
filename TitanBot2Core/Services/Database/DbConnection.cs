@@ -28,5 +28,6 @@ namespace TitanBot2.Services.Database
         public LiteCollection<Timer> TimerTable { get { return GetCollection<Timer>(); } }
         public LiteCollection<User> UserTable { get { return GetCollection<User>(); } }
         public LiteCollection<Excuse> ExcuseTable { get { return GetCollection<Excuse>(); } }
+        public LiteCollection<Registration> RegistrationTable { get { return GetCollection<Registration>(); } }
     }
 }

@@ -1,14 +1,10 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot2.Common;
-using TitanBot2.Extensions;
 using TitanBot2.Services;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
 
 namespace TitanBot2.DiscordHandlers
 {

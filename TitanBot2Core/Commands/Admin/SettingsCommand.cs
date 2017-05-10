@@ -1,15 +1,14 @@
-﻿using DC = Discord.Commands;
-using Discord;
+﻿using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
 using TitanBot2.Services.Database.Models;
 using TitanBot2.TypeReaders;
+using DC = Discord.Commands;
 
 namespace TitanBot2.Commands.Admin
 {

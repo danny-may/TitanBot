@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace TitanBot2.Services.Database.Extensions
@@ -13,6 +12,9 @@ namespace TitanBot2.Services.Database.Extensions
         {
             Database = db;
         }
+
+        public async Task<IEnumerable<T>> Get(Expression<Func<T, bool>> predicate)
+            => await Database.QueryAsync(conn => conn.GetCollection<T>().Find(predicate));
 
         public async Task Update(IEnumerable<T> objs)
             => await Database.QueryAsync(conn => conn.GetCollection<T>().Update(objs));

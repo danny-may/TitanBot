@@ -1,12 +1,6 @@
-﻿using Discord;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using TitanBot2.Common;
 using TitanBot2.Extensions;
-using TitanBot2.Models;
 using TitanBot2.Services.CommandService;
 using TitanBot2.TypeReaders;
 

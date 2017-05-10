@@ -1,13 +1,11 @@
 ﻿using Csv;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Common;
-using TitanBot2.Extensions;
 using TitanBot2.Models;
 using TitanBot2.Models.Enums;
 
