@@ -22,6 +22,11 @@ namespace TitanBot2.Commands.Data
             Calls.AddNew(a => ShowSheetAsync((int)a[0], (int)a[1]))
                  .WithArgTypes(typeof(int), typeof(int));
             Alias.Add("HS");
+            Description = $"Shows data from the high score sheet, which can be found [here](https://docs.google.com/spreadsheets/d/13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY/pubhtml?gid=4642011cYS8TLGYU)\nAll credit to <@261814131282149377>, <@169180650203512832> and <@169915601496702977> for running the sheet!";
+            Usage.Add("`{0}` - Shows the top 30 users");
+            Usage.Add("`{0} <position>` - Shows the person who is at the specified postition");
+            Usage.Add("`{0} <from> <to>` - Shows the positions in the range you give");
+
         }
 
         private async Task ShowSheetAsync(int from, int to)
@@ -32,7 +37,14 @@ namespace TitanBot2.Commands.Data
 
             var places = Enumerable.Range(from, to - from + 1)
                                    .Select(i => sheet.Users.FirstOrDefault(u => u.Ranking == i))
+                                   .Where(p => p != null)
                                    .ToList();
+
+            if (places.Count == 0)
+            {
+                await ReplyAsync($"There were no users for the range {from} - {to}!");
+                return;
+            }
 
             var data = places.Select(p => new string[] { p.Ranking.ToString(), p.TotalRelics, p.UserName, p.ClanName }).ToArray();
             data = new string[][] { new string[] { "##", " Relics", " Username", " Clan" } }.Concat(data).ToArray();
