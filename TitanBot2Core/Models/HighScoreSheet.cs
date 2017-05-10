@@ -77,16 +77,16 @@ namespace TitanBot2.Models
                 string rawAd;
                 string fullAd;
 
-                if (!int.TryParse(data[conf.RankingCol], out ranking))
+                if (!int.TryParse(data[conf.RankingCol].Trim(), out ranking))
                     return null;
-                userName = data[conf.NameCol];
-                clanName = data[conf.ClanCol];
-                rankMs = data[conf.RankMsCol];
-                simMs = data[conf.SimMSCol];
-                rankRel = data[conf.RankRelCol];
-                totalRelics = data[conf.TotalRelicsCol];
-                rawAd = data[conf.RawADCol];
-                fullAd = data[conf.FullADCol];
+                userName = data[conf.NameCol].Trim();
+                clanName = data[conf.ClanCol].Trim();
+                rankMs = data[conf.RankMsCol].Trim();
+                simMs = data[conf.SimMSCol].Trim();
+                rankRel = data[conf.RankRelCol].Trim();
+                totalRelics = data[conf.TotalRelicsCol].Trim();
+                rawAd = data[conf.RawADCol].Trim();
+                fullAd = data[conf.FullADCol].Trim();
 
                 return new HighScoreUser(ranking, userName, clanName, rankMs, simMs, rankRel, totalRelics, rawAd, fullAd);
             }

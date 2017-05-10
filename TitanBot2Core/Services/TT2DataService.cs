@@ -70,7 +70,7 @@ namespace TitanBot2.Services
 
         public async Task<HighScoreSheet> GetHighScores()
         {
-            var data = await WebClient.GetString(_highScoreSheet);
+            var data = await WebClient.GetString(_highScoreSheet, Encoding.UTF8);
 
             var sheet = new HighScoreSheet(CsvReader.ReadFromText(data, new CsvOptions
             {

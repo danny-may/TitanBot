@@ -15,12 +15,12 @@ namespace TitanBot2.Commands.Owner
             Calls.AddNew(a => ShutdownAsync());
             Calls.AddNew(a => ShutdownAsync((TimeSpan)a[0]))
                  .WithArgTypes(typeof(TimeSpan));
-            Calls.AddNew(a => ShutdownAsync((string)a[0]))
-                 .WithArgTypes(typeof(string))
-                 .WithItemAsParams(0);
             Calls.AddNew(a => ShutdownAsync((TimeSpan)a[0], (string)a[1]))
                  .WithArgTypes(typeof(TimeSpan), typeof(string))
                  .WithItemAsParams(1);
+            Calls.AddNew(a => ShutdownAsync((string)a[0]))
+                 .WithArgTypes(typeof(string))
+                 .WithItemAsParams(0);
 
             RequireOwner = true;
             Usage.Add("`{0} [time] [reason]` Sets a timer going for the bot to shut down, along with a reason");

@@ -53,5 +53,25 @@ namespace TitanBot2.Extensions
             result.Add(current);
             return result.ToArray();
         }
+
+        public static string Tableify(this object[][] data, string cellFormat = "{0} ", string headerFormat = null)
+        {
+            var builder = new StringBuilder();
+            data = data.ForceColumns();
+            var maxWidth = data.Rotate().Select(c => c.Max(v => v.ToString().Length)).ToList();
+            for (int row = 0; row < data.Length; row++)
+            {
+                for (int col = 0; col < data[row].Length; col++)
+                {
+                    if (row == 0 && headerFormat != null)
+                        builder.Append(string.Format(headerFormat, data[row][col].ToString().PadRight(maxWidth[col])));
+                    else
+                        builder.Append(string.Format(cellFormat, data[row][col].ToString().PadRight(maxWidth[col])));
+                }
+                builder.Append("\n");
+            }
+
+            return builder.ToString();
+        }
     }
 }

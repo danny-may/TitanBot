@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Services.CommandService;
 
@@ -37,6 +38,36 @@ namespace TitanBot2.Extensions
                 context.Client.CurrentUser.Mention,
                 ""
             };
+        }
+
+        public static T[][] Rotate<T>(this T[][] data)
+        {
+            var ret = new T[data.Max(r => r.Length)][];
+            for (int y = 0; y < data.Length; y++)
+            {
+                for (int x = 0; x < data[y].Length; x++)
+                {
+                    ret[x] = ret[x] ?? new T[data.Length];
+                    ret[x][y] = data[y][x];
+                }
+            }
+            return ret;
+        }
+
+        public static T[][] ForceColumns<T>(this T[][] data)
+        {
+            var columns = data.Max(r => r.Length);
+            var ret = data.Select(r => new T[columns]).ToArray();
+            for (int y = 0; y < data.Length; y++)
+            {
+                ret[y] = new T[columns];
+                for (int x = 0; x < data[y].Length; x++)
+                {
+                    ret[y][x] = data[y][x];
+                }
+            }
+
+            return ret;
         }
     }
 }

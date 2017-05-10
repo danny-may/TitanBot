@@ -28,9 +28,9 @@ namespace TitanBot2.Extensions
                         {
                             sw.Write(text);
                             sw.Flush();
+                            ms.Position = 0;
+                            return await channel.SendFileAsync(ms, "Output.txt", $"{Res.Str.ErrorText} I tried to send a message that was too long!", isTTS, options);
                         }
-                        ms.Position = 0;
-                        return await channel.SendFileAsync(ms, "Output.txt", $"{Res.Str.ErrorText} I tried to send a message that was too long!", isTTS, options);
                     }
                 }
                 catch (HttpException ex)

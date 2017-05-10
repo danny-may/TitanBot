@@ -27,14 +27,20 @@ namespace TitanBot2.Services
             => GetString(url, DefaultFreshness);
         public Task<string> GetString(string url, int freshness)
             => GetString(new Uri(url), freshness);
-        public async Task<string> GetString(Uri url, int freshness)
+        public Task<string> GetString(string url, Encoding encoding)
+            => GetString(new Uri(url), DefaultFreshness, encoding);
+        public Task<string> GetString(Uri url, Encoding encoding)
+            => GetString(url, DefaultFreshness, encoding);
+        public Task<string> GetString(string url, int freshness, Encoding encoding)
+            => GetString(new Uri(url), freshness, encoding);
+        public async Task<string> GetString(Uri url, int freshness, Encoding encoding = null)
         {
             var data = await GetBytes(url, freshness);
 
             if (data == null)
                 return null;
             else
-                return Encoding.Default.GetString(data);
+                return (encoding ?? Encoding.Default).GetString(data);
         }
 
         public Task<byte[]> GetBytes(string url)
