@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Common;
@@ -39,7 +40,15 @@ namespace TitanBot2.Commands.General
                 }
             };
 
-            var groups = Context.CommandService.Commands.GroupBy(c => c.Group);
+            var commands = new List<CommandInfo>();
+            foreach (var cmd in Context.CommandService.Commands)
+            {
+                var obj = cmd.CreateInstance(Context, Readers);
+                var result = await obj.CheckCommandAsync();
+                if (result.IsSuccess)
+                    commands.Add(cmd);
+            }
+            var groups = commands.GroupBy(c => c.Group);
             foreach (var group in groups)
             {
                 builder.AddField(group.Key, string.Join(", ", group.Select(g => g.Name)));

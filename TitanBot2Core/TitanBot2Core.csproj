@@ -236,6 +236,7 @@
     <Compile Include="Commands\Owner\DBPurgeCommand.cs" />
     <Compile Include="Commands\Owner\ExecCommand.cs" />
     <Compile Include="Commands\Owner\GetMessageCommand.cs" />
+    <Compile Include="Commands\Owner\SetCommand.cs" />
     <Compile Include="Commands\Owner\ShutdownCommand.cs" />
     <Compile Include="Commands\Owner\TestCommand.cs" />
     <Compile Include="Common\PerformanceMonitor.cs" />
@@ -303,6 +304,7 @@
     <Compile Include="TitanBot.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ArtifactTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\PermissionTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\TimeSpanTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ChannelTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\EnumTypeReader.cs" />

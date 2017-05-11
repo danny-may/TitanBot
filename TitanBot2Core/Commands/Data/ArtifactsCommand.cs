@@ -44,8 +44,6 @@ namespace TitanBot2.Commands.Data
                 Color = artifact.Image.AverageColor(0.3f, 0.5f).ToDiscord(),
             };
 
-            throw new NullReferenceException();
-
             builder.AddInlineField("Artifact id", artifact.Id);
             builder.AddInlineField("Notes", artifact.Note);
             builder.AddField("Max level", artifact.MaxLevel == null ? "∞" : artifact.MaxLevel.Value.Beautify());

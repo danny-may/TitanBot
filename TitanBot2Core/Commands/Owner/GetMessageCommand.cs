@@ -11,11 +11,17 @@ namespace TitanBot2.Commands.Owner
         public GetMessageCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => GetMessageAsync(Context.Channel.Id, (ulong)a[0]))
-                 .WithArgTypes(typeof(ulong), typeof(ulong));
+                 .WithArgTypes(typeof(ulong));
+            Calls.AddNew(a => GetMessageAsync(Context.Channel.Id, (ulong)a[0], (bool)a[1]))
+                 .WithArgTypes(typeof(ulong), typeof(bool));
             Calls.AddNew(a => GetMessageAsync((ulong)a[0], (ulong)a[1]))
                  .WithArgTypes(typeof(ulong), typeof(ulong));
             Calls.AddNew(a => GetMessageAsync((ulong)a[0], (ulong)a[1], (bool)a[2]))
                  .WithArgTypes(typeof(ulong), typeof(ulong), typeof(bool));
+            Description = "Gets a single message";
+            Usage.Add("`{0} <messageId> [escaped]` - Gets the given message from the current channel");
+            Usage.Add("`{0} <channelId> <messageId> [escaped]` - Gets the given message from the given channel");
+            RequireOwner = true;
         }
 
         private async Task GetMessageAsync(ulong channelId, ulong messageId, bool escape = false)
