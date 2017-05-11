@@ -41,6 +41,7 @@ namespace TitanBot2.Commands.Clan
             Usage.Add("`{0} info` - Gets information about the clans current level");
             Usage.Add("`{0} now` - Alerts everyone that the Titan Lord is ready to be killed right now");
             Description = "Used for Titan Lord timers and management";
+            DefaultPermission = 8;
         }
 
         private async Task TitanLordInAsync(TimeSpan time)
