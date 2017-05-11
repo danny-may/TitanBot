@@ -219,7 +219,9 @@
     <Compile Include="Commands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\Admin\NotifyCommand.cs" />
     <Compile Include="Commands\Admin\SettingsCommand.cs" />
+    <Compile Include="Commands\Clan\ApplicationsCommand.cs" />
     <Compile Include="Commands\Clan\ExcuseCommand.cs" />
+    <Compile Include="Commands\Clan\RegisterCommand.cs" />
     <Compile Include="Commands\Clan\TitanLordCommand.cs" />
     <Compile Include="Commands\Data\ArtifactsCommand.cs" />
     <Compile Include="Commands\Data\ClaimCommand.cs" />
