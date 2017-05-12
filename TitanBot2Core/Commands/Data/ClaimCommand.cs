@@ -13,7 +13,6 @@ namespace TitanBot2.Commands.Data
             Usage.Add("`{0} <support code>` - Claims a support code as your own.");
             Calls.AddNew(a => ClaimCodeAsync((string)a[0]))
                  .WithArgTypes(typeof(string));
-            Usage.Add("`{0} <supportCode>` - Claims a single support code as your own");
             Description = "Used to tie your discord account to your ingame account. Will be used in the future for API access!";
         }
 
