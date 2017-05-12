@@ -14,6 +14,8 @@ namespace TitanBot2.Common
         public string Token { get; set; } = "";
         public string ShutdownReason { get; set; } = null;
         public ulong InvitePermissions { get; set; } = 8;
+        public ulong SuggestChannel { get; set; } = 312361037749944321;
+        public ulong BugChannel { get; set; } = 312389178564542464;
         public HighScoreSheetRef HighScoreSettings { get; set; } = new HighScoreSheetRef();
         public Dictionary<string, float> Versions { get; set; }
             = new Dictionary<string, float>

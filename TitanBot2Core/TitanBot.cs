@@ -58,7 +58,9 @@ namespace TitanBot2
                 Logger = Logger,
                 TitanBot = this,
                 WebClient = WebService,
-                TT2DataService = TT2DataService
+                TT2DataService = TT2DataService,
+                SuggestionChannelID = Configuration.Instance.SuggestChannel,
+                BugChannelID = Configuration.Instance.BugChannel
             };
             
             TimerService = new TimerService(Dependencies);

@@ -219,6 +219,8 @@
     <Compile Include="Commands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\Admin\NotifyCommand.cs" />
     <Compile Include="Commands\Admin\SettingsCommand.cs" />
+    <Compile Include="Commands\Bot\ReportCommand.cs" />
+    <Compile Include="Commands\Bot\SuggestCommand.cs" />
     <Compile Include="Commands\Clan\ApplicationsCommand.cs" />
     <Compile Include="Commands\Clan\ExcuseCommand.cs" />
     <Compile Include="Commands\Clan\RegisterCommand.cs" />
@@ -227,6 +229,7 @@
     <Compile Include="Commands\Data\ClaimCommand.cs" />
     <Compile Include="Commands\Data\ClanStatsCommand.cs" />
     <Compile Include="Commands\Data\HighScoreCommand.cs" />
+    <Compile Include="Commands\Data\PrestigeCommand.cs" />
     <Compile Include="Commands\General\AboutCommand.cs" />
     <Compile Include="Commands\General\HelpCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
@@ -246,6 +249,8 @@
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IntExtensions.cs" />
     <Compile Include="Extensions\IUserMessageExtensions.cs" />
+    <Compile Include="GuildSpecific\GuildSpecificHandler.cs" />
+    <Compile Include="GuildSpecific\YortKingdom.cs" />
     <Compile Include="Models\HighScoreSheet.cs" />
     <Compile Include="Services\CommandService\CallCollection.cs" />
     <Compile Include="Services\CommandService\Command.cs" />

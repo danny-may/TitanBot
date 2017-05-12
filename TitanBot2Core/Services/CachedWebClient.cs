@@ -20,6 +20,9 @@ namespace TitanBot2.Services
         {
         }
 
+        public void WipeCache()
+            => _cache = new ConcurrentDictionary<Uri, CacheObject>();
+
         public Task<string> GetString(string url)
             => GetString(new Uri(url), DefaultFreshness);
         public Task<string> GetString(Uri url)

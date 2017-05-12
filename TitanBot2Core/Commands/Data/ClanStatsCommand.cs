@@ -19,7 +19,7 @@ namespace TitanBot2.Commands.Data
                  .WithArgTypes(typeof(int), typeof(int));
             Calls.AddNew(a => ShowStatsAsync((int)a[0], (int)a[1], (int)a[2]))
                  .WithArgTypes(typeof(int), typeof(int), typeof(int));
-            Calls.AddNew(a => ShowStatsAsync((int)a[0], (int)a[1], (int)a[2], (int[])a[2]))
+            Calls.AddNew(a => ShowStatsAsync((int)a[0], (int)a[1], (int)a[2], (int[])a[3]))
                  .WithArgTypes(typeof(int), typeof(int), typeof(int), typeof(int[]));
             Usage.Add("`{0} <clanLevel> [MS] [taps] [attackers...]` - Shows data about a clan with the given level");
             Description = "Shows various information for any clan with given attributes";

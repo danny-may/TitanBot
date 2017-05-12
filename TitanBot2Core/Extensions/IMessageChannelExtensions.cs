@@ -1,8 +1,10 @@
 ﻿using Discord;
 using Discord.Net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using TitanBot2.Common;
@@ -18,7 +20,13 @@ namespace TitanBot2.Extensions
             {
                 try
                 {
-                    if (text.Length < 2000)
+                    var serialised = JsonConvert.SerializeObject(embed, Formatting.Indented);
+                    if (text.Length < 2000 && 
+                            (embed == null || 
+                                (embed.Fields.Length <= 25 && 
+                                 embed.Fields.All(f => f.Name.Length <= 256 && f.Value.Length <= 1024) &&
+                                 ((embed.Footer?.Text ?? "") + embed.Description).Length <= 2048 &&
+                                 serialised.Length <= 4000)))
                         return await channel.SendMessageAsync(text, isTTS, embed, options);
 
                     using (var ms = new MemoryStream())
@@ -26,6 +34,8 @@ namespace TitanBot2.Extensions
                         using (var sw = new StreamWriter(ms))
                         {
                             sw.Write(text);
+                            if (embed != null)
+                                sw.Write(serialised);
                             sw.Flush();
                             ms.Position = 0;
                             return await channel.SendFileAsync(ms, "Output.txt", $"{Res.Str.ErrorText} I tried to send a message that was too long!", isTTS, options);

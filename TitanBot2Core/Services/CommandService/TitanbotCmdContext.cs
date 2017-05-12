@@ -23,6 +23,10 @@ namespace TitanBot2.Services.CommandService
         public TitanBotCommandService CommandService { get; set; }
         public string[] Arguments { get; private set; }
         public string Command { get; private set; }
+        public IMessageChannel SuggestionChannel
+            => Dependencies.SuggestionChannel;
+        public IMessageChannel BugChannel
+            => Dependencies.BugChannel;
 
         public TitanbotDependencies Dependencies { get; private set; }
 

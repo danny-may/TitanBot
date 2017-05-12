@@ -29,5 +29,14 @@ namespace TitanBot2.Common
 
         public static int AttacksNeeded(int clanLevel, int attackers, int maxStage, int tapsPerAttack)
             => (int)Math.Ceiling((TitanLordHp(clanLevel) / attackers) / (Math.Max(50, maxStage) * tapsPerAttack + Math.Max(50, maxStage) * 90 * 2));
+
+        public static int RelicsEarned(int stage, int bosLevel)
+            => (int)Math.Floor((1 + (double)bosLevel * 0.05) * Math.Pow((((double)stage - 75) / 14), 1.75));
+
+        public static int TitansOnStage(int stage, int ipLevel)
+            => Math.Max(1, (stage/1000) * 4 + 10 - ipLevel);
+
+        public static TimeSpan RunTime(int from, int to, int ipLevel, int splashAmount)
+            => new TimeSpan(0, 0, (int)Math.Ceiling((to - from) + Enumerable.Range(from, to - from).Sum(s => TitansOnStage(s, ipLevel) / splashAmount + TitansOnStage(s, ipLevel) % splashAmount) * 0.4));
     }
 }

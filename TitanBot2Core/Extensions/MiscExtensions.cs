@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Services.CommandService;
@@ -7,8 +8,12 @@ namespace TitanBot2.Extensions
 {
     public static class MiscExtensions
     {
+        private static Random _rand = new Random();
         public static Discord.Color ToDiscord(this System.Drawing.Color color)
             => new Discord.Color(color.R, color.G, color.B);
+
+        public static System.Drawing.Color RandColor()
+            => System.Drawing.Color.FromArgb(_rand.Next(255), _rand.Next(255), _rand.Next(255));
 
         public static async Task<string[]> GetPrefixes(this TitanbotCmdContext context)
         {
