@@ -227,6 +227,7 @@
     <Compile Include="Commands\Data\ClaimCommand.cs" />
     <Compile Include="Commands\Data\ClanStatsCommand.cs" />
     <Compile Include="Commands\Data\HighScoreCommand.cs" />
+    <Compile Include="Commands\General\AboutCommand.cs" />
     <Compile Include="Commands\General\HelpCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\InviteCommand.cs" />
@@ -236,6 +237,7 @@
     <Compile Include="Commands\Owner\DBPurgeCommand.cs" />
     <Compile Include="Commands\Owner\ExecCommand.cs" />
     <Compile Include="Commands\Owner\GetMessageCommand.cs" />
+    <Compile Include="Commands\Owner\ReloadCommand.cs" />
     <Compile Include="Commands\Owner\SetCommand.cs" />
     <Compile Include="Commands\Owner\ShutdownCommand.cs" />
     <Compile Include="Commands\Owner\TestCommand.cs" />

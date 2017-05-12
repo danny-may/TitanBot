@@ -63,7 +63,7 @@ namespace TitanBot2.Services
             {
                 foreach (var response in responses)
                 {
-                    if (response.Value.Message != null)
+                    if (!string.IsNullOrWhiteSpace(response.Value.Message))
                         await context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} {response.Value.Message}");
                 }
                 return;

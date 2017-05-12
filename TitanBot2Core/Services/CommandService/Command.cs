@@ -161,15 +161,15 @@ namespace TitanBot2.Services.CommandService
 
             var cmdPerm = (await Context.Database.CmdPerms.GetCmdPerm(Context.Guild.Id, Name));
 
+            if ((cmdPerm?.blackListed?.Length ?? 0) != 0)
+                if (cmdPerm.blackListed.Contains(Context.Channel.Id))
+                    return CommandCheckResponse.FromError(null);
+
             if (cmdPerm?.permissionId == null && cmdPerm?.roleIds == null)
             {
                 if (guildUser.HasAll(cmdPerm?.permissionId ?? defaultPerm))
                     return CommandCheckResponse.FromSuccess();
             }
-
-            if ((cmdPerm?.blackListed?.Length ?? 0) != 0)
-                if (cmdPerm.blackListed.Contains(Context.Channel.Id))
-                    return CommandCheckResponse.FromError(null);
 
             if (cmdPerm?.roleIds != null && guildUser.RoleIds.Any(r => cmdPerm?.roleIds?.Contains(r) ?? false))
                 return CommandCheckResponse.FromSuccess();

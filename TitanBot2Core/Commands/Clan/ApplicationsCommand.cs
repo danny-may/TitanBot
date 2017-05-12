@@ -13,6 +13,7 @@ namespace TitanBot2.Commands.Clan
         public ApplicationsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             RequiredContexts = Discord.Commands.ContextType.Guild;
+            RequireOwner = true;
         }
     }
 }

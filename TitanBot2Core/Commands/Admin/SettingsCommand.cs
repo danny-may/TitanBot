@@ -36,6 +36,7 @@ namespace TitanBot2.Commands.Admin
                     Setting.StringDefault("NowText", "Titan Lord", 500, g => g.TitanLord.NowText, (g,s) => g.TitanLord.NowText = s),
                     Setting.StringDefault("RoundText", "Titan Lord", 500, g => g.TitanLord.RoundText, (g,s) => g.TitanLord.RoundText = s, "Use %TIME% for the time, %USER% for the user, and %ROUND% for the round"),
                     Setting.IntDefault("ClanQuest", "Titan Lord", g => g.TitanLord.CQ, (g,v) => g.TitanLord.CQ = v),
+                    Setting.UlongDefault("PermissionOverride", "General", g => g.PermOverride, (g,v) => g.PermOverride = v),
                     Setting.BoolDefault("PinTimer", "Titan Lord", g => g.TitanLord.PinTimer, (g,v) => g.TitanLord.PinTimer = v, "NOTE: Wont pin if it doesnt have permission"),
                     Setting.ChannelDefault("TimerChannel", "Titan Lord", g => g.TitanLord.Channel ?? 0, (g,v) => g.TitanLord.Channel = v),
                     Setting.Default("CustomPrefix", "General", g => g.Prefix, (g,s) => $"Please use `{Context.Prefix}prefix <new prefix>` to set the prefix"),
@@ -148,6 +149,17 @@ namespace TitanBot2.Commands.Admin
                 {
                     int val;
                     if (int.TryParse(s, out val))
+                        setter(g, val);
+                    else
+                        return "Please supply a valid number.";
+                    return null;
+                }, notes);
+
+            public static Setting UlongDefault(string key, string group, Func<Guild, ulong> getter, Action<Guild, ulong> setter, string notes = "")
+                => Default(key, group, g => getter(g).ToString(), (g, s) =>
+                {
+                    ulong val;
+                    if (ulong.TryParse(s, out val))
                         setter(g, val);
                     else
                         return "Please supply a valid number.";

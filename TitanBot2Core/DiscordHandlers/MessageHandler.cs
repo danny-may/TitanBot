@@ -1,8 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot2.Common;
+using TitanBot2.Extensions;
 using TitanBot2.Services;
 using TitanBot2.Services.CommandService;
 
@@ -11,6 +13,8 @@ namespace TitanBot2.DiscordHandlers
     public class MessageHandler : HandlerBase
     {
         private TitanBotCommandService _cmds;
+
+        private DateTime _lastWave = DateTime.Now;
 
         public override async Task Install(TitanbotDependencies args)
         {
@@ -78,6 +82,12 @@ namespace TitanBot2.DiscordHandlers
             var msg = s as SocketUserMessage;
             if (msg == null || (msg.Author.IsBot && msg.Author.Id != 134133271750639616))
                 return;
+
+            if ((msg.Content.StartsWith("👋") || msg.Content.StartsWith(":wave:")) && DateTime.Now.AddSeconds(-20) > _lastWave)
+            {
+                _lastWave = DateTime.Now;
+                await msg.Channel.SendMessageSafeAsync("👋");
+            }
 
             var context = new TitanbotCmdContext(Dependencies, msg);
             

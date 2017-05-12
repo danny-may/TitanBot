@@ -9,6 +9,7 @@ namespace TitanBot2.Commands.Clan
         public RegisterCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             RequiredContexts = Discord.Commands.ContextType.Guild;
+            RequireOwner = true;
         }
 
         private async Task RegisterAsync(int maxStage, string message)

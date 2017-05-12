@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Services.Database.Models;
 
@@ -13,27 +14,38 @@ namespace TitanBot2.Services.Database.Extensions
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command, Func<Exception, Task> handler)
             => await Database.QueryAsync(conn => conn.CmdPermTable.FindOne(c => c.guildId == guildid && c.commandname == command), handler);
 
-        public async Task SetCmdPerm(ulong guildid, string command, string subCommand, ulong[] roleIds = null, ulong? permission = null)
-            => await SetCmdPerm(guildid, command, subCommand, null, roleIds, permission);
-        public async Task SetCmdPerm(ulong guildid, string command, string subCommand, Func<Exception, Task> handler, ulong[] roleIds = null, ulong? permission = null)
+        public async Task SetCmdPerm(ulong guildid, string command, ulong[] roleIds = null, ulong? permission = null)
+            => await SetCmdPerm(guildid, command, null, roleIds, permission);
+        public async Task SetCmdPerm(ulong guildid, string command, Func<Exception, Task> handler, ulong[] roleIds = null, ulong? permission = null)
         {
-            var newPerm = new CmdPerm
+            var existing = await GetCmdPerm(guildid, command) ?? new CmdPerm
             {
-                guildId = guildid,
                 commandname = command,
-                permissionId = permission,
-                roleIds = roleIds
+                guildId = guildid
             };
 
-            var current = await GetCmdPerm(guildid, command);
+            existing.roleIds = roleIds;
+            existing.permissionId = permission;
 
             await Database.QueryAsync(conn =>
             {
-                if (current != null)
-                    conn.CmdPermTable.Delete(current.entryId);
                 if (roleIds != null || permission != null)
-                    conn.CmdPermTable.Insert(newPerm);
+                    conn.CmdPermTable.Upsert(existing);
             }, handler);
+        }
+
+        public async Task BlackList(ulong guildid, string command, ulong[] channels, bool blacklist)
+        {
+            var existing = await GetCmdPerm(guildid, command) ?? new CmdPerm
+            {
+                commandname = command,
+                guildId = guildid
+            };
+            if (blacklist)
+                existing.blackListed = channels.Concat(existing.blackListed ?? new ulong[0]).Distinct().ToArray();
+            else
+                existing.blackListed = (existing.blackListed ?? new ulong[0]).Except(channels).Distinct().ToArray();
+            await Database.QueryAsync(conn => conn.CmdPermTable.Upsert(existing));
         }
 
         public async Task ResetCmdPerm(ulong guildid, string command)
