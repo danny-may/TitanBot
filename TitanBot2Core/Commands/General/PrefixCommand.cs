@@ -14,7 +14,8 @@ namespace TitanBot2.Commands.General
             DefaultPermission = 8;
             Calls.AddNew(a => GetPrefixesAsync());
             Calls.AddNew(a => SetPrefixAsync((string)a[0]))
-                 .WithArgTypes(typeof(string));
+                 .WithArgTypes(typeof(string))
+                 .WithItemAsParams(0);
             Description = "Gets or sets a custom prefix that is required to use my commands";
             Usage.Add("`{0}` - Gets all the available current prefixes");
             Usage.Add("`{0} <prefix>` - Sets the custom prefix");

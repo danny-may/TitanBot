@@ -20,7 +20,7 @@ namespace TitanBot2.Commands.General
         public async Task ShowAbout()
         {
             var message = $@"'Ello there :wave:, Im Titanbot! Im an open source discord bot dedicated to TT2 written in C# by Titansmasher.
-I can do a variety of things, all of which are better doccumented in my `{Context.Prefix}help` command!
+I can do a variety of things, all of which are better documented in my `{Context.Prefix}help` command!
 
 Im always going to be taking suggestions, which can either be DM'd to Titansmasher (He has a terrible memory though) Or sent in the #suggestions channel on my support server!
 

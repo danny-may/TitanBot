@@ -34,6 +34,7 @@ namespace TitanBot2.Commands.Admin
             Usage.Add("`{0} blacklist <commands..> <channels..>` - Prevents anyone with permissions below the override permissions from using the command in the given channel");
             Usage.Add("`{0} whitelist <commands..> <channels..>` - Reenables the use of the commands in the channels");
             Usage.Add("`{0} reset <commands..>` - Resets the roles and permissions required to use each command supplied");
+            Usage.Add("To work out just what permission id you need, give the [permission calculator](https://discordapi.com/permissions.html) a try!");
             Description = "Used to allow people with varying roles or permissions to use different commands.";
             RequiredContexts = DC.ContextType.Guild;
         }

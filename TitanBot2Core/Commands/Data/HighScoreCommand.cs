@@ -43,7 +43,7 @@ namespace TitanBot2.Commands.Data
             var data = places.Select(p => new string[] { p.Ranking.ToString(), p.TotalRelics, p.UserName, p.ClanName }).ToArray();
             data = new string[][] { new string[] { "##", " Relics", " Username", " Clan" } }.Concat(data).ToArray();
 
-            await ReplyAsync($"Here are the currently know users in rank {from} - {to}:\n```md\n{data.Tableify("[{0}]", "{0}  ")}```");
+            await ReplyAsync($"Here are the currently known users in rank {from} - {to}:\n```md\n{data.Tableify("[{0}]", "{0}  ")}```");
 
             return;
         }
