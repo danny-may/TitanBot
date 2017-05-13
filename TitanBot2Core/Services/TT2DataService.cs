@@ -1,5 +1,6 @@
 ﻿using Csv;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace TitanBot2.Services
         private CachedWebClient WebClient { get; }
         private static readonly string _ghStaticUrl = "https://s3.amazonaws.com/tt2-static/info_files/";
         private static readonly string _artifactFileLocation = "/ArtifactInfo.csv";
+        private static readonly string _equipmentFileLocation = "/EquipmentInfo.csv";
         private static readonly string _highScoreSheet = "https://docs.google.com/spreadsheets/d/13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY/export?format=csv&id=13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY&gid=4642011";
 
 
@@ -24,46 +26,149 @@ namespace TitanBot2.Services
             WebClient = client;
         }
 
-        public async Task<Artifact> GetArtifact(int artifactId)
+        private Artifact BuildArtifact(ICsvLine serverData, Artifact.ArtifactStatic staticData, Bitmap image, string version)
         {
-            float version = 1.0f;
-
-            Configuration.Instance.Versions.TryGetValue(_artifactFileLocation, out version);
-
-            var data = await WebClient.GetString(_ghStaticUrl + version.ToString("#.0") + _artifactFileLocation);
-            if (data == null)
-                return null;
-
-            var dataCSV = CsvReader.ReadFromText(data);
-            ICsvLine artifactRow = dataCSV.SingleOrDefault(r => r[0].EndsWith("t" + artifactId));
-            if (artifactRow == null)
-                return null;
-
             int maxLevel;
             string tt1, note, name;
             BonusType bonusType;
             double effectPerLevel, damageBonus, costCoef, costExpo;
 
-            int.TryParse(artifactRow[1], out maxLevel);
-            tt1 = artifactRow[2];
-            Enum.TryParse(artifactRow[3], out bonusType);
-            double.TryParse(artifactRow[4], out effectPerLevel);
-            double.TryParse(artifactRow[5], out damageBonus);
-            double.TryParse(artifactRow[6], out costCoef);
-            double.TryParse(artifactRow[7], out costExpo);
-            note = artifactRow[8];
-            name = artifactRow[9];
+            int.TryParse(serverData[1], out maxLevel);
+            tt1 = serverData[2];
+            Enum.TryParse(serverData[3], out bonusType);
+            double.TryParse(serverData[4], out effectPerLevel);
+            double.TryParse(serverData[5], out damageBonus);
+            double.TryParse(serverData[6], out costCoef);
+            double.TryParse(serverData[7], out costExpo);
+            note = serverData[8];
+            name = serverData[9];
 
-            var artifact = new Artifact(artifactId, maxLevel == 0 ? (int?)null : maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, name, version);
+            return staticData.BuildArtifact(maxLevel == 0 ? (int?)null : maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, image, version);
+        }
 
-            var imageBytes = await WebClient.GetBytes(artifact.ImageUrl);
+        private Equipment BuildEquipment(ICsvLine serverData, Equipment.EquipmentStatic staticData, Bitmap image, string version)
+        {
+            EquipmentClass eClass;
+            BonusType bonusType;
+            EquipmentRarity rarity;
+            double bonusBase, bonusIncrease;
+            EquipmentSource source;
 
-            if (imageBytes == null)
-                return artifact;
+            Enum.TryParse(serverData[1], out eClass);
+            Enum.TryParse(serverData[2], out bonusType);
+            Enum.TryParse(serverData[3], out rarity);
+            double.TryParse(serverData[4], out bonusBase);
+            double.TryParse(serverData[5], out bonusIncrease);
+            Enum.TryParse(serverData[6], out source);
 
-            artifact.Image = new Bitmap(new MemoryStream(imageBytes));
+            return staticData.BuildEquipment(eClass, bonusType, rarity, bonusBase, bonusIncrease, source, image, version);
+        }
 
-            return artifact;
+        public async Task<Artifact> GetArtifact(Artifact.ArtifactStatic artifactStatic)
+        {
+
+            Configuration.Instance.Versions.TryGetValue(_artifactFileLocation, out string version);
+
+            version = version ?? "1.0";
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _artifactFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+            ICsvLine artifactRow = dataCSV.SingleOrDefault(r => r[0].EndsWith("t" + artifactStatic.Id));
+            if (artifactRow == null)
+                return null;
+
+            var imageBytes = artifactStatic.ImageUrl == null ? null : await WebClient.GetBytes(artifactStatic.ImageUrl);
+
+            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+            return BuildArtifact(artifactRow, artifactStatic, image, version);
+        }
+
+        public async Task<Equipment> GetEquipment(Equipment.EquipmentStatic equipmentStatic)
+        {
+
+            Configuration.Instance.Versions.TryGetValue(_equipmentFileLocation, out string version);
+
+            version = version ?? "1.0";
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _equipmentFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+            ICsvLine equipmentRow = dataCSV.SingleOrDefault(r => r[0] == equipmentStatic.Id);
+            if (equipmentRow == null)
+                return null;
+
+            var imageBytes = equipmentStatic.ImageUrl == null ? null : await WebClient.GetBytes(equipmentStatic.ImageUrl);
+
+            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+            return BuildEquipment(equipmentRow, equipmentStatic, image, version);
+        }
+
+        public async Task<List<Artifact>> GetAllArtifacts()
+        {
+            Configuration.Instance.Versions.TryGetValue(_artifactFileLocation, out string version);
+
+            version = version ?? "1.0";
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _artifactFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+
+            var items = new List<Tuple<Artifact.ArtifactStatic, ICsvLine, Bitmap>>();
+
+            foreach (var art in Artifact.Artifacts)
+            {
+                var imageBytes = art.ImageUrl == null ? null : await WebClient.GetBytes(art.ImageUrl);
+
+                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+                var artifactRow = dataCSV.SingleOrDefault(r => r[0].EndsWith("t" + art.Id));
+                if (artifactRow == null)
+                    continue;
+
+                items.Add(Tuple.Create(art, artifactRow, image));
+            }
+
+            return items.Select(i => BuildArtifact(i.Item2, i.Item1, i.Item3, version)).ToList();
+        }
+
+        public async Task<List<Equipment>> GetAllEquipment()
+        {
+            Configuration.Instance.Versions.TryGetValue(_equipmentFileLocation, out string version);
+
+            version = version ?? "1.0";
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _equipmentFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+
+            var items = new List<Tuple<Equipment.EquipmentStatic, ICsvLine, Bitmap>>();
+
+            foreach (var equip in Equipment.Equipments)
+            {
+                var imageBytes = equip.ImageUrl == null ? null : await WebClient.GetBytes(equip.ImageUrl);
+
+                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+                var equipmentRow = dataCSV.SingleOrDefault(r => r[0] == equip.Id);
+
+                if (equipmentRow == null)
+                    continue;
+
+                items.Add(Tuple.Create(equip, equipmentRow, image));
+            }
+
+            return items.Select(i => BuildEquipment(i.Item2, i.Item1, i.Item3, version)).ToList();
         }
 
         public async Task<HighScoreSheet> GetHighScores()

@@ -17,10 +17,11 @@ namespace TitanBot2.Common
         public ulong SuggestChannel { get; set; } = 312361037749944321;
         public ulong BugChannel { get; set; } = 312389178564542464;
         public HighScoreSheetRef HighScoreSettings { get; set; } = new HighScoreSheetRef();
-        public Dictionary<string, float> Versions { get; set; }
-            = new Dictionary<string, float>
+        public Dictionary<string, string> Versions { get; set; }
+            = new Dictionary<string, string>
             {
-                { "/ArtifactInfo.csv", 1.0f }
+                { "/ArtifactInfo.csv", "1.0" },
+                { "/EquipmentInfo.csv", "1.0" }
             };
 
         private static Configuration _instance;

@@ -8,13 +8,13 @@ namespace TitanBot2.TypeReaders.Readers
     {
         public override async Task<TypeReaderResult> Read(TitanbotCmdContext context, string value)
         {
-            var artId = Artifact.FindArtifact(value);
-            if (artId == null)
+            var art = Artifact.Find(value);
+            if (art == null)
                 return TypeReaderResult.FromError($"`{value}` is not a valid artifact");
 
-            var artifact = await context.TT2DataService.GetArtifact(artId.Value);
+            var artifact = await context.TT2DataService.GetArtifact(art);
             if (artifact == null)
-                return TypeReaderResult.FromError($"Could not download data for artifact #{artId.Value}");
+                return TypeReaderResult.FromError($"Could not download data for artifact `#{art.Id}`");
             return TypeReaderResult.FromSuccess(artifact);
         }
     }

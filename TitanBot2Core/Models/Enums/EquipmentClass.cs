@@ -1,6 +1,6 @@
 ﻿namespace TitanBot2.Models.Enums
 {
-    public enum EquipmentClasss
+    public enum EquipmentClass
     {
         None = -1,
         Weapon,

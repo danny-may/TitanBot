@@ -29,7 +29,8 @@ namespace TitanBot2.Extensions
                     }
                 }
             }
-
+            if (pixTot == 0)
+                return Color.FromArgb(0);
             return Color.FromArgb((int)(rTot / pixTot), (int)(gTot / pixTot), (int)(bTot / pixTot));
         }
     }

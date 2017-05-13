@@ -8,7 +8,7 @@ namespace TitanBot2.Models
 {
     public class Artifact
     {
-        public int Id { get; }
+        public int Id => _staticData.Id;
         public int? MaxLevel { get; }
         public string TT1 { get; }
         public BonusType BonusType { get; }
@@ -17,24 +17,27 @@ namespace TitanBot2.Models
         public double CostCoef { get; }
         public double CostExpo { get; }
         public string Note { get; }
-        public string Name { get; }
-        public float FileVersion { get; }
-        public string ImageUrl { get { return UrlMap[Id]; } }
-        public Bitmap Image { get; set; }
+        public string Name => _staticData.Name;
+        public string FileVersion { get; }
+        public ArtifactTier Tier => _staticData.Tier;
+        public string ImageUrl => _staticData.ImageUrl;
+        public Bitmap Image { get; }
 
-        public Artifact(int id, 
-                        int? maxLevel, 
-                        string tt1, 
-                        BonusType bonusType, 
-                        double effectPerLevel, 
-                        double damageBonus, 
-                        double costCoef, 
-                        double costExpo, 
-                        string note, 
-                        string name, 
-                        float fileVersion)
+        private ArtifactStatic _staticData { get; }
+
+        internal Artifact(ArtifactStatic staticData,
+                          int? maxLevel, 
+                          string tt1, 
+                          BonusType bonusType, 
+                          double effectPerLevel, 
+                          double damageBonus, 
+                          double costCoef, 
+                          double costExpo, 
+                          string note, 
+                          Bitmap image,
+                          string fileVersion)
         {
-            Id = id;
+            _staticData = staticData;
             MaxLevel = maxLevel;
             TT1 = tt1;
             BonusType = bonusType;
@@ -43,7 +46,7 @@ namespace TitanBot2.Models
             CostCoef = costCoef;
             CostExpo = costExpo;
             Note = note;
-            Name = name;
+            Image = image;
             FileVersion = fileVersion;
         }
 
@@ -77,155 +80,84 @@ namespace TitanBot2.Models
             return total;
         }
 
-        public static int? FindArtifact(string name)
+        public static ArtifactStatic Find(string name)
         {
-            return ArtifactNames.Where(v => v.Key.Replace(" ", "").ToLower() == name.Replace(" ", "").ToLower() || v.Value.ToString() == name)
-                                .Select(v => v.Value)
-                                .Cast<int?>()
-                                .FirstOrDefault();
+            return Artifacts.SingleOrDefault(a => a.Id.ToString() == name.ToString() ||
+                                                  a.Name.Replace(" ", "").ToLower().Contains(name.Replace(" ", "").ToLower()) ||
+                                                  a.Alias.Count(v => v.ToLower() == name.ToLower()) > 0);
         }
 
-        private static IDictionary<int, string> UrlMap { get; } =
-            new Dictionary<int, string>
-            {
-                { 14, "http://www.cockleshell.org/static/TT2/img/a15.png" },
-                { 28, "http://www.cockleshell.org/static/TT2/img/a16.png" },
-                { 4, "http://www.cockleshell.org/static/TT2/img/a20.png" },
-                { 35, "http://www.cockleshell.org/static/TT2/img/a9.png" },
-                { 20, "http://www.cockleshell.org/static/TT2/img/a12.png" },
-                { 22, "http://www.cockleshell.org/static/TT2/img/a1.png" },
-                { 10, "http://www.cockleshell.org/static/TT2/img/a27.png" },
-                { 34, "http://www.cockleshell.org/static/TT2/img/a7.png" },
-                { 19, "http://www.cockleshell.org/static/TT2/img/a25.png" },
-                { 21, "http://www.cockleshell.org/static/TT2/img/a13.png" },
-                { 31, "http://www.cockleshell.org/static/TT2/img/a11.png" },
-                { 29, "http://www.cockleshell.org/static/TT2/img/a37.png" },
-                { 18, "http://www.cockleshell.org/static/TT2/img/a26.png" },
-                { 6, "http://www.cockleshell.org/static/TT2/img/a34.png" },
-                { 13, "http://www.cockleshell.org/static/TT2/img/a30.png" },
-                { 32, "http://www.cockleshell.org/static/TT2/img/a6.png" },
-                { 38, "http://www.cockleshell.org/static/TT2/img/a5.png" },
-                { 16, "http://www.cockleshell.org/static/TT2/img/a28.png" },
-                { 27, "http://www.cockleshell.org/static/TT2/img/a31.png" },
-                { 26, "http://www.cockleshell.org/static/TT2/img/a10.png" },
-                { 23, "http://www.cockleshell.org/static/TT2/img/a19.png" },
-                { 1, "http://www.cockleshell.org/static/TT2/img/a4.png" },
-                { 17, "http://www.cockleshell.org/static/TT2/img/a18.png" },
-                { 8, "http://www.cockleshell.org/static/TT2/img/a33.png" },
-                { 36, "http://www.cockleshell.org/static/TT2/img/a35.png" },
-                { 5, "http://www.cockleshell.org/static/TT2/img/a24.png" },
-                { 9, "http://www.cockleshell.org/static/TT2/img/a3.png" },
-                { 25, "http://www.cockleshell.org/static/TT2/img/a17.png" },
-                { 37, "http://www.cockleshell.org/static/TT2/img/a29.png" },
-                { 7, "http://www.cockleshell.org/static/TT2/img/a2.png" },
-                { 15, "http://www.cockleshell.org/static/TT2/img/a14.png" },
-                { 24, "http://www.cockleshell.org/static/TT2/img/a23.png" },
-                { 2, "http://www.cockleshell.org/static/TT2/img/a38.png" },
-                { 12, "http://www.cockleshell.org/static/TT2/img/a32.png" },
-                { 3, "http://www.cockleshell.org/static/TT2/img/a22.png" },
-                { 33, "http://www.cockleshell.org/static/TT2/img/a8.png" },
-                { 39, "http://www.cockleshell.org/static/TT2/img/a21.png" },
-                { 11, "http://www.cockleshell.org/static/TT2/img/a36.png" }
-            };
+        public static List<ArtifactStatic> Artifacts => new List<ArtifactStatic>
+        {
+            new ArtifactStatic(1, "Heroic Shield", new string[]{ "HSh" }, "http://www.cockleshell.org/static/TT2/img/a4.png", ArtifactTier.B),
+            new ArtifactStatic(2, "Stone of the Valrunes", new string[]{ "SoV", "SV" }, "http://www.cockleshell.org/static/TT2/img/a38.png", ArtifactTier.D),
+            new ArtifactStatic(3, "The Arcana Cloak", new string[]{ "tAC", "AC" }, "http://www.cockleshell.org/static/TT2/img/a22.png", ArtifactTier.A),
+            new ArtifactStatic(4, "Axe of Muerte", new string[]{ "AoM", "AM" }, "http://www.cockleshell.org/static/TT2/img/a20.png", ArtifactTier.B),
+            new ArtifactStatic(5, "Invader's Shield", new string[]{ "IS" }, "http://www.cockleshell.org/static/TT2/img/a24.png", ArtifactTier.D),
+            new ArtifactStatic(6, "Elixir of Eden", new string[]{ "EoE", "EE" }, "http://www.cockleshell.org/static/TT2/img/a34.png", ArtifactTier.E),
+            new ArtifactStatic(7, "Parchment of Foresight", new string[]{ "PoF", "PF" }, "http://www.cockleshell.org/static/TT2/img/a2.png", ArtifactTier.A),
+            new ArtifactStatic(8, "Hunter's Ointment", new string[]{ "HO" }, "http://www.cockleshell.org/static/TT2/img/a33.png", ArtifactTier.E),
+            new ArtifactStatic(9, "Laborer's Pendant", new string[]{ "LP" }, "http://www.cockleshell.org/static/TT2/img/a3.png", ArtifactTier.B),
+            new ArtifactStatic(10, "Bringer of Ragnarok", new string[]{ "BoR", "BR" }, "http://www.cockleshell.org/static/TT2/img/a27.png", ArtifactTier.E),
+            new ArtifactStatic(11, "Titan's Mask", new string[]{ "TM" }, "http://www.cockleshell.org/static/TT2/img/a36.png", ArtifactTier.E),
+            new ArtifactStatic(12, "Swamp Gauntlet", new string[]{ "SG" }, "http://www.cockleshell.org/static/TT2/img/a32.png", ArtifactTier.E),
+            new ArtifactStatic(13, "Forbidden Scroll", new string[]{ "FS" }, "http://www.cockleshell.org/static/TT2/img/a30.png", ArtifactTier.D),
+            new ArtifactStatic(14, "Aegis", new string[]{ "AG" }, "http://www.cockleshell.org/static/TT2/img/a15.png", ArtifactTier.A),
+            new ArtifactStatic(15, "Ring of Fealty", new string[]{ "RoF", "RF" }, "http://www.cockleshell.org/static/TT2/img/a14.png", ArtifactTier.B),
+            new ArtifactStatic(16, "Glacial Axe", new string[]{ "GA" }, "http://www.cockleshell.org/static/TT2/img/a28.png", ArtifactTier.E),
+            new ArtifactStatic(17, "Hero's Blade", new string[]{ "HB" }, "http://www.cockleshell.org/static/TT2/img/a18.png", ArtifactTier.B),
+            new ArtifactStatic(18, "Egg of Fortune", new string[]{ "EoF", "EF" }, "http://www.cockleshell.org/static/TT2/img/a26.png", ArtifactTier.D),
+            new ArtifactStatic(19, "Chest of Contentment", new string[]{ "CoC", "CC" }, "http://www.cockleshell.org/static/TT2/img/a25.png", ArtifactTier.D),
+            new ArtifactStatic(20, "Book of Prophecy", new string[]{ "BoP", "BP" }, "http://www.cockleshell.org/static/TT2/img/a12.png", ArtifactTier.C),
+            new ArtifactStatic(21, "Divine Chalice", new string[]{ "DC" }, "http://www.cockleshell.org/static/TT2/img/a13.png", ArtifactTier.C),
+            new ArtifactStatic(22, "Book of Shadows", new string[]{ "BoS", "BS" }, "http://www.cockleshell.org/static/TT2/img/a1.png", ArtifactTier.S),
+            new ArtifactStatic(23, "Helmet of Madness", new string[]{ "HoM", "HM" }, "http://www.cockleshell.org/static/TT2/img/a19.png", ArtifactTier.C),
+            new ArtifactStatic(24, "Staff of Radiance", new string[]{ "SoR", "SR" }, "http://www.cockleshell.org/static/TT2/img/a23.png", ArtifactTier.C),
+            new ArtifactStatic(25, "Lethe Water", new string[]{ "LW" }, "http://www.cockleshell.org/static/TT2/img/a17.png", ArtifactTier.B),
+            new ArtifactStatic(26, "Heavenly Sword", new string[]{ "HSW" }, "http://www.cockleshell.org/static/TT2/img/a10.png", ArtifactTier.B),
+            new ArtifactStatic(27, "Glove of Kuma", new string[]{ "GoK", "GK" }, "http://www.cockleshell.org/static/TT2/img/a31.png", ArtifactTier.D),
+            new ArtifactStatic(28, "Amethyst Staff", new string[]{ "AS" }, "http://www.cockleshell.org/static/TT2/img/a16.png", ArtifactTier.B),
+            new ArtifactStatic(29, "Drunken Hammer", new string[]{ "DH" }, "http://www.cockleshell.org/static/TT2/img/a37.png", ArtifactTier.E),
+            new ArtifactStatic(31, "Divine Retribution", new string[]{ "DR" }, "http://www.cockleshell.org/static/TT2/img/a11.png", ArtifactTier.B),
+            new ArtifactStatic(32, "Fruit of Eden", new string[]{ "FoE", "FE" }, "http://www.cockleshell.org/static/TT2/img/a6.png", ArtifactTier.A),
+            new ArtifactStatic(33, "The Sword of Storms", new string[]{ "tSoS", "tSS", "SS" }, "http://www.cockleshell.org/static/TT2/img/a8.png", ArtifactTier.A),
+            new ArtifactStatic(34, "Charm of the Ancient", new string[]{ "CoA", "CA" }, "http://www.cockleshell.org/static/TT2/img/a7.png", ArtifactTier.A),
+            new ArtifactStatic(35, "Blade of Damocles", new string[]{ "BoD", "BD" }, "http://www.cockleshell.org/static/TT2/img/a9.png", ArtifactTier.A),
+            new ArtifactStatic(36, "Infinity Pendulum", new string[]{ "IP" }, "http://www.cockleshell.org/static/TT2/img/a35.png", ArtifactTier.E),
+            new ArtifactStatic(37, "Oak Staff", new string[]{ "OS" }, "http://www.cockleshell.org/static/TT2/img/a29.png", ArtifactTier.E),
+            new ArtifactStatic(38, "Furies Bow", new string[]{ "FB" }, "http://www.cockleshell.org/static/TT2/img/a5.png", ArtifactTier.A),
+            new ArtifactStatic(39, "Titan Spear", new string[]{ "TS" }, "http://www.cockleshell.org/static/TT2/img/a21.png", ArtifactTier.B)
+        };
 
-        private static IDictionary<string, int> ArtifactNames { get; } =
-            new Dictionary<string, int>
+        public class ArtifactStatic
+        {
+            public int Id { get; }
+            public string Name { get; }
+            public string[] Alias { get; }
+            public string ImageUrl { get; }
+            public ArtifactTier Tier { get; }
+            internal ArtifactStatic(int id, string name, string[] aliases, string url, ArtifactTier tier)
             {
-                { "Heroic Shield", 1 },
-                { "HSh", 1 },
-                { "SV", 2 },
-                { "SoV", 2 },
-                { "Stone of the Valrunes", 2 },
-                { "AC", 3 },
-                { "tAC", 3 },
-                { "The Arcana Cloak", 3 },
-                { "AM", 4 },
-                { "AoM", 4 },
-                { "Axe of Muerte", 4 },
-                { "Invader's Shield", 5 },
-                { "IS", 5 },
-                { "EE", 6 },
-                { "Elixir of Eden", 6 },
-                { "EoE", 6 },
-                { "Parchment of Foresight", 7 },
-                { "PF", 7 },
-                { "PoF", 7 },
-                { "HO", 8 },
-                { "Hunter's Ointment", 8 },
-                { "Laborer's Pendant", 9 },
-                { "LP", 9 },
-                { "BoR", 10 },
-                { "BR", 10 },
-                { "Bringer of Ragnarok", 10 },
-                { "Titan's Mask", 11 },
-                { "TM", 11 },
-                { "SG", 12 },
-                { "Swamp Gauntlet", 12 },
-                { "Forbidden Scroll", 13 },
-                { "FS", 13 },
-                { "Aegis", 14 },
-                { "AG", 14 },
-                { "RF", 15 },
-                { "Ring of Fealty", 15 },
-                { "RoF", 15 },
-                { "GA", 16 },
-                { "Glacial Axe", 16 },
-                { "HB", 17 },
-                { "Hero's Blade", 17 },
-                { "EF", 18 },
-                { "Egg of Fortune", 18 },
-                { "EoF", 18 },
-                { "CC", 19 },
-                { "Chest of Contentment", 19 },
-                { "CoC", 19 },
-                { "Book of Prophecy", 20 },
-                { "BoP", 20 },
-                { "BP", 20 },
-                { "DC", 21 },
-                { "Divine Chalice", 21 },
-                { "Book of Shadows", 22 },
-                { "BoS", 22 },
-                { "BS", 22 },
-                { "Helmet of Madness", 23 },
-                { "HM", 23 },
-                { "HoM", 23 },
-                { "SoR", 24 },
-                { "SR", 24 },
-                { "Staff of Radiance", 24 },
-                { "Lethe Water", 25 },
-                { "LW", 25 },
-                { "Heavenly Sword", 26 },
-                { "HSW", 26 },
-                { "GK", 27 },
-                { "Glove of Kuma", 27 },
-                { "GoK", 27 },
-                { "Amethyst Staff", 28 },
-                { "AS", 28 },
-                { "DH", 29 },
-                { "Drunken Hammer", 29 },
-                { "Divine Retribution", 31 },
-                { "DR", 31 },
-                { "FE", 32 },
-                { "FoE", 32 },
-                { "Fruit of Eden", 32 },
-                { "SS", 33 },
-                { "The Sword of Storms", 33 },
-                { "tSoS", 33 },
-                { "tSS", 33 },
-                { "CA", 34 },
-                { "Charm of the Ancient", 34 },
-                { "CoA", 34 },
-                { "BD", 35 },
-                { "Blade of Damocles", 35 },
-                { "BoD", 35 },
-                { "Infinity Pendulum", 36 },
-                { "IP", 36 },
-                { "Oak Staff", 37 },
-                { "OS", 37 },
-                { "FB", 38 },
-                { "Furies Bow", 38 },
-                { "Titan Spear", 39 },
-                { "TS", 39 }
-            };
+                Id = id;
+                Name = name;
+                Alias = aliases;
+                ImageUrl = url;
+                Tier = tier;
+            }
+
+            public Artifact BuildArtifact(int? maxLevel,
+                                          string tt1,
+                                          BonusType bonusType,
+                                          double effectPerLevel,
+                                          double damageBonus,
+                                          double costCoef,
+                                          double costExpo,
+                                          string note,
+                                          Bitmap image,
+                                          string fileVersion)
+            {
+                return new Artifact(this, maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, image, fileVersion);
+            }
+        }
     }
 }

@@ -23,6 +23,7 @@ namespace TitanBot2.Services.CommandService
         public DC.ContextType RequiredContexts { get; protected set; } = DC.ContextType.DM | DC.ContextType.Group | DC.ContextType.Guild;
         public ulong DefaultPermission { get; protected set; } = 0;
         public CallCollection Calls = new CallCollection();
+        protected string DelayMessage { get; set; } = "This seems to be taking longer than expected... ";
         protected TypeReaderCollection Readers { get; set; }
 
         private bool HasReplied;
@@ -55,7 +56,7 @@ namespace TitanBot2.Services.CommandService
                     await Task.Delay(1000);
                     if (!HasReplied)
                     {
-                        awaitMessage = await Context.Channel.SendMessageSafeAsync("This seems to be taking longer than expected... ");
+                        awaitMessage = await Context.Channel.SendMessageSafeAsync(DelayMessage);
                     }
                 }).Start();
 

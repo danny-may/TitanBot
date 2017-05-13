@@ -28,10 +28,14 @@ namespace TitanBot2.Extensions
 
             position = (maxLength + position) % maxLength;
             var overflowAmount = Math.Max(1, data.Count() - maxLength +1);
-            for (int i = 0; i < Math.Min(data.Count(), maxLength); i++)
+            for (int i = 0; i < data.Count(); i++)
             {
                 if (i == position)
-                    yield return string.Join(" ", data.Skip(i).Take(overflowAmount));
+                {
+                    var res = string.Join(" ", data.Skip(i).Take(overflowAmount));
+                    i += overflowAmount - 1;
+                    yield return res;
+                }
                 else
                     yield return data.Skip(i).First();
             }

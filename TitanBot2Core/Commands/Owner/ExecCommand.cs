@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace TitanBot2.Commands.Owner
     {
         public ExecCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
-            Calls.AddNew(a => ExecAsync((string)a[0]))
+            Calls.AddNew(a => ExecAsync())
                  .WithArgTypes(typeof(string))
                  .WithItemAsParams(0);
 
@@ -27,8 +28,10 @@ namespace TitanBot2.Commands.Owner
             Description = "Allows for arbitrary code execution";
         }
 
-        public async Task ExecAsync(string code)
+        public async Task ExecAsync()
         {
+            var code = Context.Message.Content.Substring(Context.Prefix.Length + Context.Command.Length);
+
             var codeWithUsings = $@"using Discord;
 using Discord.Commands;
 using System;
@@ -49,34 +52,43 @@ using System.Threading.Tasks;
                 Context = Context
             };
 
-            object result;
+            object result = null;
 
-            var start = DateTime.Now;
+            Script<object> compiled = null;
+
+            var compileStart = DateTime.Now;
             try
             {
-                result = await CSharpScript.EvaluateAsync(codeWithUsings,
-                                                              ScriptOptions.Default.WithReferences(typeof(EmbedBuilder).Assembly,
-                                                                                                   typeof(Enumerable).Assembly,
-                                                                                                   typeof(ArrayList).Assembly,
-                                                                                                   typeof(AsyncEnumerator).Assembly,
-                                                                                                   typeof(TitanbotCmdContext).Assembly,
-                                                                                                   typeof(DiscordSocketClient).Assembly,
-                                                                                                   typeof(MiscExtensions).Assembly,
-                                                                                                   Assembly.Load("System.Threading.Tasks, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")),
-                                                              new ExecGlobals { Context = Context },
-                                                              typeof(ExecGlobals));
-            }
-            catch (Exception ex)
-            {
-                result = ex;
-            }
 
+                compiled = CSharpScript.Create(codeWithUsings,
+                                                   ScriptOptions.Default.WithReferences(typeof(EmbedBuilder).Assembly,
+                                                                                        typeof(Enumerable).Assembly,
+                                                                                        typeof(ArrayList).Assembly,
+                                                                                        typeof(AsyncEnumerator).Assembly,
+                                                                                        typeof(TitanbotCmdContext).Assembly,
+                                                                                        typeof(DiscordSocketClient).Assembly,
+                                                                                        typeof(MiscExtensions).Assembly,
+                                                                                        typeof(File).Assembly,
+                                                                                        Assembly.Load("System.Threading.Tasks, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")),
+                                                   typeof(ExecGlobals));
+                compiled.Compile();
+            } catch (Exception ex)
+            { result = ex; }
+
+            var compileDone = DateTime.Now;
+            var executeStart = DateTime.Now;
+            try
+            {
+                result = (await compiled?.RunAsync(globals))?.ReturnValue ?? result;
+            } catch (Exception ex)
+            { result = ex; }
+            var executeDone = DateTime.Now;
 
             var builder = new EmbedBuilder
             {
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Executed in {(DateTime.Now - start).TotalMilliseconds}ms"
+                    Text = $"Compiled in {(compileDone - compileDone).TotalMilliseconds}ms | Executed in {(executeDone - executeStart).TotalMilliseconds}ms"
                 }
             };
 
@@ -86,13 +98,18 @@ using System.Threading.Tasks;
             {
                 builder.WithTitle($":no_entry_sign: Execution Result");
                 builder.WithColor(System.Drawing.Color.Red.ToDiscord());
-                builder.AddField("Output", $"Type: {result.GetType()}\n```csharp\n{(result as Exception).Message}\n```");
+                builder.AddField("Output", $"Type: {Format.Sanitize(result.GetType().ToString())}\n```csharp\n{Format.Sanitize((result as Exception).Message)}\n```");
             }
             else
             {
                 builder.WithTitle($":white_check_mark: Execution Result");
                 builder.WithColor(System.Drawing.Color.LimeGreen.ToDiscord());
-                builder.AddField("Output", $"Type: {result?.GetType()}\n```csharp\n{result?.ToString()}\n```");
+                var resString = "";
+                if (result is IEnumerable)
+                    resString = "[" + string.Join(", ", (result as IEnumerable<object>) ?? new List<string>()) + "]";
+                else
+                    resString = result?.ToString();
+                builder.AddField("Output", $"Type: {Format.Sanitize(result?.GetType().ToString() ?? "")}\n```csharp\n{Format.Sanitize(resString ?? "")}\n```");
             }
 
             await ReplyAsync("", embed: builder.Build(), handler: ex => Context.TitanBot.Logger.Log(ex, "ExecModule"));

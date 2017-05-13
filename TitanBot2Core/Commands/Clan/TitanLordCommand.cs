@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace TitanBot2.Commands.Clan
 {
     class TitanLordCommand : Command
     {
+        private static ConcurrentDictionary<ulong, object> _guildLocks = new ConcurrentDictionary<ulong, object>();
         public TitanLordCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => TitanLordNowAsync())
@@ -42,9 +44,23 @@ namespace TitanBot2.Commands.Clan
             Usage.Add("`{0} now` - Alerts everyone that the Titan Lord is ready to be killed right now");
             Description = "Used for Titan Lord timers and management";
             DefaultPermission = 8;
+            RequiredContexts = Discord.Commands.ContextType.Guild;
         }
 
-        private async Task TitanLordInAsync(TimeSpan time)
+        private Task TitanLordInAsync(TimeSpan time)
+        {
+            if (!_guildLocks.ContainsKey(Context.Guild.Id))
+                _guildLocks.TryAdd(Context.Guild.Id, new object { });
+
+            lock (_guildLocks[Context.Guild.Id])
+            {
+                LockedTitanLordIn(time).GetAwaiter().GetResult();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private async Task LockedTitanLordIn(TimeSpan time)
         {
             var roundsRunning = (await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordRound)).Count();
             var timersRunning = (await Context.Database.Timers.Get(guildid: Context.Guild.Id, callback: EventCallback.TitanLordNow)).Count();
@@ -95,7 +111,7 @@ namespace TitanBot2.Commands.Clan
             if (guildData.TitanLord?.Channel != null)
                 tlChannel = Context.Guild.GetTextChannel(guildData.TitanLord.Channel.Value) ?? tlChannel;
 
-            var message = await tlChannel.SendMessageSafeAsync("Loading Timer...");
+            var message = await tlChannel.SendMessageSafeAsync("Loading Timer...\n*if this takes longer than 10s please PM Titansmasher ASAP*");
 
             if (guildData.TitanLord.PinTimer && (Context.User as IGuildUser).GuildPermissions.Has(GuildPermission.ManageMessages))
                 await message.PinAsync();
@@ -111,6 +127,7 @@ namespace TitanBot2.Commands.Clan
             await Context.TimerService.AddTimers(new Timer[] { tickTimer, nowTimer, roundTimer });
 
             await ReplyAsync($"Started a timer for **{time}**", ReplyType.Success);
+
         }
 
         private async Task TitanLordNowAsync()

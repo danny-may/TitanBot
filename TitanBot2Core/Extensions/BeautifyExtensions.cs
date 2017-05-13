@@ -160,21 +160,21 @@ namespace TitanBot2.Extensions
             }
         }
 
-        public static string Beautify(this EquipmentClasss equipmentType)
+        public static string Beautify(this EquipmentClass equipmentType)
         {
             switch (equipmentType)
             {
-                case EquipmentClasss.Aura:
+                case EquipmentClass.Aura:
                     return "Aura";
-                case EquipmentClasss.Hat:
+                case EquipmentClass.Hat:
                     return "Hat";
-                case EquipmentClasss.None:
+                case EquipmentClass.None:
                     return "None";
-                case EquipmentClasss.Slash:
+                case EquipmentClass.Slash:
                     return "Slash";
-                case EquipmentClasss.Suit:
+                case EquipmentClass.Suit:
                     return "Suit";
-                case EquipmentClasss.Weapon:
+                case EquipmentClass.Weapon:
                     return "Weapon";
                 default:
                     return equipmentType.ToString();
@@ -209,9 +209,14 @@ namespace TitanBot2.Extensions
                 case BonusType.MeleeHelperDamage:
                 case BonusType.SpellHelperDamage:
                 case BonusType.RangedHelperDamage:
+                case BonusType.AllHelperDamage:
+                case BonusType.CritDamage:
                 case BonusType.PetDamageMult:
                 case BonusType.MonsterHP:
                 case BonusType.TapDamage:
+                case BonusType.AllDamage:
+                case BonusType.GoldAll:
+                case BonusType.ChestAmount:
                     return $"x{value}";
                 case BonusType.SplashDamage:
                 case BonusType.ManaRegen:

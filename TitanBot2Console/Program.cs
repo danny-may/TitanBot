@@ -67,7 +67,7 @@ namespace TitanBot2Console
                     if (!Directory.Exists(path))
                         Directory.CreateDirectory(path);
                 }
-                File.AppendAllText(file, text + "\n");
+                File.AppendAllText(file, text + Environment.NewLine);
             }
         }
 

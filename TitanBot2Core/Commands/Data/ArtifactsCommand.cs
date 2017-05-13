@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Models;
@@ -14,15 +15,51 @@ namespace TitanBot2.Commands.Data
         public ArtifactsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowArtifactAsync((Artifact)a[0]))
-                 .WithArgTypes(typeof(Artifact));
+                 .WithArgTypes(typeof(Artifact))
+                 .WithItemAsParams(0);
             Calls.AddNew(a => ShowArtifactAsync((Artifact)a[0], 1, (int)a[1]))
-                 .WithArgTypes(typeof(Artifact), typeof(int));
+                 .WithArgTypes(typeof(Artifact), typeof(int))
+                 .WithItemAsParams(0);
             Calls.AddNew(a => ShowArtifactAsync((Artifact)a[0], (int)a[1], (int)a[2]))
-                 .WithArgTypes(typeof(Artifact), typeof(int), typeof(int));
+                 .WithArgTypes(typeof(Artifact), typeof(int), typeof(int))
+                 .WithItemAsParams(0);
+            Calls.AddNew(a => ListArtifactsAsync())
+                 .WithSubCommand("List");
             Alias.Add("Arts");
             Alias.Add("Artifact");
             Usage.Add("`{0} <artifact> [from] [to]` - Shows stats for a given artifact on the given levels.");
+            Usage.Add("`{0} list` - Lists all artifacts available.");
             Description = "Displays data about any artifact ";
+            DelayMessage = "This might take a short while, theres a fair bit of data to download!";
+        }
+
+        private async Task ListArtifactsAsync()
+        {
+            var artifacts = (await Context.TT2DataService.GetAllArtifacts());
+
+            var builder = new EmbedBuilder
+            {
+                Author = new EmbedAuthorBuilder
+                {
+                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
+                    Name = "Artifact listing"
+                },
+                Color = System.Drawing.Color.LightBlue.ToDiscord(),
+                Description = "All Artifacts",
+                Footer = new EmbedFooterBuilder
+                {
+                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
+                    Text = $"{Context.Client.CurrentUser.Username} Artifact tool"
+                },
+                Timestamp = DateTime.Now
+            };
+
+            foreach (var tier in artifacts.GroupBy(a => a.Tier).OrderBy(t => t.Key))
+            {
+                builder.AddField($"Tier {tier.Key}", string.Join("\n", tier.Select(a => a.Name)));
+            }
+
+            await ReplyAsync("", embed: builder.Build());
         }
 
         private async Task ShowArtifactAsync(Artifact artifact)
@@ -45,7 +82,7 @@ namespace TitanBot2.Commands.Data
             };
 
             builder.AddInlineField("Artifact id", artifact.Id);
-            builder.AddInlineField("Notes", artifact.Note);
+            builder.AddInlineField("Tier", $"[{artifact.Tier}](https://redd.it/5wae4o)");
             builder.AddField("Max level", artifact.MaxLevel == null ? "∞" : artifact.MaxLevel.Value.Beautify());
             builder.AddInlineField("Effect type", artifact.BonusType.Beautify());
             builder.AddInlineField("Effect per Level", artifact.BonusType.FormatValue(artifact.EffectPerLevel));
@@ -77,11 +114,11 @@ namespace TitanBot2.Commands.Data
                     Text = $"{Context.Client.CurrentUser.Username} Artifact tool | TT2 v{artifact.FileVersion}"
                 },
                 Timestamp = DateTime.Now,
-                Color = artifact.Image.AverageColor(0.3f, 0.5f).ToDiscord(),
+                Color = artifact.Image?.AverageColor(0.3f, 0.5f).ToDiscord() ?? System.Drawing.Color.Green.ToDiscord(),
             };
 
             builder.AddInlineField("Artifact id", artifact.Id);
-            builder.AddInlineField("Notes", artifact.Note);
+            builder.AddInlineField("Tier", $"[{artifact.Tier}](https://redd.it/5wae4o)");
             builder.AddInlineField("Max level", artifact.MaxLevel == null ? "∞" : artifact.MaxLevel.Value.Beautify());
             builder.AddField("Effect type", artifact.BonusType.Beautify());
             builder.AddInlineField($"Effect at lv {startLevel}", artifact.BonusType.FormatValue(artifact.EffectAt(startLevel)));

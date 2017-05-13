@@ -225,6 +225,7 @@
     <Compile Include="Commands\Clan\ExcuseCommand.cs" />
     <Compile Include="Commands\Clan\RegisterCommand.cs" />
     <Compile Include="Commands\Clan\TitanLordCommand.cs" />
+    <Compile Include="Commands\Data\EquipmentCommand.cs" />
     <Compile Include="Commands\Data\ArtifactsCommand.cs" />
     <Compile Include="Commands\Data\ClaimCommand.cs" />
     <Compile Include="Commands\Data\ClanStatsCommand.cs" />
@@ -251,6 +252,10 @@
     <Compile Include="Extensions\IUserMessageExtensions.cs" />
     <Compile Include="GuildSpecific\GuildSpecificHandler.cs" />
     <Compile Include="GuildSpecific\YortKingdom.cs" />
+    <Compile Include="Models\Enums\ArtifactTier.cs" />
+    <Compile Include="Models\Enums\EquipmentRarity.cs" />
+    <Compile Include="Models\Enums\EquipmentSource.cs" />
+    <Compile Include="Models\Equipment.cs" />
     <Compile Include="Models\HighScoreSheet.cs" />
     <Compile Include="Services\CommandService\CallCollection.cs" />
     <Compile Include="Services\CommandService\Command.cs" />
@@ -310,6 +315,7 @@
     <Compile Include="TimerCallbacks\TitanLordCallbacks.cs" />
     <Compile Include="TitanBot.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\EquipmentTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ArtifactTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PermissionTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\TimeSpanTypeReader.cs" />

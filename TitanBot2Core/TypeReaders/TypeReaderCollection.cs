@@ -112,6 +112,8 @@ namespace TitanBot2.TypeReaders
             if (success.Count() > 0)
                 return success.First();
 
+            if (results.Count() == 1)
+                return results.First();
             if (results.Count() > 0)
                 return TypeReaderResult.FromError($"Unable to read the value `{text}` as `{type.Name}`");
 
