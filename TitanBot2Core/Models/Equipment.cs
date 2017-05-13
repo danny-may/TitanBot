@@ -39,9 +39,13 @@ namespace TitanBot2.Models
 
         public static EquipmentStatic Find(string name)
         {
-            return Equipments.SingleOrDefault(e => e.Id.ToLower() == name.ToLower() ||
-                                                   e.Name.Replace(" ", "").ToLower().Contains(name.Replace(" ", "").ToLower()) ||
-                                                   e.Alias.Count(v => v.ToLower() == name.ToLower()) > 0);
+            var matches = Equipments.Where(e => e.Id.ToLower() == name.ToLower() ||
+                                                e.Name.Replace(" ", "").ToLower().Contains(name.Replace(" ", "").ToLower()) ||
+                                                e.Alias.Count(v => v.ToLower() == name.ToLower()) > 0);
+            if (matches.Count() != 1)
+                return null;
+            else
+                return matches.First();
         }
 
         private static List<string> _unknownImages = new List<string>

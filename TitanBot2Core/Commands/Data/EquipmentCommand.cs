@@ -162,8 +162,8 @@ namespace TitanBot2.Commands.Data
             builder.AddField("Bonus type", equipment.BonusType.Beautify());
             builder.AddInlineField("Bonus base", equipment.BonusType.FormatValue(equipment.BonusBase));
             builder.AddInlineField("Bonus increase", equipment.BonusType.FormatValue(equipment.BonusIncrease));
-            builder.AddField($"Bonus at {level} (actual ~{level * 10}", equipment.BonusType.FormatValue(equipment.BonusBase + equipment.BonusIncrease * 10 * level));
-            builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.");
+            builder.AddField($"Bonus at {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusBase + equipment.BonusIncrease * 10 * level));
+            builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.*");
 
             await ReplyAsync("", embed: builder.Build());
         }

@@ -82,9 +82,13 @@ namespace TitanBot2.Models
 
         public static ArtifactStatic Find(string name)
         {
-            return Artifacts.SingleOrDefault(a => a.Id.ToString() == name.ToString() ||
+            var matches = Artifacts.Where(a => a.Id.ToString() == name.ToString() ||
                                                   a.Name.Replace(" ", "").ToLower().Contains(name.Replace(" ", "").ToLower()) ||
                                                   a.Alias.Count(v => v.ToLower() == name.ToLower()) > 0);
+            if (matches.Count() != 1)
+                return null;
+            else
+                return matches.First();
         }
 
         public static List<ArtifactStatic> Artifacts => new List<ArtifactStatic>
