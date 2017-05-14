@@ -113,7 +113,7 @@ namespace TitanBot2.Commands.Clan
 
             var message = await tlChannel.SendMessageSafeAsync("Loading Timer...\n*if this takes longer than 10s please PM Titansmasher ASAP*");
 
-            if (guildData.TitanLord.PinTimer && (Context.User as IGuildUser).GuildPermissions.Has(GuildPermission.ManageMessages))
+            if (guildData.TitanLord.PinTimer && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.Has(GuildPermission.ManageMessages))
                 await message.PinAsync();
 
             var custArgs = new JObject();
