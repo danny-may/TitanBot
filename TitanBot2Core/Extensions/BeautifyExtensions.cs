@@ -198,11 +198,12 @@ namespace TitanBot2.Extensions
                 case BonusType.HelperBoostSkillMana:
                 case BonusType.ShadowCloneSkillMana:
                 case BonusType.TapBoostSkillMana:
-                    return $"-{(int)value}";
+                    return $"-{(int)value} mana";
                 case BonusType.HelperUpgradeCost:
                     return $"-{(int)(value * 100)}%";
                 case BonusType.DoubleFairyChance:
                 case BonusType.CritChance:
+                case BonusType.Goldx10Chance:
                 case BonusType.ChestChance:
                     return string.Format("{0:0.##}%", value * 100);
                 case BonusType.HSArtifactDamage:
@@ -218,6 +219,19 @@ namespace TitanBot2.Extensions
                 case BonusType.AllDamage:
                 case BonusType.GoldAll:
                 case BonusType.ChestAmount:
+                case BonusType.GoldBoss:
+                case BonusType.GoldMonster:
+                case BonusType.HelperBoostSkillAmount:
+                case BonusType.ShadowCloneSkillAmount:
+                case BonusType.HandOfMidasSkillAmount:
+                case BonusType.TapBoostSkillAmount:
+                case BonusType.BurstDamageSkillAmount:
+                case BonusType.PrestigeRelic:
+                case BonusType.HelmetBoost:
+                case BonusType.SwordBoost:
+                case BonusType.SlashBoost:
+                case BonusType.ArmorBoost:
+                case BonusType.AuraBoost:
                     return $"x{value}";
                 case BonusType.SplashDamage:
                 case BonusType.ManaRegen:
