@@ -68,6 +68,9 @@
         <member name="P:Discord.IChannel.Name">
             <summary> Gets the name of this channel. </summary>
         </member>
+        <member name="P:Discord.IChannel.IsNsfw">
+            <summary> Checks if the channel is NSFW. </summary>
+        </member>
         <member name="M:Discord.IChannel.GetUsersAsync(Discord.CacheMode,Discord.RequestOptions)">
             <summary> Gets a collection of all users in this channel. </summary>
         </member>
@@ -204,6 +207,59 @@
         <member name="P:Discord.VoiceChannelProperties.UserLimit">
             <summary>
             The maximum number of users that can be present in a channel.
+            </summary>
+        </member>
+        <member name="T:Discord.Emoji">
+            <summary>
+            A unicode emoji
+            </summary>
+        </member>
+        <member name="M:Discord.Emoji.#ctor(System.String)">
+            <summary>
+            Creates a unciode emoji.
+            </summary>
+            <param name="unicode">The pure UTF-8 encoding of an emoji</param>
+        </member>
+        <member name="P:Discord.Emoji.Name">
+            <summary>
+            The unicode representation of this emote.
+            </summary>
+        </member>
+        <member name="T:Discord.Emote">
+            <summary>
+            A custom image-based emote
+            </summary>
+        </member>
+        <member name="P:Discord.Emote.Name">
+            <summary>
+            The display name (tooltip) of this emote
+            </summary>
+        </member>
+        <member name="P:Discord.Emote.Id">
+            <summary>
+            The ID of this emote
+            </summary>
+        </member>
+        <member name="M:Discord.Emote.Parse(System.String)">
+            <summary>
+            Parse an Emote from its raw format
+            </summary>
+            <param name="text">The raw encoding of an emote; for example, &lt;:dab:277855270321782784&gt;</param>
+            <returns>An emote</returns>
+        </member>
+        <member name="T:Discord.GuildEmote">
+            <summary>
+            An image-based emote that is attached to a guild
+            </summary>
+        </member>
+        <member name="T:Discord.IEmote">
+            <summary>
+            A general container for any type of emote in a message.
+            </summary>
+        </member>
+        <member name="P:Discord.IEmote.Name">
+            <summary>
+            The display name or unicode representation of this emote
             </summary>
         </member>
         <member name="F:Discord.DefaultMessageNotifications.AllMessages">
@@ -364,7 +420,7 @@
         <member name="P:Discord.IGuild.EveryoneRole">
             <summary> Gets the built-in role containing all users in this guild. </summary>
         </member>
-        <member name="P:Discord.IGuild.Emojis">
+        <member name="P:Discord.IGuild.Emotes">
             <summary> Gets a collection of all custom emojis for this guild. </summary>
         </member>
         <member name="P:Discord.IGuild.Features">
@@ -629,17 +685,11 @@
         <member name="P:Discord.IUserMessage.Reactions">
             <summary> Returns all reactions included in this message. </summary>
         </member>
-        <member name="M:Discord.IUserMessage.AddReactionAsync(Discord.Emoji,Discord.RequestOptions)">
+        <member name="M:Discord.IUserMessage.AddReactionAsync(Discord.IEmote,Discord.RequestOptions)">
             <summary> Adds a reaction to this message. </summary>
         </member>
-        <member name="M:Discord.IUserMessage.AddReactionAsync(System.String,Discord.RequestOptions)">
-            <summary> Adds a reaction to this message. </summary>
-        </member>
-        <member name="M:Discord.IUserMessage.RemoveReactionAsync(Discord.Emoji,Discord.IUser,Discord.RequestOptions)">
+        <member name="M:Discord.IUserMessage.RemoveReactionAsync(Discord.IEmote,Discord.IUser,Discord.RequestOptions)">
             <summary> Removes a reaction from message. </summary>
-        </member>
-        <member name="M:Discord.IUserMessage.RemoveReactionAsync(System.String,Discord.IUser,Discord.RequestOptions)">
-            <summary> Removes a reaction from this message. </summary>
         </member>
         <member name="M:Discord.IUserMessage.RemoveAllReactionsAsync(Discord.RequestOptions)">
             <summary> Removes all reactions from this message. </summary>
