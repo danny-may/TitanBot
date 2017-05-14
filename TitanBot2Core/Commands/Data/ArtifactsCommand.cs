@@ -57,7 +57,7 @@ namespace TitanBot2.Commands.Data
 
             foreach (var tier in artifacts.GroupBy(a => a.Tier).OrderBy(t => t.Key))
             {
-                builder.AddField($"Tier {tier.Key}", string.Join("\n", tier.Select(a => a.Name)));
+                builder.AddInlineField($"Tier {tier.Key}", string.Join("\n", tier.Select(a => a.Name)));
             }
 
             await ReplyAsync("", embed: builder.Build());
