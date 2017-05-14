@@ -11,9 +11,9 @@ using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Data
 {
-    public class EquipmentCommand : Command
+    public class EquipmentsCommand : Command
     {
-        public EquipmentCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public EquipmentsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowEquipmentAsync((Equipment)a[0]))
                  .WithArgTypes(typeof(Equipment))
@@ -28,6 +28,7 @@ namespace TitanBot2.Commands.Data
                  .WithItemAsParams(0)
                  .WithSubCommand("List");
             Alias.Add("Equip");
+            Alias.Add("Equips");
             Alias.Add("Equipment");
             Usage.Add("`{0} <equipment> [level]` - Shows stats for a given equipment on the given level.");
             Usage.Add("`{0} list [equipment type]` - Lists all equipment for the given type");
@@ -54,47 +55,47 @@ namespace TitanBot2.Commands.Data
             };
 
             IEnumerable<IGrouping<BonusType, Equipment>> grouped;
+            List<Equipment> allEquip = await Context.TT2DataService.GetAllEquipment();
             switch (equipClass?.ToLower())
             {
 
                 case "aura":
-                    grouped = (await Context.TT2DataService.GetAllEquipment())
-                                   .Where(e => e.Class == EquipmentClass.Aura)
-                                   .GroupBy(e => e.BonusType);
+                    grouped = allEquip.Where(e => e.Class == EquipmentClass.Aura)
+                                      .GroupBy(e => e.BonusType);
                     break;
                 case "weapon":
                 case "sword":
-                    grouped = (await Context.TT2DataService.GetAllEquipment())
-                                   .Where(e => e.Class == EquipmentClass.Weapon)
-                                   .GroupBy(e => e.BonusType);
+                    grouped = allEquip.Where(e => e.Class == EquipmentClass.Weapon)
+                                      .GroupBy(e => e.BonusType);
                     break;
                 case "hat":
                 case "helmet":
-                    grouped = (await Context.TT2DataService.GetAllEquipment())
-                                   .Where(e => e.Class == EquipmentClass.Hat)
-                                   .GroupBy(e => e.BonusType);
+                    grouped = allEquip.Where(e => e.Class == EquipmentClass.Hat)
+                                      .GroupBy(e => e.BonusType);
                     break;
                 case "slash":
-                    grouped = (await Context.TT2DataService.GetAllEquipment())
-                                   .Where(e => e.Class == EquipmentClass.Slash)
-                                   .GroupBy(e => e.BonusType);
+                    grouped = allEquip.Where(e => e.Class == EquipmentClass.Slash)
+                                      .GroupBy(e => e.BonusType);
                     break;
                 case "suit":
                 case "armor":
                 case "body":
-                    grouped = (await Context.TT2DataService.GetAllEquipment())
-                                   .Where(e => e.Class == EquipmentClass.Suit)
-                                   .GroupBy(e => e.BonusType);
+                    grouped = allEquip.Where(e => e.Class == EquipmentClass.Suit)
+                                      .GroupBy(e => e.BonusType);
+                    break;
+                case "removed":
+                    grouped = allEquip.Where(e => e.Rarity == EquipmentRarity.Removed)
+                                      .GroupBy(e => e.BonusType);
                     break;
                 default:
                     grouped = null;
                     break;
             }
             if (grouped == null)
-                builder.WithDescription("Please use one of the following equipment types: " + string.Join("\n", Enum.GetNames(typeof(EquipmentClass))) + $"\n\n `{Context.Prefix}{Context.Command} list <type>`");
+                builder.WithDescription("Please use one of the following equipment types:\n" + string.Join("\n", Enum.GetNames(typeof(EquipmentClass))).Replace("None", "Removed") + $"\n\n `{Context.Prefix}{Context.Command} list <type>`");
             else
             {
-                builder.WithDescription($"All {grouped.First().First().Class} equipment");
+                builder.WithDescription($"All {equipClass} equipment");
                 foreach (var type in grouped)
                 {
                     builder.AddField(type.Key.Beautify(), string.Join("\n", type.OrderByDescending(e => e.Rarity)
@@ -162,7 +163,7 @@ namespace TitanBot2.Commands.Data
             builder.AddField("Bonus type", equipment.BonusType.Beautify());
             builder.AddInlineField("Bonus base", equipment.BonusType.FormatValue(equipment.BonusBase));
             builder.AddInlineField("Bonus increase", equipment.BonusType.FormatValue(equipment.BonusIncrease));
-            builder.AddField($"Bonus at {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusBase + equipment.BonusIncrease * 10 * level));
+            builder.AddField($"Bonus at {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
             builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.*");
 
             await ReplyAsync("", embed: builder.Build());

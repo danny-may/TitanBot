@@ -20,8 +20,10 @@ namespace TitanBot2.Common
         public Dictionary<string, string> Versions { get; set; }
             = new Dictionary<string, string>
             {
-                { "/ArtifactInfo.csv", "1.0" },
-                { "/EquipmentInfo.csv", "1.0" }
+                { "/ArtifactInfo.csv", "1.4" },
+                { "/EquipmentInfo.csv", "1.4" },
+                { "/PetInfo.csv", "1.4" },
+                { "/SkillTreeInfo.csv", "1.4" }
             };
 
         private static Configuration _instance;

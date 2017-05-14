@@ -183,6 +183,7 @@ namespace TitanBot2.Extensions
 
         public static string FormatValue(this BonusType bonusType, double value)
         {
+            value = Math.Round(value, 5);
             switch (bonusType)
             {
                 case BonusType.CritBoostSkillDuration:

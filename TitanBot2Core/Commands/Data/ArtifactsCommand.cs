@@ -25,6 +25,7 @@ namespace TitanBot2.Commands.Data
                  .WithItemAsParams(0);
             Calls.AddNew(a => ListArtifactsAsync())
                  .WithSubCommand("List");
+            Alias.Add("Art");
             Alias.Add("Arts");
             Alias.Add("Artifact");
             Usage.Add("`{0} <artifact> [from] [to]` - Shows stats for a given artifact on the given levels.");

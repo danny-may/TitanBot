@@ -225,11 +225,12 @@
     <Compile Include="Commands\Clan\ExcuseCommand.cs" />
     <Compile Include="Commands\Clan\RegisterCommand.cs" />
     <Compile Include="Commands\Clan\TitanLordCommand.cs" />
-    <Compile Include="Commands\Data\EquipmentCommand.cs" />
+    <Compile Include="Commands\Data\EquipmentsCommand.cs" />
     <Compile Include="Commands\Data\ArtifactsCommand.cs" />
     <Compile Include="Commands\Data\ClaimCommand.cs" />
     <Compile Include="Commands\Data\ClanStatsCommand.cs" />
     <Compile Include="Commands\Data\HighScoreCommand.cs" />
+    <Compile Include="Commands\Data\PetsCommand.cs" />
     <Compile Include="Commands\Data\PrestigeCommand.cs" />
     <Compile Include="Commands\General\AboutCommand.cs" />
     <Compile Include="Commands\General\HelpCommand.cs" />
@@ -257,6 +258,7 @@
     <Compile Include="Models\Enums\EquipmentSource.cs" />
     <Compile Include="Models\Equipment.cs" />
     <Compile Include="Models\HighScoreSheet.cs" />
+    <Compile Include="Models\Pet.cs" />
     <Compile Include="Services\CommandService\CallCollection.cs" />
     <Compile Include="Services\CommandService\Command.cs" />
     <Compile Include="Common\Calculator.cs" />
@@ -315,6 +317,7 @@
     <Compile Include="TimerCallbacks\TitanLordCallbacks.cs" />
     <Compile Include="TitanBot.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\PetTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\EquipmentTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ArtifactTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PermissionTypeReader.cs" />

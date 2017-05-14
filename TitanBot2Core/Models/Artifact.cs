@@ -91,7 +91,7 @@ namespace TitanBot2.Models
                 return matches.First();
         }
 
-        public static List<ArtifactStatic> Artifacts => new List<ArtifactStatic>
+        public static List<ArtifactStatic> Artifacts { get; } = new List<ArtifactStatic>
         {
             new ArtifactStatic(1, "Heroic Shield", new string[]{ "HSh" }, "http://www.cockleshell.org/static/TT2/img/a4.png", ArtifactTier.B),
             new ArtifactStatic(2, "Stone of the Valrunes", new string[]{ "SoV", "SV" }, "http://www.cockleshell.org/static/TT2/img/a38.png", ArtifactTier.D),

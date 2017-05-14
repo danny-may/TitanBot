@@ -18,6 +18,7 @@ namespace TitanBot2.Services
         private static readonly string _ghStaticUrl = "https://s3.amazonaws.com/tt2-static/info_files/";
         private static readonly string _artifactFileLocation = "/ArtifactInfo.csv";
         private static readonly string _equipmentFileLocation = "/EquipmentInfo.csv";
+        private static readonly string _petFileLocation = "/PetInfo.csv";
         private static readonly string _highScoreSheet = "https://docs.google.com/spreadsheets/d/13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY/export?format=csv&id=13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY&gid=4642011";
 
 
@@ -28,40 +29,48 @@ namespace TitanBot2.Services
 
         private Artifact BuildArtifact(ICsvLine serverData, Artifact.ArtifactStatic staticData, Bitmap image, string version)
         {
-            int maxLevel;
-            string tt1, note, name;
-            BonusType bonusType;
-            double effectPerLevel, damageBonus, costCoef, costExpo;
-
-            int.TryParse(serverData[1], out maxLevel);
-            tt1 = serverData[2];
-            Enum.TryParse(serverData[3], out bonusType);
-            double.TryParse(serverData[4], out effectPerLevel);
-            double.TryParse(serverData[5], out damageBonus);
-            double.TryParse(serverData[6], out costCoef);
-            double.TryParse(serverData[7], out costExpo);
-            note = serverData[8];
-            name = serverData[9];
+            int.TryParse(serverData[1], out int maxLevel);
+            string tt1 = serverData[2];
+            Enum.TryParse(serverData[3], out BonusType bonusType);
+            double.TryParse(serverData[4], out double effectPerLevel);
+            double.TryParse(serverData[5], out double damageBonus);
+            double.TryParse(serverData[6], out double costCoef);
+            double.TryParse(serverData[7], out double costExpo);
+            string note = serverData[8];
+            string name = serverData[9];
 
             return staticData.BuildArtifact(maxLevel == 0 ? (int?)null : maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, image, version);
         }
 
         private Equipment BuildEquipment(ICsvLine serverData, Equipment.EquipmentStatic staticData, Bitmap image, string version)
         {
-            EquipmentClass eClass;
-            BonusType bonusType;
-            EquipmentRarity rarity;
-            double bonusBase, bonusIncrease;
-            EquipmentSource source;
-
-            Enum.TryParse(serverData[1], out eClass);
-            Enum.TryParse(serverData[2], out bonusType);
-            Enum.TryParse(serverData[3], out rarity);
-            double.TryParse(serverData[4], out bonusBase);
-            double.TryParse(serverData[5], out bonusIncrease);
-            Enum.TryParse(serverData[6], out source);
+            Enum.TryParse(serverData[1], out EquipmentClass eClass);
+            Enum.TryParse(serverData[2], out BonusType bonusType);
+            Enum.TryParse(serverData[3], out EquipmentRarity rarity);
+            double.TryParse(serverData[4], out double bonusBase);
+            double.TryParse(serverData[5], out double bonusIncrease);
+            Enum.TryParse(serverData[6], out EquipmentSource source);
 
             return staticData.BuildEquipment(eClass, bonusType, rarity, bonusBase, bonusIncrease, source, image, version);
+        }
+
+        private Pet BuildPet(ICsvLine serverData, Pet.PetStatic staticData, Bitmap image, string version)
+        {
+            var incrementRange = new Dictionary<int, double> { };
+
+            double.TryParse(serverData[1], out double damageBase);
+            double.TryParse(serverData[2], out double inc1to40);
+            double.TryParse(serverData[3], out double inc41to80);
+            double.TryParse(serverData[4], out double inc80on);
+            Enum.TryParse(serverData[5], out BonusType bonusType);
+            double.TryParse(serverData[6], out double bonusBase);
+            double.TryParse(serverData[7], out double bonusIncrement);
+
+            incrementRange.Add(1, inc1to40);
+            incrementRange.Add(41, inc41to80);
+            incrementRange.Add(81, inc80on);
+
+            return staticData.BuildPet(damageBase, incrementRange, bonusType, bonusBase, bonusIncrement, image, version);
         }
 
         public async Task<Artifact> GetArtifact(Artifact.ArtifactStatic artifactStatic)
@@ -108,6 +117,29 @@ namespace TitanBot2.Services
             var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
             return BuildEquipment(equipmentRow, equipmentStatic, image, version);
+        }
+
+        public async Task<Pet> GetPet(Pet.PetStatic petStatic)
+        {
+
+            Configuration.Instance.Versions.TryGetValue(_petFileLocation, out string version);
+
+            version = version ?? "1.0";
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _petFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+            ICsvLine petRow = dataCSV.SingleOrDefault(r => r[0] == "Pet" + petStatic.Id);
+            if (petRow == null)
+                return null;
+
+            var imageBytes = petStatic.ImageUrl == null ? null : await WebClient.GetBytes(petStatic.ImageUrl);
+
+            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+            return BuildPet(petRow, petStatic, image, version);
         }
 
         public async Task<List<Artifact>> GetAllArtifacts()
@@ -169,6 +201,37 @@ namespace TitanBot2.Services
             }
 
             return items.Select(i => BuildEquipment(i.Item2, i.Item1, i.Item3, version)).ToList();
+        }
+
+        public async Task<List<Pet>> GetAllPets()
+        {
+            Configuration.Instance.Versions.TryGetValue(_petFileLocation, out string version);
+
+            version = version ?? "1.0";
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _petFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+
+            var items = new List<Tuple<Pet.PetStatic, ICsvLine, Bitmap>>();
+
+            foreach (var pet in Pet.Pets)
+            {
+                var imageBytes = pet.ImageUrl == null ? null : await WebClient.GetBytes(pet.ImageUrl);
+
+                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+                var equipmentRow = dataCSV.SingleOrDefault(r => r[0] == "Pet"+pet.Id);
+
+                if (equipmentRow == null)
+                    continue;
+
+                items.Add(Tuple.Create(pet, equipmentRow, image));
+            }
+
+            return items.Select(i => BuildPet(i.Item2, i.Item1, i.Item3, version)).ToList();
         }
 
         public async Task<HighScoreSheet> GetHighScores()

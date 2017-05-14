@@ -37,6 +37,11 @@ namespace TitanBot2.Models
             FileVersion = fileVersion;
         }
 
+        public double BonusOnLevel(int level)
+        {
+            return BonusBase + BonusIncrease * level;
+        }
+
         public static EquipmentStatic Find(string name)
         {
             var matches = Equipments.Where(e => e.Id.ToLower() == name.ToLower() ||
@@ -54,7 +59,7 @@ namespace TitanBot2.Models
             "http://imgur.com/7Uo6Yg0.png"
         };
 
-        public static List<EquipmentStatic> Equipments => new List<EquipmentStatic>
+        public static List<EquipmentStatic> Equipments { get; } = new List<EquipmentStatic>
         {
             new EquipmentStatic("Aura_Bats", "Bat Cave", new string[0], null),
             new EquipmentStatic("Aura_Bird", "Birds", new string[0], "http://imgur.com/tMJ0kSB.png"),
