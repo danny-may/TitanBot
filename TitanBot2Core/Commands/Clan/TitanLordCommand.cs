@@ -127,7 +127,6 @@ namespace TitanBot2.Commands.Clan
             await Context.TimerService.AddTimers(new Timer[] { tickTimer, nowTimer, roundTimer });
 
             await ReplyAsync($"Started a timer for **{time}**", ReplyType.Success);
-
         }
 
         private async Task TitanLordNowAsync()
@@ -161,6 +160,8 @@ namespace TitanBot2.Commands.Clan
 
             await Context.Database.Timers.Add(nowTimer);
             await Context.Database.Timers.Add(timer);
+
+            await ReplyAsync("Ill let everyone know!", ReplyType.Success);
         }
 
         private async Task TitanLordWhenAsync()
@@ -243,16 +244,6 @@ namespace TitanBot2.Commands.Clan
             builder.AddField("Time to kill", (DateTime.Now.Add(time).AddHours(-6) - latestTimer.To).Value.Beautify());
 
             await ReplyAsync("", embed: builder.Build());
-        }
-
-        public enum CommandType
-        {
-            In,
-            Now,
-            Dead,
-            When,
-            Info,
-            Stop
         }
     }
 }

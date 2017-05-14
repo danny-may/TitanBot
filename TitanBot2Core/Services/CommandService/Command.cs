@@ -53,7 +53,7 @@ namespace TitanBot2.Services.CommandService
             {
                 new Task(async () =>
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(2000);
                     if (!HasReplied)
                     {
                         awaitMessage = await Context.Channel.SendMessageSafeAsync(DelayMessage);
