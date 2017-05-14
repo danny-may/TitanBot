@@ -98,7 +98,7 @@ namespace TitanBot2.Commands.Data
                 builder.WithDescription($"All {equipClass} equipment");
                 foreach (var type in grouped)
                 {
-                    builder.AddField(type.Key.Beautify(), string.Join("\n", type.OrderByDescending(e => e.Rarity)
+                    builder.AddInlineField(type.Key.Beautify(), string.Join("\n", type.OrderByDescending(e => e.Rarity)
                                                                                 .Select(e => $"{e.Name} ({e.Rarity})" + (e.ImageUrl == null ? " - *No image*" : ""))));
                 }
             }
