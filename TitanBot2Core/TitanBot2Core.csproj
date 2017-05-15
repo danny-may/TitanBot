@@ -223,6 +223,7 @@
     <Compile Include="Commands\Data\ArtifactsCommand.cs" />
     <Compile Include="Commands\Data\ClaimCommand.cs" />
     <Compile Include="Commands\Data\ClanStatsCommand.cs" />
+    <Compile Include="Commands\Data\HelpersCommand.cs" />
     <Compile Include="Commands\Data\HighScoreCommand.cs" />
     <Compile Include="Commands\Data\PetsCommand.cs" />
     <Compile Include="Commands\Data\PrestigeCommand.cs" />
@@ -232,6 +233,9 @@
     <Compile Include="Commands\General\InviteCommand.cs" />
     <Compile Include="Commands\General\PingCommand.cs" />
     <Compile Include="Commands\General\PrefixCommand.cs" />
+    <Compile Include="Commands\GuildSpecific\Singularity\DemoteCommand.cs" />
+    <Compile Include="Commands\GuildSpecific\Singularity\PromoteCommand.cs" />
+    <Compile Include="Commands\GuildSpecific\Singularity\RemoveCommand.cs" />
     <Compile Include="Commands\Owner\AnnounceCommand.cs" />
     <Compile Include="Commands\Owner\DBPurgeCommand.cs" />
     <Compile Include="Commands\Owner\ExecCommand.cs" />
@@ -251,6 +255,8 @@
     <Compile Include="Models\Enums\EquipmentRarity.cs" />
     <Compile Include="Models\Enums\EquipmentSource.cs" />
     <Compile Include="Models\Equipment.cs" />
+    <Compile Include="Models\Helper.cs" />
+    <Compile Include="Models\HelperSkill.cs" />
     <Compile Include="Models\HighScoreSheet.cs" />
     <Compile Include="Models\Pet.cs" />
     <Compile Include="Services\CommandService\CallCollection.cs" />
@@ -311,6 +317,7 @@
     <Compile Include="TimerCallbacks\TitanLordCallbacks.cs" />
     <Compile Include="TitanBot.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\HelperTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PetTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\EquipmentTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ArtifactTypeReader.cs" />
@@ -334,7 +341,9 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Commands\GuildSpecific\Yort Kingdom\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

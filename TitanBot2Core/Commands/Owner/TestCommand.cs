@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Discord.WebSocket;
+using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
 using TitanBot2.TypeReaders;
 
@@ -8,7 +9,8 @@ namespace TitanBot2.Commands.Owner
     {
         public TestCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
-            Calls.AddNew(ExecuteAsync);
+            Calls.AddNew(ExecuteAsync)
+                 .WithArgTypes(typeof(SocketGuildUser));
             RequireOwner = true;
             Description = "Does something, probably";
             Usage.Add("How should I know 0_o");
@@ -16,8 +18,9 @@ namespace TitanBot2.Commands.Owner
 
         private async Task ExecuteAsync(object[] args)
         {
-            var data = await Context.WebClient.GetString("http://ipv4.download.thinkbroadband.com:8080/100MB.zip");
-            await ReplyAsync(data?.Length.ToString() ?? "null");
+            var user = (SocketGuildUser)args[0];
+
+            await TrySend(user.Id, "testc");
         }
     }
 }

@@ -36,7 +36,7 @@ namespace TitanBot2.Commands.Data
 
         private async Task ListArtifactsAsync()
         {
-            var artifacts = (await Context.TT2DataService.GetAllArtifacts());
+            var artifacts = await Context.TT2DataService.GetAllArtifacts();
 
             var builder = new EmbedBuilder
             {
@@ -63,7 +63,7 @@ namespace TitanBot2.Commands.Data
             await ReplyAsync("", embed: builder.Build());
         }
 
-        private async Task ShowArtifactAsync(Artifact artifact)
+        private EmbedBuilder GetBaseEmbed(Artifact artifact)
         {
             var builder = new EmbedBuilder
             {
@@ -85,6 +85,14 @@ namespace TitanBot2.Commands.Data
             builder.AddInlineField("Artifact id", artifact.Id);
             builder.AddInlineField("Tier", $"[{artifact.Tier}](https://redd.it/5wae4o)");
             builder.AddField("Max level", artifact.MaxLevel == null ? "∞" : artifact.MaxLevel.Value.Beautify());
+
+            return builder;
+        }
+
+        private async Task ShowArtifactAsync(Artifact artifact)
+        {
+            var builder = GetBaseEmbed(artifact);
+
             builder.AddInlineField("Effect type", artifact.BonusType.Beautify());
             builder.AddInlineField("Effect per Level", artifact.BonusType.FormatValue(artifact.EffectPerLevel));
             builder.AddInlineField("Effect type", BonusType.ArtifactDamage.Beautify());
@@ -101,26 +109,8 @@ namespace TitanBot2.Commands.Data
             var startLevel = Math.Min(from, to);
             var endLevel = Math.Max(from, to);
 
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    Name = "Artifact data for " + artifact.Name,
-                    IconUrl = artifact.ImageUrl,
-                },
-                ThumbnailUrl = artifact.ImageUrl,
-                Footer = new EmbedFooterBuilder
-                {
-                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
-                    Text = $"{Context.Client.CurrentUser.Username} Artifact tool | TT2 v{artifact.FileVersion}"
-                },
-                Timestamp = DateTime.Now,
-                Color = artifact.Image?.AverageColor(0.3f, 0.5f).ToDiscord() ?? System.Drawing.Color.Green.ToDiscord(),
-            };
+            var builder = GetBaseEmbed(artifact);
 
-            builder.AddInlineField("Artifact id", artifact.Id);
-            builder.AddInlineField("Tier", $"[{artifact.Tier}](https://redd.it/5wae4o)");
-            builder.AddInlineField("Max level", artifact.MaxLevel == null ? "∞" : artifact.MaxLevel.Value.Beautify());
             builder.AddField("Effect type", artifact.BonusType.Beautify());
             builder.AddInlineField($"Effect at lv {startLevel}", artifact.BonusType.FormatValue(artifact.EffectAt(startLevel)));
             builder.AddInlineField($"Effect at lv {endLevel}", artifact.BonusType.FormatValue(artifact.EffectAt(endLevel)));

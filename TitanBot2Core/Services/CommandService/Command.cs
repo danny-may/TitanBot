@@ -22,6 +22,7 @@ namespace TitanBot2.Services.CommandService
         public bool RequireOwner { get; protected set; } = false;
         public DC.ContextType RequiredContexts { get; protected set; } = DC.ContextType.DM | DC.ContextType.Group | DC.ContextType.Guild;
         public ulong DefaultPermission { get; protected set; } = 0;
+        public ulong[] GuildRestrictions { get; protected set; } = new ulong[0];
         public CallCollection Calls = new CallCollection();
         protected string DelayMessage { get; set; } = "This seems to be taking longer than expected... ";
         protected TypeReaderCollection Readers { get; set; }
@@ -98,11 +99,23 @@ namespace TitanBot2.Services.CommandService
             if (RequireOwner)
                 results.Add(await CheckOwner());
             results.Add(await CheckPermissions(DefaultPermission));
+            results.Add(await CheckGuild(GuildRestrictions));            
 
             if (results.Any(r => !r.IsSuccess))
                 return CommandCheckResponse.FromError(string.Join("\n", results.Where(r => !r.IsSuccess).Select(r => r.Message)));
 
             return CommandCheckResponse.FromSuccess();
+        }
+
+        protected virtual Task<CommandCheckResponse> CheckGuild(ulong[] guilds)
+        {
+            if (guilds == null || guilds.Length == 0)
+                return Task.FromResult(CommandCheckResponse.FromSuccess());
+
+            if (Context.Guild != null && guilds.Contains(Context.Guild.Id))
+                return Task.FromResult(CommandCheckResponse.FromSuccess());
+
+            return Task.FromResult(CommandCheckResponse.FromError("Invalid guild! This command can only be used in " + string.Join(", ", guilds.Select(g => Context.Client.GetGuild(g).Name ?? "UNKNOWN GUILD"))));
         }
 
         protected virtual Task<CommandCheckResponse> CheckContexts(DC.ContextType contexts)
@@ -191,7 +204,40 @@ namespace TitanBot2.Services.CommandService
             => ReplyAsync(message, ReplyType.None, handler, isTTS, embed, options);
 
         protected async Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-        { 
+        {
+            message = FormatMessage(message, replyType);
+            return await SendSafe(Context.Channel, message, handler, isTTS, embed, options);
+        }
+
+        protected Task<IUserMessage> TrySend(ulong channelid, string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            => TrySend(channelid, message, ReplyType.None, null, isTTS, embed, options);
+
+        protected Task<IUserMessage> TrySend(ulong channelid, string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            => TrySend(channelid, message, replyType, null, isTTS, embed, options);
+
+        protected Task<IUserMessage> TrySend(ulong channelid, string message, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            => TrySend(channelid, message, ReplyType.None, handler, isTTS, embed, options);
+
+        protected async Task<IUserMessage> TrySend(ulong channelid, string message, ReplyType replyType, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        {
+            IChannel channel = Context.Client.AllChannels().SingleOrDefault(c => c.Id == channelid);
+            if (channel == null)
+            {
+                await Context.Client.GetUser(channelid)?.CreateDMChannelAsync();
+                channel = Context.Client.DMChannels.SingleOrDefault(c => c.Recipient.Id == channelid);
+            }
+
+            var msgChannel = channel as IMessageChannel;
+            if (msgChannel == null)
+                return await ReplyAsync(message, replyType, handler, isTTS, embed, options);
+
+            message = FormatMessage(message, replyType);
+
+            return await SendSafe(msgChannel, message, handler, isTTS, embed, options);
+        }
+
+        private async Task<IUserMessage> SendSafe(IMessageChannel channel, string message, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        {
             HasReplied = true;
             if (awaitMessage != null)
             {
@@ -199,6 +245,19 @@ namespace TitanBot2.Services.CommandService
                 awaitMessage = null;
                 await temp.DeleteAsync();
             }
+            return await channel.SendMessageSafeAsync(message, async e => {
+                try
+                {
+                    await Context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} There was an error when trying to handle your command! `{e.GetType()}`");
+                }
+                catch { }
+                await Context.Logger.Log(e, $"Command: {Name}");
+                await (handler?.Invoke(e) ?? Task.CompletedTask);
+            }, isTTS, embed, options);
+        }
+
+        private string FormatMessage(string message, ReplyType replyType)
+        {
             switch (replyType)
             {
                 case ReplyType.Success:
@@ -213,30 +272,8 @@ namespace TitanBot2.Services.CommandService
                 default:
                     break;
             }
-            return await Context.Channel.SendMessageSafeAsync(message, async e => {
-                try
-                {
-                    await Context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} There was an error when trying to handle your command! `{e.GetType()}`");
-                } catch { }
-                await Context.Logger.Log(e, $"Command: {Name}");
-                await (handler?.Invoke(e) ?? Task.CompletedTask);
-            }, isTTS, embed, options);
-        }
 
-        protected async Task<TypeReaderResult> ReadAndReplyError<T>(int argId)
-        {
-            if (Context.Arguments.Length <= argId)
-            {
-                await ReplyAsync($"Missing argument #{argId + 1}", ReplyType.Error);
-                return TypeReaders.TypeReaderResult.FromError($"Missing argument #{argId + 1}");
-            }
-
-            string value = Context.Arguments[argId];
-
-            var res = await Readers.Read(typeof(T), Context, value);
-            if (!res.IsSuccess)
-                await ReplyAsync(res.Message, ReplyType.Error);
-            return res;
+            return message;
         }
 
         protected enum ReplyType

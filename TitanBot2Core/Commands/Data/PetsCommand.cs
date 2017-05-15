@@ -31,7 +31,7 @@ namespace TitanBot2.Commands.Data
             DelayMessage = "This might take a short while, theres a fair bit of data to download!";
         }
 
-        private async Task ShowPetAsync(Pet pet)
+        private EmbedBuilder GetBaseEmbed(Pet pet)
         {
             var builder = new EmbedBuilder
             {
@@ -51,6 +51,14 @@ namespace TitanBot2.Commands.Data
             };
 
             builder.AddInlineField("Pet id", pet.Id);
+
+            return builder;
+        }
+
+        private async Task ShowPetAsync(Pet pet)
+        {
+            var builder = GetBaseEmbed(pet);
+
             builder.AddField("Base damage", BonusType.PetDamage.FormatValue(pet.DamageBase));
             var keysOrdered = pet.IncreaseRanges.Keys.OrderBy(k => k).ToList();
             for (int i = 0; i < keysOrdered.Count(); i++)
@@ -69,36 +77,8 @@ namespace TitanBot2.Commands.Data
 
         private async Task ShowPetAsync(Pet pet, int level)
         {
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    Name = "Pet data for " + pet.Name,
-                    IconUrl = pet.ImageUrl,
-                },
-                ThumbnailUrl = pet.ImageUrl,
-                Footer = new EmbedFooterBuilder
-                {
-                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
-                    Text = $"{Context.Client.CurrentUser.Username} Pet tool | TT2 v{pet.FileVersion}"
-                },
-                Timestamp = DateTime.Now,
-                Color = pet.Image.AverageColor(0.3f, 0.5f).ToDiscord(),
-            };
-
-            builder.AddInlineField("Pet id", pet.Id);
-            builder.AddField("Base damage", BonusType.PetDamage.FormatValue(pet.DamageBase));
-            var keysOrdered = pet.IncreaseRanges.Keys.OrderBy(k => k).ToList();
-            for (int i = 0; i < keysOrdered.Count(); i++)
-            {
-                if (i == keysOrdered.Count() - 1)
-                    builder.AddInlineField($"lv {keysOrdered[i]}+ increment", BonusType.PetDamage.FormatValue(pet.IncreaseRanges[keysOrdered[i]]));
-                else
-                    builder.AddInlineField($"lv {keysOrdered[i]}-{keysOrdered[i + 1] - 1} increment", BonusType.PetDamage.FormatValue(pet.IncreaseRanges[keysOrdered[i]]));
-            }
+            var builder = GetBaseEmbed(pet);
             builder.AddField("Bonus type", pet.BonusType.Beautify());
-            builder.AddInlineField("Base bonus", pet.BonusType.FormatValue(pet.BonusBase));
-            builder.AddInlineField("Bonus increment", pet.BonusType.FormatValue(pet.BonusIncrement));
             builder.AddInlineField($"Damage at lv {level}", BonusType.PetDamage.FormatValue(pet.DamageOnLevel(level)));
             builder.AddInlineField($"Bonus at lv {level}", pet.BonusType.FormatValue(pet.BonusOnLevel(level)));
             if (pet.InactiveMultiplier(level) < 1)
@@ -113,7 +93,7 @@ namespace TitanBot2.Commands.Data
 
         private async Task ListPetsAsync()
         {
-            var pets = (await Context.TT2DataService.GetAllPets());
+            var pets = await Context.TT2DataService.GetAllPets();
 
             var builder = new EmbedBuilder
             {

@@ -82,7 +82,7 @@ namespace TitanBot2.Models
 
         public static ArtifactStatic Find(string name)
         {
-            var matches = Artifacts.Where(a => a.Id.ToString() == name.ToString() ||
+            var matches = All.Where(a => a.Id.ToString() == name.ToString() ||
                                                   a.Name.Replace(" ", "").ToLower().Contains(name.Replace(" ", "").ToLower()) ||
                                                   a.Alias.Count(v => v.ToLower() == name.ToLower()) > 0);
             if (matches.Count() != 1)
@@ -91,7 +91,7 @@ namespace TitanBot2.Models
                 return matches.First();
         }
 
-        public static List<ArtifactStatic> Artifacts { get; } = new List<ArtifactStatic>
+        public static List<ArtifactStatic> All { get; } = new List<ArtifactStatic>
         {
             new ArtifactStatic(1, "Heroic Shield", new string[]{ "HSh" }, "http://www.cockleshell.org/static/TT2/img/a4.png", ArtifactTier.B),
             new ArtifactStatic(2, "Stone of the Valrunes", new string[]{ "SoV", "SV" }, "http://www.cockleshell.org/static/TT2/img/a38.png", ArtifactTier.D),
@@ -149,7 +149,7 @@ namespace TitanBot2.Models
                 Tier = tier;
             }
 
-            public Artifact BuildArtifact(int? maxLevel,
+            public Artifact Build(int? maxLevel,
                                           string tt1,
                                           BonusType bonusType,
                                           double effectPerLevel,

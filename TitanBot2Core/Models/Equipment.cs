@@ -44,7 +44,7 @@ namespace TitanBot2.Models
 
         public static EquipmentStatic Find(string name)
         {
-            var matches = Equipments.Where(e => e.Id.ToLower() == name.ToLower() ||
+            var matches = All.Where(e => e.Id.ToLower() == name.ToLower() ||
                                                 e.Name.Replace(" ", "").ToLower().Contains(name.Replace(" ", "").ToLower()) ||
                                                 e.Alias.Count(v => v.ToLower() == name.ToLower()) > 0);
             if (matches.Count() != 1)
@@ -64,7 +64,7 @@ namespace TitanBot2.Models
             "http://imgur.com/J0M2hGl.png",
         };
 
-        public static List<EquipmentStatic> Equipments { get; } = new List<EquipmentStatic>
+        public static List<EquipmentStatic> All { get; } = new List<EquipmentStatic>
         {
             new EquipmentStatic("Aura_Bats", "Bat Cave", new string[0], "http://imgur.com/6JQGW3V.png"),
             new EquipmentStatic("Aura_Bird", "Birds", new string[0], "http://imgur.com/iIC7MeB.png"),
@@ -214,7 +214,7 @@ namespace TitanBot2.Models
                 ImageUrl = imageUrl;
             }
 
-            public Equipment BuildEquipment(EquipmentClass eClass, BonusType bonusType, EquipmentRarity rarity, double bonusBase, double bonusIncrease, EquipmentSource source, Bitmap image, string fileVersion)
+            public Equipment Build(EquipmentClass eClass, BonusType bonusType, EquipmentRarity rarity, double bonusBase, double bonusIncrease, EquipmentSource source, Bitmap image, string fileVersion)
             {
                 return new Equipment(this, eClass, bonusType, rarity, bonusBase, bonusIncrease, source, image, fileVersion);
             }

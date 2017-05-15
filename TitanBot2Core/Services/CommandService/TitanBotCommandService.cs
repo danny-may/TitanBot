@@ -39,6 +39,7 @@ namespace TitanBot2.Services
                     _readers.AddTypeReader<Artifact>(new ArtifactTypeReader());
                     _readers.AddTypeReader<Equipment>(new EquipmentTypeReader());
                     _readers.AddTypeReader<Pet>(new PetTypeReader());
+                    _readers.AddTypeReader<Helper>(new HelperTypeReader());
                     _readers.AddTypeReader<TimeSpan>(new TimeSpanTypeReader());
                 }
             });

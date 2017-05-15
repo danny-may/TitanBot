@@ -16,9 +16,12 @@ namespace TitanBot2.Services
     {
         private CachedWebClient WebClient { get; }
         private static readonly string _ghStaticUrl = "https://s3.amazonaws.com/tt2-static/info_files/";
+        private static readonly string _defaultGhStaticVersion = "1.4";
         private static readonly string _artifactFileLocation = "/ArtifactInfo.csv";
         private static readonly string _equipmentFileLocation = "/EquipmentInfo.csv";
         private static readonly string _petFileLocation = "/PetInfo.csv";
+        private static readonly string _helperFileLocation = "/HelperInfo.csv";
+        private static readonly string _helperSkillFileLocation = "/HelperSkillInfo.csv";
         private static readonly string _highScoreSheet = "https://docs.google.com/spreadsheets/d/13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY/export?format=csv&id=13hsvWaYvp_QGFuQ0ukcgG-FlSAj2NyW8DOvPUG3YguY&gid=4642011";
 
 
@@ -39,7 +42,7 @@ namespace TitanBot2.Services
             string note = serverData[8];
             string name = serverData[9];
 
-            return staticData.BuildArtifact(maxLevel == 0 ? (int?)null : maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, image, version);
+            return staticData.Build(maxLevel == 0 ? (int?)null : maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, image, version);
         }
 
         private Equipment BuildEquipment(ICsvLine serverData, Equipment.EquipmentStatic staticData, Bitmap image, string version)
@@ -51,7 +54,7 @@ namespace TitanBot2.Services
             double.TryParse(serverData[5], out double bonusIncrease);
             Enum.TryParse(serverData[6], out EquipmentSource source);
 
-            return staticData.BuildEquipment(eClass, bonusType, rarity, bonusBase, bonusIncrease, source, image, version);
+            return staticData.Build(eClass, bonusType, rarity, bonusBase, bonusIncrease, source, image, version);
         }
 
         private Pet BuildPet(ICsvLine serverData, Pet.PetStatic staticData, Bitmap image, string version)
@@ -70,15 +73,42 @@ namespace TitanBot2.Services
             incrementRange.Add(41, inc41to80);
             incrementRange.Add(81, inc80on);
 
-            return staticData.BuildPet(damageBase, incrementRange, bonusType, bonusBase, bonusIncrement, image, version);
+            return staticData.Build(damageBase, incrementRange, bonusType, bonusBase, bonusIncrement, image, version);
         }
+
+        private Helper BuildHelper(ICsvLine serverData, List<HelperSkill> helperSkills, Helper.HelperStatic staticData, Bitmap image, string version)
+        {
+            int.TryParse(serverData[0].Replace("H", ""), out int helperId);
+            int.TryParse(serverData[1], out int order);
+            Enum.TryParse(serverData[2], out HelperType type);
+            double.TryParse(serverData[3], out double baseCost);
+            int.TryParse(serverData[4], out int isInGame);
+
+            var skills = helperSkills.Where(h => h.HelperId == helperId).ToList();
+
+            return staticData.Build(type, order, baseCost, skills, isInGame > 0, image, version);
+        }
+
+        private HelperSkill BuildHelperSkill(ICsvLine serverData, string version)
+        {
+            int.TryParse(serverData[0], out int skillId);
+            int.TryParse(serverData[1].Replace("H", ""), out int helperId);
+            var name = serverData[2];
+            Enum.TryParse(serverData[3], out BonusType type);
+            double.TryParse(serverData[4], out double magnitude);
+            int.TryParse(serverData[5], out int requirement);
+
+            return new HelperSkill(skillId, helperId, name, type, magnitude, requirement, version);
+        }
+
+        
 
         public async Task<Artifact> GetArtifact(Artifact.ArtifactStatic artifactStatic)
         {
 
             Configuration.Instance.Versions.TryGetValue(_artifactFileLocation, out string version);
 
-            version = version ?? "1.0";
+            version = version ?? _defaultGhStaticVersion;
 
             var data = await WebClient.GetString(_ghStaticUrl + version + _artifactFileLocation);
             if (data == null)
@@ -101,7 +131,7 @@ namespace TitanBot2.Services
 
             Configuration.Instance.Versions.TryGetValue(_equipmentFileLocation, out string version);
 
-            version = version ?? "1.0";
+            version = version ?? _defaultGhStaticVersion;
 
             var data = await WebClient.GetString(_ghStaticUrl + version + _equipmentFileLocation);
             if (data == null)
@@ -124,7 +154,7 @@ namespace TitanBot2.Services
 
             Configuration.Instance.Versions.TryGetValue(_petFileLocation, out string version);
 
-            version = version ?? "1.0";
+            version = version ?? _defaultGhStaticVersion;
 
             var data = await WebClient.GetString(_ghStaticUrl + version + _petFileLocation);
             if (data == null)
@@ -142,11 +172,37 @@ namespace TitanBot2.Services
             return BuildPet(petRow, petStatic, image, version);
         }
 
+        public async Task<Helper> GetHelper(Helper.HelperStatic helperStatic)
+        {
+
+            Configuration.Instance.Versions.TryGetValue(_helperFileLocation, out string version);
+
+            version = version ?? _defaultGhStaticVersion;
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _helperFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+            ICsvLine helperRow = dataCSV.SingleOrDefault(r => r[0] == "H" + helperStatic.Id.ToString("00"));
+            if (helperRow == null)
+                return null;
+
+            var imageBytes = helperStatic.ImageUrl == null ? null : await WebClient.GetBytes(helperStatic.ImageUrl);
+
+            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+            var skills = await GetAllHelperSkills();
+
+            return BuildHelper(helperRow, skills, helperStatic, image, version);
+        }
+
+
         public async Task<List<Artifact>> GetAllArtifacts()
         {
             Configuration.Instance.Versions.TryGetValue(_artifactFileLocation, out string version);
 
-            version = version ?? "1.0";
+            version = version ?? _defaultGhStaticVersion;
 
             var data = await WebClient.GetString(_ghStaticUrl + version + _artifactFileLocation);
             if (data == null)
@@ -156,7 +212,7 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Artifact.ArtifactStatic, ICsvLine, Bitmap>>();
 
-            foreach (var art in Artifact.Artifacts)
+            foreach (var art in Artifact.All)
             {
                 var imageBytes = art.ImageUrl == null ? null : await WebClient.GetBytes(art.ImageUrl);
 
@@ -176,7 +232,7 @@ namespace TitanBot2.Services
         {
             Configuration.Instance.Versions.TryGetValue(_equipmentFileLocation, out string version);
 
-            version = version ?? "1.0";
+            version = version ?? _defaultGhStaticVersion;
 
             var data = await WebClient.GetString(_ghStaticUrl + version + _equipmentFileLocation);
             if (data == null)
@@ -186,7 +242,7 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Equipment.EquipmentStatic, ICsvLine, Bitmap>>();
 
-            foreach (var equip in Equipment.Equipments)
+            foreach (var equip in Equipment.All)
             {
                 var imageBytes = equip.ImageUrl == null ? null : await WebClient.GetBytes(equip.ImageUrl);
 
@@ -207,7 +263,7 @@ namespace TitanBot2.Services
         {
             Configuration.Instance.Versions.TryGetValue(_petFileLocation, out string version);
 
-            version = version ?? "1.0";
+            version = version ?? _defaultGhStaticVersion;
 
             var data = await WebClient.GetString(_ghStaticUrl + version + _petFileLocation);
             if (data == null)
@@ -217,21 +273,69 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Pet.PetStatic, ICsvLine, Bitmap>>();
 
-            foreach (var pet in Pet.Pets)
+            foreach (var pet in Pet.All)
             {
                 var imageBytes = pet.ImageUrl == null ? null : await WebClient.GetBytes(pet.ImageUrl);
 
                 var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
-                var equipmentRow = dataCSV.SingleOrDefault(r => r[0] == "Pet"+pet.Id);
+                var petRow = dataCSV.SingleOrDefault(r => r[0] == "Pet"+pet.Id);
 
-                if (equipmentRow == null)
+                if (petRow == null)
                     continue;
 
-                items.Add(Tuple.Create(pet, equipmentRow, image));
+                items.Add(Tuple.Create(pet, petRow, image));
             }
 
             return items.Select(i => BuildPet(i.Item2, i.Item1, i.Item3, version)).ToList();
+        }
+
+        public async Task<List<Helper>> GetAllHelpers()
+        {
+            Configuration.Instance.Versions.TryGetValue(_helperFileLocation, out string version);
+
+            version = version ?? _defaultGhStaticVersion;
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _helperFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+
+            var items = new List<Tuple<Helper.HelperStatic, ICsvLine, Bitmap>>();
+
+            foreach (var helper in Helper.All)
+            {
+                var imageBytes = helper.ImageUrl == null ? null : await WebClient.GetBytes(helper.ImageUrl);
+
+                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+
+                var helperRow = dataCSV.SingleOrDefault(r => r[0] == "H" + helper.Id.ToString("00"));
+
+                if (helperRow == null)
+                    continue;
+
+                items.Add(Tuple.Create(helper, helperRow, image));
+            }
+
+            var skills = await GetAllHelperSkills();
+
+            return items.Select(i => BuildHelper(i.Item2, skills, i.Item1, i.Item3, version)).ToList();
+        }
+
+        public async Task<List<HelperSkill>> GetAllHelperSkills()
+        {
+            Configuration.Instance.Versions.TryGetValue(_helperSkillFileLocation, out string version);
+
+            version = version ?? _defaultGhStaticVersion;
+
+            var data = await WebClient.GetString(_ghStaticUrl + version + _helperSkillFileLocation);
+            if (data == null)
+                return null;
+
+            var dataCSV = CsvReader.ReadFromText(data);
+
+            return dataCSV.Select(d => BuildHelperSkill(d, version)).ToList();
         }
 
         public async Task<HighScoreSheet> GetHighScores()

@@ -106,7 +106,7 @@ namespace TitanBot2.Commands.Data
             await ReplyAsync("", embed: builder.Build());
         }
 
-        private async Task ShowEquipmentAsync(Equipment equipment)
+        private EmbedBuilder GetBaseEmbed(Equipment equipment)
         {
             var builder = new EmbedBuilder
             {
@@ -129,6 +129,14 @@ namespace TitanBot2.Commands.Data
             builder.AddInlineField("Equipment type", equipment.Class);
             builder.AddInlineField("Rarity", equipment.Rarity);
             builder.AddInlineField("Source", equipment.Source);
+
+            return builder;
+        }
+
+        private async Task ShowEquipmentAsync(Equipment equipment)
+        {
+            var builder = GetBaseEmbed(equipment);
+
             builder.AddField("Bonus type", equipment.BonusType.Beautify());
             builder.AddInlineField("Bonus base", equipment.BonusType.FormatValue(equipment.BonusBase));
             builder.AddInlineField("Bonus increase", equipment.BonusType.FormatValue(equipment.BonusIncrease));
@@ -139,30 +147,9 @@ namespace TitanBot2.Commands.Data
 
         private async Task ShowEquipmentAsync(Equipment equipment, double level)
         {
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    Name = "Equipment data for " + equipment.Name,
-                    IconUrl = equipment.ImageUrl,
-                },
-                ThumbnailUrl = equipment.ImageUrl,
-                Footer = new EmbedFooterBuilder
-                {
-                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
-                    Text = $"{Context.Client.CurrentUser.Username} Equipment tool | TT2 v{equipment.FileVersion}"
-                },
-                Timestamp = DateTime.Now,
-                Color = equipment.Image.AverageColor(0.3f, 0.5f).ToDiscord(),
-            };
+            var builder = GetBaseEmbed(equipment);
 
-            builder.AddInlineField("Equipment id", equipment.Id);
-            builder.AddInlineField("Equipment type", equipment.Class);
-            builder.AddInlineField("Rarity", equipment.Rarity);
-            builder.AddInlineField("Source", equipment.Source);
             builder.AddField("Bonus type", equipment.BonusType.Beautify());
-            builder.AddInlineField("Bonus base", equipment.BonusType.FormatValue(equipment.BonusBase));
-            builder.AddInlineField("Bonus increase", equipment.BonusType.FormatValue(equipment.BonusIncrease));
             builder.AddField($"Bonus at {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
             builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.*");
 

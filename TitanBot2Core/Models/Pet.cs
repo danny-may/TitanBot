@@ -54,7 +54,7 @@ namespace TitanBot2.Models
 
         public static PetStatic Find(string name)
         {
-            var matches = Pets.Where(a => a.Id.ToString() == name.ToString() ||
+            var matches = All.Where(a => a.Id.ToString() == name.ToString() ||
                                           a.Name.Replace(" ", "").ToLower().Contains(name.Replace(" ", "").ToLower()) ||
                                           a.Alias.Count(v => v.ToLower() == name.ToLower()) > 0);
             if (matches.Count() != 1)
@@ -63,7 +63,7 @@ namespace TitanBot2.Models
                 return matches.First();
         }
 
-        public static List<PetStatic> Pets { get; } = new List<PetStatic>
+        public static List<PetStatic> All { get; } = new List<PetStatic>
         {
             new PetStatic(1, "Nova", new string[0], "http://www.cockleshell.org/static/TT2/img/p9.png"),
             new PetStatic(2, "Toto", new string[0], "http://www.cockleshell.org/static/TT2/img/p7.png"),
@@ -98,7 +98,7 @@ namespace TitanBot2.Models
                 ImageUrl = imageUrl;
             }
 
-            public Pet BuildPet(double damageBase, Dictionary<int, double> incrementRange, BonusType bonusType, double bonusBase, double bonusIncrement, Bitmap image, string version)
+            public Pet Build(double damageBase, Dictionary<int, double> incrementRange, BonusType bonusType, double bonusBase, double bonusIncrement, Bitmap image, string version)
             {
                 return new Pet(this, damageBase, incrementRange, bonusType, bonusBase, bonusIncrement, image, version);
             }
