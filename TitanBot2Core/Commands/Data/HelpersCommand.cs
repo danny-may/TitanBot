@@ -32,6 +32,8 @@ namespace TitanBot2.Commands.Data
             Description = "Displays data about any hero";
             DelayMessage = "This might take a short while, theres a fair bit of data to download!";
             Name = "Heroes";
+
+            RequireOwner = true;
         }
 
         private async Task ListHelpersAsync(bool grouped)
