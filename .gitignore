@@ -9,3 +9,6 @@
 /TitanBot2Console/bin
 /TitanBot2Core/obj
 /TitanBot2Console/obj
+/Compiled/config
+/Compiled/database
+/Compiled/logs
