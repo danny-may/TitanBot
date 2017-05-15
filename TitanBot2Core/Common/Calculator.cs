@@ -11,7 +11,7 @@ namespace TitanBot2.Common
         private static int[] BossAttackCosts { get; } = new int[] { 0, 5, 25, 50, 75, 100, 125, 150 };
 
         public static double TitanLordHp(int clanQuest)
-            => 1500000 + Math.Pow(clanQuest - 1, 0.9) * 900000;
+            => 1500000 + Math.Pow(Math.Min(clanQuest, 650) - 1, 0.9) * Math.Pow(Math.Max(clanQuest - 650, 0) - 1, 1.4) * 900000;
 
         public static double ClanBonus(int clanQuest)
             => 100 * 
