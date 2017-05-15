@@ -9,6 +9,8 @@ namespace TitanBot2.Extensions
         {
             if (double.IsInfinity(value))
                 return "∞";
+            if (double.IsNaN(value))
+                return "NaN";
             var postfixes = new string[] { "", "K", "M", "B", "T" };
             var magnitude = (int)Math.Floor(Math.Log10(value)) / 3;
             string postfix;
