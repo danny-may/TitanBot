@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -41,6 +42,7 @@ namespace TitanBot2.Services
                     _readers.AddTypeReader<Pet>(new PetTypeReader());
                     _readers.AddTypeReader<Helper>(new HelperTypeReader());
                     _readers.AddTypeReader<TimeSpan>(new TimeSpanTypeReader());
+                    _readers.AddTypeReader<Color>(new ColourTypeReader());
                 }
             });
         }

@@ -233,6 +233,8 @@
     <Compile Include="Commands\General\InviteCommand.cs" />
     <Compile Include="Commands\General\PingCommand.cs" />
     <Compile Include="Commands\General\PrefixCommand.cs" />
+    <Compile Include="Commands\GuildSpecific\Singularity\ChampionCommand.cs" />
+    <Compile Include="Commands\GuildSpecific\Singularity\ColourMeCommand.cs" />
     <Compile Include="Commands\GuildSpecific\Singularity\DemoteCommand.cs" />
     <Compile Include="Commands\GuildSpecific\Singularity\PromoteCommand.cs" />
     <Compile Include="Commands\GuildSpecific\Singularity\RemoveCommand.cs" />
@@ -317,6 +319,7 @@
     <Compile Include="TimerCallbacks\TitanLordCallbacks.cs" />
     <Compile Include="TitanBot.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\ColourTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\HelperTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PetTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\EquipmentTypeReader.cs" />
