@@ -60,19 +60,19 @@ namespace TitanBot2.TypeReaders.Readers
 
             //By Username (0.5-0.6)
             {
-                foreach (var channelUser in channelUsers.Where(x => x.Username.ToLower().Contains(input.ToLower())))
+                foreach (var channelUser in channelUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, channelUser as T, channelUser.Username == input ? 0.65f : 0.55f);
 
-                foreach (var guildUser in guildUsers.Where(x => x.Username.ToLower().Contains(input.ToLower())))
+                foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Username == input ? 0.60f : 0.50f);
             }
 
             //By Nickname (0.5-0.6)
             {
-                foreach (var channelUser in channelUsers.Where(x => (x as IGuildUser)?.Nickname.ToLower().Contains(input.ToLower()) ?? false))
+                foreach (var channelUser in channelUsers.Where(x => string.Equals(input, (x as IGuildUser)?.Nickname, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, channelUser as T, (channelUser as IGuildUser).Nickname == input ? 0.65f : 0.55f);
 
-                foreach (var guildUser in guildUsers.Where(x => (x as IGuildUser)?.Nickname.ToLower().Contains(input.ToLower()) ?? false))
+                foreach (var guildUser in guildUsers.Where(x => string.Equals(input, (x as IGuildUser)?.Nickname, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, (guildUser as IGuildUser).Nickname == input ? 0.60f : 0.50f);
             }
 
