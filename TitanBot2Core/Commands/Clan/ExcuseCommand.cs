@@ -15,7 +15,7 @@ namespace TitanBot2.Commands.Clan
             Calls.AddNew(a => ExcuseUserAsync());
             Calls.AddNew(a => ExcuseUserAsync((IUser)a[0]))
                  .WithArgTypes(typeof(IUser));
-            Calls.AddNew(a => ExcuseUserAsync(null, (int)a[1]))
+            Calls.AddNew(a => ExcuseUserAsync(null, (int)a[0]))
                  .WithArgTypes(typeof(int));
             Calls.AddNew(a => ExcuseUserAsync((IUser)a[0], (int)a[1]))
                  .WithArgTypes(typeof(IUser), typeof(int));
