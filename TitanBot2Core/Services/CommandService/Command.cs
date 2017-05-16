@@ -79,10 +79,13 @@ namespace TitanBot2.Services.CommandService
                     await ReplyAsync($"The arguments you gave could not be matched to a method. Please use `{Context.Prefix}help {Name}` for more info", ReplyType.Error);
             }
             catch (Exception ex)
-            {
+            {                    
                 try
                 {
-                    await ReplyAsync($"Exception thrown: `{ex.GetType()}`", ReplyType.Error);
+                    if (ex is AggregateException)
+                        await ReplyAsync($"Aggregate exception thrown: `{string.Join("`, `", (ex as AggregateException).InnerExceptions.Select(e => e.GetType()))}`", ReplyType.Error);
+                    else
+                        await ReplyAsync($"Exception thrown: `{ex.GetType()}`", ReplyType.Error);
                 }
                 catch { }
                 await Context.Logger.Log(ex, "Command:" +(Name ?? GetType().Name));
