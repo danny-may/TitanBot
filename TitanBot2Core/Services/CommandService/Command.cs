@@ -223,12 +223,11 @@ namespace TitanBot2.Services.CommandService
 
         protected async Task<IUserMessage> TrySend(ulong channelid, string message, ReplyType replyType, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            IChannel channel = Context.Client.AllChannels().SingleOrDefault(c => c.Id == channelid);
+            IMessageChannel channel = Context.Client.AllChannels().SingleOrDefault(c => c.Id == channelid) as IMessageChannel;
             if (channel == null)
-            {
-                await Context.Client.GetUser(channelid)?.CreateDMChannelAsync();
-                channel = Context.Client.DMChannels.SingleOrDefault(c => c.Recipient.Id == channelid);
-            }
+                channel = Context.Client.DMChannels.SingleOrDefault(c => c.Recipient.Id == channelid) as IMessageChannel;
+            if (channel == null)
+                channel = await Context.Client.GetUser(channelid)?.CreateDMChannelAsync();
 
             var msgChannel = channel as IMessageChannel;
             if (msgChannel == null)
