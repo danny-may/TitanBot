@@ -114,7 +114,7 @@ namespace TitanBot2.Commands.Data
 
             foreach (var bonus in pets.GroupBy(p => p.BonusType).OrderBy(t => t.Key))
             {
-                builder.AddField(bonus.Key.Beautify(), string.Join("\n", bonus.Select(a => a.Name)));
+                builder.AddInlineField(bonus.Key.Beautify(), string.Join("\n", bonus.Select(a => a.Name)));
             }
 
             await ReplyAsync("", embed: builder.Build());

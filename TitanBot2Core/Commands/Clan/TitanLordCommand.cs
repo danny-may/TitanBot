@@ -243,7 +243,12 @@ namespace TitanBot2.Commands.Clan
             builder.AddField("Next Titan Lord HP", bossHp.Beautify());
             builder.AddField("Time to kill", (DateTime.Now.Add(time).AddHours(-6) - latestTimer.To).Value.Beautify());
 
-            await ReplyAsync("", embed: builder.Build());
+
+            var tlChannel = Context.Channel.Id;
+            if (guildData.TitanLord?.Channel != null)
+                tlChannel = guildData.TitanLord.Channel.Value;
+
+            await TrySend(tlChannel, "", embed: builder.Build());
         }
     }
 }
