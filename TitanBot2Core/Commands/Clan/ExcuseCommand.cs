@@ -15,6 +15,8 @@ namespace TitanBot2.Commands.Clan
             Calls.AddNew(a => ExcuseUserAsync());
             Calls.AddNew(a => ExcuseUserAsync((IUser)a[0]))
                  .WithArgTypes(typeof(IUser));
+            Calls.AddNew(a => ExcuseUserAsync((IUser)a[0], (int)a[1]))
+                 .WithArgTypes(typeof(IUser), typeof(int));
             Calls.AddNew(a => AddExcuseAsync((string)a[0]))
                  .WithArgTypes(typeof(string))
                  .WithSubCommand("Add")
@@ -22,13 +24,13 @@ namespace TitanBot2.Commands.Clan
             Calls.AddNew(a => RemoveExcuseAsync((int)a[0]))
                  .WithArgTypes(typeof(int))
                  .WithSubCommand("Remove");
-            Usage.Add("`{0} [user]` - Gets an excuse for why that person (or yourself) didnt attack the boss");
+            Usage.Add("`{0} [user] [id]` - Gets an excuse for why that person (or yourself) didnt attack the boss");
             Usage.Add("`{0} add <text>` - Adds an excuse to the pool of available excuses");
             Usage.Add("`{0} remove <id>` - Removes an excuse you made by ID");
             Description = "Missed the boss? Or did someone else? Use this to get a water-tight excuse whenever you need!";
         }
 
-        public async Task ExcuseUserAsync(IUser user = null)
+        public async Task ExcuseUserAsync(IUser user = null, int? excuseId = null)
         {
             user = user ?? Context.User;
 
@@ -37,8 +39,11 @@ namespace TitanBot2.Commands.Clan
                 await ReplyAsync("Haha! You must be mistaken, I never miss a Titan Lord attack.");
                 return;
             }
-
-            var excuse = await Context.Database.Excuses.GetRandom();
+            Excuse excuse;
+            if (excuseId == null)
+                excuse = await Context.Database.Excuses.GetRandom();
+            else
+                excuse = await Context.Database.Excuses.Get(excuseId??0);
             var submitter = Context.Client.GetUser(excuse.CreatorId);
 
             var builder = new EmbedBuilder
