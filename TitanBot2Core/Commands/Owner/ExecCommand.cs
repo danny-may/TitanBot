@@ -105,7 +105,7 @@ using System.Threading.Tasks;
                 builder.WithTitle($":white_check_mark: Execution Result");
                 builder.WithColor(System.Drawing.Color.LimeGreen.ToDiscord());
                 var resString = "";
-                if (result is IEnumerable)
+                if (result is IEnumerable && !(result is string))
                     resString = "[" + string.Join(", ", (result as IEnumerable<object>) ?? new List<string>()) + "]";
                 else
                     resString = result?.ToString();
