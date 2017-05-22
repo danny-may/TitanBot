@@ -150,7 +150,7 @@ namespace TitanBot2.Commands.Data
             var builder = GetBaseEmbed(equipment);
 
             builder.AddField("Bonus type", equipment.BonusType.Beautify());
-            builder.AddField($"Bonus at {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
+            builder.AddField($"Bonus at lv {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
             builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.*");
 
             await ReplyAsync("", embed: builder.Build());
