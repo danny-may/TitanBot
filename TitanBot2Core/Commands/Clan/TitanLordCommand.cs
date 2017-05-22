@@ -176,9 +176,8 @@ namespace TitanBot2.Commands.Clan
 
         private async Task TitanLordInfoAsync()
         {
-            var infoCmd = new ClanStatsCommand(Context, Readers);
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-            await infoCmd.ShowStatsAsync(guildData.TitanLord.CQ);
+            await ReplyAsync("", embed: ClanStatsCommand.StatsBuilder(Context.Client.CurrentUser, guildData.TitanLord.CQ).Build());
         }
 
         private async Task TitanLordStopAsync()
