@@ -30,6 +30,41 @@ namespace TitanBot2.Services
             WebClient = client;
         }
 
+        private Task<Dictionary<string, Bitmap>> GetImages(IEnumerable<string> urls)
+            => GetImages(urls.ToArray());
+        private async Task<Dictionary<string, Bitmap>> GetImages(string[] urls)
+        {
+            var res = new Dictionary<string, Task<Bitmap>>();
+
+            foreach (var url in urls)
+            {
+                res.Add(url, GetImage(url));
+            }
+
+            await Task.WhenAll(res.Select(r => r.Value));
+
+            return res.ToDictionary(r => r.Key, r => r.Value.GetAwaiter().GetResult());
+        }
+
+        private async Task<Bitmap> GetImage(string url, int retries = 1)
+        {
+            Bitmap img = null;
+            try
+            {
+                return await WebClient.GetImage(url);
+            }
+            catch
+            {
+                if (retries > 0)
+                {
+                    WebClient.HardReset(url);
+                    return await GetImage(url, --retries);
+                }
+
+                return null;
+            }
+        }
+
         private Artifact BuildArtifact(ICsvLine serverData, Artifact.ArtifactStatic staticData, Bitmap image, string version)
         {
             int.TryParse(serverData[1], out int maxLevel);
@@ -42,7 +77,7 @@ namespace TitanBot2.Services
             string note = serverData[8];
             string name = serverData[9];
 
-            return staticData.Build(maxLevel == 0 ? (int?)null : maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, image, version);
+            return staticData.Build(maxLevel == 0 ? (int?)null : maxLevel, tt1, bonusType, effectPerLevel, damageBonus, costCoef, costExpo, note, image ?? new Bitmap(1,1), version);
         }
 
         private Equipment BuildEquipment(ICsvLine serverData, Equipment.EquipmentStatic staticData, Bitmap image, string version)
@@ -54,7 +89,7 @@ namespace TitanBot2.Services
             double.TryParse(serverData[5], out double bonusIncrease);
             Enum.TryParse(serverData[6], out EquipmentSource source);
 
-            return staticData.Build(eClass, bonusType, rarity, bonusBase, bonusIncrease, source, image, version);
+            return staticData.Build(eClass, bonusType, rarity, bonusBase, bonusIncrease, source, image ?? new Bitmap(1, 1), version);
         }
 
         private Pet BuildPet(ICsvLine serverData, Pet.PetStatic staticData, Bitmap image, string version)
@@ -73,7 +108,7 @@ namespace TitanBot2.Services
             incrementRange.Add(41, inc41to80);
             incrementRange.Add(81, inc80on);
 
-            return staticData.Build(damageBase, incrementRange, bonusType, bonusBase, bonusIncrement, image, version);
+            return staticData.Build(damageBase, incrementRange, bonusType, bonusBase, bonusIncrement, image ?? new Bitmap(1, 1), version);
         }
 
         private Helper BuildHelper(ICsvLine serverData, List<HelperSkill> helperSkills, Helper.HelperStatic staticData, Bitmap image, string version)
@@ -86,7 +121,7 @@ namespace TitanBot2.Services
 
             var skills = helperSkills.Where(h => h.HelperId == helperId).ToList();
 
-            return staticData.Build(type, order, baseCost, skills, isInGame > 0, image, version);
+            return staticData.Build(type, order, baseCost, skills, isInGame > 0, image ?? new Bitmap(1, 1), version);
         }
 
         private HelperSkill BuildHelperSkill(ICsvLine serverData, string version)
@@ -119,9 +154,7 @@ namespace TitanBot2.Services
             if (artifactRow == null)
                 return null;
 
-            var imageBytes = artifactStatic.ImageUrl == null ? null : await WebClient.GetBytes(artifactStatic.ImageUrl);
-
-            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+            var image = await GetImage(artifactStatic.ImageUrl);
 
             return BuildArtifact(artifactRow, artifactStatic, image, version);
         }
@@ -142,9 +175,7 @@ namespace TitanBot2.Services
             if (equipmentRow == null)
                 return null;
 
-            var imageBytes = equipmentStatic.ImageUrl == null ? null : await WebClient.GetBytes(equipmentStatic.ImageUrl);
-
-            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+            var image = await GetImage(equipmentStatic.ImageUrl);
 
             return BuildEquipment(equipmentRow, equipmentStatic, image, version);
         }
@@ -165,9 +196,7 @@ namespace TitanBot2.Services
             if (petRow == null)
                 return null;
 
-            var imageBytes = petStatic.ImageUrl == null ? null : await WebClient.GetBytes(petStatic.ImageUrl);
-
-            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+            var image = await GetImage(petStatic.ImageUrl);
 
             return BuildPet(petRow, petStatic, image, version);
         }
@@ -188,9 +217,7 @@ namespace TitanBot2.Services
             if (helperRow == null)
                 return null;
 
-            var imageBytes = helperStatic.ImageUrl == null ? null : await WebClient.GetBytes(helperStatic.ImageUrl);
-
-            var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+            var image = await GetImage(helperStatic.ImageUrl);
 
             var skills = await GetAllHelperSkills();
 
@@ -212,11 +239,11 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Artifact.ArtifactStatic, ICsvLine, Bitmap>>();
 
+            var images = await GetImages(Artifact.All.Select(a => a.ImageUrl));
+
             foreach (var art in Artifact.All)
             {
-                var imageBytes = art.ImageUrl == null ? null : await WebClient.GetBytes(art.ImageUrl);
-
-                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+                var image = images[art.ImageUrl];
 
                 var artifactRow = dataCSV.SingleOrDefault(r => r[0].EndsWith("t" + art.Id));
                 if (artifactRow == null)
@@ -242,11 +269,11 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Equipment.EquipmentStatic, ICsvLine, Bitmap>>();
 
+            var images = await GetImages(Equipment.All.Select(e => e.ImageUrl));
+
             foreach (var equip in Equipment.All)
             {
-                var imageBytes = equip.ImageUrl == null ? null : await WebClient.GetBytes(equip.ImageUrl);
-
-                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+                var image = images[equip.ImageUrl];
 
                 var equipmentRow = dataCSV.SingleOrDefault(r => r[0] == equip.Id);
 
@@ -273,11 +300,11 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Pet.PetStatic, ICsvLine, Bitmap>>();
 
+            var images = await GetImages(Pet.All.Select(p => p.ImageUrl));
+
             foreach (var pet in Pet.All)
             {
-                var imageBytes = pet.ImageUrl == null ? null : await WebClient.GetBytes(pet.ImageUrl);
-
-                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+                var image = images[pet.ImageUrl];
 
                 var petRow = dataCSV.SingleOrDefault(r => r[0] == "Pet"+pet.Id);
 
@@ -304,11 +331,11 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Helper.HelperStatic, ICsvLine, Bitmap>>();
 
+            var images = await GetImages(Helper.All.Select(h => h.ImageUrl));
+
             foreach (var helper in Helper.All)
             {
-                var imageBytes = helper.ImageUrl == null ? null : await WebClient.GetBytes(helper.ImageUrl);
-
-                var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
+                var image = images[helper.ImageUrl];
 
                 var helperRow = dataCSV.SingleOrDefault(r => r[0] == "H" + helper.Id.ToString("00"));
 

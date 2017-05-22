@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,23 @@ namespace TitanBot2.Services
         public void WipeCache()
             => _cache = new ConcurrentDictionary<Uri, CacheObject>();
 
+        private void EnsureCache(Uri url)
+        {
+            if (!_cache.ContainsKey(url))
+            {
+                _cache.Add(url, new CacheObject(url));
+                _cache[url].LogWebRequest += Log;
+            }
+        }
+
+        public void HardReset(string url)
+            => HardReset(new Uri(url));
+        public void HardReset(Uri url)
+        {
+            if (_cache.ContainsKey(url))
+                _cache.Remove(url);
+        }
+
         public Task<string> GetString(string url)
             => GetString(new Uri(url), DefaultFreshness);
         public Task<string> GetString(Uri url)
@@ -41,8 +60,22 @@ namespace TitanBot2.Services
 
             if (data == null)
                 return null;
-            else
-                return (encoding ?? Encoding.Default).GetString(data);
+            return (encoding ?? Encoding.Default).GetString(data);
+        }
+
+        public Task<Bitmap> GetImage(string url)
+            => GetImage(new Uri(url), DefaultFreshness);
+        public Task<Bitmap> GetImage(string url, int freshness)
+            => GetImage(new Uri(url), freshness);
+        public Task<Bitmap> GetImage(Uri url)
+            => GetImage(url, DefaultFreshness);
+        public async Task<Bitmap> GetImage(Uri url, int freshness)
+        {
+            var data = await GetBytes(url, freshness);
+
+            if (data == null)
+                return null;
+            return new Bitmap(new MemoryStream(data));
         }
 
         public Task<byte[]> GetBytes(string url)
@@ -53,19 +86,25 @@ namespace TitanBot2.Services
             => GetBytes(new Uri(url), freshness);
         public Task<byte[]> GetBytes(Uri url, int freshness)
         {
-            if (!_cache.ContainsKey(url))
+            EnsureCache(url);
+
+            try
             {
-                _cache.Add(url, new CacheObject(url));
-                _cache[url].LogWebRequest += Log;
+                return _cache[url].Get(freshness, RequestTimeout);
             }
-
-            return _cache[url].Get(freshness, RequestTimeout);
+            catch (Exception ex)
+            {
+                if (DefaultExceptionHandler != null)
+                    Handle(ex);
+                throw;
+            }
         }
 
-        private async Task Log(Uri url, string message)
-        {
-            await (LogWebRequest?.Invoke(url, message) ?? Task.CompletedTask);
-        }
+        private Task Log(Uri url, string message)
+            => (LogWebRequest?.Invoke(url, message) ?? Task.CompletedTask);
+
+        private Task Handle(Exception ex)
+            => (DefaultExceptionHandler?.Invoke(ex) ?? Task.CompletedTask);
 
         internal class CacheObject
         {
@@ -88,50 +127,50 @@ namespace TitanBot2.Services
 
             public async Task<byte[]> Get(int freshness, int timeout)
             {
-                if (_lastUpdate.AddSeconds(freshness) < DateTime.Now)
+                try
                 {
-                    Log("Updating WebCache");
-                    bool queryOwner = false;
-                    if (_webQueryTask == null)
+                    if (_lastUpdate.AddSeconds(freshness) < DateTime.Now)
                     {
-                        queryOwner = true;
-
-                        _data = null;
-                        
-                        _webQueryTask = new Task(() =>
+                        Log("Updating WebCache");
+                        bool queryOwner = false;
+                        if (_webQueryTask == null)
                         {
-                            using (var wc = new WebClient())
+                            queryOwner = true;
+
+                            _data = null;
+
+                            _webQueryTask = new Task(() =>
                             {
-                                Task.Run(async () =>
+                                using (var wc = new WebClient())
                                 {
-                                    await Task.Delay(timeout);
-                                    if (wc != null)
-                                        wc.CancelAsync();
-                                });
-                                _data = wc.DownloadData(_location);
-                                Log("Download Complete");
-                            }
-                            _lastUpdate = DateTime.Now;
+                                    Task.Run(async () =>
+                                    {
+                                        await Task.Delay(timeout);
+                                        if (wc != null)
+                                            wc.CancelAsync();
+                                    });
+                                    _data = wc.DownloadData(_location);
+                                    Log("Download Complete");
+                                }
+                                _lastUpdate = DateTime.Now;
 
-                        });
-                        _webQueryTask.Start();
-                    }
+                            });
+                            _webQueryTask.Start();
+                        }
 
-                    Log("Waiting for download");
-
-                    try
-                    {
+                        Log("Waiting for download");
                         await _webQueryTask;
+
+                        if (queryOwner)
+                            _webQueryTask = null;
                     }
-                    catch (WebException ex)
-                    {
-                        if (ex.Status != WebExceptionStatus.RequestCanceled)
-                            throw;
-                        else
-                            Log("Download cancelled");
-                    }
-                    if (queryOwner)
-                        _webQueryTask = null;
+                }
+                catch (WebException ex)
+                {
+                    if (ex.Status != WebExceptionStatus.RequestCanceled)
+                        throw;
+                    else
+                        Log("Download cancelled");
                 }
 
                 return _data;
