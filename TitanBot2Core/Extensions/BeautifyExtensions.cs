@@ -234,7 +234,7 @@ namespace TitanBot2.Extensions
                 case BonusType.SlashBoost:
                 case BonusType.ArmorBoost:
                 case BonusType.AuraBoost:
-                    return $"x{value}";
+                    return $"x{value+1}";
                 case BonusType.SplashDamage:
                 case BonusType.ManaRegen:
                 case BonusType.ManaPoolCap:

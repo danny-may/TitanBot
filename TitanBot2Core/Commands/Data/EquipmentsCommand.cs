@@ -92,7 +92,7 @@ namespace TitanBot2.Commands.Data
                     break;
             }
             if (grouped == null)
-                builder.WithDescription("Please use one of the following equipment types:\n" + string.Join("\n", Enum.GetNames(typeof(EquipmentClass))).Replace("None", "Removed") + $"\n\n `{Context.Prefix}{Context.Command} list <type>`");
+                builder.WithDescription("Please use one of the following equipment types:\n" + string.Join("\n", Enum.GetNames(typeof(EquipmentClass))).Replace("None", "Removed") + $"\n\n `{Context.Prefix}{Context.Command} list [type]`");
             else
             {
                 builder.WithDescription($"All {equipClass} equipment");
