@@ -96,7 +96,7 @@ namespace TitanBot2.Services.CommandService
             internal ArgTypePair(Type type, string argument)
             {
                 Type = type;
-                Argument = argument;
+                Argument = argument.Trim('[', '<', '>', ']');
             }
         }
 
@@ -107,7 +107,7 @@ namespace TitanBot2.Services.CommandService
             internal ArgSubcommandPair(string subCommand, string argument)
             {
                 SubCommand = subCommand;
-                Argument = argument;
+                Argument = argument.Trim('[', '<', '>', ']');
             }
 
             public bool Matches()
