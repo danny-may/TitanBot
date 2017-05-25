@@ -88,6 +88,7 @@ namespace TitanBot2.Services
 
             public async Task<byte[]> Get(int freshness, int timeout)
             {
+                _lastUpdate = new DateTime(0);
                 if (_lastUpdate.AddSeconds(freshness) < DateTime.Now)
                 {
                     Log("Updating WebCache");

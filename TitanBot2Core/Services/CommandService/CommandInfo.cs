@@ -19,7 +19,7 @@ namespace TitanBot2.Services.CommandService
             
         }
 
-        public Command CreateInstance(TitanbotCmdContext context, TypeReaderCollection readers)
+        public Command CreateInstance(CmdContext context, TypeReaderCollection readers)
         {
             return Activator.CreateInstance(CommandType, context, readers) as Command;
         }
@@ -30,7 +30,7 @@ namespace TitanBot2.Services.CommandService
             {
                 try
                 {
-                    var obj = Activator.CreateInstance(t, null as TitanbotCmdContext, null as TypeReaderCollection) as Command;
+                    var obj = Activator.CreateInstance(t, null as CmdContext, null as TypeReaderCollection) as Command;
                     if (obj == null)
                         return null;
 

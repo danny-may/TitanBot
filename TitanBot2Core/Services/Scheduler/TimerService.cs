@@ -13,15 +13,15 @@ namespace TitanBot2.Services.Scheduler
 {
     public class TimerService : ThreadedService
     {
-        private TitanbotDatabase _database { get; }
-        private TitanbotDependencies _dependencies { get; }
+        private BotDatabase _database { get; }
+        private BotDependencies _dependencies { get; }
 
         private IDictionary<EventCallback, ConcurrentBag<Func<TimerContext, Task>>> _callbacks { get; }
             = new ConcurrentDictionary<EventCallback, ConcurrentBag<Func<TimerContext, Task>>>();
 
         private object _lock = new object();
 
-        public TimerService(TitanbotDependencies dependencies)
+        public TimerService(BotDependencies dependencies)
         {
             _database = dependencies.Database;
             _dependencies = dependencies;

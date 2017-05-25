@@ -12,7 +12,7 @@ namespace TitanBot2.Commands.Bot
 {
     public class ReportCommand : Command
     {
-        public ReportCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ReportCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ReportAsync((string)a[0]))
                  .WithArgTypes(typeof(string))

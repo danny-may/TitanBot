@@ -8,7 +8,7 @@ namespace TitanBot2.Commands.General
 {
     public class PrefixCommand : Command
     {
-        public PrefixCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public PrefixCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             RequiredContexts = ContextType.Guild;
             DefaultPermission = 8;

@@ -11,7 +11,7 @@ namespace TitanBot2.DiscordHandlers
     {
         private Dictionary<ulong, GuildSpecificHandler> _guildHandlers = new Dictionary<ulong, GuildSpecificHandler>();
 
-        public override async Task Install(TitanbotDependencies args)
+        public override async Task Install(BotDependencies args)
         {
             await base.Install(args);
 
@@ -24,7 +24,7 @@ namespace TitanBot2.DiscordHandlers
             Client.UserUpdated += HandleUpdateAsync;
             Client.GuildMemberUpdated += HandleGUpdateAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "User"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "User"));
         }
 
         public override async Task Uninstall()
@@ -36,7 +36,7 @@ namespace TitanBot2.DiscordHandlers
             Client.UserUpdated -= HandleUpdateAsync;
             Client.GuildMemberUpdated -= HandleGUpdateAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "User"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "User"));
             await base.Uninstall();
         }
 

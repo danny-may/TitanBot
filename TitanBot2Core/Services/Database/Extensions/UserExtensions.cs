@@ -6,7 +6,7 @@ namespace TitanBot2.Services.Database.Extensions
 {
     public class UserExtensions : DatabaseExtension<User>
     {
-        public UserExtensions(TitanbotDatabase db) : base(db)
+        public UserExtensions(BotDatabase db) : base(db)
         {
         }
 

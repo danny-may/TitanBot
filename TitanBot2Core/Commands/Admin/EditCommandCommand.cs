@@ -11,7 +11,7 @@ namespace TitanBot2.Commands.Admin
 {
     public class EditCommandCommand : Command
     {
-        public EditCommandCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public EditCommandCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => SetRoleAsync((string[])a[0], (SocketRole[])a[1]))
                  .WithArgTypes(typeof(string[]), typeof(SocketRole[]))

@@ -14,14 +14,14 @@ namespace TitanBot2.Services.Scheduler
         public SocketGuild Guild { get; }
         public ISocketMessageChannel Channel { get; }
         public DateTime EventTime { get; } = DateTime.Now;
-        public TitanbotDependencies Dependencies { get; }
-        public TitanBot TitanBot { get { return Dependencies?.TitanBot; } }
+        public BotDependencies Dependencies { get; }
+        public BotClient BotClient { get { return Dependencies?.BotClient; } }
         public DiscordSocketClient Client { get { return Dependencies?.Client; } }
-        public TitanbotDatabase Database { get { return Dependencies?.Database; } }
+        public BotDatabase Database { get { return Dependencies?.Database; } }
         public TimerService TimerService { get { return Dependencies?.TimerService; } }
         public Logger Logger { get { return Dependencies?.Logger; } }
 
-        public TimerContext(TitanbotDependencies dependencies, Timer timer, DateTime execTime)
+        public TimerContext(BotDependencies dependencies, Timer timer, DateTime execTime)
         {
             EventTime = execTime;
             Dependencies = dependencies;

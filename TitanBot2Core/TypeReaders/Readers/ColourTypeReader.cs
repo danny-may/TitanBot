@@ -11,7 +11,7 @@ namespace TitanBot2.TypeReaders.Readers
 {
     public class ColourTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> Read(TitanbotCmdContext context, string value)
+        public override Task<TypeReaderResult> Read(CmdContext context, string value)
         {
             var colour = Color.FromName(value);
             if (colour.IsKnownColor)

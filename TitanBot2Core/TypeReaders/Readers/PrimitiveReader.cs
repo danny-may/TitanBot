@@ -24,7 +24,7 @@ namespace TitanBot2.TypeReaders.Readers
             _tryParse = PrimitiveParsers.Get<T>();
         }
 
-        public override Task<TypeReaderResult> Read(TitanbotCmdContext context, string input)
+        public override Task<TypeReaderResult> Read(CmdContext context, string input)
         {
             T value;
             if (_tryParse(input, out value))

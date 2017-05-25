@@ -8,7 +8,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class GetMessageCommand : Command
     {
-        public GetMessageCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public GetMessageCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => GetMessageAsync(Context.Channel.Id, (ulong)a[0]))
                  .WithArgTypes(typeof(ulong));

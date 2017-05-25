@@ -12,7 +12,7 @@ namespace TitanBot2Console
 {
     class Program
     {
-        private TitanBot _bot;
+        private BotClient _bot;
         private string logPath = "logs/Log_" + DateTime.Now.ToString("yyyy.mm.dd_hh.mm.ss") + ".txt";
         private object _syncObj = new object();
 
@@ -21,7 +21,7 @@ namespace TitanBot2Console
 
         public async Task Start()
         {
-            _bot = new TitanBot();
+            _bot = new BotClient();
 
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += async (o, e) =>

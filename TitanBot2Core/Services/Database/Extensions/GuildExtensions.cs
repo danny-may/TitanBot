@@ -10,7 +10,7 @@ namespace TitanBot2.Services.Database.Extensions
 
     public class GuildExtensions : DatabaseExtension<Guild>
     {
-        public GuildExtensions(TitanbotDatabase db) : base(db) { }
+        public GuildExtensions(BotDatabase db) : base(db) { }
 
         public async Task<Guild> GetGuild(ulong guildId)
             => await GetGuild(guildId, null);

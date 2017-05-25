@@ -4,7 +4,7 @@ namespace TitanBot2.Services.Database.Extensions
 {
     public class RegistrationExtensions : DatabaseExtension<Registration>
     {
-        public RegistrationExtensions(TitanbotDatabase db) : base(db)
+        public RegistrationExtensions(BotDatabase db) : base(db)
         {
         }
     }

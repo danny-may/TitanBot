@@ -7,7 +7,7 @@ namespace TitanBot2.Commands.Data
 {
     public class ClaimCommand : Command
     {
-        public ClaimCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ClaimCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Description = "Claims a support code. Not currently used for anything, but will be used later for API calls";
             Usage.Add("`{0} <support code>` - Claims a support code as your own.");

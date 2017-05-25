@@ -17,7 +17,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class ExecCommand : Command
     {
-        public ExecCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ExecCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ExecAsync())
                  .WithArgTypes(typeof(string))
@@ -65,7 +65,7 @@ using System.Threading.Tasks;
                                                                                         typeof(Enumerable).Assembly,
                                                                                         typeof(ArrayList).Assembly,
                                                                                         typeof(AsyncEnumerator).Assembly,
-                                                                                        typeof(TitanbotCmdContext).Assembly,
+                                                                                        typeof(CmdContext).Assembly,
                                                                                         typeof(DiscordSocketClient).Assembly,
                                                                                         typeof(MiscExtensions).Assembly,
                                                                                         typeof(File).Assembly,
@@ -112,12 +112,12 @@ using System.Threading.Tasks;
                 builder.AddField("Output", $"Type: {Format.Sanitize(result?.GetType().ToString() ?? "")}\n```csharp\n{Format.Sanitize(resString ?? "")}\n```");
             }
 
-            await ReplyAsync("", embed: builder.Build(), handler: ex => Context.TitanBot.Logger.Log(ex, "ExecModule"));
+            await ReplyAsync("", embed: builder.Build(), handler: ex => Context.BotClient.Logger.Log(ex, "ExecModule"));
         }
     }
 
     public class ExecGlobals
     {
-        public TitanbotCmdContext Context { get; set; }
+        public CmdContext Context { get; set; }
     }
 }

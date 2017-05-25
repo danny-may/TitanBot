@@ -6,7 +6,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class DBPurgeCommand : Command
     {
-        public DBPurgeCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public DBPurgeCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => PurgeAsync((string)a[0]))
                  .WithArgTypes(typeof(string));

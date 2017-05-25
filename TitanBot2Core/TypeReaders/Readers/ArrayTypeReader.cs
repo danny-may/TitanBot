@@ -27,7 +27,7 @@ namespace TitanBot2.TypeReaders.Readers
             _parser = parser;
         }
 
-        public override async Task<TypeReaderResult> Read(TitanbotCmdContext context, string value)
+        public override async Task<TypeReaderResult> Read(CmdContext context, string value)
         {
             var values = new List<T>();
 

@@ -6,7 +6,7 @@ namespace TitanBot2.Commands.Clan
 {
     public class RegisterCommand : Command
     {
-        public RegisterCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public RegisterCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             RequiredContexts = Discord.Commands.ContextType.Guild;
             RequireOwner = true;

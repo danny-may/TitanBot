@@ -9,7 +9,7 @@ namespace TitanBot2.Services.Database.Extensions
 {
     public class TimerExtensions : DatabaseExtension<Timer>
     {
-        public TimerExtensions(TitanbotDatabase db) : base(db) { }
+        public TimerExtensions(BotDatabase db) : base(db) { }
 
         public async Task Add(Timer timer)
             =>await Database.QueryAsync(conn => conn.TimerTable.Insert(timer));

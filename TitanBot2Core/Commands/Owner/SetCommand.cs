@@ -13,7 +13,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class SetCommand : Command
     {
-        public SetCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public SetCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => SetAvatarAsync((Uri)a[0]))
                  .WithArgTypes(typeof(Uri))

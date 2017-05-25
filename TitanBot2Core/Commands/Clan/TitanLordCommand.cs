@@ -19,7 +19,7 @@ namespace TitanBot2.Commands.Clan
     class TitanLordCommand : Command
     {
         private static ConcurrentDictionary<ulong, object> _guildLocks = new ConcurrentDictionary<ulong, object>();
-        public TitanLordCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public TitanLordCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => TitanLordNowAsync())
                  .WithSubCommand("Now");

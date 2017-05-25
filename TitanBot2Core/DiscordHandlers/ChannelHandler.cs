@@ -8,7 +8,7 @@ namespace TitanBot2.DiscordHandlers
     public class ChannelHandler : HandlerBase
     {
 
-        public override async Task Install(TitanbotDependencies args)
+        public override async Task Install(BotDependencies args)
         {
             await base.Install(args);
 
@@ -18,7 +18,7 @@ namespace TitanBot2.DiscordHandlers
             Client.RecipientAdded += HandleRecipientAddedAsync;
             Client.RecipientRemoved += HandleRecipientRemovedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Channel"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Channel"));
         }
 
         public override async Task Uninstall()
@@ -30,7 +30,7 @@ namespace TitanBot2.DiscordHandlers
             Client.RecipientAdded -= HandleRecipientAddedAsync;
             Client.RecipientRemoved -= HandleRecipientRemovedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Channel"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Channel"));
 
             await base.Uninstall();
         }

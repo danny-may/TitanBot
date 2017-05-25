@@ -32,9 +32,9 @@ namespace TitanBot2.Services.CommandService
 
         protected CommandCheckResponse CheckResult { get; private set; }
 
-        public TitanbotCmdContext Context { get; private set; }
+        public CmdContext Context { get; private set; }
 
-        public Command(TitanbotCmdContext context, TypeReaderCollection readers)
+        public Command(CmdContext context, TypeReaderCollection readers)
         {
             Context = context;
             Readers = readers;
@@ -158,7 +158,7 @@ namespace TitanBot2.Services.CommandService
 
         protected virtual async Task<CommandCheckResponse> CheckPermissions(ulong defaultPerm)
         {
-            var owner = Context.TitanBot?.Owner ?? (await Context.Client.GetApplicationInfoAsync()).Owner;
+            var owner = Context.BotClient?.Owner ?? (await Context.Client.GetApplicationInfoAsync()).Owner;
 
             if (Context.User.Id == owner.Id || Context.Channel is IDMChannel || Context.Channel is IGroupChannel)
                 return CommandCheckResponse.FromSuccess();

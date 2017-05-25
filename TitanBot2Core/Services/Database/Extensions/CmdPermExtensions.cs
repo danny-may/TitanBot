@@ -7,7 +7,7 @@ namespace TitanBot2.Services.Database.Extensions
 {
     public class CmdPermExtensions : DatabaseExtension<CmdPerm>
     {
-        public CmdPermExtensions(TitanbotDatabase db) : base(db) { }
+        public CmdPermExtensions(BotDatabase db) : base(db) { }
 
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command)
             => await GetCmdPerm(guildid, command, null);

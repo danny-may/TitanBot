@@ -6,7 +6,7 @@ namespace TitanBot2.TypeReaders.Readers
 {
     public class EquipmentTypeReader : TypeReader
     {
-        public override async Task<TypeReaderResult> Read(TitanbotCmdContext context, string value)
+        public override async Task<TypeReaderResult> Read(CmdContext context, string value)
         {
             var equip = Equipment.Find(value);
             if (equip == null)

@@ -11,7 +11,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class ReloadCommand : Command
     {
-        public ReloadCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ReloadCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ReloadAsync());
             RequireOwner = true;

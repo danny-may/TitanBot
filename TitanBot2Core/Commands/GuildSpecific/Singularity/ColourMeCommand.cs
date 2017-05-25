@@ -12,7 +12,7 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
     public class ColourMeCommand : Command
     {
-        public ColourMeCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ColourMeCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 

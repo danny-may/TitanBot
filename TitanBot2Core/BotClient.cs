@@ -13,12 +13,12 @@ using TitanBot2.Services.Scheduler;
 
 namespace TitanBot2
 {
-    public class TitanBot
+    public class BotClient
     {
         private DiscordSocketClient Client { get; }
-        private TitanbotDatabase Database { get; }
+        private BotDatabase Database { get; }
         private TimerService TimerService { get; set; }
-        private TitanbotDependencies Dependencies { get; }
+        private BotDependencies Dependencies { get; }
         private CachedWebClient WebService { get; }
         private TT2DataService TT2DataService { get; }
         public Logger Logger { get; }
@@ -29,7 +29,7 @@ namespace TitanBot2
         private UserHandler _UHandle;
         private ChannelHandler _CHandle;
 
-        public TitanBot()
+        public BotClient()
         {
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -46,17 +46,17 @@ namespace TitanBot2
             _CHandle = new ChannelHandler();
             
             Logger = new Logger();
-            Database = new TitanbotDatabase("database/TitanBot2.db");
+            Database = new BotDatabase("database/TitanBot2.db");
             WebService = new CachedWebClient();
             WebService.DefaultExceptionHandler += ex => Logger.Log(ex, "WebCache");
             WebService.LogWebRequest += (uri, msg) => Logger.Log(new LogEntry(LogType.Service, LogSeverity.Info, $"{msg} - URI: {uri}", "WebCache"));
             TT2DataService = new TT2DataService(WebService);
-            Dependencies = new TitanbotDependencies()
+            Dependencies = new BotDependencies()
             {
                 Client = Client,
                 Database = Database,
                 Logger = Logger,
-                TitanBot = this,
+                BotClient = this,
                 WebClient = WebService,
                 TT2DataService = TT2DataService,
                 SuggestionChannelID = Configuration.Instance.SuggestChannel,

@@ -7,8 +7,8 @@ namespace TitanBot2.Services.Database.Extensions
 {
     public abstract class DatabaseExtension<T>
     {
-        protected TitanbotDatabase Database { get; }
-        public DatabaseExtension(TitanbotDatabase db)
+        protected BotDatabase Database { get; }
+        public DatabaseExtension(BotDatabase db)
         {
             Database = db;
         }

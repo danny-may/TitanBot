@@ -13,7 +13,7 @@ namespace TitanBot2.Commands.Data
 {
     public class PrestigeCommand : Command
     {
-        public PrestigeCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public PrestigeCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => PrestigeStatsAsync((int)a[0], 0, 0, 0))
                  .WithArgTypes(typeof(int));
@@ -30,7 +30,6 @@ namespace TitanBot2.Commands.Data
 
         private async Task PrestigeStatsAsync(int stage, int bosLevel, int clanLevel, int ipLevel)
         {
-            stage = Math.Min(3500, stage);
             ipLevel = Math.Min(20, ipLevel);
             var startingStage = (int)Math.Max(1, stage * Calculator.AdvanceStart(clanLevel));
             var totalRelics = Calculator.RelicsEarned(stage, bosLevel);

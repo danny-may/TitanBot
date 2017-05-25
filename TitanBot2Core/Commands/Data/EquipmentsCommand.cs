@@ -13,7 +13,7 @@ namespace TitanBot2.Commands.Data
 {
     public class EquipmentsCommand : Command
     {
-        public EquipmentsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public EquipmentsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowEquipmentAsync((Equipment)a[0]))
                  .WithArgTypes(typeof(Equipment))

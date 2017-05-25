@@ -98,7 +98,7 @@ namespace TitanBot2.TypeReaders
             return null;
         }
 
-        public async Task<TypeReaderResult> Read(Type type, TitanbotCmdContext context, string text)
+        public async Task<TypeReaderResult> Read(Type type, CmdContext context, string text)
         {
             var readers = GetTypeReaders(type);
 

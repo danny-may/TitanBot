@@ -10,7 +10,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class AnnounceCommand : Command
     {
-        public AnnounceCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public AnnounceCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => AnnounceAsync((string)a[0]))
                  .WithArgTypes(typeof(string))

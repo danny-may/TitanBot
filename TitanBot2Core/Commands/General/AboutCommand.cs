@@ -10,7 +10,7 @@ namespace TitanBot2.Commands.General
 {
     public class AboutCommand : Command
     {
-        public AboutCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public AboutCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowAbout());
             Usage.Add("`{0}` - Shows some about text for me");
@@ -28,7 +28,7 @@ namespace TitanBot2.Commands.General
 
         public async Task ShowAbout()
         {
-            var message = $"'Ello there :wave:, Im Titanbot! Im an open source discord bot dedicated to TT2 written in C# by {Context.Client.GetUser(135556895086870528).Username}.\n" +
+            var message = $"'Ello there :wave:, Im {Context.Client.CurrentUser.Username}! Im an open source discord bot dedicated to TT2 written in C# by {Context.Client.GetUser(135556895086870528).Username}.\n" +
                           $"I can do a variety of things, all of which are better documented in my `{Context.Prefix}help` command!\n\n" +
                           $"Im always going to be taking suggestions, which can either be DM'd to {Context.Client.GetUser(135556895086870528).Username} (He has a terrible memory though) Or sent in the #suggestions channel on my support server!\n\n" +
                            "Public repository: <https://github.com/Titansmasher/TitanBot2>\n" +

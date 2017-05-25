@@ -14,7 +14,7 @@ namespace TitanBot2.Commands.Data
 {
     public class PetsCommand : Command
     {
-        public PetsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public PetsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowPetAsync((Pet)a[0]))
                  .WithArgTypes(typeof(Pet))

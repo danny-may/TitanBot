@@ -12,7 +12,7 @@ namespace TitanBot2.Commands.Data
 {
     public class ArtifactsCommand : Command
     {
-        public ArtifactsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ArtifactsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowArtifactAsync((Artifact)a[0]))
                  .WithArgTypes(typeof(Artifact))

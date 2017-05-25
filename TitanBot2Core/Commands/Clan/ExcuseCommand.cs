@@ -10,7 +10,7 @@ namespace TitanBot2.Commands.Clan
 {
     public class ExcuseCommand : Command
     {
-        public ExcuseCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ExcuseCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ExcuseUserAsync());
             Calls.AddNew(a => ExcuseUserAsync((IUser)a[0]))
@@ -91,7 +91,7 @@ namespace TitanBot2.Commands.Clan
                 return;
             }
 
-            if (Context.User.Id != Context.TitanBot.Owner.Id && Context.User.Id != excuse.CreatorId)
+            if (Context.User.Id != Context.BotClient.Owner.Id && Context.User.Id != excuse.CreatorId)
             {
                 await ReplyAsync("You do not own this excuse.", ReplyType.Error);
                 return;

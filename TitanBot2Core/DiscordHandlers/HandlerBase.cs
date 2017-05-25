@@ -9,18 +9,18 @@ namespace TitanBot2.DiscordHandlers
 {
     public abstract class HandlerBase
     {
-        protected TitanBot TitanBot { get; private set; }
+        protected BotClient BotClient { get; private set; }
         protected DiscordSocketClient Client { get; private set; }
-        protected TitanbotDatabase Database { get; private set; }
+        protected BotDatabase Database { get; private set; }
         protected TimerService TimerService { get; private set; }
         protected CachedWebClient WebService { get; private set; }
 
-        protected TitanbotDependencies Dependencies { get; private set; }
+        protected BotDependencies Dependencies { get; private set; }
 
 
-        public virtual Task Install(TitanbotDependencies args)
+        public virtual Task Install(BotDependencies args)
         {
-            TitanBot = args.TitanBot;
+            BotClient = args.BotClient;
             Client = args.Client;
             Database = args.Database;
             TimerService = args.TimerService;
@@ -33,7 +33,7 @@ namespace TitanBot2.DiscordHandlers
 
         public virtual Task Uninstall()
         {
-            TitanBot = null;
+            BotClient = null;
             Client = null;
             Database = null;
             TimerService = null;

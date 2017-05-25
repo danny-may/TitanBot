@@ -10,7 +10,7 @@ namespace TitanBot2.TypeReaders.Readers
 {
     public class PermissionTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> Read(TitanbotCmdContext context, string value)
+        public override Task<TypeReaderResult> Read(CmdContext context, string value)
         {
             return null;
         }

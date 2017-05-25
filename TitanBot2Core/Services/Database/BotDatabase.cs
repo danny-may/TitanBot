@@ -6,7 +6,7 @@ using TitanBot2.Services.Database.Extensions;
 
 namespace TitanBot2.Services.Database
 {
-    public partial class TitanbotDatabase : ThreadedService
+    public partial class BotDatabase : ThreadedService
     {
         private string FileName { get; set; }
 
@@ -21,7 +21,7 @@ namespace TitanBot2.Services.Database
         public ExcuseExtension Excuses { get; }
         public RegistrationExtensions Registrations { get; }
 
-        public TitanbotDatabase(string target)
+        public BotDatabase(string target)
         {
             FileName = target;
             Guilds = new GuildExtensions(this);

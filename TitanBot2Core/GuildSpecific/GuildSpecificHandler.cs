@@ -10,9 +10,9 @@ namespace TitanBot2.GuildSpecific
 {
     public abstract class GuildSpecificHandler
     {
-        protected TitanbotDependencies Dependencies;
+        protected BotDependencies Dependencies;
 
-        public GuildSpecificHandler(TitanbotDependencies dependencies)
+        public GuildSpecificHandler(BotDependencies dependencies)
         {
             Dependencies = dependencies;
         }

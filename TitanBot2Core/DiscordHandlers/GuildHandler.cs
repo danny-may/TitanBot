@@ -7,7 +7,7 @@ namespace TitanBot2.DiscordHandlers
 {
     public class GuildHandler : HandlerBase
     {
-        public override async Task Install(TitanbotDependencies args)
+        public override async Task Install(BotDependencies args)
         {
             await base.Install(args);
 
@@ -20,7 +20,7 @@ namespace TitanBot2.DiscordHandlers
             Client.RoleDeleted += HandleRoleDeletedAsync;
             Client.RoleUpdated += HandleRoleUpdateddAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Guild"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Guild"));
         }
 
         public override async Task Uninstall()
@@ -34,7 +34,7 @@ namespace TitanBot2.DiscordHandlers
             Client.RoleDeleted -= HandleRoleDeletedAsync;
             Client.RoleUpdated -= HandleRoleUpdateddAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Guild"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Guild"));
             await base.Uninstall();
         }
 
@@ -55,7 +55,7 @@ namespace TitanBot2.DiscordHandlers
 
         private async Task HandleJoinAsync(SocketGuild guild)
         {
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, $"Joined {guild.Name} ({guild.Id})", "Guild"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, $"Joined {guild.Name} ({guild.Id})", "Guild"));
             await Database.Guilds.EnsureExists(guild.Id);
         }
 

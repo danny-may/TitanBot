@@ -8,7 +8,7 @@ namespace TitanBot2.Commands.General
 {
     public class PingCommand : Command
     {
-        public PingCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public PingCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Usage.Add("`{0}` - Replies with a pong and what the current delay is.");
 

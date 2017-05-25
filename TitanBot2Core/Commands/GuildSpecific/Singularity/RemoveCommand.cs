@@ -21,7 +21,7 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             312177555379585024,
         };
 
-        public RemoveCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public RemoveCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 

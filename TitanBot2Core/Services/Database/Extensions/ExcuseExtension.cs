@@ -8,7 +8,7 @@ namespace TitanBot2.Services.Database.Extensions
 {
     public class ExcuseExtension : DatabaseExtension<Excuse>
     {
-        public ExcuseExtension(TitanbotDatabase db) : base(db)
+        public ExcuseExtension(BotDatabase db) : base(db)
         {
         }
 

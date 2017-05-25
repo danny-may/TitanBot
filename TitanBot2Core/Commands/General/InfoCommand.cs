@@ -12,7 +12,7 @@ namespace TitanBot2.Commands.General
 {
     public class InfoCommand : Command
     {
-        public InfoCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public InfoCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Description = "Displays some technical information about me";
             Usage.Add("`{0}` - Displays the info");

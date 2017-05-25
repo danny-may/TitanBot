@@ -12,15 +12,15 @@ namespace TitanBot2.DiscordHandlers
 {
     public class MessageHandler : HandlerBase
     {
-        private TitanBotCommandService _cmds;
+        private BotCommandService _cmds;
 
         private DateTime _lastWave = DateTime.Now;
 
-        public override async Task Install(TitanbotDependencies args)
+        public override async Task Install(BotDependencies args)
         {
             await base.Install(args);
 
-            _cmds = new TitanBotCommandService();
+            _cmds = new BotCommandService();
 
             await _cmds.Install(Assembly.GetExecutingAssembly());
 
@@ -31,7 +31,7 @@ namespace TitanBot2.DiscordHandlers
             Client.ReactionRemoved += HandleReactionRemoveAsync;
             Client.ReactionsCleared += HandleReactionClearedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Message"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Message"));
         }
 
         public override async Task Uninstall()
@@ -43,7 +43,7 @@ namespace TitanBot2.DiscordHandlers
             Client.ReactionRemoved -= HandleReactionRemoveAsync;
             Client.ReactionsCleared -= HandleReactionClearedAsync;
 
-            await TitanBot.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Message"));
+            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Message"));
             await base.Uninstall();
         }
 
@@ -89,7 +89,7 @@ namespace TitanBot2.DiscordHandlers
                 await msg.Channel.SendMessageSafeAsync("👋");
             }
 
-            var context = new TitanbotCmdContext(Dependencies, msg);
+            var context = new CmdContext(Dependencies, msg);
             
             var argPos = await context.CheckCommand();
             if (argPos != null)

@@ -9,7 +9,7 @@ namespace TitanBot2.TypeReaders.Readers
         where T : class, IMessage
     { 
 
-        public override async Task<TypeReaderResult> Read(TitanbotCmdContext context, string value)
+        public override async Task<TypeReaderResult> Read(CmdContext context, string value)
         {
             ulong id;
 

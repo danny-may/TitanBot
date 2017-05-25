@@ -11,7 +11,7 @@ namespace TitanBot2.Commands.Data
 {
     public class ClanStatsCommand : Command
     {
-        public ClanStatsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ClanStatsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowStatsAsync((int)a[0]))
                  .WithArgTypes(typeof(int));

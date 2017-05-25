@@ -71,7 +71,7 @@ namespace TitanBot2.Services.CommandService
                 SubCommands = subCommands;
             }
 
-            public async Task Parse(TypeReaderCollection readers, TitanbotCmdContext context)
+            public async Task Parse(TypeReaderCollection readers, CmdContext context)
             {
                 if (!SubCommands.All(c => c.Matches()))
                     Results = new TypeReaderResult[] { TypeReaderResult.FromError("Could not match subcommand parameters") };
@@ -80,7 +80,7 @@ namespace TitanBot2.Services.CommandService
                 HasParsed = true;
             }
 
-            public async Task Execute(TitanbotCmdContext context)
+            public async Task Execute(CmdContext context)
             {
                 if (!IsSuccess)
                     return;

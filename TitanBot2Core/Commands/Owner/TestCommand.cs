@@ -8,7 +8,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class TestCommand : Command
     {
-        public TestCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public TestCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(ExecuteAsync)
                  .WithArgTypes(typeof(SocketGuildUser));

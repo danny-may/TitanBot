@@ -7,7 +7,7 @@ namespace TitanBot2.Commands.General
 {
     public class InviteCommand : Command
     {
-        public InviteCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public InviteCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Description = "Provides a link to invite me to any guild";
             Usage.Add("`{0}` - Shows the invite link");

@@ -6,7 +6,7 @@ namespace TitanBot2.TypeReaders.Readers
 {
     public class PetTypeReader : TypeReader
     {
-        public override async Task<TypeReaderResult> Read(TitanbotCmdContext context, string value)
+        public override async Task<TypeReaderResult> Read(CmdContext context, string value)
         {
             var pet = Pet.Find(value);
             if (pet == null)

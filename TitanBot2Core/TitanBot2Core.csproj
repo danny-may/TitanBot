@@ -268,8 +268,8 @@
     <Compile Include="Common\Logger.cs" />
     <Compile Include="Common\Res.cs" />
     <Compile Include="Services\CommandService\CommandCall.cs" />
-    <Compile Include="Services\CommandService\TitanbotCmdContext.cs" />
-    <Compile Include="Common\TitanbotDependencies.cs" />
+    <Compile Include="Services\CommandService\CmdContext.cs" />
+    <Compile Include="Common\BotDependencies.cs" />
     <Compile Include="Extensions\BeautifyExtensions.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\CommandServiceExtensions.cs" />
@@ -310,14 +310,14 @@
     <Compile Include="Services\Database\Models\Registration.cs" />
     <Compile Include="Services\Database\Models\Timer.cs" />
     <Compile Include="Services\Database\Models\User.cs" />
-    <Compile Include="Services\Database\TitanbotDatabase.cs" />
+    <Compile Include="Services\Database\BotDatabase.cs" />
     <Compile Include="Services\Scheduler\Callback.cs" />
     <Compile Include="Services\Scheduler\TimerContext.cs" />
     <Compile Include="Services\Scheduler\TimerService.cs" />
     <Compile Include="Services\ThreadedService.cs" />
     <Compile Include="Services\TT2DataService.cs" />
     <Compile Include="TimerCallbacks\TitanLordCallbacks.cs" />
-    <Compile Include="TitanBot.cs" />
+    <Compile Include="BotClient.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ColourTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\HelperTypeReader.cs" />

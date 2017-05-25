@@ -45,7 +45,7 @@ namespace TitanBot2.TypeReaders.Readers
             _enumsByValue = byValueBuilder.ToImmutable();
         }
 
-        public override Task<TypeReaderResult> Read(TitanbotCmdContext context, string input)
+        public override Task<TypeReaderResult> Read(CmdContext context, string input)
         {
             T baseValue;
             object enumValue;

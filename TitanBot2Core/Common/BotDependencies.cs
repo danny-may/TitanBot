@@ -11,11 +11,11 @@ using TitanBot2.Services.Scheduler;
 
 namespace TitanBot2.Common
 {
-    public class TitanbotDependencies
+    public class BotDependencies
     {
-        public TitanBot TitanBot { get; set; }
+        public BotClient BotClient { get; set; }
         public DiscordSocketClient Client { get; set; }
-        public TitanbotDatabase Database { get; set; }
+        public BotDatabase Database { get; set; }
         public TimerService TimerService { get; set; }
         public Logger Logger { get; set; }
         public CachedWebClient WebClient { get; set; }

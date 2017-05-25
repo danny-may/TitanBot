@@ -11,16 +11,16 @@ using TitanBot2.Services.Scheduler;
 
 namespace TitanBot2.Services.CommandService
 {
-    public class TitanbotCmdContext : SocketCommandContext
+    public class CmdContext : SocketCommandContext
     {
         public Logger Logger { get; private set; }
-        public TitanBot TitanBot { get; private set; }
-        public TitanbotDatabase Database { get; private set; }
+        public BotClient BotClient { get; private set; }
+        public BotDatabase Database { get; private set; }
         public string Prefix { get; private set; }
         public TimerService TimerService { get; private set; }
         public CachedWebClient WebClient { get; private set; }
         public TT2DataService TT2DataService { get; private set; }
-        public TitanBotCommandService CommandService { get; set; }
+        public BotCommandService CommandService { get; set; }
         public string[] Arguments { get; private set; }
         public string Command { get; private set; }
         public IMessageChannel SuggestionChannel
@@ -28,14 +28,14 @@ namespace TitanBot2.Services.CommandService
         public IMessageChannel BugChannel
             => Dependencies.BugChannel;
 
-        public TitanbotDependencies Dependencies { get; private set; }
+        public BotDependencies Dependencies { get; private set; }
 
-        public TitanbotCmdContext(TitanbotDependencies args, SocketUserMessage msg) : base(args.Client, msg)
+        public CmdContext(BotDependencies args, SocketUserMessage msg) : base(args.Client, msg)
         {
-            TitanBot = args.TitanBot;
+            BotClient = args.BotClient;
             Database = args.Database;
             TimerService = args.TimerService;
-            Logger = TitanBot.Logger;
+            Logger = BotClient.Logger;
             WebClient = args.WebClient;
             TT2DataService = args.TT2DataService;
 

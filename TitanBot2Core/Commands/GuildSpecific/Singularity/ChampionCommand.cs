@@ -11,7 +11,7 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
     public class ChampionCommand : Command
     {
-        public ChampionCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ChampionCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 

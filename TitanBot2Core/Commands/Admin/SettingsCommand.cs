@@ -16,7 +16,7 @@ namespace TitanBot2.Commands.Admin
     {
         private readonly List<Setting> _settings;
 
-        public SettingsCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public SettingsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ListSettingsAsync());
             Calls.AddNew(a => SetSettingAsync((string)a[0], (string)a[1]))

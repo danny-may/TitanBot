@@ -7,7 +7,7 @@ namespace TitanBot2.Commands.Owner
 {
     public class ShutdownCommand : Command
     {
-        public ShutdownCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ShutdownCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShutdownAsync());
             Calls.AddNew(a => ShutdownAsync((TimeSpan)a[0]))
@@ -39,7 +39,7 @@ namespace TitanBot2.Commands.Owner
         private async Task ShutDown(TimeSpan? time = null, string reason = null)
         {
             await ReplyAsync("Starting shut down sequence!");
-            Context.TitanBot.StopAsync(time, reason);
+            Context.BotClient.StopAsync(time, reason);
         }
     }
 }

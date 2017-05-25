@@ -10,7 +10,7 @@ namespace TitanBot2.GuildSpecific
 {
     public class YortKingdom : GuildSpecificHandler
     {
-        public YortKingdom(TitanbotDependencies dependencies) : base(dependencies)
+        public YortKingdom(BotDependencies dependencies) : base(dependencies)
         {
         }
 

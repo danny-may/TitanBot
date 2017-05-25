@@ -14,7 +14,7 @@ using TitanBot2.TypeReaders.Readers;
 
 namespace TitanBot2.Services
 {
-    public class TitanBotCommandService
+    public class BotCommandService
     {
         public IReadOnlyList<CommandInfo> Commands { get { return _commands; } }
         private List<CommandInfo> _commands = new List<CommandInfo>();
@@ -47,7 +47,7 @@ namespace TitanBot2.Services
             });
         }
 
-        public async Task ExecuteAsync(TitanbotCmdContext context, int argPos)
+        public async Task ExecuteAsync(CmdContext context, int argPos)
         {
             if (context.Command == null)
                 return;

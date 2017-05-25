@@ -15,7 +15,7 @@ namespace TitanBot2.Extensions
         public static System.Drawing.Color RandColor()
             => System.Drawing.Color.FromArgb(_rand.Next(255), _rand.Next(255), _rand.Next(255));
 
-        public static async Task<string[]> GetPrefixes(this TitanbotCmdContext context)
+        public static async Task<string[]> GetPrefixes(this CmdContext context)
         {
             if (context.Guild != null)
             {

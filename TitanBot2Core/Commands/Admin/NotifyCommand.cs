@@ -10,7 +10,7 @@ namespace TitanBot2.Commands.Admin
 {
     public class NotifyCommand : Command
     {
-        public NotifyCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public NotifyCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ListTypesAsync((NotificationType)a[0]))
                  .WithArgTypes(typeof(NotificationType));
@@ -56,7 +56,7 @@ namespace TitanBot2.Commands.Admin
 
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
             guildData.NotifyAlive = channel?.Id;
-            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData), ex => Context.TitanBot.Logger.Log(ex, "NotifyCmd"));
+            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData), ex => Context.BotClient.Logger.Log(ex, "NotifyCmd"));
             if (channel == null)
                 await ReplyAsync("This guild will no longer recieve notification when I come onine!", ReplyType.Success);
             else
@@ -74,7 +74,7 @@ namespace TitanBot2.Commands.Admin
 
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
             guildData.NotifyDead = channel?.Id;
-            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData), ex => Context.TitanBot.Logger.Log(ex, "NotifyCmd"));
+            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData), ex => Context.BotClient.Logger.Log(ex, "NotifyCmd"));
             if (channel == null)
                 await ReplyAsync("This guild will no longer recieve notification when I shutdown!", ReplyType.Success);
             else

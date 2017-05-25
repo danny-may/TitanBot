@@ -119,7 +119,7 @@ namespace TitanBot2.Services
             if (artifactRow == null)
                 return null;
 
-            var imageBytes = artifactStatic.ImageUrl == null ? null : await WebClient.GetBytes(artifactStatic.ImageUrl);
+            var imageBytes = artifactStatic.ImageUrl == null ? null : await WebClient.GetBytes(artifactStatic.ImageUrl, 60 * 60 * 24);
 
             var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
@@ -142,7 +142,7 @@ namespace TitanBot2.Services
             if (equipmentRow == null)
                 return null;
 
-            var imageBytes = equipmentStatic.ImageUrl == null ? null : await WebClient.GetBytes(equipmentStatic.ImageUrl);
+            var imageBytes = equipmentStatic.ImageUrl == null ? null : await WebClient.GetBytes(equipmentStatic.ImageUrl, 60 * 60 * 24);
 
             var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
@@ -165,7 +165,7 @@ namespace TitanBot2.Services
             if (petRow == null)
                 return null;
 
-            var imageBytes = petStatic.ImageUrl == null ? null : await WebClient.GetBytes(petStatic.ImageUrl);
+            var imageBytes = petStatic.ImageUrl == null ? null : await WebClient.GetBytes(petStatic.ImageUrl, 60 * 60 * 24);
 
             var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
@@ -188,7 +188,7 @@ namespace TitanBot2.Services
             if (helperRow == null)
                 return null;
 
-            var imageBytes = helperStatic.ImageUrl == null ? null : await WebClient.GetBytes(helperStatic.ImageUrl);
+            var imageBytes = helperStatic.ImageUrl == null ? null : await WebClient.GetBytes(helperStatic.ImageUrl, 60*60*24);
 
             var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
@@ -214,7 +214,7 @@ namespace TitanBot2.Services
 
             foreach (var art in Artifact.All)
             {
-                var imageBytes = art.ImageUrl == null ? null : await WebClient.GetBytes(art.ImageUrl);
+                var imageBytes = art.ImageUrl == null ? null : await WebClient.GetBytes(art.ImageUrl, 60 * 60 * 24);
 
                 var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
@@ -244,7 +244,7 @@ namespace TitanBot2.Services
 
             foreach (var equip in Equipment.All)
             {
-                var imageBytes = equip.ImageUrl == null ? null : await WebClient.GetBytes(equip.ImageUrl);
+                var imageBytes = equip.ImageUrl == null ? null : await WebClient.GetBytes(equip.ImageUrl, 60 * 60 * 24);
 
                 var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
@@ -275,7 +275,7 @@ namespace TitanBot2.Services
 
             foreach (var pet in Pet.All)
             {
-                var imageBytes = pet.ImageUrl == null ? null : await WebClient.GetBytes(pet.ImageUrl);
+                var imageBytes = pet.ImageUrl == null ? null : await WebClient.GetBytes(pet.ImageUrl, 60 * 60 * 24);
 
                 var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 
@@ -306,7 +306,7 @@ namespace TitanBot2.Services
 
             foreach (var helper in Helper.All)
             {
-                var imageBytes = helper.ImageUrl == null ? null : await WebClient.GetBytes(helper.ImageUrl);
+                var imageBytes = helper.ImageUrl == null ? null : await WebClient.GetBytes(helper.ImageUrl, 60 * 60 * 24);
 
                 var image = imageBytes == null ? new Bitmap(1, 1) : new Bitmap(new MemoryStream(imageBytes));
 

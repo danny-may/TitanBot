@@ -12,7 +12,7 @@ namespace TitanBot2.Commands.Bot
 {
     public class SuggestCommand : Command
     {
-        public SuggestCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public SuggestCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => SuggestAsync((string)a[0]))
                  .WithArgTypes(typeof(string))

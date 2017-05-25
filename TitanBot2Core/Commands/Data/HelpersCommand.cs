@@ -13,7 +13,7 @@ namespace TitanBot2.Commands.Data
 {
     public class HelpersCommand : Command
     {
-        public HelpersCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public HelpersCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowHelperAsync((Helper)a[0]))
                      .WithArgTypes(typeof(Helper))

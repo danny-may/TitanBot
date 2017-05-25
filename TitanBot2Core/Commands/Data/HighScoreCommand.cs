@@ -8,7 +8,7 @@ namespace TitanBot2.Commands.Data
 {
     public class HighScoreCommand : Command
     {
-        public HighScoreCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public HighScoreCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => ShowSheetAsync(1, 30));
             Calls.AddNew(a => ShowSheetAsync((int)a[0], (int)a[0]))

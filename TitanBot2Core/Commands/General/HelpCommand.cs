@@ -12,7 +12,7 @@ namespace TitanBot2.Commands.General
 {
     public class HelpCommand : Command
     {
-        public HelpCommand(TitanbotCmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public HelpCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
         {
             Calls.AddNew(a => AllHelpAsync());
             Calls.AddNew(a => HelpAsync((string)a[0]))
