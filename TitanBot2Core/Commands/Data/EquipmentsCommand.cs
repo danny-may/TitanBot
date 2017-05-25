@@ -92,7 +92,7 @@ namespace TitanBot2.Commands.Data
                     break;
             }
             if (grouped == null)
-                builder.WithDescription("Please use one of the following equipment types:\n" + string.Join("\n", Enum.GetNames(typeof(EquipmentClass))).Replace("None", "Removed") + $"\n\n `{Context.Prefix}{Context.Command} list <type>`");
+                builder.WithDescription("Please use one of the following equipment types:\n" + string.Join("\n", Enum.GetNames(typeof(EquipmentClass))).Replace("None", "Removed") + $"\n\n `{Context.Prefix}{Context.Command} list [type]`");
             else
             {
                 builder.WithDescription($"All {equipClass} equipment");
@@ -150,7 +150,7 @@ namespace TitanBot2.Commands.Data
             var builder = GetBaseEmbed(equipment);
 
             builder.AddField("Bonus type", equipment.BonusType.Beautify());
-            builder.AddField($"Bonus at {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
+            builder.AddField($"Bonus at lv {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
             builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.*");
 
             await ReplyAsync("", embed: builder.Build());

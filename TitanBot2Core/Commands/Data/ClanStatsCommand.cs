@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,9 +26,9 @@ namespace TitanBot2.Commands.Data
             Description = "Shows various information for any clan with given attributes";
         }
 
-        public async Task ShowStatsAsync(int clanLevel, int averageMS = 3500, int tapsPerCq = 500, int[] attackers = null)
+        public static EmbedBuilder StatsBuilder(SocketSelfUser me, int clanLevel, int averageMS = 3500, int tapsPerCq = 500, int[] attackers = null)
         {
-            var absLevel = (int)clanLevel;
+            var absLevel = Math.Abs(clanLevel);
 
             var currentBonus = Calculator.ClanBonus(absLevel);
             var nextBonus = Calculator.ClanBonus(absLevel + 1);
@@ -39,8 +40,8 @@ namespace TitanBot2.Commands.Data
             {
                 Footer = new EmbedFooterBuilder
                 {
-                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
-                    Text = Context.Client.CurrentUser.Username + "#" + Context.Client.CurrentUser.Discriminator
+                    IconUrl = me.GetAvatarUrl(),
+                    Text = me.Username + "#" + me.Discriminator
                 },
                 Color = System.Drawing.Color.DarkOrange.ToDiscord(),
                 Author = new EmbedAuthorBuilder
@@ -65,8 +66,12 @@ namespace TitanBot2.Commands.Data
                 return $"Attackers: {num} | Damage/person: {dmgpp.Beautify()} | Attacks: {attacks.Beautify()} | Diamonds: {dia.Beautify()}";
             })));
 
+            return builder;
+        }
 
-            await ReplyAsync("", embed: builder.Build());
+        public async Task ShowStatsAsync(int clanLevel, int averageMS = 3500, int tapsPerCq = 500, int[] attackers = null)
+        {
+            await ReplyAsync("", embed: StatsBuilder(Context.Client.CurrentUser, clanLevel, averageMS, tapsPerCq, attackers).Build());
         }
     }
 }

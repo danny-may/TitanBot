@@ -72,7 +72,7 @@ namespace TitanBot2.Commands.General
             if (string.IsNullOrWhiteSpace(usage))
                 usage = "No usage available!";
             else
-                usage += "\n\n _`<param>` = required\n`[param]` = optional\n`<pram...>` = accepts multiple (comma separated)_";
+                usage += "\n\n _`<param>` = required\n`[param]` = optional\n`<param...>` = accepts multiple (comma separated)_";
 
             var aliases = string.Join(", ", command.Alias);
 

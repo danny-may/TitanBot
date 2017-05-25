@@ -81,7 +81,7 @@ namespace TitanBot2.Services
             else
                 try
                 {
-                    Task.Run(() => successCommand.ExecuteAsync());
+                    new Task(async () => await successCommand.ExecuteAsync()).Start();
                 }
                 catch (Exception ex)
                 {
