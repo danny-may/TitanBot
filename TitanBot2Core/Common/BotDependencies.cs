@@ -22,24 +22,5 @@ namespace TitanBot2.Common
         public TT2DataService TT2DataService { get; set; }
         public ulong SuggestionChannelID { get; set; }
         public ulong BugChannelID { get; set; }
-        public IMessageChannel SuggestionChannel
-        { get
-            {
-                if (_suggestionChannel == null || _suggestionChannel.Id != SuggestionChannelID)
-                    _suggestionChannel = Client.GetChannel(SuggestionChannelID) as IMessageChannel;
-                return _suggestionChannel;
-            }
-        }
-        public IMessageChannel BugChannel
-        {
-            get
-            {
-                if (_bugChannel == null || _bugChannel.Id != BugChannelID)
-                    _bugChannel = Client.GetChannel(BugChannelID) as IMessageChannel;
-                return _bugChannel;
-            }
-        }
-        private IMessageChannel _bugChannel;
-        private IMessageChannel _suggestionChannel;
     }
 }

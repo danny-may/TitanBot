@@ -34,10 +34,10 @@ namespace TitanBot2.Services.CommandService
             _channel = channel;
             _me = me;
 
-            Parse();
+            Parse().Wait();
         }
 
-        private async void Parse()
+        private async Task Parse()
         {
             var prefix = await GetPrefix();
             

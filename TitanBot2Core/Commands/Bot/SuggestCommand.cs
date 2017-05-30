@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System;
 using System.Threading.Tasks;
+using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
@@ -14,7 +15,9 @@ namespace TitanBot2.Commands.Bot
         [Usage("Sends a suggestion to my home guild.")]
         public async Task SuggestAsync([Dense]string message)
         {
-            if (Context.SuggestionChannel == null)
+            var suggestionChannel = Context.Client.GetChannel(Configuration.Instance.SuggestChannel) as IMessageChannel;
+
+            if (suggestionChannel == null)
             {
                 await ReplyAsync("I could not find where I need to send the suggestion! Please try again later.", ReplyType.Error);
                 return;
@@ -33,7 +36,7 @@ namespace TitanBot2.Commands.Bot
             .AddField("Suggestion", message)
             .AddInlineField(Context.Guild?.Name ?? Context.User.Username, Context.Guild?.Id ?? Context.User.Id)
             .AddInlineField(Context.Channel.Name, Context.Channel.Id);
-            await Context.SuggestionChannel.SendMessageSafeAsync("", embed: builder.Build());
+            await suggestionChannel.SendMessageSafeAsync("", embed: builder.Build());
             await ReplyAsync("Suggestion sent", ReplyType.Success);
         }
     }

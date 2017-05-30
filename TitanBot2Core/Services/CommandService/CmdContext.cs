@@ -29,10 +29,6 @@ namespace TitanBot2.Services.CommandService
         public string[] Arguments => _splitter.Arguments;
         public string Command => _splitter.Command;
         public FlagValue[] Flags => _splitter.Flags;
-        public IMessageChannel SuggestionChannel
-            => Dependencies.SuggestionChannel;
-        public IMessageChannel BugChannel
-            => Dependencies.BugChannel;
 
         private CmdSplitter _splitter;
 
