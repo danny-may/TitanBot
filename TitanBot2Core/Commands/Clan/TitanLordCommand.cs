@@ -23,16 +23,11 @@ namespace TitanBot2.Commands.Clan
     [Alias("TL", "Boss")]
     class TitanLordCommand : Command
     {
-        private static ConcurrentDictionary<ulong, object> _guildLocks = new ConcurrentDictionary<ulong, object>();
-
         [Call("In")]
         [Usage("Sets a Titan Lord timer running for the given period.")]
         private Task TitanLordInAsync(TimeSpan time)
         {
-            if (!_guildLocks.ContainsKey(Context.Guild.Id))
-                _guildLocks.TryAdd(Context.Guild.Id, new object { });
-
-            lock (_guildLocks[Context.Guild.Id])
+            lock (_guildCommandLock)
             {
                 LockedTitanLordIn(time).Wait();
             }

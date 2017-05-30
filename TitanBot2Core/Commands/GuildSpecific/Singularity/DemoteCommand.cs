@@ -1,14 +1,14 @@
 ﻿using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
+    [Description("Demotes a user down the ranks, potentially even out of the clan")]
+    [RequireGuild(307803032534646785)]
+    [DefaultPermission(8)]
     class DemoteCommand : Command
     {
         private ulong[] _roleOrder = new ulong[]
@@ -21,17 +21,9 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             312177555379585024,
         };
 
-        public DemoteCommand()
-        {
-            GuildRestrictions = new ulong[] { 307803032534646785 };
-
-            //Handlers.AddNew(a => Demote((SocketGuildUser)a[0]))
-            //     .WithItemAsParams(0);
-            //
-            //Description = "Demotes a user down the ranks";
-        }
-
-        private async Task Demote(SocketGuildUser user)
+        [Call]
+        [Usage("Demotes the given user")]
+        async Task Demote([Dense]SocketGuildUser user)
         {
             var callingUser = Context.User as SocketGuildUser;
             if (callingUser == null)

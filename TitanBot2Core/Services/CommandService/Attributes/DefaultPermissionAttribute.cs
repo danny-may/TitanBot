@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using TitanBot2.Services.CommandService.Models;
 
 namespace TitanBot2.Services.CommandService.Attributes
 {
     [AttributeUsage(AttributeTargets.Method|AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class DefaultPermissionAttribute : Attribute
+    class DefaultPermissionAttribute : Attribute
     {
         public ulong DefaultPerm { get; }
         private string _permissionKey { get; }

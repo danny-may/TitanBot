@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,13 +15,15 @@ namespace TitanBot2.Services.CommandService
 {
     public abstract class Command
     {
-        public ulong[] GuildRestrictions { get; protected set; } = new ulong[0];
         protected string DelayMessage { get; set; } = "This seems to be taking longer than expected... ";
 
         private bool HasReplied;
         private IUserMessage awaitMessage;
-        private object _lock = new object();
-
+        private static ConcurrentDictionary<Type, object> _commandLocks = new ConcurrentDictionary<Type, object>();
+        private static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> _guildLocks = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
+        protected object _globalLock => _commandLocks.GetOrAdd(GetType(), new object());
+        protected object _guildCommandLock => _guildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
+    
         protected CallCheckResponse CheckResult { get; private set; }
 
         protected CmdContext Context { get; private set; }
@@ -43,7 +46,7 @@ namespace TitanBot2.Services.CommandService
             new Task(async () =>
             {
                 await Task.Delay(3000);
-                lock (_lock)
+                lock (_globalLock)
                 {
                     if (!HasReplied)
                     {
@@ -88,7 +91,7 @@ namespace TitanBot2.Services.CommandService
             if (info.RequireOwner)
                 results.Add(await CheckOwner());
             results.Add(await CheckPermissions(info.DefaultPermissions, info.PermissionKey));
-            results.Add(await CheckGuild(GuildRestrictions));            
+            results.Add(await CheckGuild(info.ParentInfo.RequireGuild));            
 
             if (results.Any(r => !r.IsSuccess))
                 return CallCheckResponse.FromError(string.Join("\n", results.Where(r => !r.IsSuccess).Select(r => r.Message)));
@@ -96,15 +99,15 @@ namespace TitanBot2.Services.CommandService
             return CallCheckResponse.FromSuccess();
         }
 
-        protected virtual Task<CallCheckResponse> CheckGuild(ulong[] guilds)
+        protected virtual Task<CallCheckResponse> CheckGuild(ulong? guild)
         {
-            if (guilds == null || guilds.Length == 0)
+            if (guild == null)
                 return Task.FromResult(CallCheckResponse.FromSuccess());
 
-            if (Context.Guild != null && guilds.Contains(Context.Guild.Id))
+            if (Context.Guild != null && guild == Context.Guild.Id)
                 return Task.FromResult(CallCheckResponse.FromSuccess());
 
-            return Task.FromResult(CallCheckResponse.FromError("Invalid guild! This command can only be used in " + string.Join(", ", guilds.Select(g => Context.Client.GetGuild(g).Name ?? "UNKNOWN GUILD"))));
+            return Task.FromResult(CallCheckResponse.FromError($"Invalid guild! This command can only be used in {Context.Client.GetGuild(guild.Value)?.Name ?? "UNKNOWN GUILD"}"));
         }
 
         protected virtual Task<CallCheckResponse> CheckContexts(ContextType contexts)
@@ -226,7 +229,7 @@ namespace TitanBot2.Services.CommandService
 
         private async Task<IUserMessage> SendSafe(IMessageChannel channel, string message, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            lock (_lock)
+            lock (_globalLock)
             {
                 HasReplied = true;
                 if (awaitMessage != null)
@@ -242,7 +245,7 @@ namespace TitanBot2.Services.CommandService
                     await Context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} There was an error when trying to handle your command! `{e.GetType()}`");
                 }
                 catch { }
-                await Context.Logger.Log(e, $"Command: {this.GetType().Name}");
+                await Context.Logger.Log(e, $"Command: {GetType().Name}");
                 await (handler?.Invoke(e) ?? Task.CompletedTask);
             }, isTTS, embed, options);
         }

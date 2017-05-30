@@ -1,15 +1,14 @@
 ﻿using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
-    public class PromoteCommand : Command
+    [Description("Promotes a user up the ranks")]
+    [RequireGuild(307803032534646785)]
+    class PromoteCommand : Command
     {
         private ulong[] _roleOrder = new ulong[]
         {
@@ -21,17 +20,9 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             312177555379585024,
         };
 
-        public PromoteCommand()
-        {
-            GuildRestrictions = new ulong[] { 307803032534646785 };
-
-            //Handlers.AddNew(a => Promote((SocketGuildUser)a[0]))
-            //     .WithItemAsParams(0);
-            //
-            //Description = "Promotes a user up the ranks";
-        }
-
-        private async Task Promote(SocketGuildUser user)
+        [Call]
+        [Usage("Promotes the given user")]
+        async Task Promote([Dense]SocketGuildUser user)
         {
             var callingUser = Context.User as SocketGuildUser;
             if (callingUser == null)
@@ -76,7 +67,7 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             await MessageForPromotion(user, promoRole);
         }
 
-        private async Task MessageForPromotion(SocketGuildUser user, SocketRole role)
+        async Task MessageForPromotion(SocketGuildUser user, SocketRole role)
         {
             string message;
             switch (role.Id)

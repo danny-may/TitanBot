@@ -1,29 +1,22 @@
 ﻿using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
-    public class ColourMeCommand : Command
+    [Description("Sets your colour, if you have the daily or weekly champion role")]
+    [RequireGuild(307803032534646785)]
+    class ColourMeCommand : Command
     {
-        public ColourMeCommand()
-        {
-            GuildRestrictions = new ulong[] { 307803032534646785 };
-
-            //Handlers.AddNew(a => ColourRole((System.Drawing.Color)a[0]))
-            //     .WithItemAsParams(0);
-        }
-
         private ulong _dailyChamp = 314036070100500493;
         private ulong _weeklyChamp = 314036021975318538;
 
-        private async Task ColourRole(System.Drawing.Color color)
+        [Call]
+        [Usage("Sets your colour to whatever you want")]
+        async Task ColourRole([Dense]System.Drawing.Color color)
         {
             var user = Context.User as SocketGuildUser;
             if (user == null)

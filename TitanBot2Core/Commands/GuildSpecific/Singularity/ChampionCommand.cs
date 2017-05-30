@@ -1,35 +1,27 @@
 ﻿using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
-    public class ChampionCommand : Command
+    [Description("Sets a person as the clan champion for the day or week")]
+    [RequireGuild(307803032534646785)]
+    [DefaultPermission(8)]
+    class ChampionCommand : Command
     {
-        public ChampionCommand()
-        {
-            GuildRestrictions = new ulong[] { 307803032534646785 };
+        [Call("Daily")]
+        [Usage("Sets the champion for today")]
+        Task SetDailyAsync([Dense]SocketGuildUser user)
+            => SetChampAsync(user, 314036070100500493);
 
-            //Handlers.AddNew(a => SetChampAsync((SocketGuildUser)a[0], _dailyChamp))
-            //     .WithSubCommand("Daily")
-            //     .WithItemAsParams(0);
-            //Handlers.AddNew(a => SetChampAsync((SocketGuildUser)a[0], _weeklyChamp))
-            //     .WithSubCommand("Weekly")
-            //     .WithItemAsParams(0);
-            //
-            //DefaultPermission = 8;
+        [Call("Weekly")]
+        [Usage("Sets the champion for this week")]
+        Task SetWeeklyAsync([Dense]SocketGuildUser user)
+            => SetChampAsync(user, 314036021975318538);
 
-        }
-
-        private ulong _dailyChamp = 314036070100500493;
-        private ulong _weeklyChamp = 314036021975318538;
-
-        private async Task SetChampAsync(SocketGuildUser target, ulong roleId)
+        async Task SetChampAsync(SocketGuildUser target, ulong roleId)
         {
             var targetRole = Context.Guild.GetRole(roleId);
             var users = Context.Guild.Users.Where(u => u.Roles.Contains(targetRole));

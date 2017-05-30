@@ -21,6 +21,7 @@ namespace TitanBot2.Services.CommandService.Models
         public string PermissionKey => DefaultPermissionAttribute.GetKey(this);
         public string Note => NotesAttribute.GetFrom(this);
         public bool RequireOwner => RequireOwnerAttribute.GetFrom(this);
+        public ulong? RequireGuild => RequireGuildAttribute.GetFrom(this);
 
         public CallInfo[] Calls { get; }
 

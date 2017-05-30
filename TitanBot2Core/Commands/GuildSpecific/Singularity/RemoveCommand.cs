@@ -1,15 +1,14 @@
 ﻿using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
-    public class RemoveCommand : Command
+    [Description("Removes a user completely from the guild")]
+    [RequireGuild(307803032534646785)]
+    class RemoveCommand : Command
     {
         private ulong[] _roleOrder = new ulong[]
         {
@@ -20,18 +19,10 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             307807022903197698,
             312177555379585024,
         };
-
-        public RemoveCommand()
-        {
-            GuildRestrictions = new ulong[] { 307803032534646785 };
-
-            //Handlers.AddNew(a => Remove((SocketGuildUser)a[0], (string)a[1]))
-            //     .WithItemAsParams(1);
-            //
-            //Description = "Demotes a user down the ranks";
-        }
     
-        private async Task Remove(SocketGuildUser user, string reason)
+        [Call]
+        [Usage("Removes the given user from the clan with the given reason")]
+        async Task Remove(SocketGuildUser user, [Dense]string reason)
         {
             var callingUser = Context.User as SocketGuildUser;
             if (callingUser == null)

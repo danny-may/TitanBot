@@ -246,6 +246,7 @@
     <Compile Include="Common\FluentSwitcher.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Responses\ArgumentReadResponse.cs" />
+    <Compile Include="Services\CommandService\Attributes\RequireGuildAttribute.cs" />
     <Compile Include="Services\CommandService\Models\ArgumentInfo.cs" />
     <Compile Include="Services\CommandService\Attributes\AliasAttribute.cs" />
     <Compile Include="Services\CommandService\Attributes\CallAttribute.cs" />

@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using TitanBot2.Services.CommandService.Flags;
 using TitanBot2.Services.CommandService.Models;
 
 namespace TitanBot2.Services.CommandService.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-    public class CallFlagAttribute : Attribute
+    class CallFlagAttribute : Attribute
     {
         public FlagInfo Flag { get; }
 
