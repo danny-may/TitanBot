@@ -127,12 +127,13 @@ namespace TitanBot2.Services
 
             public async Task<byte[]> Get(int freshness, int timeout)
             {
+                bool queryOwner = false;
                 try
                 {
                     if (_lastUpdate.AddSeconds(freshness) < DateTime.Now)
                     {
                         Log("Updating WebCache");
-                        bool queryOwner = false;
+                        
                         if (_webQueryTask == null)
                         {
                             queryOwner = true;
@@ -160,18 +161,18 @@ namespace TitanBot2.Services
 
                         Log("Waiting for download");
                         await _webQueryTask;
-
-                        if (queryOwner)
-                            _webQueryTask = null;
                     }
                 }
                 catch (WebException ex)
                 {
                     if (ex.Status != WebExceptionStatus.RequestCanceled)
                         throw;
-                    else
-                        Log("Download cancelled");
+                    Log("Download cancelled");
+
                 }
+
+                if (queryOwner)
+                    _webQueryTask = null;
 
                 return _data;
             }

@@ -19,11 +19,18 @@ namespace TitanBot2.Services.CommandService
 
         private bool HasReplied;
         private IUserMessage awaitMessage;
+        
         private static ConcurrentDictionary<Type, object> _commandLocks = new ConcurrentDictionary<Type, object>();
+        protected object _globalCommandLock => _commandLocks.GetOrAdd(GetType(), new object());
+
         private static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> _guildLocks = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
-        protected object _globalLock => _commandLocks.GetOrAdd(GetType(), new object());
         protected object _guildCommandLock => _guildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
-    
+
+        private static ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>> _channelLocks = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>>();
+        protected object _channelCommandLock => _channelLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong, object>()).GetOrAdd(Context.Channel.Id, new object());
+
+        protected object _instanceCommandLock { get; } = new object();
+
         protected CallCheckResponse CheckResult { get; private set; }
 
         protected CmdContext Context { get; private set; }
@@ -48,7 +55,7 @@ namespace TitanBot2.Services.CommandService
             new Task(async () =>
             {
                 await Task.Delay(3000);
-                lock (_globalLock)
+                lock (_instanceCommandLock)
                 {
                     if (!HasReplied)
                     {
@@ -73,6 +80,12 @@ namespace TitanBot2.Services.CommandService
                         await ReplyAsync($"Exception thrown: `{ex.GetType()}`", ReplyType.Error);
                 }
                 catch { }
+            }
+
+            if (!HasReplied)
+            {
+                await ReplyAsync("No reply was set up for this path (blame Titansmasher), but I think it executed correctly", ReplyType.Error);
+                HasReplied = true;
             }
 
             return true;
@@ -262,7 +275,7 @@ namespace TitanBot2.Services.CommandService
 
         private async Task<IUserMessage> SendSafe(IMessageChannel channel, string message, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            lock (_globalLock)
+            lock (_instanceCommandLock)
             {
                 HasReplied = true;
                 if (awaitMessage != null)

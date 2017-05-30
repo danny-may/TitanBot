@@ -49,5 +49,8 @@ namespace TitanBot2.Extensions
 
         public static bool Exists<T>(this IEnumerable<T> source, Func<T, bool> predicate)
             => source.Where(predicate).Count() > 0;
+
+        public static IEnumerable<TValue> SelectDistinct<TSource, TValue>(this IEnumerable<TSource> source, Func<TSource, TValue> selector)
+            => source.Select(selector).Distinct();
     }
 }

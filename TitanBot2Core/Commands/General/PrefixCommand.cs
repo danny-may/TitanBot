@@ -22,9 +22,9 @@ namespace TitanBot2.Commands.General
             var prefixes = await Context.GetPrefixes();
 
             if (prefixes.Length > 0)
-                await ReplyAsync($"Your available prefixes are {string.Join(", ", prefixes)}", ReplyType.Success);
+                await ReplyAsync($"Your available prefixes are {string.Join(", ", prefixes)}", ReplyType.Info);
             else
-                await ReplyAsync("You do not require prefixes in this channel", ReplyType.Success);
+                await ReplyAsync("You do not require prefixes in this channel", ReplyType.Info);
         }
 
         [Call]

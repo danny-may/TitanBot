@@ -199,6 +199,11 @@ namespace TitanBot2.Models
             new EquipmentStatic("Weapon_Valentines", "Heartbreaker", new string[0], "http://imgur.com/LnE4Erc.png")
         };
 
+        public override string ToString()
+        {
+            return $"{Name} ({Rarity}) [{Id}]" + (ImageUrl == null ? " - *No Image*" : "");
+        }
+
         public class EquipmentStatic
         {
             public string Name { get; }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Models;
 using TitanBot2.Models.Enums;
+using TitanBot2.Extensions;
 
 namespace TitanBot2.Services
 {
@@ -34,12 +35,7 @@ namespace TitanBot2.Services
             => GetImages(urls.ToArray());
         private async Task<Dictionary<string, Bitmap>> GetImages(string[] urls)
         {
-            var res = new Dictionary<string, Task<Bitmap>>();
-
-            foreach (var url in urls)
-            {
-                res.Add(url, GetImage(url));
-            }
+            var res = urls.Distinct().ToDictionary(u => u, u => GetImage(u));
 
             await Task.WhenAll(res.Select(r => r.Value));
 
@@ -224,7 +220,7 @@ namespace TitanBot2.Services
         }
 
 
-        public async Task<List<Artifact>> GetAllArtifacts()
+        public async Task<List<Artifact>> GetAllArtifacts(bool skipImages = false)
         {
             Configuration.Instance.Versions.TryGetValue(_artifactFileLocation, out string version);
 
@@ -238,7 +234,12 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Artifact.ArtifactStatic, ICsvLine, Bitmap>>();
 
-            var images = await GetImages(Artifact.All.Select(a => a.ImageUrl));
+            Dictionary<string, Bitmap> images;
+            var imageTask = GetImages(Artifact.All.Select(a => a.ImageUrl));
+            if (!skipImages)
+                images = await imageTask;
+            else
+                images = Artifact.All.SelectDistinct(a => a.ImageUrl).ToDictionary(a => a, a => (Bitmap)null);
 
             foreach (var art in Artifact.All)
             {
@@ -254,7 +255,7 @@ namespace TitanBot2.Services
             return items.Select(i => BuildArtifact(i.Item2, i.Item1, i.Item3, version)).ToList();
         }
 
-        public async Task<List<Equipment>> GetAllEquipment()
+        public async Task<List<Equipment>> GetAllEquipment(bool skipImages = false)
         {
             Configuration.Instance.Versions.TryGetValue(_equipmentFileLocation, out string version);
 
@@ -268,7 +269,12 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Equipment.EquipmentStatic, ICsvLine, Bitmap>>();
 
-            var images = await GetImages(Equipment.All.Select(e => e.ImageUrl));
+            Dictionary<string, Bitmap> images;
+            var imageTask = GetImages(Equipment.All.Select(a => a.ImageUrl));
+            if (!skipImages)
+                images = await imageTask;
+            else
+                images = Equipment.All.SelectDistinct(a => a.ImageUrl).ToDictionary(a => a, a => (Bitmap)null);
 
             foreach (var equip in Equipment.All)
             {
@@ -285,7 +291,7 @@ namespace TitanBot2.Services
             return items.Select(i => BuildEquipment(i.Item2, i.Item1, i.Item3, version)).ToList();
         }
 
-        public async Task<List<Pet>> GetAllPets()
+        public async Task<List<Pet>> GetAllPets(bool skipImages = false)
         {
             Configuration.Instance.Versions.TryGetValue(_petFileLocation, out string version);
 
@@ -299,7 +305,12 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Pet.PetStatic, ICsvLine, Bitmap>>();
 
-            var images = await GetImages(Pet.All.Select(p => p.ImageUrl));
+            Dictionary<string, Bitmap> images;
+            var imageTask = GetImages(Pet.All.Select(a => a.ImageUrl));
+            if (!skipImages)
+                images = await imageTask;
+            else
+                images = Pet.All.SelectDistinct(a => a.ImageUrl).ToDictionary(a => a, a => (Bitmap)null);
 
             foreach (var pet in Pet.All)
             {
@@ -316,7 +327,7 @@ namespace TitanBot2.Services
             return items.Select(i => BuildPet(i.Item2, i.Item1, i.Item3, version)).ToList();
         }
 
-        public async Task<List<Helper>> GetAllHelpers()
+        public async Task<List<Helper>> GetAllHelpers(bool skipImages = false)
         {
             Configuration.Instance.Versions.TryGetValue(_helperFileLocation, out string version);
 
@@ -330,7 +341,12 @@ namespace TitanBot2.Services
 
             var items = new List<Tuple<Helper.HelperStatic, ICsvLine, Bitmap>>();
 
-            var images = await GetImages(Helper.All.Select(h => h.ImageUrl));
+            Dictionary<string, Bitmap> images;
+            var imageTask = GetImages(Helper.All.Select(a => a.ImageUrl));
+            if (!skipImages)
+                images = await imageTask;
+            else
+                images = Helper.All.SelectDistinct(a => a.ImageUrl).ToDictionary(a => a, a => (Bitmap)null);
 
             foreach (var helper in Helper.All)
             {

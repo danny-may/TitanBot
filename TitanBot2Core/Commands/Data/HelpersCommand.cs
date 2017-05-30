@@ -24,7 +24,7 @@ namespace TitanBot2.Commands.Data
         [CallFlag("g", "group", "Groups the heroes by damage")]
         async Task ListHelpersAsync()
         {
-            var helpers = await Context.TT2DataService.GetAllHelpers();
+            var helpers = await Context.TT2DataService.GetAllHelpers(true);
 
             var builder = new EmbedBuilder
             {

@@ -28,9 +28,9 @@ namespace TitanBot2.Commands.Owner
             message += $"Arg2: {text} ({typeof(string)})\n";
             message += $"Flag(F): {Flags.Has("f")}\n";
 
-            await Task.Delay(30000);
+            await Task.Delay(4000);
 
-            await ReplyAsync(message);
+            //await ReplyAsync(message);
         }
     }
 }

@@ -86,7 +86,7 @@ namespace TitanBot2.Commands.Data
         [Usage("Lists all pets available")]
         async Task ListPetsAsync()
         {
-            var pets = await Context.TT2DataService.GetAllPets();
+            var pets = await Context.TT2DataService.GetAllPets(true);
 
             var builder = new EmbedBuilder
             {
@@ -107,7 +107,7 @@ namespace TitanBot2.Commands.Data
 
             foreach (var bonus in pets.GroupBy(p => p.BonusType).OrderBy(t => t.Key))
             {
-                builder.AddInlineField(bonus.Key.Beautify(), string.Join("\n", bonus.Select(a => a.Name)));
+                builder.AddInlineField(bonus.Key.Beautify(), string.Join("\n", bonus.Select(a => $"{a.Name} ({a.Id})")));
             }
 
             await ReplyAsync("", embed: builder.Build());
