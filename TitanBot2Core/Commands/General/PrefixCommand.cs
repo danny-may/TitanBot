@@ -1,27 +1,20 @@
-﻿using Discord.Commands;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TitanBot2.Extensions;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
+using TitanBot2.Services.CommandService.Models;
 
 namespace TitanBot2.Commands.General
 {
-    public class PrefixCommand : Command
+    [Description("Gets or sets a custom prefix that is required to use my commands")]
+    [DefaultPermission(8)]
+    [RequireContext(ContextType.Guild)]
+    class PrefixCommand : Command
     {
-        public PrefixCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            RequiredContexts = ContextType.Guild;
-            DefaultPermission = 8;
-            Calls.AddNew(a => GetPrefixesAsync());
-            Calls.AddNew(a => SetPrefixAsync((string)a[0]))
-                 .WithArgTypes(typeof(string))
-                 .WithItemAsParams(0);
-            Description = "Gets or sets a custom prefix that is required to use my commands";
-            Usage.Add("`{0}` - Gets all the available current prefixes");
-            Usage.Add("`{0} <prefix>` - Sets the custom prefix");
-        }
-
-        protected async Task GetPrefixesAsync()
+        [Call]
+        [Usage("Gets all the available current prefixes")]
+        async Task GetPrefixesAsync()
         {
             var prefixes = await Context.GetPrefixes();
 
@@ -31,7 +24,9 @@ namespace TitanBot2.Commands.General
                 await ReplyAsync("You do not require prefixes in this channel", ReplyType.Success);
         }
 
-        private async Task SetPrefixAsync(string newPrefix)
+        [Call]
+        [Usage("Sets the custom prefix")]
+        async Task SetPrefixAsync(string newPrefix)
         {
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
             guildData.Prefix = newPrefix.ToLower();
@@ -39,15 +34,15 @@ namespace TitanBot2.Commands.General
             await ReplyAsync($"Your guilds prefix has been set to `{guildData.Prefix}`", ReplyType.Success);
         }
 
-        protected override Task<CommandCheckResponse> CheckPermissions(ulong defaultPerm)
+        protected override Task<CallCheckResponse> CheckPermissions(ulong defaultPerm, string permKey)
         {
             if (Context.Arguments.Length > 0)
-                return base.CheckPermissions(defaultPerm);
+                return base.CheckPermissions(defaultPerm, permKey);
             else
-                return base.CheckPermissions(0);
+                return base.CheckPermissions(0, permKey);
         }
 
-        protected override Task<CommandCheckResponse> CheckContexts(ContextType contexts)
+        protected override Task<CallCheckResponse> CheckContexts(ContextType contexts)
         {
             if (Context.Arguments.Length > 0)
                 return base.CheckContexts(contexts);

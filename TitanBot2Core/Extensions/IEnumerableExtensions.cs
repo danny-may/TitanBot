@@ -46,5 +46,8 @@ namespace TitanBot2.Extensions
             count = Math.Min(count, value.Count());
             return value.Take(count);
         }
+
+        public static bool Exists<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+            => source.Where(predicate).Count() > 0;
     }
 }

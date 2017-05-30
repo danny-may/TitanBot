@@ -6,20 +6,16 @@ using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.General
 {
-    public class InfoCommand : Command
+    [Description("Displays some technical information about me")]
+    class InfoCommand : Command
     {
-        public InfoCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Description = "Displays some technical information about me";
-            Usage.Add("`{0}` - Displays the info");
-            Calls.AddNew(a => ShowInfoAsync());
-        }
-
-        protected async Task ShowInfoAsync()
+        [Call]
+        [Usage("Displays the info")]
+        async Task ShowInfoAsync()
         {
             var guildCount = Context.Client.Guilds.Count;
             var channelCount = Context.Client.Guilds.Sum(g => g.Channels.Count);
@@ -53,7 +49,9 @@ namespace TitanBot2.Commands.General
             builder.AddInlineField("Guilds", guildCount.ToString())
                    .AddInlineField("Channels", channelCount.ToString())
                    .AddInlineField("Users", userCount.ToString())
-                   .AddInlineField("RAM", $"{((double)ramUsage/(1024*1024)).ToString("#0.##")} / {ramAvailable}")
+                   .AddInlineField("Loaded commands", Context.CommandService.Commands.Count)
+                   .AddInlineField("Loaded calls", Context.CommandService.Commands.Sum(c => c.Calls.Length))
+                   .AddInlineField("RAM", $"{((double)ramUsage / (1024 * 1024)).ToString("#0.##")} / {ramAvailable}")
                    .AddInlineField("CPU", cpuUsage)
                    .AddInlineField("Active Timers", timersActive.Count())
                    .AddInlineField("Uptime", (DateTime.Now - startTime).Beautify());

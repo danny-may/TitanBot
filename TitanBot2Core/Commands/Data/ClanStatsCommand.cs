@@ -6,27 +6,14 @@ using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.Data
 {
-    public class ClanStatsCommand : Command
-    {
-        public ClanStatsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => ShowStatsAsync((int)a[0]))
-                 .WithArgTypes(typeof(int));
-            Calls.AddNew(a => ShowStatsAsync((int)a[0], (int)a[1]))
-                 .WithArgTypes(typeof(int), typeof(int));
-            Calls.AddNew(a => ShowStatsAsync((int)a[0], (int)a[1], (int)a[2]))
-                 .WithArgTypes(typeof(int), typeof(int), typeof(int));
-            Calls.AddNew(a => ShowStatsAsync((int)a[0], (int)a[1], (int)a[2], (int[])a[3]))
-                 .WithArgTypes(typeof(int), typeof(int), typeof(int), typeof(int[]));
-            Usage.Add("`{0} <clanLevel> [MS] [taps] [attackers...]` - Shows data about a clan with the given level");
-            Description = "Shows various information for any clan with given attributes";
-        }
-
-        public static EmbedBuilder StatsBuilder(SocketSelfUser me, int clanLevel, int averageMS = 3500, int tapsPerCq = 500, int[] attackers = null)
+    [Description("Shows various information for any clan with given attributes")]
+    class ClanStatsCommand : Command
+    {        
+        internal static EmbedBuilder StatsBuilder(SocketSelfUser me, int clanLevel, int averageMS, int tapsPerCq, int[] attackers)
         {
             var absLevel = Math.Abs(clanLevel);
 
@@ -56,7 +43,6 @@ namespace TitanBot2.Commands.Data
             builder.AddInlineField("Next Bonus", nextBonus.Beautify() + "%");
             builder.AddInlineField("Next Titan Lord HP", nextTitanLordHp.Beautify());
             builder.AddInlineField("Advance start", (advanceStart * 100).Beautify() + "%");
-            attackers = attackers ?? new int[] { 20, 30, 40, 50 };
             attackers = attackers.Count() == 0 ? new int[] { 20, 30, 40, 50 } : attackers;
             builder.AddField($"Requirements per boss (assuming MS {averageMS} + {tapsPerCq} taps)", string.Join("\n", attackers.Select(num =>
             {
@@ -69,8 +55,19 @@ namespace TitanBot2.Commands.Data
             return builder;
         }
 
-        public async Task ShowStatsAsync(int clanLevel, int averageMS = 3500, int tapsPerCq = 500, int[] attackers = null)
+        [Call]
+        [CallFlag(typeof(int), "s", "stage", "Average max stage to use")]
+        [CallFlag(typeof(int), "t", "taps", "Average taps to use")]
+        [CallFlag(typeof(int[]), "a", "attackers", "Number of attackers to use (array)")]
+        [Usage("Shows data about a clan with the given level")]
+        async Task ShowStatsAsync(int clanLevel)
         {
+            if (!Flags.TryGet("s", out int averageMS))
+                averageMS = 4000;
+            if (!Flags.TryGet("t", out int tapsPerCq))
+                tapsPerCq = 500;
+            if (!Flags.TryGet("a", out int[] attackers))
+                attackers = new int[] { 20, 30, 40, 50 };
             await ReplyAsync("", embed: StatsBuilder(Context.Client.CurrentUser, clanLevel, averageMS, tapsPerCq, attackers).Build());
         }
     }

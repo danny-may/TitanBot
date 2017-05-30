@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
 {
     public class TimeSpanTypeReader : TypeReader
     {   
-        public override Task<TypeReaderResult> Read(CmdContext context, string input)
+        public override Task<TypeReaderResponse> Read(CmdContext context, string input)
         {
             var days = 0;
             var hours = 0;
@@ -78,11 +79,11 @@ namespace TitanBot2.TypeReaders.Readers
 
             if (match)
             {
-                return Task.FromResult(TypeReaderResult.FromSuccess(new TimeSpan(days, hours, minutes, seconds)));
+                return Task.FromResult(TypeReaderResponse.FromSuccess(new TimeSpan(days, hours, minutes, seconds)));
             }
             else
             {
-                return Task.FromResult(TypeReaderResult.FromError("Input could not be parsed as a TimeSpan"));
+                return Task.FromResult(TypeReaderResponse.FromError("Input could not be parsed as a TimeSpan"));
             }
         }
     }

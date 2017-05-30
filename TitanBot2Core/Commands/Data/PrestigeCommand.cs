@@ -1,35 +1,28 @@
 ﻿using Discord;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.Data
 {
-    public class PrestigeCommand : Command
+    [Description("Shows you exactly what prestiging at a given point will mean for you")]
+    class PrestigeCommand : Command
     {
-        public PrestigeCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        [Call]
+        [Usage("Shows various stats about prestiging on the given stage")]
+        [CallFlag(typeof(int), "b", "bos", "Uses the given BoS level")]
+        [CallFlag(typeof(int), "c", "clan", "Uses the given clan level")]
+        [CallFlag(typeof(int), "i", "ip", "Uses the given IP level")]
+        async Task PrestigeStatsAsync(int stage)
         {
-            Calls.AddNew(a => PrestigeStatsAsync((int)a[0], 0, 0, 0))
-                 .WithArgTypes(typeof(int));
-            Calls.AddNew(a => PrestigeStatsAsync((int)a[0], (int)a[1], 0, 0))
-                 .WithArgTypes(typeof(int), typeof(int));
-            Calls.AddNew(a => PrestigeStatsAsync((int)a[0], (int)a[1], (int)a[2], 0))
-                 .WithArgTypes(typeof(int), typeof(int), typeof(int));
-            Calls.AddNew(a => PrestigeStatsAsync((int)a[0], (int)a[1], (int)a[2], (int)a[3]))
-                 .WithArgTypes(typeof(int), typeof(int), typeof(int), typeof(int));
+            var showIP = Flags.TryGet("i", out int ipLevel);
+            var showClan = Flags.TryGet("c", out int clanLevel);
+            var showBos = Flags.TryGet("b", out int bosLevel);
 
-            Usage.Add("`{0} <stage> [bos level] [clan level] [IP level]` - Shows various stats about prestiging with the given values");
-            Description = "Shows you exactly what prestiging at a given point will mean for you";
-        }
-
-        private async Task PrestigeStatsAsync(int stage, int bosLevel, int clanLevel, int ipLevel)
-        {
             ipLevel = Math.Min(20, ipLevel);
             var startingStage = (int)Math.Max(1, stage * Calculator.AdvanceStart(clanLevel));
             var totalRelics = Calculator.RelicsEarned(stage, bosLevel);
@@ -38,9 +31,18 @@ namespace TitanBot2.Commands.Data
             var timeTaken = Calculator.RunTime(startingStage, stage, ipLevel, 1);
             var timeTakenSplash = Calculator.RunTime(startingStage, stage, ipLevel, 4);
 
+            var description = "";
+            if (showBos)
+                description += $"\nBoS: {bosLevel}";
+            if (showClan)
+                description += $"\nClan: {clanLevel}";
+            if (showIP)
+                description += $"\nIP: {ipLevel}";
+
             var builder = new EmbedBuilder
             {
-                Title = $"Info when prestiging on stage **{stage}** with a lv **{bosLevel}** BoS while in a level **{clanLevel}** Clan with **IP {ipLevel}**",
+                Title = $"Info when prestiging on stage **{stage}**",
+                Description = description,
                 Color = System.Drawing.Color.Gold.ToDiscord(),
                 Footer = new EmbedFooterBuilder
                 {

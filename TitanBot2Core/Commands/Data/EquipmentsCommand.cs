@@ -7,36 +7,22 @@ using TitanBot2.Extensions;
 using TitanBot2.Models;
 using TitanBot2.Models.Enums;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.Data
 {
-    public class EquipmentsCommand : Command
+    [Description("Displays data about any equipment")]
+    [Alias("Equip", "Equips", "Equipment")]
+    class EquipmentsCommand : Command
     {
-        public EquipmentsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public EquipmentsCommand()
         {
-            Calls.AddNew(a => ShowEquipmentAsync((Equipment)a[0]))
-                 .WithArgTypes(typeof(Equipment))
-                 .WithItemAsParams(0);
-            Calls.AddNew(a => ShowEquipmentAsync((Equipment)a[0], (double)a[1]))
-                 .WithArgTypes(typeof(Equipment), typeof(double))
-                 .WithItemAsParams(0);
-            Calls.AddNew(a => ListEquipmentAsync(null))
-                 .WithSubCommand("List");
-            Calls.AddNew(a => ListEquipmentAsync((string)a[0]))
-                 .WithArgTypes(typeof(string))
-                 .WithItemAsParams(0)
-                 .WithSubCommand("List");
-            Alias.Add("Equip");
-            Alias.Add("Equips");
-            Alias.Add("Equipment");
-            Usage.Add("`{0} <equipment> [level]` - Shows stats for a given equipment on the given level.");
-            Usage.Add("`{0} list [equipment type]` - Lists all equipment for the given type");
-            Description = "Displays data about any equipment";
             DelayMessage = "This might take a short while, theres a fair bit of data to download!";
         }
 
-        private async Task ListEquipmentAsync(string equipClass)
+        [Call("List")]
+        [Usage("Lists all equipment for the given type")]
+        async Task ListEquipmentAsync([Dense]string equipClass = null)
         {
             var builder = new EmbedBuilder
             {
@@ -106,7 +92,7 @@ namespace TitanBot2.Commands.Data
             await ReplyAsync("", embed: builder.Build());
         }
 
-        private EmbedBuilder GetBaseEmbed(Equipment equipment)
+        EmbedBuilder GetBaseEmbed(Equipment equipment)
         {
             var builder = new EmbedBuilder
             {
@@ -133,25 +119,25 @@ namespace TitanBot2.Commands.Data
             return builder;
         }
 
-        private async Task ShowEquipmentAsync(Equipment equipment)
+        [Call]
+        [Usage("Shows stats for a given equipment on the given level.")]
+        async Task ShowEquipmentAsync([Dense] Equipment equipment, double? level = null)
         {
             var builder = GetBaseEmbed(equipment);
 
-            builder.AddField("Bonus type", equipment.BonusType.Beautify());
-            builder.AddInlineField("Bonus base", equipment.BonusType.FormatValue(equipment.BonusBase));
-            builder.AddInlineField("Bonus increase", equipment.BonusType.FormatValue(equipment.BonusIncrease));
-            builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level.*");
-
-            await ReplyAsync("", embed: builder.Build());
-        }
-
-        private async Task ShowEquipmentAsync(Equipment equipment, double level)
-        {
-            var builder = GetBaseEmbed(equipment);
-
-            builder.AddField("Bonus type", equipment.BonusType.Beautify());
-            builder.AddField($"Bonus at lv {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
-            builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.*");
+            if (level == null)
+            {
+                builder.AddField("Bonus type", equipment.BonusType.Beautify());
+                builder.AddInlineField("Bonus base", equipment.BonusType.FormatValue(equipment.BonusBase));
+                builder.AddInlineField("Bonus increase", equipment.BonusType.FormatValue(equipment.BonusIncrease));
+                builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level.*");
+            }
+            else
+            {
+                builder.AddField("Bonus type", equipment.BonusType.Beautify());
+                builder.AddField($"Bonus at lv {level} (actual ~{level * 10})", equipment.BonusType.FormatValue(equipment.BonusOnLevel((int)(10 * level))));
+                builder.AddField("Note", "*The level displayed by equipment ingame is actually 10x lower than the real level and rounded.*");
+            }
 
             await ReplyAsync("", embed: builder.Build());
         }

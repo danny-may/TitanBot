@@ -21,15 +21,14 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             312177555379585024,
         };
 
-        public PromoteCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public PromoteCommand()
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 
-            Calls.AddNew(a => Promote((SocketGuildUser)a[0]))
-                 .WithArgTypes(typeof(SocketGuildUser))
-                 .WithItemAsParams(0);
-
-            Description = "Promotes a user up the ranks";
+            //Handlers.AddNew(a => Promote((SocketGuildUser)a[0]))
+            //     .WithItemAsParams(0);
+            //
+            //Description = "Promotes a user up the ranks";
         }
 
         private async Task Promote(SocketGuildUser user)

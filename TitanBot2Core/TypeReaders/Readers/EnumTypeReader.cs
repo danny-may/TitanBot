@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
@@ -45,7 +46,7 @@ namespace TitanBot2.TypeReaders.Readers
             _enumsByValue = byValueBuilder.ToImmutable();
         }
 
-        public override Task<TypeReaderResult> Read(CmdContext context, string input)
+        public override Task<TypeReaderResponse> Read(CmdContext context, string input)
         {
             T baseValue;
             object enumValue;
@@ -53,16 +54,16 @@ namespace TitanBot2.TypeReaders.Readers
             if (_tryParse(input, out baseValue))
             {
                 if (_enumsByValue.TryGetValue(baseValue, out enumValue))
-                    return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
+                    return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResult.FromError($"Value is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {_enumType.Name}"));
             }
             else
             {
                 if (_enumsByName.TryGetValue(input.ToLower(), out enumValue))
-                    return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
+                    return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResult.FromError($"Value is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {_enumType.Name}"));
             }
         }
     }

@@ -1,32 +1,36 @@
 ﻿using Discord.WebSocket;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
+using TitanBot2.Services.CommandService.Attributes;
+using TitanBot2.Services.CommandService.Models;
 using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Owner
 {
+    [Description("Does something, probably")]
+    [Alias("t", "testing")]
+    [RequireOwner]
+    [Notes("This command changes function very frequently. Dont expect it to be in any way consistent.")]
     public class TestCommand : Command
     {
-        public TestCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        [Call]
+        [Usage("how should I know 0_o")]
+        [RequireContext(ContextType.Guild)]
+        [CallFlag("f", "flag", @"¯\_(ツ)_/¯")]
+        public async Task ExecuteAsync(TimeSpan? time = null, [Dense]string text = "default text")
         {
-            Calls.AddNew(ExecuteAsync)
-                 .WithArgTypes(typeof(SocketGuildUser));
-            RequireOwner = true;
-            Description = "Does something, probably";
-            Usage.Add("How should I know 0_o");
-        }
+            var message = "";
+            message += $"Prefix: {Context.Prefix}\n";
+            message += $"Command: {Context.Command}\n";
+            message += $"Arg1: {time} ({typeof(TimeSpan?)})\n";
+            message += $"Arg2: {text} ({typeof(string)})\n";
+            message += $"Flag(F): {Flags.Has("f")}\n";
 
-        private async Task ExecuteAsync(object[] args)
-        {
-            var user = (SocketGuildUser)args[0];
+            await Task.Delay(30000);
 
-            foreach (var channel in Context.Client.DMChannels)
-            {
-                await channel.CloseAsync();
-            }
-
-            await TrySend(user.Id, "testc");
+            await ReplyAsync(message);
         }
     }
 }

@@ -3,38 +3,22 @@ using System;
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
+using TitanBot2.Services.CommandService.Attributes;
 using TitanBot2.Services.Database.Models;
-using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Clan
 {
+    [Description("Missed the boss? Or did someone else? Use this to get a water-tight excuse whenever you need!")]
     public class ExcuseCommand : Command
     {
-        public ExcuseCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => ExcuseUserAsync());
-            Calls.AddNew(a => ExcuseUserAsync((IUser)a[0]))
-                 .WithArgTypes(typeof(IUser));
-            Calls.AddNew(a => ExcuseUserAsync(null, (int)a[0]))
-                 .WithArgTypes(typeof(int));
-            Calls.AddNew(a => ExcuseUserAsync((IUser)a[0], (int)a[1]))
-                 .WithArgTypes(typeof(IUser), typeof(int));
-            Calls.AddNew(a => AddExcuseAsync((string)a[0]))
-                 .WithArgTypes(typeof(string))
-                 .WithSubCommand("Add")
-                 .WithItemAsParams(0);
-            Calls.AddNew(a => RemoveExcuseAsync((int)a[0]))
-                 .WithArgTypes(typeof(int))
-                 .WithSubCommand("Remove");
-            Usage.Add("`{0} [user] [id]` - Gets an excuse for why that person (or yourself) didnt attack the boss");
-            Usage.Add("`{0} add <text>` - Adds an excuse to the pool of available excuses");
-            Usage.Add("`{0} remove <id>` - Removes an excuse you made by ID");
-            Description = "Missed the boss? Or did someone else? Use this to get a water-tight excuse whenever you need!";
-        }
-
-        public async Task ExcuseUserAsync(IUser user = null, int? excuseId = null)
+        [Call]
+        [Usage("Gets an excuse for why that person (or yourself) didnt attack the boss")]
+        [CallFlag(typeof(int?), "i", "id", "Specifies an ID to use")]
+        public async Task ExcuseUserAsync(IUser user = null)
         {
             user = user ?? Context.User;
+
+            Flags.TryGet("i", out int? excuseId);
 
             if (user?.Id == Context.Client.CurrentUser.Id)
             {
@@ -45,7 +29,10 @@ namespace TitanBot2.Commands.Clan
             if (excuseId == null)
                 excuse = await Context.Database.Excuses.GetRandom();
             else
-                excuse = await Context.Database.Excuses.Get(excuseId??0);
+                excuse = await Context.Database.Excuses.Get(excuseId.Value) ?? await Context.Database.Excuses.GetRandom();
+
+            excuse = excuse ?? new Excuse { CreatorId = Context.Client.CurrentUser.Id, ExcuseNo = 0, ExcuseText = "Im uninteresting and havent made any excuses yet", SubmissionTime = DateTime.MinValue };
+
             var submitter = Context.Client.GetUser(excuse.CreatorId);
 
             var builder = new EmbedBuilder
@@ -66,7 +53,9 @@ namespace TitanBot2.Commands.Clan
             await ReplyAsync($"<@{user.Id}> didnt attack the boss because: ", embed: builder);
         }
 
-        public async Task AddExcuseAsync(string text)
+        [Call("Add")]
+        [Usage("Adds an excuse to the pool of available excuses")]
+        public async Task AddExcuseAsync([Dense]string text)
         {
             var excuse = new Excuse
             {
@@ -81,6 +70,8 @@ namespace TitanBot2.Commands.Clan
             await ReplyAsync($"Added the excuse as #{excuseId}", ReplyType.Success);
         }
 
+        [Call("Remove")]
+        [Usage("Removes an excuse you made by ID")]
         public async Task RemoveExcuseAsync(int id)
         { 
             var excuse = await Context.Database.Excuses.Get(id);

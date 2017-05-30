@@ -5,17 +5,18 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
 {
     public class ColourTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> Read(CmdContext context, string value)
+        public override Task<TypeReaderResponse> Read(CmdContext context, string value)
         {
             var colour = Color.FromName(value);
             if (colour.IsKnownColor)
-                return Task.FromResult(TypeReaderResult.FromSuccess(colour));
+                return Task.FromResult(TypeReaderResponse.FromSuccess(colour));
 
             var input = (string)value.Clone();
             if (value.StartsWith("#"))
@@ -32,14 +33,14 @@ namespace TitanBot2.TypeReaders.Readers
             else if (input.Length == 6)
                 charsPerVal = 2;
             else
-                return Task.FromResult(TypeReaderResult.FromError($"`{value}` is not a valid colour"));
+                return Task.FromResult(TypeReaderResponse.FromError($"`{value}` is not a valid colour"));
 
             if (!int.TryParse(input.Substring(0, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out r) ||
                 !int.TryParse(input.Substring(charsPerVal, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out g) ||
                 !int.TryParse(input.Substring(2 * charsPerVal, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out b))
-                return Task.FromResult(TypeReaderResult.FromError($"`{value}` is not a valid colour"));
+                return Task.FromResult(TypeReaderResponse.FromError($"`{value}` is not a valid colour"));
 
-            return Task.FromResult(TypeReaderResult.FromSuccess(Color.FromArgb(r, g, b)));
+            return Task.FromResult(TypeReaderResponse.FromSuccess(Color.FromArgb(r, g, b)));
 
         }
     }

@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
@@ -12,7 +13,7 @@ namespace TitanBot2.TypeReaders.Readers
     public class UserTypeReader<T> : TypeReader
         where T : class, IUser
     {
-        public override async Task<TypeReaderResult> Read(CmdContext context, string input)
+        public override async Task<TypeReaderResponse> Read(CmdContext context, string input)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
             IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?
@@ -77,8 +78,8 @@ namespace TitanBot2.TypeReaders.Readers
             }
 
             if (results.Count > 0)
-                return TypeReaderResult.FromSuccess(results.Values.ToImmutableArray());
-            return TypeReaderResult.FromError("User not found.");
+                return TypeReaderResponse.FromSuccess(results.Values.ToImmutableArray());
+            return TypeReaderResponse.FromError("User not found.");
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T user, float score)

@@ -21,15 +21,14 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             312177555379585024,
         };
 
-        public RemoveCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public RemoveCommand()
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 
-            Calls.AddNew(a => Remove((SocketGuildUser)a[0], (string)a[1]))
-                 .WithArgTypes(typeof(SocketGuildUser), typeof(string))
-                 .WithItemAsParams(1);
-
-            Description = "Demotes a user down the ranks";
+            //Handlers.AddNew(a => Remove((SocketGuildUser)a[0], (string)a[1]))
+            //     .WithItemAsParams(1);
+            //
+            //Description = "Demotes a user down the ranks";
         }
     
         private async Task Remove(SocketGuildUser user, string reason)

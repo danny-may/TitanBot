@@ -1,22 +1,16 @@
 ﻿using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.Owner
 {
-    public class DBPurgeCommand : Command
+    [Description("Wipes any database table clean")]
+    [RequireOwner]
+    class DBPurgeCommand : Command
     {
-        public DBPurgeCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => PurgeAsync((string)a[0]))
-                 .WithArgTypes(typeof(string));
-
-            RequireOwner = true;
-            Usage.Add("`{0} <table>` - Wipes the given table.");
-            Description = "Wipes any database table clean";
-        }
-
-        public async Task PurgeAsync(string table)
+        [Call]
+        [Usage("Wipes the given table.")]
+        async Task PurgeAsync(string table)
         {
             switch (table.ToLower())
             {

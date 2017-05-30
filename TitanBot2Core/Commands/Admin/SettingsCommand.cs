@@ -6,29 +6,21 @@ using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
+using TitanBot2.Services.CommandService.Attributes;
+using TitanBot2.Services.CommandService.Models;
 using TitanBot2.Services.Database.Models;
-using TitanBot2.TypeReaders;
-using DC = Discord.Commands;
 
 namespace TitanBot2.Commands.Admin
 {
-    public class SettingsCommand : Command
+    [Description("Allows the retrieval and changing of existing settings for the server")]
+    [DefaultPermission(8)]
+    [RequireContext(ContextType.Guild)]
+    class SettingsCommand : Command
     {
         private readonly List<Setting> _settings;
 
-        public SettingsCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public SettingsCommand()
         {
-            Calls.AddNew(a => ListSettingsAsync());
-            Calls.AddNew(a => SetSettingAsync((string)a[0], (string)a[1]))
-                 .WithArgTypes(typeof(string), typeof(string))
-                 .WithSubCommand("Set")
-                 .WithItemAsParams(1);
-            Usage.Add("`{0}` - Gets a list of all the current settings");
-            Usage.Add("`{0} <setting> <value>` - Sets the given setting to the given value.");
-            Description = "Allows the retrieval and changing of existing settings for the server";
-            RequiredContexts = DC.ContextType.Guild;
-            DefaultPermission = 8;
-
             _settings = new List<Setting>()
                 {
                     Setting.StringDefault("TimerText", "Titan Lord", 500, g => g.TitanLord.TimerText, (g,s) => g.TitanLord.TimerText = s),
@@ -48,7 +40,7 @@ namespace TitanBot2.Commands.Admin
                         Set = (g, s) =>
                         {
                             var ints = s.Split(' ', true)
-                                        .Select(t => Readers.Read(typeof(TimeSpan), Context, t).GetAwaiter().GetResult())
+                                        .Select(t => Readers.Read(typeof(TimeSpan), Context, t).Result)
                                         .Where(r => r.IsSuccess)
                                         .SelectMany(r => r.Values)
                                         .Select(t => t.Value as TimeSpan?)
@@ -67,7 +59,9 @@ namespace TitanBot2.Commands.Admin
             };
         }
 
-        public async Task ListSettingsAsync()
+        [Call]
+        [Usage("Lists all settings available")]
+        async Task ListSettingsAsync([Dense]string settingGroup = null)
         {
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
 
@@ -91,7 +85,9 @@ namespace TitanBot2.Commands.Admin
             await ReplyAsync("", embed: embed.Build());
         }
 
-        public async Task SetSettingAsync(string key, string value)
+        [Call("Set")]
+        [Usage("Sets the given setting to the given value.")]
+        async Task SetSettingAsync(string key, [Dense] string value)
         {
             var setting = _settings.SingleOrDefault(s => s.Key.ToLower() == key.ToLower());
 

@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace TitanBot2.TypeReaders
+namespace TitanBot2.Responses
 {
     public struct TypeReaderValue
     {
@@ -18,7 +18,7 @@ namespace TitanBot2.TypeReaders
         public override string ToString() => Value?.ToString();
     }
 
-    public struct TypeReaderResult
+    public struct TypeReaderResponse
     {
         public IReadOnlyCollection<TypeReaderValue> Values { get; }
         
@@ -26,21 +26,21 @@ namespace TitanBot2.TypeReaders
         public bool IsSuccess { get; }
         public object Best => Values?.OrderByDescending(v => v.Score).Select(v => v.Value).FirstOrDefault();
 
-        private TypeReaderResult(IReadOnlyCollection<TypeReaderValue> values, bool success, string message)
+        private TypeReaderResponse(IReadOnlyCollection<TypeReaderValue> values, bool success, string message)
         {
             Values = values;
             Message = message;
             IsSuccess = success;
         }
 
-        public static TypeReaderResult FromSuccess(object value)
-            => new TypeReaderResult(ImmutableArray.Create(new TypeReaderValue(value, 1.0f)), true, null);
-        public static TypeReaderResult FromSuccess(TypeReaderValue value)
-            => new TypeReaderResult(ImmutableArray.Create(value), true, null);
-        public static TypeReaderResult FromSuccess(IReadOnlyCollection<TypeReaderValue> values)
-            => new TypeReaderResult(values, true, null);
-        public static TypeReaderResult FromError(string message)
-            => new TypeReaderResult(null, false, message);
+        public static TypeReaderResponse FromSuccess(object value)
+            => new TypeReaderResponse(ImmutableArray.Create(new TypeReaderValue(value, 1.0f)), true, null);
+        public static TypeReaderResponse FromSuccess(TypeReaderValue value)
+            => new TypeReaderResponse(ImmutableArray.Create(value), true, null);
+        public static TypeReaderResponse FromSuccess(IReadOnlyCollection<TypeReaderValue> values)
+            => new TypeReaderResponse(values, true, null);
+        public static TypeReaderResponse FromError(string message)
+            => new TypeReaderResponse(null, false, message);
 
         public override string ToString() => IsSuccess ? "Success" : Message;
     }

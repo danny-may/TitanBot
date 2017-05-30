@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
@@ -11,7 +12,7 @@ namespace TitanBot2.TypeReaders.Readers
     public class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
-        public override Task<TypeReaderResult> Read(CmdContext context, string input)
+        public override Task<TypeReaderResponse> Read(CmdContext context, string input)
         {
             ulong id;
 
@@ -33,9 +34,9 @@ namespace TitanBot2.TypeReaders.Readers
                     AddResult(results, role as T, role.Name == input ? 0.80f : 0.70f);
 
                 if (results.Count > 0)
-                    return Task.FromResult(TypeReaderResult.FromSuccess(results.Values));
+                    return Task.FromResult(TypeReaderResponse.FromSuccess(results.Values));
             }
-            return Task.FromResult(TypeReaderResult.FromError("Role not found."));
+            return Task.FromResult(TypeReaderResponse.FromError("Role not found."));
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T role, float score)

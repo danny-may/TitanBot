@@ -1,28 +1,18 @@
 ﻿using Discord;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.Bot
 {
+    [Description("Allows you to make suggestions and feature requests for me!")]
     public class SuggestCommand : Command
     {
-        public SuggestCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => SuggestAsync((string)a[0]))
-                 .WithArgTypes(typeof(string))
-                 .WithItemAsParams(0);
-
-            Usage.Add("`{0} <suggestion>` - Sends a suggestion to my home guild.");
-            Description = "Allows you to make suggestions and feature requests for me!";
-        }
-
-        private async Task SuggestAsync(string message)
+        [Call]
+        [Usage("Sends a suggestion to my home guild.")]
+        public async Task SuggestAsync([Dense]string message)
         {
             if (Context.SuggestionChannel == null)
             {

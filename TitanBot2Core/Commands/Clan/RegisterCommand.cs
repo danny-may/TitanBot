@@ -1,15 +1,16 @@
 ﻿using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
+using TitanBot2.Services.CommandService.Models;
 using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Clan
 {
     public class RegisterCommand : Command
     {
-        public RegisterCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public RegisterCommand()
         {
-            RequiredContexts = Discord.Commands.ContextType.Guild;
-            RequireOwner = true;
+            //RequiredContexts = ContextType.Guild;
+            //RequireOwner = true;
         }
 
         private async Task RegisterAsync(int maxStage, string message)

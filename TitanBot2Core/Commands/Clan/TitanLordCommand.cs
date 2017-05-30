@@ -9,44 +9,24 @@ using TitanBot2.Commands.Data;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
+using TitanBot2.Services.CommandService.Attributes;
+using TitanBot2.Services.CommandService.Models;
 using TitanBot2.Services.Database.Models;
 using TitanBot2.Services.Scheduler;
 using TitanBot2.TimerCallbacks;
-using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Clan
 {
+    [Description("Used for Titan Lord timers and management")]
+    [DefaultPermission(8)]
+    [RequireContext(ContextType.Guild)]
+    [Alias("TL", "Boss")]
     class TitanLordCommand : Command
     {
         private static ConcurrentDictionary<ulong, object> _guildLocks = new ConcurrentDictionary<ulong, object>();
-        public TitanLordCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => TitanLordNowAsync())
-                 .WithSubCommand("Now");
-            Calls.AddNew(a => TitanLordWhenAsync())
-                 .WithSubCommand("When");
-            Calls.AddNew(a => TitanLordStopAsync())
-                 .WithSubCommand("Stop");
-            Calls.AddNew(a => TitanLordInfoAsync())
-                 .WithSubCommand("Info");
-            Calls.AddNew(a => TitanLordInAsync(new TimeSpan(6,0,0))) 
-                 .WithSubCommand("Dead");
-            Calls.AddNew(a => TitanLordInAsync((TimeSpan)a[0]))
-                 .WithSubCommand("In")
-                 .WithArgTypes(typeof(TimeSpan));
-            Alias.Add("TL");
-            Alias.Add("Boss");
-            Usage.Add("`{0} in <time>` - Sets a Titan Lord timer running for the given period.");
-            Usage.Add("`{0} dead` - Sets a Titan Lord timer running for 6 hours.");
-            Usage.Add("`{0} stop` - Stops any currently running timers.");
-            Usage.Add("`{0} when` - Gets the time until the Titan Lord is ready to be killed");
-            Usage.Add("`{0} info` - Gets information about the clans current level");
-            Usage.Add("`{0} now` - Alerts everyone that the Titan Lord is ready to be killed right now");
-            Description = "Used for Titan Lord timers and management";
-            DefaultPermission = 8;
-            RequiredContexts = Discord.Commands.ContextType.Guild;
-        }
 
+        [Call("In")]
+        [Usage("Sets a Titan Lord timer running for the given period.")]
         private Task TitanLordInAsync(TimeSpan time)
         {
             if (!_guildLocks.ContainsKey(Context.Guild.Id))
@@ -54,11 +34,16 @@ namespace TitanBot2.Commands.Clan
 
             lock (_guildLocks[Context.Guild.Id])
             {
-                LockedTitanLordIn(time).GetAwaiter().GetResult();
+                LockedTitanLordIn(time).Wait();
             }
 
             return Task.CompletedTask;
         }
+
+        [Call("Dead")]
+        [Usage("Sets a Titan Lord timer running for 6 hours.")]
+        private Task TitanLordDead()
+            => TitanLordInAsync(new TimeSpan(6, 0, 0));
 
         private async Task LockedTitanLordIn(TimeSpan time)
         {
@@ -102,7 +87,7 @@ namespace TitanBot2.Commands.Clan
                 MessageId = Context.Message.Id,
                 Callback = EventCallback.TitanLordRound,
                 From = timeNow.Add(time).AddHours(1),
-                SecondInterval = 60 * 60,
+                SecondInterval = 60 * 60 - 30,
                 To = timeNow.Add(time).AddDays(1)
             };
 
@@ -129,6 +114,8 @@ namespace TitanBot2.Commands.Clan
             await ReplyAsync($"Started a timer for **{time}**", ReplyType.Success);
         }
 
+        [Call("Now")]
+        [Usage("Alerts everyone that the Titan Lord is ready to be killed right now")]
         private async Task TitanLordNowAsync()
         {
             await CompleteExisting();
@@ -143,7 +130,7 @@ namespace TitanBot2.Commands.Clan
                 MessageId = Context.Message.Id,
                 Callback = EventCallback.TitanLordRound,
                 From = time.AddHours(1),
-                SecondInterval = 60 * 60,
+                SecondInterval = 60 * 60 - 30,
                 To = time.AddDays(1)
             };
             var nowTimer = new Timer
@@ -164,6 +151,8 @@ namespace TitanBot2.Commands.Clan
             await ReplyAsync("Ill let everyone know!", ReplyType.Success);
         }
 
+        [Call("When")]
+        [Usage("Gets the time until the Titan Lord is ready to be killed")]
         private async Task TitanLordWhenAsync()
         {
             var activeTimer = await Context.Database.Timers.GetLatest(Context.Guild.Id, EventCallback.TitanLordNow);
@@ -174,12 +163,16 @@ namespace TitanBot2.Commands.Clan
                 await ReplyAsync($"There will be a TitanLord in {(activeTimer.To.Value - DateTime.Now).Beautify()}", ReplyType.Success);
         }
 
+        [Call("Info")]
+        [Usage("Gets information about the clans current level")]
         private async Task TitanLordInfoAsync()
         {
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-            await ReplyAsync("", embed: ClanStatsCommand.StatsBuilder(Context.Client.CurrentUser, guildData.TitanLord.CQ).Build());
+            await ReplyAsync("", embed: ClanStatsCommand.StatsBuilder(Context.Client.CurrentUser, guildData.TitanLord.CQ, 4000, 500, new int[] { 20, 30, 40, 50 }).Build());
         }
 
+        [Call("Stop")]
+        [Usage("Stops any currently running timers.")]
         private async Task TitanLordStopAsync()
         {
             await CompleteExisting();

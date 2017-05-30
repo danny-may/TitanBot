@@ -4,23 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
+using TitanBot2.Services.CommandService.Models;
 
 namespace TitanBot2.Commands.Owner
 {
+    [Description("Sends a message to the owners of each server that I am on")]
+    [Alias("a")]
+    [RequireOwner]
     public class AnnounceCommand : Command
     {
-        public AnnounceCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => AnnounceAsync((string)a[0]))
-                 .WithArgTypes(typeof(string))
-                 .WithItemAsParams(0);
-            RequireOwner = true;
-            Usage.Add("`{0} <message>` - Instructs what message to send");
-            Description = "Sends a message to the owners of each server that I am on";
-        }
-
-        public async Task AnnounceAsync(string message)
+        [Call("this", "please")]
+        [Usage("Instructs what message to send")]
+        [RequireContext(ContextType.Guild)]
+        public async Task AnnounceAsync([Dense, Name("hmm")]string message, int[] test)
         {
             var builder = new EmbedBuilder
             {

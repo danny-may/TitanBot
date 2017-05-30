@@ -7,31 +7,26 @@ using System.Text;
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
+using TitanBot2.Services.CommandService.Attributes;
 using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Owner
 {
-    public class SetCommand : Command
+    [Description("Used to set various attributes about me")]
+    [RequireOwner]
+    class SetCommand : Command
     {
-        public SetCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        [Call("Avatar")]
+        [Usage("Sets my avatar.")]
+        async Task SetAvatarAsync(Uri location = null)
         {
-            Calls.AddNew(a => SetAvatarAsync((Uri)a[0]))
-                 .WithArgTypes(typeof(Uri))
-                 .WithSubCommand("Avatar");
-            Calls.AddNew(a => SetGameAsync((string)a[0]))
-                 .WithArgTypes(typeof(string))
-                 .WithItemAsParams(0)
-                 .WithSubCommand("Game");
-            Calls.AddNew(a => SetGameAsync(null))
-                 .WithSubCommand("Game");
-            RequireOwner = true;
-            Usage.Add("`{0} avatar <avatarUrl>` - Sets my avatar.");
-            Usage.Add("`{0} game <game>` - Sets my game.");
-            Description = "Used to set various attributes about me";
-        }
-
-        private async Task SetAvatarAsync(Uri location)
-        {
+            if (location == null && Context.Message.Attachments.Count > 0)
+                location = new Uri(Context.Message.Attachments.First().Url);
+            else if (location == null)
+            {
+                await ReplyAsync("You must provide an image as either an attachment or URL!", ReplyType.Error);
+                return;
+            }
             var msg = await ReplyAsync("Updating avatar...", ReplyType.Success);
             var imgBytes = await Context.WebClient.GetBytes(location, 0);
             var image = new Discord.Image(new MemoryStream(imgBytes));
@@ -42,7 +37,9 @@ namespace TitanBot2.Commands.Owner
             await ReplyAsync("Avatar updated!", ReplyType.Success);
         }
 
-        private async Task SetGameAsync(string game)
+        [Call("Game")]
+        [Usage("Sets my game")]
+        async Task SetGameAsync(string game = null)
         {
             game = game ?? "";
             await Context.Client.SetGameAsync(game);

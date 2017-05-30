@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
@@ -11,7 +12,7 @@ namespace TitanBot2.TypeReaders.Readers
     public class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
-        public override async Task<TypeReaderResult> Read(CmdContext context, string input)
+        public override async Task<TypeReaderResponse> Read(CmdContext context, string input)
         {
             if (context.Guild != null)
             {
@@ -32,10 +33,10 @@ namespace TitanBot2.TypeReaders.Readers
                     AddResult(results, channel as T, channel.Name == input ? 0.80f : 0.70f);
 
                 if (results.Count > 0)
-                    return TypeReaderResult.FromSuccess(results.Values);
+                    return TypeReaderResponse.FromSuccess(results.Values);
             }
 
-            return TypeReaderResult.FromError("Channel not found.");
+            return TypeReaderResponse.FromError("Channel not found.");
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T channel, float score)

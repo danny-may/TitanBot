@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 using TitanBot2.TypeReaders.Readers;
 
@@ -98,14 +99,15 @@ namespace TitanBot2.TypeReaders
             return null;
         }
 
-        public async Task<TypeReaderResult> Read(Type type, CmdContext context, string text)
+        public async Task<TypeReaderResponse> Read(Type type, CmdContext context, string text)
         {
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
             var readers = GetTypeReaders(type);
 
             var resultTasks = readers.Select(r => r.Value.Read(context, text)).ToArray();
-            Task.WaitAll(resultTasks);
 
-            var results = resultTasks.Select(r => r.Result);
+            var results = await Task.WhenAll(resultTasks);
 
             var success = results.Where(r => r.IsSuccess).OrderByDescending(r => r.Values.Max(v => v.Score));
 
@@ -115,9 +117,35 @@ namespace TitanBot2.TypeReaders
             if (results.Count() == 1)
                 return results.First();
             if (results.Count() > 0)
-                return TypeReaderResult.FromError($"Unable to read the value `{text}` as `{type.Name}`");
+                return TypeReaderResponse.FromError($"Unable to read the value `{text}` as `{type.Name}`");
 
-            return TypeReaderResult.FromError($"No reader found for type `{type.FullName}`");
+            return TypeReaderResponse.FromError($"No reader found for type `{type.FullName}`");
+        }
+
+        public CachedReader NewCache()
+        {
+            return new CachedReader(this);
+        }
+
+        public class CachedReader
+        {
+            private ConcurrentDictionary<ValueTuple<Type, string>, TypeReaderResponse> _results  = new ConcurrentDictionary<ValueTuple<Type, string>, TypeReaderResponse>();
+            private TypeReaderCollection _parent;
+
+            internal CachedReader(TypeReaderCollection parent)
+            {
+                _parent = parent;
+            }
+
+            public async Task<TypeReaderResponse> Read(Type type, CmdContext context, string text)
+            {
+                var key = ValueTuple.Create(type, text);
+                if (_results.TryGetValue(key, out TypeReaderResponse result))
+                    return result;
+
+                result = await _parent.Read(type, context, text);
+                return _results.GetOrAdd(key, result);
+            }
         }
     }
 }

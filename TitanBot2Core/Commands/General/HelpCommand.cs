@@ -1,28 +1,29 @@
 ﻿using Discord;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.General
 {
-    public class HelpCommand : Command
+    [Description("Displays help for any command")]
+    class HelpCommand : Command
     {
-        public HelpCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        [Call]
+        [Usage("Displays a list of all commands, or help for a single command")]
+        [CallFlag(typeof(string), "c", "Command to show help for")]
+        async Task HelpAsync(string command = null)
         {
-            Calls.AddNew(a => AllHelpAsync());
-            Calls.AddNew(a => HelpAsync((string)a[0]))
-                 .WithArgTypes(typeof(string));
-            Description = "Displays help for any command";
-            Usage.Add("`{0}` - Displays a list of all commands");
-            Usage.Add("`{0} <command>` - Displays help for a specific command");
+            if (command == null)
+                await AllHelpAsync();
+            else
+                await HelpCommandAsync(command);
         }
 
-        protected async Task AllHelpAsync()
+        async Task AllHelpAsync()
         {
             var prefixes = await Context.GetPrefixes();
             var builder = new EmbedBuilder()
@@ -40,49 +41,50 @@ namespace TitanBot2.Commands.General
                 }
             };
 
-            var commands = new List<CommandInfo>();
-            foreach (var cmd in Context.CommandService.Commands)
-            {
-                var obj = cmd.CreateInstance(Context, Readers);
-                var result = await obj.CheckCommandAsync();
-                if (result.IsSuccess)
-                    commands.Add(cmd);
-            }
-            var groups = commands.GroupBy(c => c.Group);
+            var commands = await Context.CommandService.FindAllowed(Context);
+
+            var groups = commands.GroupBy(c => c.Key.Group);
             foreach (var group in groups)
             {
-                builder.AddField(group.Key, string.Join(", ", group.Select(g => g.Name)));
+                builder.AddField(group.Key, string.Join(", ", group.GroupBy(g => g.Key.Name).Select(g => g.Key)));
             }
 
             await ReplyAsync("", embed: builder);
         }
 
-        private async Task HelpAsync(string name)
+        async Task HelpCommandAsync(string name)
         {
-            var searching = name.ToLower();
-            var command = Context.CommandService.Commands.SingleOrDefault(c => c.Alias.Select(a => a.ToLower()).Contains(searching));
+            name = name.ToLower();
 
-            if (command == null)
-            {
+            var classes = await Context.CommandService.FindAllowed(Context, name);
+
+            if (classes.Count() != 1)
+            { 
                 await ReplyAsync($"`{name}` is not a recognised command. Use `{Context.Prefix}help` for a list of all available commands", ReplyType.Error);
                 return;
             }
 
-            var usage = string.Join("\n", command.Usage.Select(u => string.Format(u, Context.Prefix + searching)));
+            var callInfos = classes.First();
+
+            var usage = string.Join("\n", callInfos.Select(c => $"`{Context.Prefix + name + (" " + string.Join(" ", c.Subcalls.Concat(c.GetParameters()))).TrimEnd()}` - {c.Usage}"));
             if (string.IsNullOrWhiteSpace(usage))
                 usage = "No usage available!";
             else
-                usage += "\n\n _`<param>` = required\n`[param]` = optional\n`<param...>` = accepts multiple (comma separated)_";
+                usage += "\n\n_`<param>` = required\n`[param]` = optional\n`<param...>` = accepts multiple (comma separated)_";
 
-            var aliases = string.Join(", ", command.Alias);
+            var aliases = callInfos.Key.Alias.Length == 0 ? "" : string.Join(", ", callInfos.Key.Alias.ToList());
 
-            var group = command.Group ?? "No categories!";
+            var group = callInfos.Key.Group ?? "No categories!";
+
+            var flags = string.Join("\n", callInfos.SelectMany(c => c.Flags).GroupBy(f => f.ShortKey.ToLower()).Select(g => g.First()));
+
+            var notes = callInfos.Key.Note;
 
             var builder = new EmbedBuilder
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = $"{Res.Str.InfoText} Help for {command.Name}",
-                Description = command.Description ?? "No description",
+                Title = $"{Res.Str.InfoText} Help for {callInfos.Key.Name}",
+                Description = callInfos.Key.Description ?? "No description",
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
@@ -91,10 +93,14 @@ namespace TitanBot2.Commands.General
                 }
             };
 
-            builder.AddField("Group", group);
+            builder.AddInlineField("Group", group);
             if (!string.IsNullOrWhiteSpace(aliases))
-                builder.AddField("Aliases", aliases);
+                builder.AddInlineField("Aliases", Format.Sanitize(aliases));
             builder.AddField("Usage", usage);
+            if (!string.IsNullOrWhiteSpace(flags))
+                builder.AddField("Flags", flags);
+            if (!string.IsNullOrWhiteSpace(notes))
+                builder.AddField("Notes", notes);
 
             await ReplyAsync("", embed: builder.Build());
         }

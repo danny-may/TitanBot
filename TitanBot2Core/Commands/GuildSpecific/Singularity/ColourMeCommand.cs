@@ -12,13 +12,12 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
     public class ColourMeCommand : Command
     {
-        public ColourMeCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ColourMeCommand()
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 
-            Calls.AddNew(a => ColourRole((System.Drawing.Color)a[0]))
-                 .WithArgTypes(typeof(System.Drawing.Color))
-                 .WithItemAsParams(0);
+            //Handlers.AddNew(a => ColourRole((System.Drawing.Color)a[0]))
+            //     .WithItemAsParams(0);
         }
 
         private ulong _dailyChamp = 314036070100500493;

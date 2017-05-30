@@ -11,13 +11,15 @@ using TitanBot2.Models;
 using TitanBot2.Services.CommandService;
 using TitanBot2.TypeReaders;
 using TitanBot2.TypeReaders.Readers;
+using TitanBot2.Services.CommandService.Models;
+using TitanBot2.Responses;
 
 namespace TitanBot2.Services
 {
     public class BotCommandService
     {
-        public IReadOnlyList<CommandInfo> Commands { get { return _commands; } }
-        private List<CommandInfo> _commands = new List<CommandInfo>();
+        public IReadOnlyList<CommandInfo> Commands { get { return _calls; } }
+        private List<CommandInfo> _calls = new List<CommandInfo>();
         private TypeReaderCollection _readers = new TypeReaderCollection();
 
         private object _lock = new object();
@@ -30,11 +32,10 @@ namespace TitanBot2.Services
                 {
                     var commandQuery = assembly.GetTypes()
                                             .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(Command)));
+
                     foreach (var type in commandQuery)
                     {
-                        var cmdInfo = CommandInfo.FromType(type);
-                        if (cmdInfo != null)
-                            _commands.Add(cmdInfo);
+                        _calls.Add(CommandInfo.FromType(type));
                     }
 
                     _readers.AddTypeReader<Artifact>(new ArtifactTypeReader());
@@ -47,46 +48,71 @@ namespace TitanBot2.Services
             });
         }
 
-        public async Task ExecuteAsync(CmdContext context, int argPos)
+        public void ExecuteAsync(CmdContext context)
         {
-            if (context.Command == null)
-                return;
+            Task.Run(async () =>
+            {
 
-            context.CommandService = this;
+                if (context.Command == null)
+                    return;
 
-            var cmdInfos = Commands.Where(c => c.Alias.Select(a => a.ToLower()).Contains(context.Command.ToLower()));
+                context.CommandService = this;
+
+                var allowed = await FindAllowed(context, context.Command);
+
+                if (allowed.Count() == 0 && context.ExplicitCommand)
+                {
+                    await context.Channel.SendMessageSafeAsync(Command.FormatMessage("That command either does not exist, or you do not have permission to use it!", Command.ReplyType.Error));
+                    return;
+                }
+                else if (allowed.Count() != 1)
+                    return;
+
+                var inst = allowed.First().Key.CreateInstance(context, _readers);
+                var calls = allowed.First();
+
+                Dictionary<CallInfo, SignatureMatchResponse> validationResults;
+                var reader = _readers.NewCache();
+                var validators = calls.ToDictionary(c => c, c => c.ValidateSignature(context, reader));
+                await Task.WhenAll(validators.Select(v => v.Value));
+                validationResults = validators.ToDictionary(v => v.Key, v => v.Value.Result);
+
+                var valid = validationResults.Where(r => r.Value.IsSuccess).OrderByDescending(v => v.Value.Weight);
+                var invalid = validationResults.Where(r => !r.Value.IsSuccess);
+
+                if (valid.Count() == 0)
+                {
+                    await context.Channel.SendMessageSafeAsync(Command.FormatMessage($"There was an issue with the arguments you gave. Try using `{context.Prefix}help {calls.Key.Name}` for usage", Command.ReplyType.Error));
+                    return;
+                }
+
+                var success = false;
+                foreach (var call in valid)
+                {
+                    foreach (var arg in call.Value.Arguments)
+                    {
+                        success = await inst.ExecuteAsync(call.Key, arg, call.Value.Flags);
+                        if (success)
+                            break;
+                    }
+                    if (success)
+                        break;
+                }
+            });
+        }
+
+        public async Task<IEnumerable<IGrouping<CommandInfo, CallInfo>>> FindAllowed(CmdContext context, string command = null)
+            => (await FindCommand(context, command)).Where(c => c.Value.IsSuccess)
+                                                    .Select(c => c.Key)
+                                                    .GroupBy(c => c.ParentInfo);
+
+        public async Task<Dictionary<CallInfo, CallCheckResponse>> FindCommand(CmdContext context, string command = null)
+        {
+            var cmdInfos = Commands.Where(c => command == null || c.Alias.Select(a => a.ToLower()).Contains(command.ToLower()) || c.Name.ToLower() == command.ToLower());
+
+            var checkResults = cmdInfos.Select(c => c.CheckCalls(context, _readers));
+            return (await Task.WhenAll(checkResults)).SelectMany(c => c).ToDictionary(c => c.Key, c => c.Value);
             
-            var responses = new Dictionary<Command, CommandCheckResponse>();
-
-            foreach (var cmdInfo in cmdInfos)
-            {
-                var command = cmdInfo.CreateInstance(context, _readers);
-                responses.Add(command, await command.CheckCommandAsync());
-            }
-
-            if (!responses.Any(r => r.Value.IsSuccess))
-            {
-                foreach (var response in responses)
-                {
-                    if (!string.IsNullOrWhiteSpace(response.Value.Message))
-                        await context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} {response.Value.Message}");
-                }
-                return;
-            }
-
-            var successCommand = responses.Where(r => r.Value.IsSuccess).Select(r => r.Key).SingleOrDefault();
-
-            if (successCommand == null)
-                await context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} I was unable to determine which command to run!");
-            else
-                try
-                {
-                    new Task(async () => await successCommand.ExecuteAsync()).Start();
-                }
-                catch (Exception ex)
-                {
-                    await context.Logger.Log(ex, successCommand.Name);
-                }
         }
     }
 }

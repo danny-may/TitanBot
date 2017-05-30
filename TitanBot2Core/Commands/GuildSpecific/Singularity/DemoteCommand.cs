@@ -21,15 +21,14 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
             312177555379585024,
         };
 
-        public DemoteCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public DemoteCommand()
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 
-            Calls.AddNew(a => Demote((SocketGuildUser)a[0]))
-                 .WithArgTypes(typeof(SocketGuildUser))
-                 .WithItemAsParams(0);
-
-            Description = "Demotes a user down the ranks";
+            //Handlers.AddNew(a => Demote((SocketGuildUser)a[0]))
+            //     .WithItemAsParams(0);
+            //
+            //Description = "Demotes a user down the ranks";
         }
 
         private async Task Demote(SocketGuildUser user)

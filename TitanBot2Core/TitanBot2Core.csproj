@@ -35,9 +35,6 @@
       <HintPath>..\packages\Csv.1.0.11\lib\dotnet\Csv.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Discord.Net.Commands, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Commands.1.0.0-rc3-00742\lib\netstandard1.1\Discord.Net.Commands.dll</HintPath>
-    </Reference>
     <Reference Include="Discord.Net.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Net.Core.1.0.0-rc3-00742\lib\net45\Discord.Net.Core.dll</HintPath>
     </Reference>
@@ -246,13 +243,30 @@
     <Compile Include="Commands\Owner\SetCommand.cs" />
     <Compile Include="Commands\Owner\ShutdownCommand.cs" />
     <Compile Include="Commands\Owner\TestCommand.cs" />
+    <Compile Include="Common\FluentSwitcher.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Responses\ArgumentReadResponse.cs" />
+    <Compile Include="Services\CommandService\Models\ArgumentInfo.cs" />
+    <Compile Include="Services\CommandService\Attributes\AliasAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\CallAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\DefaultPermissionAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\DenseAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\DescriptionAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\NotesAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\CallFlagAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\GroupAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\NameAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\RequireContextAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\RequireOwnerAttribute.cs" />
+    <Compile Include="Services\CommandService\Attributes\UsageAttribute.cs" />
+    <Compile Include="Services\CommandService\CmdSplitter.cs" />
     <Compile Include="Common\PerformanceMonitor.cs" />
     <Compile Include="Extensions\ICsvLineExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IntExtensions.cs" />
     <Compile Include="Extensions\IUserMessageExtensions.cs" />
-    <Compile Include="GuildSpecific\GuildSpecificHandler.cs" />
-    <Compile Include="GuildSpecific\YortKingdom.cs" />
+    <Compile Include="GuildSpecificHandler\GuildSpecificHandler.cs" />
+    <Compile Include="GuildSpecificHandler\YortKingdom.cs" />
     <Compile Include="Models\Enums\ArtifactTier.cs" />
     <Compile Include="Models\Enums\EquipmentRarity.cs" />
     <Compile Include="Models\Enums\EquipmentSource.cs" />
@@ -261,25 +275,23 @@
     <Compile Include="Models\HelperSkill.cs" />
     <Compile Include="Models\HighScoreSheet.cs" />
     <Compile Include="Models\Pet.cs" />
-    <Compile Include="Services\CommandService\CallCollection.cs" />
+    <Compile Include="Services\CommandService\Flags\FlagCollection.cs" />
+    <Compile Include="Services\CommandService\Flags\FlagInfo.cs" />
     <Compile Include="Services\CommandService\Command.cs" />
     <Compile Include="Common\Calculator.cs" />
     <Compile Include="Common\Configuration.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="Common\Res.cs" />
-    <Compile Include="Services\CommandService\CommandCall.cs" />
     <Compile Include="Services\CommandService\CmdContext.cs" />
     <Compile Include="Common\BotDependencies.cs" />
     <Compile Include="Extensions\BeautifyExtensions.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
-    <Compile Include="Extensions\CommandServiceExtensions.cs" />
     <Compile Include="Extensions\DiscordSocketClientExtensions.cs" />
     <Compile Include="Extensions\GuildPermissionExtension.cs" />
     <Compile Include="Extensions\GuildPermissionsExtensions.cs" />
     <Compile Include="Extensions\IGuildUserExtensions.cs" />
     <Compile Include="Extensions\IMessageChannelExtensions.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
-    <Compile Include="Extensions\ModuleInfoExtensions.cs" />
     <Compile Include="Extensions\SocketGuildExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="DiscordHandlers\ChannelHandler.cs" />
@@ -293,8 +305,12 @@
     <Compile Include="Models\Enums\HelperType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CachedWebClient.cs" />
-    <Compile Include="Services\CommandService\CommandCheckResponse.cs" />
-    <Compile Include="Services\CommandService\CommandInfo.cs" />
+    <Compile Include="Responses\CallCheckResponse.cs" />
+    <Compile Include="Services\CommandService\Models\CallInfo.cs" />
+    <Compile Include="Services\CommandService\Models\CommandInfo.cs" />
+    <Compile Include="Services\CommandService\Flags\FlagValue.cs" />
+    <Compile Include="Responses\SignatureMatchResponse.cs" />
+    <Compile Include="Services\CommandService\Models\ContextType.cs" />
     <Compile Include="Services\CommandService\TitanBotCommandService.cs" />
     <Compile Include="Services\Database\DbConnection.cs" />
     <Compile Include="Services\Database\Extensions\CmdPermExtensions.cs" />
@@ -334,7 +350,7 @@
     <Compile Include="TypeReaders\Readers\UserTypeReader.cs" />
     <Compile Include="TypeReaders\TypeReader.cs" />
     <Compile Include="TypeReaders\TypeReaderCollection.cs" />
-    <Compile Include="TypeReaders\TypeReaderResult.cs" />
+    <Compile Include="Responses\TypeReaderResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

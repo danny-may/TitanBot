@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.General
 {
-    public class AboutCommand : Command
+    [Description("A tiny command that just displays some helpful links :)")]
+    class AboutCommand : Command
     {
-        public AboutCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public AboutCommand()
         {
-            Calls.AddNew(a => ShowAbout());
-            Usage.Add("`{0}` - Shows some about text for me");
-            Description = "A tiny command that just displays some helpful links :";
             _specialThanks = new Dictionary<ulong, string>
             {
                 {181829392027090954, "Awesome guy, helped out with the initial testing of titanbot" },
@@ -26,7 +21,9 @@ namespace TitanBot2.Commands.General
 
         private Dictionary<ulong, string> _specialThanks;
 
-        public async Task ShowAbout()
+        [Call]
+        [Usage("Shows some about text for me")]
+        async Task ShowAbout()
         {
             var message = $"'Ello there :wave:, Im {Context.Client.CurrentUser.Username}! Im an open source discord bot dedicated to TT2 written in C# by {Context.Client.GetUser(135556895086870528).Username}.\n" +
                           $"I can do a variety of things, all of which are better documented in my `{Context.Prefix}help` command!\n\n" +

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System.Globalization;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
@@ -9,7 +10,7 @@ namespace TitanBot2.TypeReaders.Readers
         where T : class, IMessage
     { 
 
-        public override async Task<TypeReaderResult> Read(CmdContext context, string value)
+        public override async Task<TypeReaderResponse> Read(CmdContext context, string value)
         {
             ulong id;
 
@@ -18,10 +19,10 @@ namespace TitanBot2.TypeReaders.Readers
             {
                 var msg = await context.Channel.GetMessageAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T;
                 if (msg != null)
-                    return TypeReaderResult.FromSuccess(msg);
+                    return TypeReaderResponse.FromSuccess(msg);
             }
 
-            return TypeReaderResult.FromError("Message not found.");
+            return TypeReaderResponse.FromError("Message not found.");
         }
     }
 }

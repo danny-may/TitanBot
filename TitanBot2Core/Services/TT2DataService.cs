@@ -43,7 +43,7 @@ namespace TitanBot2.Services
 
             await Task.WhenAll(res.Select(r => r.Value));
 
-            return res.ToDictionary(r => r.Key, r => r.Value.GetAwaiter().GetResult());
+            return res.ToDictionary(r => r.Key, r => r.Value.Result);
         }
 
         private async Task<Bitmap> GetImage(string url, int retries = 1)

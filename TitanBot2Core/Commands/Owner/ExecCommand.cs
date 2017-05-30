@@ -11,26 +11,20 @@ using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.Owner
 {
-    public class ExecCommand : Command
+    [Description("Allows for arbitrary code execution")]
+    [RequireOwner]
+    class ExecCommand : Command
     {
-        public ExecCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => ExecAsync())
-                 .WithArgTypes(typeof(string))
-                 .WithItemAsParams(0);
 
-            RequireOwner = true;
-            Usage.Add("`{0} <code>` - Executes arbitrary code");
-            Description = "Allows for arbitrary code execution";
-        }
-
-        public async Task ExecAsync()
+        [Call]
+        [Usage("Executes arbitrary code")]
+        async Task ExecAsync([Dense]string code)
         {
-            var code = Context.Message.Content.Substring(Context.Prefix.Length + Context.Command.Length);
+            code = Context.Message.Content.Substring(Context.Prefix.Length + Context.Command.Length + 1);
 
             var codeWithUsings = $@"using Discord;
 using Discord.Commands;
@@ -72,7 +66,8 @@ using System.Threading.Tasks;
                                                                                         Assembly.Load("System.Threading.Tasks, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")),
                                                    typeof(ExecGlobals));
                 compiled.Compile();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             { result = ex; }
 
             var compileDone = DateTime.Now;
@@ -80,7 +75,8 @@ using System.Threading.Tasks;
             try
             {
                 result = (await compiled?.RunAsync(globals))?.ReturnValue ?? result;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             { result = ex; }
             var executeDone = DateTime.Now;
 
@@ -114,10 +110,10 @@ using System.Threading.Tasks;
 
             await ReplyAsync("", embed: builder.Build(), handler: ex => Context.BotClient.Logger.Log(ex, "ExecModule"));
         }
-    }
 
-    public class ExecGlobals
-    {
-        public CmdContext Context { get; set; }
+        class ExecGlobals
+        {
+            public CmdContext Context { get; set; }
+        }
     }
 }

@@ -64,7 +64,7 @@ namespace TitanBot2
             };
             
             TimerService = new TimerService(Dependencies);
-            TimerService.Install(Assembly.GetExecutingAssembly()).GetAwaiter().GetResult();
+            TimerService.Install(Assembly.GetExecutingAssembly()).Wait();
             Dependencies.TimerService = TimerService;
 
             Client.Log += l => Logger.Log(l);

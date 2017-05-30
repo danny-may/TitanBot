@@ -1,29 +1,21 @@
 ﻿using Discord;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
-using DC = Discord.Commands;
+using TitanBot2.Services.CommandService.Attributes;
+using TitanBot2.Services.CommandService.Models;
 
 namespace TitanBot2.Commands.Admin
 {
-    public class NotifyCommand : Command
+    [Description("Used to enable/disable notifications of various bot events")]
+    [Notes("Valid notifications are:\nalive (online)\ndead (offline)")]
+    [RequireContext(ContextType.Guild)]
+    [DefaultPermission(8)]
+    class NotifyCommand : Command
     {
-        public NotifyCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Calls.AddNew(a => ListTypesAsync((NotificationType)a[0]))
-                 .WithArgTypes(typeof(NotificationType));
-            Calls.AddNew(a => ListTypesAsync((NotificationType)a[0], (IMessageChannel)a[1]))
-                 .WithArgTypes(typeof(NotificationType), typeof(IMessageChannel));
-            Usage.Add("`{0} <notification> [channel]` - Sets which channel each notification should appear in.");
-            Usage.Add("Valid notifications are:\n" + string.Join("\n", Enum.GetNames(typeof(NotificationType))));
-            Description = "Used to enable/disable notifications of various bot events";
-            RequiredContexts = DC.ContextType.Guild;
-            DefaultPermission = 8;
-        }
-
-        public async Task ListTypesAsync(NotificationType notificationType, IMessageChannel channel = null)
+        [Call]
+        [Usage("Sets which channel each notification should appear in.")]
+        async Task SwitchTypesAsync(NotificationType notificationType, IMessageChannel channel = null)
         {
             switch (notificationType)
             {
@@ -38,7 +30,7 @@ namespace TitanBot2.Commands.Admin
             }
         }
 
-        public enum NotificationType
+        enum NotificationType
         {
             alive,
             online,
@@ -46,7 +38,7 @@ namespace TitanBot2.Commands.Admin
             offline
         }
 
-        public async Task SetAliveAsync(IMessageChannel channel)
+        async Task SetAliveAsync(IMessageChannel channel)
         {
             if (channel != null && !Context.Guild.Channels.Select(c => c.Id).Contains(channel.Id))
             {
@@ -64,7 +56,7 @@ namespace TitanBot2.Commands.Admin
 
         }
 
-        public async Task SetDeadAsync(IMessageChannel channel)
+        async Task SetDeadAsync(IMessageChannel channel)
         {
             if (channel != null && !Context.Guild.Channels.Select(c => c.Id).Contains(channel.Id))
             {

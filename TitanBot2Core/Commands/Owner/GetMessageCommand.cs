@@ -2,31 +2,19 @@
 using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
-using TitanBot2.TypeReaders;
+using TitanBot2.Services.CommandService.Attributes;
 
 namespace TitanBot2.Commands.Owner
 {
-    public class GetMessageCommand : Command
+    [Description("Gets a single message")]
+    [RequireOwner]
+    class GetMessageCommand : Command
     {
-        public GetMessageCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        [Call]
+        [Usage("Gets the given message from the current or given channel")]
+        async Task GetMessageAsync(ulong messageId, ulong? channelId = null, bool escape = false)
         {
-            Calls.AddNew(a => GetMessageAsync(Context.Channel.Id, (ulong)a[0]))
-                 .WithArgTypes(typeof(ulong));
-            Calls.AddNew(a => GetMessageAsync(Context.Channel.Id, (ulong)a[0], (bool)a[1]))
-                 .WithArgTypes(typeof(ulong), typeof(bool));
-            Calls.AddNew(a => GetMessageAsync((ulong)a[0], (ulong)a[1]))
-                 .WithArgTypes(typeof(ulong), typeof(ulong));
-            Calls.AddNew(a => GetMessageAsync((ulong)a[0], (ulong)a[1], (bool)a[2]))
-                 .WithArgTypes(typeof(ulong), typeof(ulong), typeof(bool));
-            Description = "Gets a single message";
-            Usage.Add("`{0} <messageId> [escaped]` - Gets the given message from the current channel");
-            Usage.Add("`{0} <channelId> <messageId> [escaped]` - Gets the given message from the given channel");
-            RequireOwner = true;
-        }
-
-        private async Task GetMessageAsync(ulong channelId, ulong messageId, bool escape = false)
-        {
-            var channel = Context.Client.GetChannel(channelId) as IMessageChannel;
+            var channel = Context.Client.GetChannel(channelId ?? Context.Channel.Id) as IMessageChannel;
             if (channel == null)
             {
                 await ReplyAsync("I could not find that channel!", ReplyType.Error);

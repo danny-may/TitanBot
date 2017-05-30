@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
@@ -24,12 +26,12 @@ namespace TitanBot2.TypeReaders.Readers
             _tryParse = PrimitiveParsers.Get<T>();
         }
 
-        public override Task<TypeReaderResult> Read(CmdContext context, string input)
+        public override Task<TypeReaderResponse> Read(CmdContext context, string input)
         {
             T value;
             if (_tryParse(input, out value))
-                return Task.FromResult(TypeReaderResult.FromSuccess(value));
-            return Task.FromResult(TypeReaderResult.FromError($"Failed to parse {typeof(T).Name}"));
+                return Task.FromResult(TypeReaderResponse.FromSuccess(value));
+            return Task.FromResult(TypeReaderResponse.FromError($"Failed to parse {typeof(T).Name}"));
         }
     }
 
@@ -71,8 +73,6 @@ namespace TitanBot2.TypeReaders.Readers
             };
             return parserBuilder.ToImmutable();
         }
-
-
 
         public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)_parsers.Value[typeof(T)];
         public static Delegate Get(Type type) => _parsers.Value[type];

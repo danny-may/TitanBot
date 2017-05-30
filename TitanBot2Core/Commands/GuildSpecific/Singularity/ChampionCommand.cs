@@ -11,20 +11,18 @@ namespace TitanBot2.Commands.GuildSpecific.Singularity
 {
     public class ChampionCommand : Command
     {
-        public ChampionCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
+        public ChampionCommand()
         {
             GuildRestrictions = new ulong[] { 307803032534646785 };
 
-            Calls.AddNew(a => SetChampAsync((SocketGuildUser)a[0], _dailyChamp))
-                 .WithArgTypes(typeof(SocketGuildUser))
-                 .WithSubCommand("Daily")
-                 .WithItemAsParams(0);
-            Calls.AddNew(a => SetChampAsync((SocketGuildUser)a[0], _weeklyChamp))
-                 .WithArgTypes(typeof(SocketGuildUser))
-                 .WithSubCommand("Weekly")
-                 .WithItemAsParams(0);
-
-            DefaultPermission = 8;
+            //Handlers.AddNew(a => SetChampAsync((SocketGuildUser)a[0], _dailyChamp))
+            //     .WithSubCommand("Daily")
+            //     .WithItemAsParams(0);
+            //Handlers.AddNew(a => SetChampAsync((SocketGuildUser)a[0], _weeklyChamp))
+            //     .WithSubCommand("Weekly")
+            //     .WithItemAsParams(0);
+            //
+            //DefaultPermission = 8;
 
         }
 

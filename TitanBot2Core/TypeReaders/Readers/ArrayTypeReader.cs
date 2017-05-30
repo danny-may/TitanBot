@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
 namespace TitanBot2.TypeReaders.Readers
@@ -27,12 +28,12 @@ namespace TitanBot2.TypeReaders.Readers
             _parser = parser;
         }
 
-        public override async Task<TypeReaderResult> Read(CmdContext context, string value)
+        public override async Task<TypeReaderResponse> Read(CmdContext context, string value)
         {
             var values = new List<T>();
 
             if (_parser == null)
-                return TypeReaderResult.FromError($"No reader found for `{typeof(T)}`");
+                return TypeReaderResponse.FromError($"No reader found for `{typeof(T)}`");
 
             foreach (var item in value.Split(','))
             {
@@ -40,10 +41,10 @@ namespace TitanBot2.TypeReaders.Readers
                 if (response.IsSuccess)
                     values.Add((T)response.Best);
                 else
-                    return TypeReaderResult.FromError($"`{item.Trim()}` is not a valid `{typeof(T).Name}`");
+                    return TypeReaderResponse.FromError($"`{item.Trim()}` is not a valid `{typeof(T).Name}`");
             }
 
-            return TypeReaderResult.FromSuccess(values.ToArray());
+            return TypeReaderResponse.FromSuccess(values.ToArray());
         }
     }
 }

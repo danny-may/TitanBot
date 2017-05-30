@@ -1,22 +1,17 @@
 ﻿using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
+using TitanBot2.Services.CommandService.Attributes;
 using TitanBot2.Services.Database.Models;
-using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Data
 {
-    public class ClaimCommand : Command
+    [Description("Used to tie your discord account to your ingame account. Will be used in the future for API access")]
+    class ClaimCommand : Command
     {
-        public ClaimCommand(CmdContext context, TypeReaderCollection readers) : base(context, readers)
-        {
-            Description = "Claims a support code. Not currently used for anything, but will be used later for API calls";
-            Usage.Add("`{0} <support code>` - Claims a support code as your own.");
-            Calls.AddNew(a => ClaimCodeAsync((string)a[0]))
-                 .WithArgTypes(typeof(string));
-            Description = "Used to tie your discord account to your ingame account. Will be used in the future for API access!";
-        }
 
-        protected async Task ClaimCodeAsync(string supportCode)
+        [Call]
+        [Usage("Claims a support code as your own.")]
+        async Task ClaimCodeAsync(string supportCode)
         {
             if (supportCode == null)
             {
