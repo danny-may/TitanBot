@@ -12,7 +12,7 @@ namespace TitanBot2.Commands.Owner
     {
         [Call]
         [Usage("Sets a timer going for the bot to shut down, along with a reason")]
-        async Task ShutDown(TimeSpan? time = null, string reason = null)
+        async Task ShutDown(TimeSpan? time = null, [Dense]string reason = null)
         {
             await ReplyAsync("Starting shut down sequence!");
             Context.BotClient.StopAsync(time, reason).AllowRun();
