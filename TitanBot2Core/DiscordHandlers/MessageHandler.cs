@@ -91,7 +91,7 @@ namespace TitanBot2.DiscordHandlers
 
             var context = new CmdContext(Dependencies, msg);
             
-            if (await context.IsCommand())
+            if (context.IsCommand())
             {
                 _cmds.ExecuteAsync(context);
             }

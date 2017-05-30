@@ -12,7 +12,7 @@ namespace TitanBot2.Services.Database.Extensions
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command)
             => await GetCmdPerm(guildid, command, null);
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command, Func<Exception, Task> handler)
-            => await Database.QueryAsync(conn => conn.CmdPermTable.FindOne(c => c.guildId == guildid && c.commandname == command), handler);
+            => await Database.QueryAsync(conn => conn.CmdPermTable.FindOne(c => c.guildId == guildid && c.commandname.ToLower() == command.ToLower()), handler);
 
         public async Task SetCmdPerm(ulong guildid, string command, ulong[] roleIds = null, ulong? permission = null)
             => await SetCmdPerm(guildid, command, null, roleIds, permission);

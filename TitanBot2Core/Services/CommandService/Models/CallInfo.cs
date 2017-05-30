@@ -17,7 +17,7 @@ namespace TitanBot2.Services.CommandService.Models
         public MethodInfo Call { get; }
         public CommandInfo ParentInfo { get; }
         public string Usage => UsageAttribute.GetFrom(this);
-        public ulong DefaultPermissions => DefaultPermissionAttribute.GetFrom(this);
+        public ulong DefaultPermissions => DefaultPermissionAttribute.GetPerm(this);
         public string PermissionKey => DefaultPermissionAttribute.GetKey(this);
         public ContextType RequiredContexts => RequireContextAttribute.GetFrom(this);
         public bool RequireOwner => RequireOwnerAttribute.GetFrom(this);
@@ -66,14 +66,9 @@ namespace TitanBot2.Services.CommandService.Models
 
             var parsedArguments = await ReadArguments(readers, context, args);
 
-            var successful = parsedArguments.Where(a => a.IsSuccess);
-
-            if (successful.Count() == 0)
-                return SignatureMatchResponse.FromError();
-
             var flags = new FlagCollection(context, readers, Flags, context.Flags);
 
-            return SignatureMatchResponse.FromSuccess(successful.ToArray(), flags);
+            return SignatureMatchResponse.FromSuccess(parsedArguments.ToArray(), flags);
         }
 
         private bool CheckSubcommand(CmdContext context, out string[] arguments)
@@ -151,6 +146,14 @@ namespace TitanBot2.Services.CommandService.Models
                 yield return Parameters.Zip(mask, (a,m) => m ? a : null).ToArray();
                 counter--;
             }
+        }
+
+        public bool Matches(string name)
+        {
+            var namePath = name.ToLower().Split('.');
+            var keyPath = PermissionKey.ToLower().Split('.');
+            return namePath.Length <= keyPath.Length &&
+                   namePath.Zip(keyPath, (n, k) => n == k).All(a => a);
         }
 
         public static CallInfo[] FromCommandInfo(CommandInfo t)

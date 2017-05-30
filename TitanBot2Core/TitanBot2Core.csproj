@@ -244,6 +244,7 @@
     <Compile Include="Commands\Owner\ShutdownCommand.cs" />
     <Compile Include="Commands\Owner\TestCommand.cs" />
     <Compile Include="Common\FluentSwitcher.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Responses\ArgumentReadResponse.cs" />
     <Compile Include="Services\CommandService\Attributes\RequireGuildAttribute.cs" />

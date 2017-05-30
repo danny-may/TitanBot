@@ -13,7 +13,7 @@ namespace TitanBot2.Responses
         public string Message { get; private set; }
         public Reason ErrorReason { get; private set; }
         public object[] ParsedArguments { get; private set; }
-        public double Weight => ParsedArguments.Sum(a => Weigh(a?.GetType()));
+        public double Weight => ParsedArguments?.Sum(a => Weigh(a?.GetType())) ?? 0;
 
         public static ArgumentReadResponse FromSuccess(TypeReaderResponse[] args)
         {

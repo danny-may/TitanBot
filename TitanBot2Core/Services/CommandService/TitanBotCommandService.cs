@@ -62,7 +62,7 @@ namespace TitanBot2.Services
 
                 if (allowed.Count() == 0 && context.ExplicitCommand)
                 {
-                    await context.Channel.SendMessageSafeAsync(Command.FormatMessage("That command either does not exist, or you do not have permission to use it!", Command.ReplyType.Error));
+                    await SendError(context, "That command either does not exist, or you do not have permission to use it!");
                     return;
                 }
                 else if (allowed.Count() != 1)
@@ -77,19 +77,19 @@ namespace TitanBot2.Services
                 await Task.WhenAll(validators.Select(v => v.Value));
                 validationResults = validators.ToDictionary(v => v.Key, v => v.Value.Result);
 
-                var valid = validationResults.Where(r => r.Value.IsSuccess).OrderByDescending(v => v.Value.Weight);
-                var invalid = validationResults.Where(r => !r.Value.IsSuccess);
+                var validCalls = validationResults.Where(r => r.Value.IsSuccess).OrderByDescending(v => v.Value.Weight);
+                var invalidCalls = validationResults.Where(r => !r.Value.IsSuccess);
 
-                if (valid.Count() == 0)
+                if (validCalls.Count() == 0)
                 {
-                    await context.Channel.SendMessageSafeAsync(Command.FormatMessage($"There was an issue with the arguments you gave. Try using `{context.Prefix}help {calls.Key.Name}` for usage", Command.ReplyType.Error));
+                    await SendError(context, "The arguments you gave could not be matched to a command/subcommand");
                     return;
                 }
 
                 var success = false;
-                foreach (var call in valid)
+                foreach (var call in validCalls)
                 {
-                    foreach (var arg in call.Value.Arguments)
+                    foreach (var arg in call.Value.Arguments.Where(a => a.IsSuccess))
                     {
                         success = await inst.ExecuteAsync(call.Key, arg, call.Value.Flags);
                         if (success)
@@ -98,7 +98,33 @@ namespace TitanBot2.Services
                     if (success)
                         break;
                 }
+
+                if (!success)
+                    await SendError(context, TextForError(validCalls.First().Value.Arguments.First().ErrorReason), true);
             });
+        }
+
+        private string TextForError(ArgumentReadResponse.Reason reason)
+        {
+            switch (reason)
+            {
+                case ArgumentReadResponse.Reason.IncorrectArgumentType:
+                    return "The arguments you gave were of the wrong type";
+                case ArgumentReadResponse.Reason.NotEnoughArguments:
+                    return "You have not supplied enough arguments.";
+                case ArgumentReadResponse.Reason.TooManyArguments:
+                    return "You have suppplied too many arguments.";
+                default:
+                    return "Fucked if I know why this failed";
+            }
+        }
+
+        private async Task SendError(CmdContext context, string message, bool force = false)
+        {
+            if (!context.ExplicitCommand && !force)
+                return;
+
+            await context.Channel.SendMessageSafeAsync(Command.FormatMessage(message, Command.ReplyType.Error));
         }
 
         public async Task<IEnumerable<IGrouping<CommandInfo, CallInfo>>> FindAllowed(CmdContext context, string command = null)
@@ -111,6 +137,7 @@ namespace TitanBot2.Services
             var cmdInfos = Commands.Where(c => command == null || c.Alias.Select(a => a.ToLower()).Contains(command.ToLower()) || c.Name.ToLower() == command.ToLower());
 
             var checkResults = cmdInfos.Select(c => c.CheckCalls(context, _readers));
+            await Task.WhenAll(checkResults);
             return (await Task.WhenAll(checkResults)).SelectMany(c => c).ToDictionary(c => c.Key, c => c.Value);
             
         }

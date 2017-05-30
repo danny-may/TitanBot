@@ -52,7 +52,7 @@ namespace TitanBot2.Services.CommandService
             _splitter = new CmdSplitter(Database, Message, Client.CurrentUser, User, Channel);
         }
 
-        public async Task<bool> IsCommand()
+        public bool IsCommand()
         {
             return Prefix != null && Command != null;
         }

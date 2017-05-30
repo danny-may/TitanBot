@@ -16,7 +16,7 @@ namespace TitanBot2.Services.CommandService.Models
         public string Name => NameAttribute.GetFrom(this);
         public string[] Alias => AliasAttribute.GetFom(this);
         public string Description => DescriptionAttribute.GetFrom(this);
-        public ulong DefaultPermissions => DefaultPermissionAttribute.GetFrom(this);
+        public ulong DefaultPermissions => DefaultPermissionAttribute.GetPerm(this);
         public ContextType RequiredContexts => RequireContextAttribute.GetFrom(this);
         public string PermissionKey => DefaultPermissionAttribute.GetKey(this);
         public string Note => NotesAttribute.GetFrom(this);
@@ -38,14 +38,12 @@ namespace TitanBot2.Services.CommandService.Models
             return res;
         }
 
-        public async Task<Dictionary<CallInfo, CallCheckResponse>> CheckCalls(CmdContext context, TypeReaderCollection readers)
+        public Task<Dictionary<CallInfo, CallCheckResponse>> CheckCalls(CmdContext context, TypeReaderCollection readers)
         {
             if (Calls.Length == 0)
-                return new Dictionary<CallInfo, CallCheckResponse>();
+                return Task.FromResult(new Dictionary<CallInfo, CallCheckResponse>());
             var inst = CreateInstance(context, readers);
-            var checking = Calls.ToDictionary(c => c, c => inst.CheckCallAsync(c));
-            await Task.WhenAll(checking.Select(c => c.Value));
-            return checking.ToDictionary(c => c.Key, c => c.Value.Result);
+            return inst.CheckCallsAsync(Calls);
         }
 
         public static CommandInfo FromType(Type t)

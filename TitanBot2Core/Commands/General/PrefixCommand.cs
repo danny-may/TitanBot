@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using TitanBot2.Extensions;
 using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
@@ -9,10 +12,10 @@ namespace TitanBot2.Commands.General
 {
     [Description("Gets or sets a custom prefix that is required to use my commands")]
     [DefaultPermission(8)]
-    [RequireContext(ContextType.Guild)]
     class PrefixCommand : Command
     {
         [Call]
+        [DefaultPermission(0, "Show")]
         [Usage("Gets all the available current prefixes")]
         async Task GetPrefixesAsync()
         {
@@ -25,6 +28,8 @@ namespace TitanBot2.Commands.General
         }
 
         [Call]
+        [DefaultPermission(8, "Set")]
+        [RequireContext(ContextType.Guild)]
         [Usage("Sets the custom prefix")]
         async Task SetPrefixAsync(string newPrefix)
         {
@@ -32,22 +37,6 @@ namespace TitanBot2.Commands.General
             guildData.Prefix = newPrefix.ToLower();
             await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData));
             await ReplyAsync($"Your guilds prefix has been set to `{guildData.Prefix}`", ReplyType.Success);
-        }
-
-        protected override Task<CallCheckResponse> CheckPermissions(ulong defaultPerm, string permKey)
-        {
-            if (Context.Arguments.Length > 0)
-                return base.CheckPermissions(defaultPerm, permKey);
-            else
-                return base.CheckPermissions(0, permKey);
-        }
-
-        protected override Task<CallCheckResponse> CheckContexts(ContextType contexts)
-        {
-            if (Context.Arguments.Length > 0)
-                return base.CheckContexts(contexts);
-            else
-                return base.CheckContexts(ContextType.DM | ContextType.Group | ContextType.Guild);
         }
     }
 }

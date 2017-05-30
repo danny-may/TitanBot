@@ -74,5 +74,8 @@ namespace TitanBot2.Extensions
 
             return ret;
         }
+
+        public static Random RandInstance
+            => _rand;
     }
 }

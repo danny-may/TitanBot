@@ -51,6 +51,8 @@ namespace TitanBot2.Commands.General
                    .AddInlineField("Users", userCount.ToString())
                    .AddInlineField("Loaded commands", Context.CommandService.Commands.Count)
                    .AddInlineField("Loaded calls", Context.CommandService.Commands.Sum(c => c.Calls.Length))
+                   .AddInlineField("Commands used this session", TotalCommands)
+                   .AddInlineField("Database queries", Context.Database.TotalCalls)
                    .AddInlineField("RAM", $"{((double)ramUsage / (1024 * 1024)).ToString("#0.##")} / {ramAvailable}")
                    .AddInlineField("CPU", cpuUsage)
                    .AddInlineField("Active Timers", timersActive.Count())

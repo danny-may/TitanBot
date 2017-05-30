@@ -7,25 +7,30 @@ namespace TitanBot2.Services.CommandService.Attributes
     [AttributeUsage(AttributeTargets.Method|AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     class DefaultPermissionAttribute : Attribute
     {
-        public ulong DefaultPerm { get; }
+        private ulong _defaultPerm { get; }
         private string _permissionKey { get; }
 
         public DefaultPermissionAttribute(ulong defaultPerm, string permissionKey = null)
         {
-            DefaultPerm = defaultPerm;
+            _defaultPerm = defaultPerm;
             _permissionKey = permissionKey;
         }
 
         public static string GetKey(CallInfo info)
-            => info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? info.ParentInfo.PermissionKey;
+        {
+            if (info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm != null)
+                return info.ParentInfo.PermissionKey + ("." + info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? "").TrimEnd('.');
+            else
+                return info.ParentInfo.PermissionKey + ("." + string.Join(".", info.Subcalls)).TrimEnd('.');
+        }
 
-        public static ulong GetFrom(CallInfo info)
-            => info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?.DefaultPerm ?? info.ParentInfo.DefaultPermissions;
+        public static ulong GetPerm(CallInfo info)
+            => info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm ?? info.ParentInfo.DefaultPermissions;
 
         public static string GetKey(CommandInfo info)
             => info.CommandType.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? info.Name;
 
-        public static ulong GetFrom(CommandInfo info)
-            => info.CommandType.GetCustomAttribute<DefaultPermissionAttribute>()?.DefaultPerm ?? 0;
+        public static ulong GetPerm(CommandInfo info)
+            => info.CommandType.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm ?? 0;
     }
 }

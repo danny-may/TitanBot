@@ -30,6 +30,8 @@ namespace TitanBot2.Services.CommandService
         protected TypeReaderCollection Readers { get; private set; }
         protected FlagCollection Flags { get; private set; }
 
+        public static int TotalCommands { get; private set; } = 0;
+
         private Dictionary<CallInfo, CallCheckResponse> CheckResponses = new Dictionary<CallInfo, CallCheckResponse>();
 
         public async Task<bool> ExecuteAsync(CallInfo callInfo, ArgumentReadResponse argResponse, FlagCollection flags)
@@ -38,7 +40,7 @@ namespace TitanBot2.Services.CommandService
                 return false;
 
             if (!CheckResponses.ContainsKey(callInfo))
-                CheckResponses.Add(callInfo, await CheckCallAsync(callInfo));
+                await CheckCallsAsync(new CallInfo[] { callInfo });
 
             if (!CheckResponses[callInfo].IsSuccess)
                 return false;
@@ -58,6 +60,7 @@ namespace TitanBot2.Services.CommandService
             try
             {
                 Flags = flags;
+                TotalCommands++;
                 await (Task)callInfo.Call.Invoke(this, argResponse.ParsedArguments);
             } catch (Exception ex)
             {
@@ -83,107 +86,137 @@ namespace TitanBot2.Services.CommandService
             Readers = readers;
         }
 
-        public virtual async Task<CallCheckResponse> CheckCallAsync(CallInfo info)
+        public virtual async Task<Dictionary<CallInfo, CallCheckResponse>> CheckCallsAsync(CallInfo[] calls)
         {
-            var results = new List<CallCheckResponse>();
+            var results = calls.ToDictionary(c => c, c => new List<CallCheckResponse>());
 
-            results.Add(await CheckContexts(info.RequiredContexts));
-            if (info.RequireOwner)
-                results.Add(await CheckOwner());
-            results.Add(await CheckPermissions(info.DefaultPermissions, info.PermissionKey));
-            results.Add(await CheckGuild(info.ParentInfo.RequireGuild));            
+            foreach (var res in CheckContexts(calls))
+                results[res.Key].Add(res.Value);
+            foreach (var res in await CheckOwner(calls))
+                results[res.Key].Add(res.Value);
+            foreach (var res in await CheckPermissions(calls))
+                results[res.Key].Add(res.Value);
+            foreach (var res in CheckGuild(calls))
+                results[res.Key].Add(res.Value);
 
-            if (results.Any(r => !r.IsSuccess))
-                return CallCheckResponse.FromError(string.Join("\n", results.Where(r => !r.IsSuccess).Select(r => r.Message)));
+            var response = results.ToDictionary(c => c.Key, c =>
+            {
+                if (c.Value.Any(r => !r.IsSuccess))
+                    return CallCheckResponse.FromError(string.Join("\n", c.Value.Where(r => !r.IsSuccess).Select(r => r.Message)));
 
-            return CallCheckResponse.FromSuccess();
+                return CallCheckResponse.FromSuccess();
+            });
+
+            foreach (var res in response)
+                CheckResponses.Add(res.Key, res.Value);
+
+            return response;
         }
 
-        protected virtual Task<CallCheckResponse> CheckGuild(ulong? guild)
+        protected virtual Dictionary<CallInfo, CallCheckResponse> CheckGuild(CallInfo[] calls)
         {
-            if (guild == null)
-                return Task.FromResult(CallCheckResponse.FromSuccess());
+            return calls.ToDictionary(c => c, c =>
+            {
+                if (c.ParentInfo.RequireGuild == null)
+                    return CallCheckResponse.FromSuccess();
 
-            if (Context.Guild != null && guild == Context.Guild.Id)
-                return Task.FromResult(CallCheckResponse.FromSuccess());
+                if (Context.Guild != null && c.ParentInfo.RequireGuild == Context.Guild.Id)
+                    return CallCheckResponse.FromSuccess();
 
-            return Task.FromResult(CallCheckResponse.FromError($"Invalid guild! This command can only be used in {Context.Client.GetGuild(guild.Value)?.Name ?? "UNKNOWN GUILD"}"));
+                return CallCheckResponse.FromError($"Invalid guild! This command can only be used in {Context.Client.GetGuild(c.ParentInfo.RequireGuild.Value)?.Name ?? "UNKNOWN GUILD"}");
+            });
+            
         }
 
-        protected virtual Task<CallCheckResponse> CheckContexts(ContextType contexts)
+        protected virtual IDictionary<CallInfo, CallCheckResponse> CheckContexts(CallInfo[] calls)
         {
-            bool isValid = false;
+            return calls.ToDictionary(c => c, c =>
+            {
+                bool isValid = false;
 
-            if ((contexts & ContextType.Guild) != 0)
-                isValid = isValid || Context.Channel is IGuildChannel;
-            if ((contexts & ContextType.DM) != 0)
-                isValid = isValid || Context.Channel is IDMChannel;
-            if ((contexts & ContextType.Group) != 0)
-                isValid = isValid || Context.Channel is IGroupChannel;
+                if ((c.RequiredContexts & ContextType.Guild) != 0)
+                    isValid = isValid || Context.Channel is IGuildChannel;
+                if ((c.RequiredContexts & ContextType.DM) != 0)
+                    isValid = isValid || Context.Channel is IDMChannel;
+                if ((c.RequiredContexts & ContextType.Group) != 0)
+                    isValid = isValid || Context.Channel is IGroupChannel;
 
-            if (isValid)
-                return Task.FromResult(CallCheckResponse.FromSuccess());
-            else
-                return Task.FromResult(CallCheckResponse.FromError($"Invalid context for command! Accepted contexts: {contexts}"));
+                if (isValid)
+                    return CallCheckResponse.FromSuccess();
+                else
+                    return CallCheckResponse.FromError($"Invalid context for command! Accepted contexts: {c.RequiredContexts}");
+            });
         }
 
-        protected virtual async Task<CallCheckResponse> CheckOwner()
+        protected virtual async Task<IDictionary<CallInfo, CallCheckResponse>> CheckOwner(CallInfo[] calls)
         {
+            CallCheckResponse response;
+
             switch (Context.Client.TokenType)
             {
                 case TokenType.Bot:
                     var application = await Context.Client.GetApplicationInfoAsync();
                     if (Context.User.Id != application.Owner.Id)
-                        return CallCheckResponse.FromError("Command can only be run by the owner of the bot");
-                    return CallCheckResponse.FromSuccess();
+                        response = CallCheckResponse.FromError("Command can only be run by the owner of the bot");
+                    else
+                        response = CallCheckResponse.FromSuccess();
+                    break;
                 case TokenType.User:
                     if (Context.User.Id != Context.Client.CurrentUser.Id)
-                        return CallCheckResponse.FromError("Command can only be run by the owner of the bot");
-                    return CallCheckResponse.FromSuccess();
+                        response = CallCheckResponse.FromError("Command can only be run by the owner of the bot");
+                    else
+                        response = CallCheckResponse.FromSuccess();
+                    break;
                 default:
-                    return CallCheckResponse.FromError($"{nameof(TokenType)} applications do not have an owner");
+                    response = CallCheckResponse.FromError($"{Context.Client.TokenType} applications do not have an owner");
+                    break;
             }
+
+            return calls.ToDictionary(c => c, c => c.RequireOwner ? response : CallCheckResponse.FromSuccess());
         }
 
-        protected virtual async Task<CallCheckResponse> CheckPermissions(ulong defaultPerm, string permKey)
+        protected virtual async Task<IDictionary<CallInfo, CallCheckResponse>> CheckPermissions(CallInfo[] calls)
         {
             var owner = Context.BotClient?.Owner ?? (await Context.Client.GetApplicationInfoAsync()).Owner;
 
             if (Context.User.Id == owner.Id || Context.Channel is IDMChannel || Context.Channel is IGroupChannel)
-                return CallCheckResponse.FromSuccess();
+                return calls.ToDictionary(c=>c, c=> CallCheckResponse.FromSuccess());
 
             if (Context.Guild.OwnerId == Context.User.Id)
-                return CallCheckResponse.FromSuccess();
+                return calls.ToDictionary(c => c, c => CallCheckResponse.FromSuccess());
 
             var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
             var guildUser = Context.User as IGuildUser;
 
             if (guildUser.HasAll(guildData.PermOverride))
-                return CallCheckResponse.FromSuccess();
+                return calls.ToDictionary(c => c, c => CallCheckResponse.FromSuccess());
 
             if ((guildData.BlackListed?.Length ?? 0) != 0)
                 if (guildData.BlackListed.Contains(Context.Channel.Id))
-                    return CallCheckResponse.FromError(null);
+                    return calls.ToDictionary(c => c, c => CallCheckResponse.FromError(null));
 
-            var cmdPerm = (await Context.Database.CmdPerms.GetCmdPerm(Context.Guild.Id, permKey));
+            var cmdPerms = calls.ToDictionary(c => c, c => Context.Database.CmdPerms.GetCmdPerm(Context.Guild.Id, c.PermissionKey).Result);
 
-            if ((cmdPerm?.blackListed?.Length ?? 0) != 0)
-                if (cmdPerm.blackListed.Contains(Context.Channel.Id))
-                    return CallCheckResponse.FromError(null);
-
-            if (cmdPerm?.permissionId == null && cmdPerm?.roleIds == null)
+            return cmdPerms.ToDictionary(c => c.Key, c => 
             {
-                if (guildUser.HasAll(cmdPerm?.permissionId ?? defaultPerm))
+                if ((c.Value?.blackListed?.Length ?? 0) != 0)
+                    if (c.Value.blackListed.Contains(Context.Channel.Id))
+                        return CallCheckResponse.FromError(null);
+
+                if (c.Value?.permissionId == null && c.Value?.roleIds == null)
+                {
+                    if (guildUser.HasAll(c.Value?.permissionId ?? c.Key.DefaultPermissions))
+                        return CallCheckResponse.FromSuccess();
+                }
+
+                if (c.Value?.roleIds != null && guildUser.RoleIds.Any(r => c.Value?.roleIds?.Contains(r) ?? false))
                     return CallCheckResponse.FromSuccess();
-            }
 
-            if (cmdPerm?.roleIds != null && guildUser.RoleIds.Any(r => cmdPerm?.roleIds?.Contains(r) ?? false))
-                return CallCheckResponse.FromSuccess();
+                if (c.Value?.permissionId != null && guildUser.HasAll(c.Value?.permissionId ?? c.Key.DefaultPermissions))
+                    return CallCheckResponse.FromSuccess();
 
-            if (cmdPerm?.permissionId != null && guildUser.HasAll(cmdPerm?.permissionId ?? defaultPerm))
-                return CallCheckResponse.FromSuccess();
-
-            return CallCheckResponse.FromError($"{Context.User.Mention} You do not have the required permissions to use that command");
+                return CallCheckResponse.FromError($"{Context.User.Mention} You do not have the required permissions to use that command");
+            });
         }
 
         protected Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)

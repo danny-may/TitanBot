@@ -87,7 +87,6 @@ namespace TitanBot2
             if (string.IsNullOrWhiteSpace(config.Token))
                 return false;
 
-            Database.Initialise();
             TimerService.Initialise();
 
             await Client.LoginAsync(TokenType.Bot, config.Token);
@@ -124,8 +123,7 @@ namespace TitanBot2
             await _GHandle.Uninstall();
             await _MHandle.Uninstall();
             await _UHandle.Uninstall();
-
-            await Database.StopAsync();
+            
             await TimerService.StopAsync();
         }
 

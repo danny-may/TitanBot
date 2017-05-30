@@ -48,7 +48,6 @@ namespace TitanBot2.Services
 
         private async Task<Bitmap> GetImage(string url, int retries = 1)
         {
-            Bitmap img = null;
             try
             {
                 return await WebClient.GetImage(url);

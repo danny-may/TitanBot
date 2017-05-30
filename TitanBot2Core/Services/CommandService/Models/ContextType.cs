@@ -8,8 +8,8 @@ namespace TitanBot2.Services.CommandService.Models
 {
     public enum ContextType
     {
-        DM,
-        Group,
-        Guild
+        DM = 1,
+        Group = 2,
+        Guild = 4
     }
 }

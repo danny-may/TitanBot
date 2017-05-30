@@ -14,7 +14,7 @@ namespace TitanBot2.Services.CommandService.Attributes
             GuildID = guild;
         }
 
-        public static ulong? GetFrom(CommandInfo info)
+        new public static ulong? GetFrom(CommandInfo info)
             => info.CommandType.GetCustomAttribute<RequireGuildAttribute>()?.GuildID;
     }
 }

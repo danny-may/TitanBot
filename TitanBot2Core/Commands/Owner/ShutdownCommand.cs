@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
-using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Owner
 {
@@ -15,7 +15,7 @@ namespace TitanBot2.Commands.Owner
         async Task ShutDown(TimeSpan? time = null, string reason = null)
         {
             await ReplyAsync("Starting shut down sequence!");
-            Context.BotClient.StopAsync(time, reason);
+            Context.BotClient.StopAsync(time, reason).AllowRun();
         }
     }
 }
