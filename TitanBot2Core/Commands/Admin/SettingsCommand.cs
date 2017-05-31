@@ -8,7 +8,7 @@ using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
 using TitanBot2.Services.CommandService.Models;
-using TitanBot2.Services.Database.Models;
+using TitanBot2.Services.Database.Tables;
 
 namespace TitanBot2.Commands.Admin
 {

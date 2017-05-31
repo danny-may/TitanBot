@@ -24,7 +24,7 @@ namespace TitanBot2.Commands.Owner
         [Usage("Executes arbitrary code")]
         async Task ExecAsync([Dense]string code)
         {
-            code = Context.Message.Content.Substring(Context.Prefix.Length + Context.Command.Length + 1);
+            code = Context.Message.Content.Substring(Context.Prefix.Length + Context.Command.Name.Length + 1);
 
             var codeWithUsings = $@"using Discord;
 using Discord.Commands;

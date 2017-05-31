@@ -1,7 +1,7 @@
 ﻿using LiteDB;
 using System;
 using System.IO;
-using TitanBot2.Services.Database.Models;
+using TitanBot2.Services.Database.Tables;
 
 namespace TitanBot2.Services.Database
 {
@@ -23,11 +23,12 @@ namespace TitanBot2.Services.Database
         {
         }
 
-        public LiteCollection<Guild> GuildTable { get { return GetCollection<Guild>(); } }
-        public LiteCollection<CmdPerm> CmdPermTable { get { return GetCollection<CmdPerm>(); } }
-        public LiteCollection<Timer> TimerTable { get { return GetCollection<Timer>(); } }
-        public LiteCollection<User> UserTable { get { return GetCollection<User>(); } }
-        public LiteCollection<Excuse> ExcuseTable { get { return GetCollection<Excuse>(); } }
-        public LiteCollection<Registration> RegistrationTable { get { return GetCollection<Registration>(); } }
+        public LiteCollection<Guild> GuildTable => GetCollection<Guild>();
+        public LiteCollection<CmdPerm> CmdPermTable => GetCollection<CmdPerm>(); 
+        public LiteCollection<Timer> TimerTable => GetCollection<Timer>(); 
+        public LiteCollection<User> UserTable => GetCollection<User>(); 
+        public LiteCollection<Excuse> ExcuseTable => GetCollection<Excuse>(); 
+        public LiteCollection<Registration> RegistrationTable => GetCollection<Registration>();
+        public LiteCollection<TT2Submission> TT2SubmissionTabel => GetCollection<TT2Submission>();
     }
 }

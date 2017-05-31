@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
 using TitanBot2.Services.CommandService.Models;
-using TitanBot2.Services.Database.Models;
+using TitanBot2.Services.Database.Tables;
 using TitanBot2.Services.Scheduler;
 using TitanBot2.TimerCallbacks;
 

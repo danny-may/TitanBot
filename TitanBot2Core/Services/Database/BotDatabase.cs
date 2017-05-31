@@ -20,6 +20,7 @@ namespace TitanBot2.Services.Database
         public TimerExtensions Timers { get; }
         public UserExtensions Users { get; }
         public ExcuseExtension Excuses { get; }
+        public TT2SubmissionExtensions Submissions { get; }
         public RegistrationExtensions Registrations { get; }
 
         public int TotalCalls { get; private set; } = 0;
@@ -33,6 +34,7 @@ namespace TitanBot2.Services.Database
             Users = new UserExtensions(this);
             Excuses = new ExcuseExtension(this);
             Registrations = new RegistrationExtensions(this);
+            Submissions = new TT2SubmissionExtensions(this);
 
             string file = Path.Combine(AppContext.BaseDirectory, FileName);
             string path = Path.GetDirectoryName(file);

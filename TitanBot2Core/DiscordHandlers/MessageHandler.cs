@@ -89,11 +89,11 @@ namespace TitanBot2.DiscordHandlers
                 await msg.Channel.SendMessageSafeAsync("👋");
             }
 
-            var context = new CmdContext(Dependencies, msg);
+            var context = new CmdContext(Dependencies, _cmds, msg);
             
             if (context.IsCommand())
             {
-                _cmds.ExecuteAsync(context);
+                _cmds.CheckCommandAsync(context);
             }
         }
     }

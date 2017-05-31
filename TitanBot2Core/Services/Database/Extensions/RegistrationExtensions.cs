@@ -1,4 +1,4 @@
-﻿using TitanBot2.Services.Database.Models;
+﻿using TitanBot2.Services.Database.Tables;
 
 namespace TitanBot2.Services.Database.Extensions
 {

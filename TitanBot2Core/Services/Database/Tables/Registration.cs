@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TitanBot2.Services.Database.Models
+namespace TitanBot2.Services.Database.Tables
 {
     public class Registration
     {

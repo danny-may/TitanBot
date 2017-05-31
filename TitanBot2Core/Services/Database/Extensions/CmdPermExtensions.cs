@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot2.Services.Database.Models;
+using TitanBot2.Services.Database.Tables;
 
 namespace TitanBot2.Services.Database.Extensions
 {

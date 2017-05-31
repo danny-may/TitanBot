@@ -48,36 +48,32 @@ namespace TitanBot2.Services
             });
         }
 
-        public void ExecuteAsync(CmdContext context)
+        public void CheckCommandAsync(CmdContext context)
         {
             Task.Run(async () =>
             {
+                Dictionary<CallInfo, CallCheckResponse> callChecks = null;
+                if (context.Command != null)
+                    callChecks = await context.Command.CheckCalls(context, _readers);
 
-                if (context.Command == null)
-                    return;
+                var allowed = callChecks?.Where(c => c.Value.IsSuccess).Select(c => c.Key);
 
-                context.CommandService = this;
-
-                var allowed = await FindAllowed(context, context.Command);
-
-                if (allowed.Count() == 0 && context.ExplicitCommand)
+                if (context.Command == null || allowed.Count() == 0)
                 {
-                    await SendError(context, "That command either does not exist, or you do not have permission to use it!");
+                    if (context.ExplicitCommand)
+                        await SendError(context, "That command either does not exist, or you do not have permission to use it!");
                     return;
                 }
-                else if (allowed.Count() != 1)
-                    return;
 
-                var inst = allowed.First().Key.CreateInstance(context, _readers);
-                var calls = allowed.First();
+                var inst = context.Command.CreateInstance(context, _readers);
 
                 Dictionary<CallInfo, SignatureMatchResponse> validationResults;
                 var reader = _readers.NewCache();
-                var validators = calls.ToDictionary(c => c, c => c.ValidateSignature(context, reader));
+                var validators = allowed.ToDictionary(c => c, c => c.ValidateSignature(context, reader));
                 await Task.WhenAll(validators.Select(v => v.Value));
                 validationResults = validators.ToDictionary(v => v.Key, v => v.Value.Result);
 
-                var validCalls = validationResults.Where(r => r.Value.IsSuccess).OrderByDescending(v => v.Value.Weight);
+                var validCalls = validationResults.Where(r => r.Value.IsSuccess);
                 var invalidCalls = validationResults.Where(r => !r.Value.IsSuccess);
 
                 if (validCalls.Count() == 0)
@@ -86,22 +82,27 @@ namespace TitanBot2.Services
                     return;
                 }
 
-                var success = false;
-                foreach (var call in validCalls)
-                {
-                    foreach (var arg in call.Value.Arguments.Where(a => a.IsSuccess))
-                    {
-                        success = await inst.ExecuteAsync(call.Key, arg, call.Value.Flags);
-                        if (success)
-                            break;
-                    }
-                    if (success)
-                        break;
-                }
-
-                if (!success)
+                if (!await ExecuteAsync(context, validCalls.ToDictionary(c => c.Key, c => c.Value)))
                     await SendError(context, TextForError(validCalls.First().Value.Arguments.First().ErrorReason), true);
             });
+        }
+
+        private async Task<bool> ExecuteAsync(CmdContext context, Dictionary<CallInfo, SignatureMatchResponse> calls)
+        {
+            var grouped = calls.GroupBy(c => c.Key.ParentInfo).OrderByDescending(g => g.Sum(c => c.Value.Weight));
+            foreach (var group in grouped)
+            {
+                var inst = group.Key.CreateInstance(context, _readers);
+                foreach (var call in group.Where(c => c.Value.IsSuccess).OrderBy(c => c.Value.Weight))
+                {
+                    foreach (var args in call.Value.Arguments.Where(a => a.IsSuccess))
+                    {
+                        if (await inst.ExecuteAsync(call.Key, args, call.Value.Flags))
+                            return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private string TextForError(ArgumentReadResponse.Reason reason)

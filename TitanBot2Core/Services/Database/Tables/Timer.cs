@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using TitanBot2.Services.Scheduler;
 
-namespace TitanBot2.Services.Database.Models
+namespace TitanBot2.Services.Database.Tables
 {
     public class Timer
     {
