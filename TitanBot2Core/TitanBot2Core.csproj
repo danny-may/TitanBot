@@ -237,6 +237,7 @@
     <Compile Include="Commands\GuildSpecific\Singularity\RemoveCommand.cs" />
     <Compile Include="Commands\GuildSpecific\TapTitans2\SubmitCommand.cs" />
     <Compile Include="Commands\Owner\AnnounceCommand.cs" />
+    <Compile Include="Commands\Owner\FocusCommand.cs" />
     <Compile Include="Commands\Owner\DBPurgeCommand.cs" />
     <Compile Include="Commands\Owner\ExecCommand.cs" />
     <Compile Include="Commands\Owner\GetMessageCommand.cs" />

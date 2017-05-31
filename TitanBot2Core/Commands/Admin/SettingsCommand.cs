@@ -63,8 +63,6 @@ namespace TitanBot2.Commands.Admin
         [Usage("Lists all settings available")]
         async Task ListSettingsAsync([Dense]string settingGroup = null)
         {
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-
             var embed = new EmbedBuilder
             {
                 Author = new EmbedAuthorBuilder
@@ -79,7 +77,7 @@ namespace TitanBot2.Commands.Admin
             };
             foreach (var group in _settings.GroupBy(s => s.Group))
             {
-                embed.AddField($"{group.Key} Settings", string.Join("\n", group.Select(s => $"**> __{s.Key}__**\n{s.Get(guildData)}" + (!string.IsNullOrWhiteSpace(s.Notes) ? $"\n*{s.Notes}*" : ""))));
+                embed.AddField($"{group.Key} Settings", string.Join("\n", group.Select(s => $"**> __{s.Key}__**\n{s.Get(Context.GuildData)}" + (!string.IsNullOrWhiteSpace(s.Notes) ? $"\n*{s.Notes}*" : ""))));
             }
 
             await ReplyAsync("", embed: embed.Build());
@@ -97,14 +95,12 @@ namespace TitanBot2.Commands.Admin
                 return;
             }
 
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-
-            var result = setting.Set(guildData, value);
+            var result = setting.Set(Context.GuildData, value);
 
             if (result == null)
             {
-                await Context.Database.Guilds.Update(guildData);
-                await ReplyAsync($"Set `{setting.Key}` to {setting.Get(guildData)}", ReplyType.Success);
+                await Context.Database.Guilds.Update(Context.GuildData);
+                await ReplyAsync($"Set `{setting.Key}` to {setting.Get(Context.GuildData)}", ReplyType.Success);
             }
             else
             {

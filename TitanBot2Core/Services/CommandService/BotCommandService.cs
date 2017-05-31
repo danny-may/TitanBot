@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace TitanBot2.Services.CommandService
                     _readers.AddTypeReader<Pet>(new PetTypeReader());
                     _readers.AddTypeReader<Helper>(new HelperTypeReader());
                     _readers.AddTypeReader<TimeSpan>(new TimeSpanTypeReader());
-                    _readers.AddTypeReader<Color>(new ColourTypeReader());
+                    _readers.AddTypeReader<System.Drawing.Color>(new ColourTypeReader());
                 }
             });
         }

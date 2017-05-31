@@ -202,18 +202,19 @@ namespace TitanBot2.Services.CommandService
 
             if (Context.Guild.OwnerId == Context.User.Id)
                 return calls.ToDictionary(c => c, c => CallCheckResponse.FromSuccess());
-
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
+            
             var guildUser = Context.User as IGuildUser;
 
-            if (guildUser.HasAll(guildData.PermOverride))
+            if (guildUser.HasAll(Context.GuildData.PermOverride))
                 return calls.ToDictionary(c => c, c => CallCheckResponse.FromSuccess());
 
-            if ((guildData.BlackListed?.Length ?? 0) != 0)
-                if (guildData.BlackListed.Contains(Context.Channel.Id))
+            if ((Context.GuildData.BlackListed?.Length ?? 0) != 0)
+                if (Context.GuildData.BlackListed.Contains(Context.Channel.Id))
                     return calls.ToDictionary(c => c, c => CallCheckResponse.FromError(null));
 
-            var cmdPerms = calls.ToDictionary(c => c, c => Context.Database.CmdPerms.GetCmdPerm(Context.Guild.Id, c.PermissionKey).Result);
+            var allperms = await Context.Database.CmdPerms.GetCmdPerms(Context.Guild.Id);
+
+            var cmdPerms = calls.ToDictionary(c => c, c => allperms.FirstOrDefault(p => c.PermissionKey.ToLower() == p.commandname.ToLower()));
 
             return cmdPerms.ToDictionary(c => c.Key, c => 
             {
@@ -291,11 +292,7 @@ namespace TitanBot2.Services.CommandService
                 }
             }
             return await channel.SendMessageSafeAsync(message, async e => {
-                try
-                {
-                    await Context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} There was an error when trying to handle your command! `{e.GetType()}`");
-                }
-                catch { }
+                await Context.Channel.SendMessageSafeAsync($"{Res.Str.ErrorText} There was an error when trying to handle your command! `{e.GetType()}`");
                 await Context.Logger.Log(e, $"Command: {GetType().Name}");
                 await (handler?.Invoke(e) ?? Task.CompletedTask);
             }, isTTS, embed, options);

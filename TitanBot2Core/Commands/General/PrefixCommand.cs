@@ -33,10 +33,9 @@ namespace TitanBot2.Commands.General
         [Usage("Sets the custom prefix")]
         async Task SetPrefixAsync(string newPrefix)
         {
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-            guildData.Prefix = newPrefix.ToLower();
-            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData));
-            await ReplyAsync($"Your guilds prefix has been set to `{guildData.Prefix}`", ReplyType.Success);
+            Context.GuildData.Prefix = newPrefix.ToLower();
+            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(Context.GuildData));
+            await ReplyAsync($"Your guilds prefix has been set to `{Context.GuildData.Prefix}`", ReplyType.Success);
         }
     }
 }

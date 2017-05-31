@@ -17,6 +17,7 @@ namespace TitanBot2.Common
         public ulong SuggestChannel { get; set; } = 312361037749944321;
         public ulong BugChannel { get; set; } = 312389178564542464;
         public ulong SubmissionChannel { get; set; } = 319164064414695429;
+        public ulong? FocusId { get; set; } = null;
         public HighScoreSheetRef HighScoreSettings { get; set; } = new HighScoreSheetRef();
         public Dictionary<string, string> Versions { get; set; }
             = new Dictionary<string, string>

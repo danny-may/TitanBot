@@ -12,6 +12,7 @@ using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService.Flags;
 using TitanBot2.Services.CommandService.Models;
 using TitanBot2.Services.Database;
+using TitanBot2.Services.Database.Tables;
 using TitanBot2.Services.Scheduler;
 
 namespace TitanBot2.Services.CommandService
@@ -30,10 +31,20 @@ namespace TitanBot2.Services.CommandService
         public string[] Arguments { get; private set; }
         public CommandInfo Command { get; private set; }
         public FlagValue[] Flags { get; private set; }
-
-        private CmdSplitter _splitter;
-
         public BotDependencies Dependencies { get; private set; }
+        public Guild GuildData
+        {
+            get
+            {
+                if (_guildData == null)
+                    _guildData = Database.Guilds.GetGuild(Guild?.Id ?? 0).Result;
+                return _guildData;
+            }
+        }
+
+
+        private Guild _guildData;
+        private CmdSplitter _splitter;
 
         public CmdContext(BotDependencies args, BotCommandService cmdService, SocketUserMessage msg) : base(args.Client, msg)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Services.Database.Tables;
@@ -9,6 +10,8 @@ namespace TitanBot2.Services.Database.Extensions
     {
         public CmdPermExtensions(BotDatabase db) : base(db) { }
 
+        public async Task<IEnumerable<CmdPerm>> GetCmdPerms(ulong guildid)
+            => await Database.QueryAsync(conn => conn.CmdPermTable.Find(c => c.guildId == guildid));
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command)
             => await GetCmdPerm(guildid, command, null);
         public async Task<CmdPerm> GetCmdPerm(ulong guildid, string command, Func<Exception, Task> handler)

@@ -84,15 +84,14 @@ namespace TitanBot2.Commands.Clan
                 SecondInterval = 60 * 60 - 30,
                 To = timeNow.Add(time).AddDays(1)
             };
-
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
+            
             var tlChannel = Context.Channel;
-            if (guildData.TitanLord?.Channel != null)
-                tlChannel = Context.Guild.GetTextChannel(guildData.TitanLord.Channel.Value) ?? tlChannel;
+            if (Context.GuildData.TitanLord?.Channel != null)
+                tlChannel = Context.Guild.GetTextChannel(Context.GuildData.TitanLord.Channel.Value) ?? tlChannel;
 
             var message = await tlChannel.SendMessageSafeAsync("Loading Timer...\n*if this takes longer than 10s please PM Titansmasher ASAP*");
 
-            if (guildData.TitanLord.PinTimer && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.Has(GuildPermission.ManageMessages))
+            if (Context.GuildData.TitanLord.PinTimer && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.Has(GuildPermission.ManageMessages))
                 await message.PinAsync();
 
             var custArgs = new JObject();
@@ -159,11 +158,8 @@ namespace TitanBot2.Commands.Clan
 
         [Call("Info")]
         [Usage("Gets information about the clans current level")]
-        private async Task TitanLordInfoAsync()
-        {
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-            await ReplyAsync("", embed: ClanStatsCommand.StatsBuilder(Context.Client.CurrentUser, guildData.TitanLord.CQ, 4000, 500, new int[] { 20, 30, 40, 50 }).Build());
-        }
+        private Task TitanLordInfoAsync()
+            => ReplyAsync("", embed: ClanStatsCommand.StatsBuilder(Context.Client.CurrentUser, Context.GuildData.TitanLord.CQ, 4000, 500, new int[] { 20, 30, 40, 50 }).Build());
 
         [Call("Stop")]
         [Usage("Stops any currently running timers.")]
@@ -201,14 +197,13 @@ namespace TitanBot2.Commands.Clan
 
         private async Task NewBoss(TimeSpan time)
         {
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-            guildData.TitanLord.CQ += 1;
+            Context.GuildData.TitanLord.CQ += 1;
 
-            await Context.Database.Guilds.Update(guildData);
+            await Context.Database.Guilds.Update(Context.GuildData);
 
-            var bossHp = Calculator.TitanLordHp(guildData.TitanLord.CQ);
-            var clanBonus = Calculator.ClanBonus(guildData.TitanLord.CQ);
-            var advStart = Calculator.AdvanceStart(guildData.TitanLord.CQ);
+            var bossHp = Calculator.TitanLordHp(Context.GuildData.TitanLord.CQ);
+            var clanBonus = Calculator.ClanBonus(Context.GuildData.TitanLord.CQ);
+            var advStart = Calculator.AdvanceStart(Context.GuildData.TitanLord.CQ);
 
             var latestTimer = await Context.Database.Timers.GetLatest(Context.Guild.Id, EventCallback.TitanLordNow, true);
 
@@ -224,15 +219,15 @@ namespace TitanBot2.Commands.Clan
                 Timestamp = DateTime.Now,
             };
 
-            builder.AddField("New Clan Quest", guildData.TitanLord.CQ);
+            builder.AddField("New Clan Quest", Context.GuildData.TitanLord.CQ);
             builder.AddField("New bonus", clanBonus.Beautify());
             builder.AddField("Next Titan Lord HP", bossHp.Beautify());
             builder.AddField("Time to kill", (DateTime.Now.Add(time).AddHours(-6) - latestTimer.To).Value.Beautify());
 
 
             var tlChannel = Context.Channel.Id;
-            if (guildData.TitanLord?.Channel != null)
-                tlChannel = guildData.TitanLord.Channel.Value;
+            if (Context.GuildData.TitanLord?.Channel != null)
+                tlChannel = Context.GuildData.TitanLord.Channel.Value;
 
             await TrySend(tlChannel, "", embed: builder.Build());
         }

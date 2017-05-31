@@ -45,10 +45,9 @@ namespace TitanBot2.Commands.Admin
                 await ReplyAsync("That channel does not exist on this guild!", ReplyType.Error);
                 return;
             }
-
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-            guildData.NotifyAlive = channel?.Id;
-            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData), ex => Context.BotClient.Logger.Log(ex, "NotifyCmd"));
+            
+            Context.GuildData.NotifyAlive = channel?.Id;
+            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(Context.GuildData), ex => Context.BotClient.Logger.Log(ex, "NotifyCmd"));
             if (channel == null)
                 await ReplyAsync("This guild will no longer recieve notification when I come onine!", ReplyType.Success);
             else
@@ -64,9 +63,8 @@ namespace TitanBot2.Commands.Admin
                 return;
             }
 
-            var guildData = await Context.Database.Guilds.GetGuild(Context.Guild.Id);
-            guildData.NotifyDead = channel?.Id;
-            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(guildData), ex => Context.BotClient.Logger.Log(ex, "NotifyCmd"));
+            Context.GuildData.NotifyDead = channel?.Id;
+            await Context.Database.QueryAsync(conn => conn.GuildTable.Update(Context.GuildData), ex => Context.BotClient.Logger.Log(ex, "NotifyCmd"));
             if (channel == null)
                 await ReplyAsync("This guild will no longer recieve notification when I shutdown!", ReplyType.Success);
             else
