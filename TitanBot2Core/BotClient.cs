@@ -13,7 +13,7 @@ using TitanBot2.Services.Scheduler;
 
 namespace TitanBot2
 {
-    public class BotClient
+    public class BotClient : IDisposable
     {
         private DiscordSocketClient Client { get; }
         private BotDatabase Database { get; }
@@ -49,7 +49,7 @@ namespace TitanBot2
             Database = new BotDatabase("database/TitanBot2.db");
             WebService = new CachedWebClient();
             WebService.DefaultExceptionHandler += ex => Logger.Log(ex, "WebCache");
-            WebService.LogWebRequest += (uri, msg) => Logger.Log(new LogEntry(LogType.Service, LogSeverity.Info, $"{msg} - URI: {uri}", "WebCache"));
+            WebService.LogWebRequest += (uri, msg) => Logger.Log(new BotLog(LogType.Service, LogSeverity.Info, $"{msg} - URI: {uri}", "WebCache"));
             TT2DataService = new TT2DataService(WebService);
             Dependencies = new BotDependencies()
             {
@@ -136,6 +136,12 @@ namespace TitanBot2
             var inst = Configuration.Instance;
             inst.ShutdownReason = "Unexpected Crash";
             inst.SaveJson();
+        }
+
+        public void Dispose()
+        {
+            Client.Dispose();
+            Database.Dispose();
         }
 
         public event Func<Task> LoggedIn;

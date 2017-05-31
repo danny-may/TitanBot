@@ -9,24 +9,33 @@ namespace TitanBot2.Common
 {
     public class Logger
     {
-        public event Func<LogEntry, Task> HandleLog;
+        public event Func<ILoggable, Task> HandleLog;
 
-        internal Task Log(LogEntry entry)
+        internal Task Log(ILoggable entry)
             => HandleLog?.Invoke(entry) ?? Task.CompletedTask;
 
         internal Task Log(Exception ex, string source)
-            => Log(new LogEntry(LogType.Exception, LogSeverity.Error, ex.ToString(), source));
+            => Log(new BotLog(LogType.Exception, LogSeverity.Error, ex.ToString(), source));
 
         internal Task Log(LogMessage msg)
-            => Log(new LogEntry(LogType.Client, msg.Severity, msg.Message ?? msg.Exception.Message, msg.Source));
+            => Log(new BotLog(LogType.Client, msg.Severity, msg.Message ?? msg.Exception.Message, msg.Source));
     }
 
-    public class LogEntry
+    public interface ILoggable
     {
-        public DateTime Time { get; private set; }
-        public LogType Type { get; private set; }
+        DateTime LogTime { get; }
+        LogSeverity Severity { get; }
+        LogType LogType { get; }
+        string Source { get; }
+        string Message { get; }
+    }
+
+    internal class BotLog : ILoggable
+    {
+        public DateTime LogTime { get; private set; }
+        public LogType LogType { get; private set; }
         public LogSeverity Severity { get; private set; }
-        public string Description { get; private set; }
+        public string Message { get; private set; }
         public string Source { get; private set; }
 
         private string typeText;
@@ -34,22 +43,22 @@ namespace TitanBot2.Common
         {
             get
             {
-                if (Type == LogType.Other)
+                if (LogType == LogType.Other)
                     return typeText ?? "Other";
-                return Type.ToString();
+                return LogType.ToString();
             }
         }
 
-        internal LogEntry(LogType type, LogSeverity severity, string description, string source)
+        internal BotLog(LogType type, LogSeverity severity, string description, string source)
         {
-            Type = type;
+            LogType = type;
             Severity = severity;
-            Description = description;
+            Message = description;
             Source = source;
-            Time = DateTime.Now;
+            LogTime = DateTime.Now;
         }
 
-        internal LogEntry(string type, string description, string source)
+        internal BotLog(string type, string description, string source)
             : this(LogType.Other, LogSeverity.Info, description, source)
         {
             typeText = type;
@@ -57,7 +66,7 @@ namespace TitanBot2.Common
 
         public override string ToString()
         {
-            return $"[{Time.ToString("HH:mm:ss")}][{TypeText}][{Source}]\t{Description}";
+            return $"[{LogTime.ToString("HH:mm:ss")}][{TypeText}][{Source}]\t{Message}";
         }
     }
 

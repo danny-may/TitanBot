@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Models;
-using TitanBot2.Services.CommandService;
+using TitanBot2.Responses;
+using TitanBot2.Services.CommandService.Models;
 using TitanBot2.TypeReaders;
 using TitanBot2.TypeReaders.Readers;
-using TitanBot2.Services.CommandService.Models;
-using TitanBot2.Responses;
 
-namespace TitanBot2.Services
+namespace TitanBot2.Services.CommandService
 {
     public class BotCommandService
     {

@@ -52,6 +52,9 @@ namespace TitanBot2.Services.CommandService
             if (!CheckResponses[callInfo].IsSuccess)
                 return false;
 
+            var start = DateTime.Now;
+            await Context.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Debug, $"Enter Command: {callInfo.ParentInfo.Name} | mId: {Context.Message.Id} | uId: {Context.User.Id} | cId: {Context.Channel.Id}", "Commands"));
+
             new Task(async () =>
             {
                 await Task.Delay(3000);
@@ -87,6 +90,8 @@ namespace TitanBot2.Services.CommandService
                 await ReplyAsync("No reply was set up for this path (blame Titansmasher), but I think it executed correctly", ReplyType.Error);
                 HasReplied = true;
             }
+
+            await Context.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Debug, $"Exit Command: {callInfo.ParentInfo.Name} | mId: {Context.Message.Id} | {(DateTime.Now - start).TotalMilliseconds}ms", "Commands"));
 
             return true;
         }

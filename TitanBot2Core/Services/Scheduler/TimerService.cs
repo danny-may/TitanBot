@@ -87,7 +87,7 @@ namespace TitanBot2.Services.Scheduler
             {
                 await _database.Timers.Complete(processed.ToArray());
                 var totalTimers = await _database.Timers.Get(loopTime);
-                await _dependencies.Logger.Log(new LogEntry(LogType.Service, LogSeverity.Info, $"{processed.Count} timers completed. Total Pool: {totalTimers.Count()}", "Scheduler"));
+                await _dependencies.Logger.Log(new BotLog(LogType.Service, LogSeverity.Info, $"{processed.Count} timers completed. Total Pool: {totalTimers.Count()}", "Scheduler"));
             }
         }
 

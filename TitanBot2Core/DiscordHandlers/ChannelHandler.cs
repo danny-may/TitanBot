@@ -18,7 +18,7 @@ namespace TitanBot2.DiscordHandlers
             Client.RecipientAdded += HandleRecipientAddedAsync;
             Client.RecipientRemoved += HandleRecipientRemovedAsync;
 
-            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Channel"));
+            await BotClient.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Info, "Installed successfully", "Channel"));
         }
 
         public override async Task Uninstall()
@@ -30,7 +30,7 @@ namespace TitanBot2.DiscordHandlers
             Client.RecipientAdded -= HandleRecipientAddedAsync;
             Client.RecipientRemoved -= HandleRecipientRemovedAsync;
 
-            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Channel"));
+            await BotClient.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Channel"));
 
             await base.Uninstall();
         }

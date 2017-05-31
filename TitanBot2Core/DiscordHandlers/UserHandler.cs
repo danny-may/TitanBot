@@ -24,7 +24,7 @@ namespace TitanBot2.DiscordHandlers
             Client.UserUpdated += HandleUpdateAsync;
             Client.GuildMemberUpdated += HandleGUpdateAsync;
 
-            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "User"));
+            await BotClient.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Info, "Installed successfully", "User"));
         }
 
         public override async Task Uninstall()
@@ -36,7 +36,7 @@ namespace TitanBot2.DiscordHandlers
             Client.UserUpdated -= HandleUpdateAsync;
             Client.GuildMemberUpdated -= HandleGUpdateAsync;
 
-            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "User"));
+            await BotClient.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "User"));
             await base.Uninstall();
         }
 

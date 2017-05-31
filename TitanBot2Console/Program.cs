@@ -31,7 +31,7 @@ namespace TitanBot2Console
                     Restart();
             };
 
-            _bot.Logger.HandleLog += e => Log(e.ToString());
+            _bot.Logger.HandleLog += e => Log(e);
             _bot.LoggedOut += async () =>
             {
                 await Log("Logged out");
@@ -54,6 +54,9 @@ namespace TitanBot2Console
 
             await Task.Delay(-1);
         }
+
+        public Task Log(ILoggable entry)
+            => Log(entry.ToString());
 
         public async Task Log(string text)
         {

@@ -7,7 +7,7 @@ using TitanBot2.Services.Database.Extensions;
 
 namespace TitanBot2.Services.Database
 {
-    public partial class BotDatabase
+    public partial class BotDatabase : IDisposable
     {
         private string FileName { get; set; }
 
@@ -100,6 +100,11 @@ namespace TitanBot2.Services.Database
                 }
                 return result;
             });
+        }
+
+        public void Dispose()
+        {
+            _db.Dispose();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace TitanBot2.DiscordHandlers
             Client.ReactionRemoved += HandleReactionRemoveAsync;
             Client.ReactionsCleared += HandleReactionClearedAsync;
 
-            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Installed successfully", "Message"));
+            await BotClient.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Info, "Installed successfully", "Message"));
         }
 
         public override async Task Uninstall()
@@ -43,7 +43,7 @@ namespace TitanBot2.DiscordHandlers
             Client.ReactionRemoved -= HandleReactionRemoveAsync;
             Client.ReactionsCleared -= HandleReactionClearedAsync;
 
-            await BotClient.Logger.Log(new LogEntry(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Message"));
+            await BotClient.Logger.Log(new BotLog(LogType.Handler, LogSeverity.Info, "Uninstalled successfully", "Message"));
             await base.Uninstall();
         }
 
