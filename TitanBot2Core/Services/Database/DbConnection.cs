@@ -29,6 +29,6 @@ namespace TitanBot2.Services.Database
         public LiteCollection<User> UserTable => GetCollection<User>(); 
         public LiteCollection<Excuse> ExcuseTable => GetCollection<Excuse>(); 
         public LiteCollection<Registration> RegistrationTable => GetCollection<Registration>();
-        public LiteCollection<TT2Submission> TT2SubmissionTabel => GetCollection<TT2Submission>();
+        public LiteCollection<TT2Submission> TT2SubmissionTable => GetCollection<TT2Submission>();
     }
 }

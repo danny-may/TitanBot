@@ -12,5 +12,8 @@ namespace TitanBot2.Services.Database.Extensions
         public TT2SubmissionExtensions(BotDatabase db) : base(db)
         {
         }
+
+        public async Task<TT2Submission> Find(int id)
+            => await Database.QueryAsync(conn => conn.TT2SubmissionTable.Find(s => s.Id == id).SingleOrDefault());
     }
 }

@@ -15,8 +15,13 @@ namespace TitanBot2.Services.Database.Tables
         public ulong? Answerer { get; set; }
         public SubmissionType Type { get; set; }
         public string Title { get; set; }
-        public string Contents { get; set; }
+        public string Description { get; set; }
         public string Response { get; set; }
+        public Uri ImageUrl { get; set; }
+        public Uri Reddit { get; set; }
+        public ulong? Message { get; set; }
+        public DateTime SubmissionTime { get; set; }
+        public DateTime? ReplyTime { get; set; }
 
         public enum SubmissionType
         {

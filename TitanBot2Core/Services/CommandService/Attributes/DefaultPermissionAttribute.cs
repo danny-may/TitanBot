@@ -18,7 +18,7 @@ namespace TitanBot2.Services.CommandService.Attributes
 
         public static string GetKey(CallInfo info)
         {
-            if (info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm != null)
+            if (info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey != null)
                 return info.ParentInfo.PermissionKey + ("." + info.Call.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? "").TrimEnd('.');
             else
                 return info.ParentInfo.PermissionKey + ("." + string.Join(".", info.Subcalls)).TrimEnd('.');

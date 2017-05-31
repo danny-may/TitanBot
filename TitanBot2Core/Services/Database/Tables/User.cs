@@ -7,5 +7,6 @@ namespace TitanBot2.Services.Database.Tables
         [BsonId]
         public ulong DiscordId { get; set; }
         public string SupportCode { get; set; }
+        public bool CanSubmit { get; set; } = true;
     }
 }

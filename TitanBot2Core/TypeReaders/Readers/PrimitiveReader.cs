@@ -69,7 +69,7 @@ namespace TitanBot2.TypeReaders.Readers
             };
             parserBuilder[typeof(Uri)] = (TryParseDelegate<Uri>)delegate (string str, out Uri value)
             {
-                return Uri.TryCreate(str, UriKind.Absolute, out value);
+                return Uri.TryCreate(str.Trim('<', '>', ' '), UriKind.Absolute, out value);
             };
             return parserBuilder.ToImmutable();
         }

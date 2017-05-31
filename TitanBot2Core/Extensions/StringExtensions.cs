@@ -71,5 +71,10 @@ namespace TitanBot2.Extensions
 
             return builder.ToString();
         }
+
+        public static bool EndsWithAny(this string text, params string[] endings)
+        {
+            return endings.Any(e => text.EndsWith(e));
+        }
     }
 }
