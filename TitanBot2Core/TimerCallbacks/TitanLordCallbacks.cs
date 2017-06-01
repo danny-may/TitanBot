@@ -100,7 +100,7 @@ namespace TitanBot2.TimerCallbacks
                 if (guildData.TitanLord?.Channel != null)
                     tlChannel = context.Guild.GetTextChannel(guildData.TitanLord.Channel.Value) ?? tlChannel;
 
-                var round = (int)(context.EventTime - context.Timer.From).TotalSeconds / (60 * 60) + 2;
+                var round = 2 + (int)(context.EventTime - context.Timer.From).TotalSeconds / context.Timer.SecondInterval;
 
                 await tlChannel.SendMessageSafeAsync(FormatString(guildData.TitanLord.RoundText, new TimeSpan(), context.User, round, guildData.TitanLord.CQ));
             }

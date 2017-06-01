@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
 
@@ -12,26 +13,15 @@ namespace TitanBot2.Commands.Owner
         [Usage("Wipes the given table.")]
         async Task PurgeAsync(string table)
         {
-            switch (table.ToLower())
+            var tables = await Context.Database.QueryAsync(conn => conn.GetCollectionNames());
+            var target = tables.FirstOrDefault(t => t.ToLower() == table.ToLower());
+            if (target != null)
             {
-                case "timer":
-                    await Context.Database.Timers.Drop();
-                    break;
-                case "cmdperm":
-                    await Context.Database.CmdPerms.Drop();
-                    break;
-                case "guild":
-                    await Context.Database.Guilds.Drop();
-                    break;
-                case "excuse":
-                    await Context.Database.Excuses.Drop();
-                    break;
-                default:
-                    await ReplyAsync($"Unknown table `{table}`", ReplyType.Error);
-                    return;
+                await Context.Database.QueryAsync(conn => conn.DropCollection(target));
+                await ReplyAsync($"Dropped all data from the `{target}` table", ReplyType.Success);
             }
-
-            await ReplyAsync($"Dropped all data from the `{table}` table", ReplyType.Success);
+            else
+                await ReplyAsync($"The table `{table}` either does not exist or has no records.", ReplyType.Error);
         }
     }
 }

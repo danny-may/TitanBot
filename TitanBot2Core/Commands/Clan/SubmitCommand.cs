@@ -11,7 +11,7 @@ using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
 using TitanBot2.Services.Database.Tables;
 
-namespace TitanBot2.Commands.GuildSpecific.TapTitans2
+namespace TitanBot2.Commands.Clan
 {
     [Description("Allows you to submit a bug, suggestion or question to GameHive!")]
     [RequireGuild(169160979744161793)]

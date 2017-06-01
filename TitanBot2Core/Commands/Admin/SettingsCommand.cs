@@ -39,7 +39,7 @@ namespace TitanBot2.Commands.Admin
                          .Create(g => g.TitanLord.PinTimer)
                          .Create(g => g.TitanLord.RoundPings)
                          .Create("ClanQuest", g => g.TitanLord.CQ, v => v < 0 ? "Your clan quest cannot be negative" : null)
-                         .Create("TimerChannel", g => g.TitanLord.Channel, (IMessageChannel c) => c.Id, (v, c) => v == null ? "" : $"<#{v}>"),
+                         .Create("TimerChannel", g => g.TitanLord.Channel, (IMessageChannel c) => c?.Id, (v, c) => v == null ? "" : $"<#{v}>"),
                 new SettingGroup("General").Create(g => g.PermOverride)
                                            .Create(g => g.Prefix)
                                            .Create(g => g.NotifyAlive, (IMessageChannel c) => c?.Id, (v, c) => v == null ? "" : $"<#{v}>")

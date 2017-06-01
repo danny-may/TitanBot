@@ -235,12 +235,13 @@
     <Compile Include="Commands\GuildSpecific\Singularity\DemoteCommand.cs" />
     <Compile Include="Commands\GuildSpecific\Singularity\PromoteCommand.cs" />
     <Compile Include="Commands\GuildSpecific\Singularity\RemoveCommand.cs" />
-    <Compile Include="Commands\GuildSpecific\TapTitans2\SubmitCommand.cs" />
+    <Compile Include="Commands\Clan\SubmitCommand.cs" />
     <Compile Include="Commands\Owner\AnnounceCommand.cs" />
     <Compile Include="Commands\Owner\FocusCommand.cs" />
     <Compile Include="Commands\Owner\DBPurgeCommand.cs" />
     <Compile Include="Commands\Owner\ExecCommand.cs" />
     <Compile Include="Commands\Owner\GetMessageCommand.cs" />
+    <Compile Include="Commands\Owner\MakeTimerCommand.cs" />
     <Compile Include="Commands\Owner\ReloadCommand.cs" />
     <Compile Include="Commands\Owner\SetCommand.cs" />
     <Compile Include="Commands\Owner\ShutdownCommand.cs" />
