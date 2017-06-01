@@ -197,6 +197,7 @@ namespace TitanBot2.Commands.GuildSpecific.TapTitans2
         [Call("Reply")]
         [Usage("Replys to a given submission")]
         [DefaultPermission(8)]
+        [CallFlag("q", "quiet", "Specifies that there should be no DM sent to the submitter")]
         async Task ReplySubmissionAsync(int id, [Dense]string reply)
         {
             var submission = await Context.Database.Submissions.Find(id);
@@ -218,7 +219,7 @@ namespace TitanBot2.Commands.GuildSpecific.TapTitans2
                 await message.ModifySafeAsync(m => m.Embed = GetSubmissionMessage(submission).Build());
 
             var submitter = Context.Client.GetUser(submission.Submitter);
-            if (submitter != null && !alreadyReplied)
+            if (submitter != null && !alreadyReplied && !Flags.Has("q"))
                 await TrySend(submitter.Id, $"Your recent {submission.Type} titled `{submission.Title}` has just been replied to:\n\n{reply}\n - {Context.User}");
 
             await ReplyAsync("Reply has been accepted!", ReplyType.Success);
