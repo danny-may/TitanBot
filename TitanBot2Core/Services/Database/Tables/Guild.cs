@@ -11,8 +11,9 @@ namespace TitanBot2.Services.Database.Tables
         public ulong? NotifyAlive { get; set; }
         public ulong? NotifyDead { get; set; }
         public ulong PermOverride { get; set; } = 8;
-        public ulong[] BlackListed { get; set; }
+        public ulong[] BlackListed { get; set; } = new ulong[0];
         public TitanLordSettings TitanLord { get; set; } = new TitanLordSettings();
+        public ulong[] RegisterIgnore { get; set; } = new ulong[0];
 
         public class TitanLordSettings
         {

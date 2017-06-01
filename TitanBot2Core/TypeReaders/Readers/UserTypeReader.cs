@@ -29,6 +29,7 @@ namespace TitanBot2.TypeReaders.Readers
                     AddResult(results, context.Guild.Users.FirstOrDefault(u => u.Id == id) as T, 1.00f);
                 else
                     AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
+                AddResult(results, context.Client.GetUser(id) as T, 0.2f);
             }
 
             //By Id (0.9)
@@ -38,6 +39,7 @@ namespace TitanBot2.TypeReaders.Readers
                     AddResult(results, context.Guild.Users.FirstOrDefault(u => u.Id == id) as T, 0.90f);
                 else
                     AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
+                AddResult(results, context.Client.GetUser(id) as T, 0.1f);
             }
 
             //By Username + Discriminator (0.7-0.85)

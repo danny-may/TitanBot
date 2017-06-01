@@ -21,6 +21,8 @@ namespace TitanBot2.Commands.Clan
         [Usage("Creates your application for this clan")]
         [CallFlag("g", "global", "Specifies that the application is a global application.")]
         [CallFlag(typeof(Uri[]), "i", "images", "Specifies a list of images to use with your application")]
+        [CallFlag(typeof(int), "r", "relics", "Specifies how many relics you have earned")]
+        [CallFlag(typeof(int), "a", "attacks", "Specifies how many attacks you aim to do per week")]
         [DefaultPermission(0)]
         [RequireContext(ContextType.Guild)]
         async Task RegisterGuildAsync(int maxStage, [Dense]string message)
@@ -34,6 +36,8 @@ namespace TitanBot2.Commands.Clan
         [Call]
         [Usage("Creates a global application")]
         [CallFlag(typeof(Uri[]), "i", "images", "Specifies a list of images to use with your registration")]
+        [CallFlag(typeof(int), "r", "relics", "Specifies how many relics you have earned")]
+        [CallFlag(typeof(int), "a", "attacks", "Specifies how many attacks you aim to do per week")]
         [RequireContext(ContextType.DM|ContextType.Group)]
         Task RegisterGlobalAsync(int maxStage, [Dense]string message)
             => RegisterAsync(maxStage, message, null);
@@ -41,6 +45,7 @@ namespace TitanBot2.Commands.Clan
         async Task RegisterAsync(int maxStage, string message, ulong? guildId)
         {
             Flags.TryGet("i", out Uri[] images);
+            images = images?.Where(i => i.AbsoluteUri.EndsWithAny(".png", ".jpg", ".gif", ".svg")).ToArray();
             var current = await Context.Database.Registrations.GetForUserOnGuild(Context.User.Id, guildId);
             var isNew = current == null;
             current = current ?? new Registration
@@ -49,8 +54,12 @@ namespace TitanBot2.Commands.Clan
                 GuildId = guildId,
             };
 
-            if (images != null)
+            if (images != null && images.Count() > 0)
                 current.Images = images;
+            if (Flags.TryGet("r", out int relics))
+                current.Relics = relics;
+            if (Flags.TryGet("a", out int attacks))
+                current.CQPerWeek = attacks;
             current.MaxStage = maxStage;
             current.Message = message;
             current.EditTime = DateTime.Now;
@@ -65,34 +74,41 @@ namespace TitanBot2.Commands.Clan
                 await ReplyAsync("Your global application has been successfully updated", ReplyType.Success);
         }
 
-        [Call("View")]
+        [Call("ViewMine")]
         [Usage("Views your registration for this guild")]
+        [CallFlag("g", "global", "Specifies that the application is a global application.")]
         [RequireContext(ContextType.Guild)]
         [DefaultPermission(0)]
         Task ViewGuildRegistrationAsync()
             => ViewRegistrationAsync(Context.Guild.Id, Context.User);
 
-        [Call("View")]
+        [Call("ViewMine")]
         [Usage("Views your global registration")]
         [RequireContext(ContextType.DM|ContextType.Group)]
         Task ViewGlobalRegistrationAsync()
             => ViewRegistrationAsync(null, Context.User);
 
-        [Call("Show")]
-        [Usage("Shows the registration for the given user")]
+        [Call("View")]
+        [Usage("View the registration for the given user")]
+        [CallFlag("g", "global", "Specifies that the application is a global application.")]
         [RequireContext(ContextType.Guild)]
         Task ViewGuildRegistrationAsync(SocketUser user)
             => ViewRegistrationAsync(Context.Guild.Id, user);
 
         async Task ViewRegistrationAsync(ulong? guildId, IUser user)
         {
-            var current = await Context.Database.Registrations.GetForUserOnGuild(user?.Id ?? Context.User.Id, guildId) ??
-                          await Context.Database.Registrations.GetForUserOnGuild(user?.Id ?? Context.User.Id, null);
+            Registration current;
+            if (!Flags.Has("g"))
+                current = await Context.Database.Registrations.GetForUserOnGuild(user?.Id ?? Context.User.Id, guildId);
+            else
+                current = await Context.Database.Registrations.GetForUserOnGuild(user?.Id ?? Context.User.Id, null);
 
             if (current == null)
             {
                 if (user.Id == Context.User.Id)
                     await ReplyAsync("You have not registered yet!", ReplyType.Error);
+                else if (Flags.Has("g"))
+                    await ReplyAsync("That user does not have a global registration yet!", ReplyType.Error);
                 else
                     await ReplyAsync("That user does not have a registration here yet!", ReplyType.Error);
                 return;
@@ -112,7 +128,10 @@ namespace TitanBot2.Commands.Clan
                 {
                     Text = $"{(current.GuildId == null ? "Global" : "Local")} application | Applied {current.ApplyTime} | Updated {current.EditTime}"
                 }
-            }.AddField("Images", string.Join("\n", current.Images?.Select(i => i.AbsoluteUri) ?? new string[] { "None" }));
+            }.AddInlineField("Max Stage", current.MaxStage)
+             .AddInlineField("Relics", current.Relics)
+             .AddInlineField("CQ/Week", current.CQPerWeek)
+             .AddField("Images", string.Join("\n", current.Images?.Select(i => i.AbsoluteUri) ?? new string[] { "None" }));
 
             await ReplyAsync("", embed: builder);
         }
@@ -138,12 +157,37 @@ namespace TitanBot2.Commands.Clan
 
         async Task RemoveRegistrationAsync(ulong? guildID, IUser user)
         {
+            if (guildID == null && user != Context.User)
+            {
+                await ReplyAsync($"You cannot remove another users global application. Try usng `{Context.Prefix}apply ignore <user>`.", ReplyType.Error);
+                return;
+            }
             await Context.Database.Registrations.RemoveRegistration(user.Id, guildID);
 
             if (user.Id == Context.User.Id)
                 await ReplyAsync($"You have successfully removed your {(guildID == null ? "global " : "")}application{(guildID != null ? " for this guild" : "")}", ReplyType.Success);
             else
                 await ReplyAsync($"You have successfully removed the application by {user.Username} for this guild");
+        }
+
+        [Call("Ignore")]
+        [Usage("Specifies if a users global registrations should be ignored. Defaults to yes")]
+        [RequireContext(ContextType.Guild)]
+        async Task IgnoreUser(IUser user, bool ignore = true)
+        {
+            var ignored = Context.GuildData.RegisterIgnore.ToList();
+            if (ignore)
+                ignored.Add(user.Id);
+            else
+                ignored.Remove(user.Id);
+            Context.GuildData.RegisterIgnore = ignored.ToArray();
+
+            await Context.Database.Guilds.Upsert(Context.GuildData);
+
+            if (ignore)
+                await ReplyAsync("That user will no longer be shown from the global listings. They will be for local ones however.", ReplyType.Success);
+            else
+                await ReplyAsync("That user will now be shown in global listings.", ReplyType.Success);
         }
 
         [Call("List")]
@@ -160,7 +204,9 @@ namespace TitanBot2.Commands.Clan
             var includeGlobal = Flags.Has("g");
 
             var applications = await Context.Database.Registrations.GetForGuild(Context.Guild.Id);
+            var ignore = Context.GuildData.RegisterIgnore.ToList();
             applications = applications.Where(a => includeGlobal || a.GuildId != null)
+                                       .Where(a => !(ignore.Contains(a.UserId) && a.GuildId == null))
                                        .OrderByDescending(a => a.MaxStage)
                                        .ThenByDescending(a => a.Images?.Count() ?? 0)
                                        .ThenBy(a => a.ApplyTime)
@@ -173,9 +219,11 @@ namespace TitanBot2.Commands.Clan
                 "#",
                 "User",
                 "MS",
-                "#Images",
-                "Global",
-                "Last edit"
+                "Imgs",
+                "Relics",
+                "CQ/wk",
+                "Last edit",
+                ""
             });
             var pos = from + 1;
             foreach (var app in applications)
@@ -184,12 +232,14 @@ namespace TitanBot2.Commands.Clan
                 if (user == null)
                     continue;
                 table.Add(new string[]{
-                    pos++.ToString(),
+                    "#" + pos++.ToString(),
                     $"{user} ({user.Id})",
-                    app.MaxStage.ToString(),
+                    $"[{app.MaxStage}]",
                     (app.Images?.Length ?? 0).ToString(),
-                    app.GuildId != null ? "False" : "True",
-                    (DateTime.Now - app.EditTime).Days + " day(s) ago"
+                    $"#{app.Relics}",
+                    app.CQPerWeek.ToString(),
+                    (DateTime.Now - app.EditTime).Days + " day(s) ago",
+                    app.GuildId == null ? "-g" : ""
                 });
                 if (table.Count == to - from)
                     break;
@@ -200,7 +250,7 @@ namespace TitanBot2.Commands.Clan
             if (table.Count == 1)
                 await ReplyAsync("You have no registered users!", ReplyType.Error);
             else
-                await ReplyAsync($"```{text}```");
+                await ReplyAsync($"```css\n{text}```");
         }
 
         [Call("Clear")]
