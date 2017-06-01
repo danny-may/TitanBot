@@ -46,7 +46,6 @@ namespace TitanBot2.TypeReaders.Readers
         static IReadOnlyDictionary<Type, Delegate> CreateParsers()
         {
             var parserBuilder = ImmutableDictionary.CreateBuilder<Type, Delegate>();
-            parserBuilder[typeof(bool)] = (TryParseDelegate<bool>)bool.TryParse;
             parserBuilder[typeof(sbyte)] = (TryParseDelegate<sbyte>)sbyte.TryParse;
             parserBuilder[typeof(byte)] = (TryParseDelegate<byte>)byte.TryParse;
             parserBuilder[typeof(short)] = (TryParseDelegate<short>)short.TryParse;
@@ -62,6 +61,27 @@ namespace TitanBot2.TypeReaders.Readers
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;
             parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
             parserBuilder[typeof(char)] = (TryParseDelegate<char>)char.TryParse;
+            parserBuilder[typeof(bool)] = (TryParseDelegate<bool>)delegate (string str, out bool value)
+            {
+                switch (str.ToLower())
+                {
+                    case "t":
+                    case "true":
+                    case "y":
+                    case "yes":
+                        value = true;
+                        return true;
+                    case "f":
+                    case "false":
+                    case "n":
+                    case "no":
+                        value = false;
+                        return true;
+                    default:
+                        value = false;
+                        return false;
+                }
+            };
             parserBuilder[typeof(string)] = (TryParseDelegate<string>)delegate (string str, out string value)
             {
                 value = str;

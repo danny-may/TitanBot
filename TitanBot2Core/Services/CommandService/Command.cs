@@ -34,7 +34,6 @@ namespace TitanBot2.Services.CommandService
         protected CallCheckResponse CheckResult { get; private set; }
 
         protected CmdContext Context { get; private set; }
-        protected TypeReaderCollection Readers { get; private set; }
         protected FlagCollection Flags { get; private set; }
 
         public static int TotalCommands { get; private set; } = 0;
@@ -96,12 +95,11 @@ namespace TitanBot2.Services.CommandService
             return true;
         }
 
-        public void SetContext(CmdContext context, TypeReaderCollection readers)
+        public void SetContext(CmdContext context)
         {
-            if (Context != null || Readers != null)
+            if (Context != null)
                 throw new InvalidOperationException("Unable to set Command Context once it has already been set");
             Context = context;
-            Readers = readers;
         }
 
         public virtual async Task<Dictionary<CallInfo, CallCheckResponse>> CheckCallsAsync(CallInfo[] calls)

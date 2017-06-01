@@ -14,6 +14,7 @@ using TitanBot2.Services.CommandService.Models;
 using TitanBot2.Services.Database;
 using TitanBot2.Services.Database.Tables;
 using TitanBot2.Services.Scheduler;
+using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Services.CommandService
 {
@@ -28,6 +29,7 @@ namespace TitanBot2.Services.CommandService
         public CachedWebClient WebClient { get; private set; }
         public TT2DataService TT2DataService { get; private set; }
         public BotCommandService CommandService { get; private set; }
+        public TypeReaderCollection.CachedReader Readers { get; private set; }
         public string[] Arguments { get; private set; }
         public CommandInfo Command { get; private set; }
         public FlagValue[] Flags { get; private set; }
@@ -54,6 +56,7 @@ namespace TitanBot2.Services.CommandService
             Logger = BotClient.Logger;
             WebClient = args.WebClient;
             CommandService = cmdService;
+            Readers = cmdService.GetReader();
             TT2DataService = args.TT2DataService;
 
             Dependencies = args;

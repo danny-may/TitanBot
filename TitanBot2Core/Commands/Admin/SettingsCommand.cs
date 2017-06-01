@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot2.Common;
 using TitanBot2.Extensions;
@@ -9,6 +11,7 @@ using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
 using TitanBot2.Services.CommandService.Models;
 using TitanBot2.Services.Database.Tables;
+using TitanBot2.TypeReaders;
 
 namespace TitanBot2.Commands.Admin
 {
@@ -17,208 +20,224 @@ namespace TitanBot2.Commands.Admin
     [RequireContext(ContextType.Guild)]
     class SettingsCommand : Command
     {
-        private readonly List<Setting> _settings;
+        private static List<SettingGroup> _settingGroups { get; }
 
-        public SettingsCommand()
+        static SettingsCommand()
         {
-            _settings = new List<Setting>()
-                {
-                    Setting.StringDefault("TimerText", "Titan Lord", 500, g => g.TitanLord.TimerText, (g,s) => g.TitanLord.TimerText = s),
-                    Setting.StringDefault("InXText", "Titan Lord", 500, g => g.TitanLord.InXText, (g,s) => g.TitanLord.InXText = s),
-                    Setting.StringDefault("NowText", "Titan Lord", 500, g => g.TitanLord.NowText, (g,s) => g.TitanLord.NowText = s),
-                    Setting.StringDefault("RoundText", "Titan Lord", 500, g => g.TitanLord.RoundText, (g,s) => g.TitanLord.RoundText = s, "Use %TIME% for the time, %USER% for the user, and %ROUND% for the round"),
-                    Setting.IntDefault("ClanQuest", "Titan Lord", g => g.TitanLord.CQ, (g,v) => g.TitanLord.CQ = v),
-                    Setting.UlongDefault("PermissionOverride", "General", g => g.PermOverride, (g,v) => g.PermOverride = v),
-                    Setting.BoolDefault("PinTimer", "Titan Lord", g => g.TitanLord.PinTimer, (g,v) => g.TitanLord.PinTimer = v, "NOTE: Wont pin if it doesnt have permission"),
-                    Setting.ChannelDefault("TimerChannel", "Titan Lord", g => g.TitanLord.Channel ?? 0, (g,v) => g.TitanLord.Channel = v),
-                    Setting.Default("CustomPrefix", "General", g => g.Prefix, (g,s) => $"Please use `{Context.Prefix}prefix <new prefix>` to set the prefix"),
-                    new Setting
-                    {
-                        Key = "PrePings",
-                        Group = "Titan Lord",
-                        Get = g => string.Join(", ", g.TitanLord.PrePings.Select(p => new TimeSpan(0, 0, p).Beautify())),
-                        Set = (g, s) =>
-                        {
-                            var ints = s.Split(' ', true)
-                                        .Select(t => Readers.Read(typeof(TimeSpan), Context, t).Result)
-                                        .Where(r => r.IsSuccess)
-                                        .SelectMany(r => r.Values)
-                                        .Select(t => t.Value as TimeSpan?)
-                                        .Where(t => t != null)
-                                        .Cast<TimeSpan>()
-                                        .Select(t => (int)t.TotalSeconds);
-
-                            if (ints.Count() == 0)
-                                return "Invalid times specified.";
-
-                            g.TitanLord.PrePings = ints.ToArray();
-
-                            return null;
-                        }
-                    }
+            _settingGroups = new List<SettingGroup>
+            {
+                new SettingGroup("TitanLord", "There are several format strings you can use to have live data in your message.\n" +
+                                              "Use `%USER%` to include the user who started the timer\n" +
+                                              "Use `%TIME%` to include how long until the titan lord is up\n" +
+                                              "Use `%ROUND%` for the round number\n" +
+                                              "Use `%CQ%` for the current CQ number\n" +
+                                              "Use `%COMPLETE%` for the time the titan lord will be up (UTC time)")
+                         .Create(g => g.TitanLord.TimerText, v => v.Length > 500 ? "You cannot have more than 500 characters for this setting" : null)
+                         .Create(g => g.TitanLord.InXText, v => v.Length > 500 ? "You cannot have more than 500 characters for this setting" : null)
+                         .Create(g => g.TitanLord.NowText, v => v.Length > 500 ? "You cannot have more than 500 characters for this setting" : null)
+                         .Create(g => g.TitanLord.RoundText, v => v.Length > 500 ? "You cannot have more than 500 characters for this setting" : null)
+                         .Create(g => g.TitanLord.PinTimer)
+                         .Create(g => g.TitanLord.RoundPings)
+                         .Create("ClanQuest", g => g.TitanLord.CQ, v => v < 0 ? "Your clan quest cannot be negative" : null)
+                         .Create("TimerChannel", g => g.TitanLord.Channel, (IMessageChannel c) => c.Id, (v, c) => v == null ? "" : $"<#{v}>"),
+                new SettingGroup("General").Create(g => g.PermOverride)
+                                           .Create(g => g.Prefix)
+                                           .Create(g => g.NotifyAlive, (IMessageChannel c) => c?.Id, (v, c) => v == null ? "" : $"<#{v}>")
+                                           .Create(g => g.NotifyDead, (IMessageChannel c) => c?.Id, (v, c) => v == null ? "" : $"<#{v}>")
             };
         }
 
         [Call]
         [Usage("Lists all settings available")]
-        async Task ListSettingsAsync()//[Dense]string settingGroup = null)
+        async Task ListSettingsAsync([Dense]string settingGroup = null)
         {
-            var embed = new EmbedBuilder
+            var builder = new EmbedBuilder
             {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = Res.Emoji.Information_source,
-                    Name = "Settings"
-                },
-                Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
+                Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                 Timestamp = DateTime.Now,
-                Title = "These are the settings for this guild",
-                Description = $"Use `{Context.Prefix}settings set <setting> <value>` to change the value for a setting"
+                Footer = new EmbedFooterBuilder
+                {
+                    IconUrl = Context.User.GetAvatarUrl(),
+                    Text = $"{Context.User.Username} | Settings"
+                }
             };
-            foreach (var group in _settings.GroupBy(s => s.Group))
+
+            if (settingGroup == null)
             {
-                embed.AddField($"{group.Key} Settings", string.Join("\n", group.Select(s => $"**> __{s.Key}__**\n{s.Get(Context.GuildData)}" + (!string.IsNullOrWhiteSpace(s.Notes) ? $"\n*{s.Notes}*" : ""))));
+                builder.WithTitle($"Please select a setting group from the following:")
+                       .WithDescription(string.Join("\n", _settingGroups.Select(g => g.GroupName)));
+                await ReplyAsync("", embed: builder.Build());
+                return;
+            }
+            var group = _settingGroups.FirstOrDefault(g => g.GroupName.ToLower() == settingGroup.ToLower());
+            if (group == null)
+            {
+                await ReplyAsync("That isnt a valid setting group!");
+                return;
             }
 
-            await ReplyAsync("", embed: embed.Build());
+            builder.WithTitle($"Here are all the settings for the group `{group.GroupName}`");
+            foreach (var setting in group.Settings)
+            {
+                var value = setting.Load(Context);
+                if (string.IsNullOrWhiteSpace(value))
+                    value = "Not Set";
+                builder.AddInlineField(setting.Name, value);
+            }
+            if (!string.IsNullOrWhiteSpace(group.Description))
+                builder.AddField("Notes", group.Description);
+            await ReplyAsync("", embed: builder.Build());
         }
 
         [Call("Set")]
         [Usage("Sets the given setting to the given value.")]
-        async Task SetSettingAsync(string key, [Dense] string value)
+        async Task SetSettingAsync(string key, [Dense] string value = null)
         {
-            var setting = _settings.SingleOrDefault(s => s.Key.ToLower() == key.ToLower());
-
+            var setting = _settingGroups.SelectMany(g => g.Settings)
+                                        .FirstOrDefault(s => s.Name.ToLower() == key.ToLower());
             if (setting == null)
-            {
-                await ReplyAsync($"The setting `{key}` could not be found. Please use `{Context.Prefix}settings list` for a list of all available settings", ReplyType.Error);
-                return;
-            }
-
-            var result = setting.Set(Context.GuildData, value);
-
-            if (result == null)
-            {
-                await Context.Database.Guilds.Update(Context.GuildData);
-                await ReplyAsync($"Set `{setting.Key}` to {setting.Get(Context.GuildData)}", ReplyType.Success);
-            }
+                await ReplyAsync("Could not find setting", ReplyType.Error);
             else
             {
-                await ReplyAsync($"Unable to set `{setting.Key}` to {value}. {result}", ReplyType.Error);
+                if (!setting.Save(Context, value, out string errors))
+                    await ReplyAsync(errors, ReplyType.Error);
+                else
+                    await ReplyAsync("Setting has been set succesfully", ReplyType.Success);
             }
         }
 
-        private class Setting
+        private abstract class Setting
         {
-            public string Group { get; set; }
-            public string Key { get; set; }
-            public string Notes { get; set; }
-            public Func<Guild, string> Get { get; set; }
-            public Func<Guild, string, string> Set { get; set; }
+            public string Name { get; protected set; }
 
-            public static Setting Default(string key, string group, Func<Guild, string> getter, Func<Guild, string, string> setter, string notes = "")
-            => new Setting
+            public abstract bool Save(CmdContext context, string text, out string errors);
+            public abstract string Load(CmdContext context);
+
+            public static SettingGroup BuildGroup(string groupName, string description)
+                => new SettingGroup(groupName, description);
+
+            public static Setting Create<Ts, Ta>(string name, Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter, Func<Ts, CmdContext, string> viewer, Func<Ta, string> validator)
+                => new TypedSetting<Ts, Ta>(name, property, converter, viewer, validator);
+
+            //TStore is the type that the value is stored in the database as
+            //TAccept is the data type that is permitted by the setting
+            //Func<TAccept, TStore> Converter is used to go from the accepted data type to the stored data type
+            //TStore is calculated by the type of the property given to property
+            //TAccept is calculated by the input type of the converter
+            private class TypedSetting<TStore, TAccept> : Setting
             {
-                Key = key,
-                Group = group,
-                Get = getter,
-                Set = setter,
-                Notes = notes
-            };
+                private Func<TAccept, string> Validator { get; }
+                private Func<TAccept, TStore> Converter { get; }
+                private Func<TStore, CmdContext, string> Viewer { get; }
+                private Action<Guild, TStore> Setter { get; }
+                private Func<Guild, TStore> Getter { get; }
 
-            public static Setting StringDefault(string key, string group, int maxlength, Func<Guild, string> getter, Action<Guild, string> setter, string notes = "")
-                => Default(key, group, getter, (g, s) =>
+                public TypedSetting(string name, Expression<Func<Guild, TStore>> property, Func<TAccept, TStore> converter, Func<TStore, CmdContext, string> viewer, Func<TAccept, string> validator)
                 {
-                    if (s.Length < maxlength && maxlength > 0)
-                        setter(g, s);
-                    else
-                        return $"The text supplied is too long. Limit set to {maxlength} characters (including formatting characters)";
-                    return null;
-                }, notes);
+                    Name = name;
+                    Setter = CreateSetter(property);
+                    Getter = property.Compile();
+                    Viewer = viewer;
+                    Validator = validator;
+                    Converter = converter;
+                }
 
-            public static Setting IntDefault(string key, string group, Func<Guild, int> getter, Action<Guild, int> setter, string notes = "")
-                => Default(key, group, g => getter(g).ToString(), (g, s) =>
+                public override bool Save(CmdContext context, string text, out string errors)
                 {
-                    int val;
-                    if (int.TryParse(s, out val))
-                        setter(g, val);
+                    var acceptType = typeof(TAccept);
+                    TAccept result = default(TAccept);
+                    if (text == null && (!acceptType.IsValueType || (Nullable.GetUnderlyingType(acceptType) != null)))
+                        errors = null;
                     else
-                        return "Please supply a valid number.";
-                    return null;
-                }, notes);
+                    {
+                        var readRes = context.Readers.Read(acceptType, context, text).Result;
+                        if (!readRes.IsSuccess)
+                            errors = $"`{text}` is not a valid value for {Name}";
+                        else
+                        {
+                            errors = Validator((TAccept)readRes.Best);
+                            result = (TAccept)readRes.Best;
+                        }
+                    }
 
-            public static Setting UlongDefault(string key, string group, Func<Guild, ulong> getter, Action<Guild, ulong> setter, string notes = "")
-                => Default(key, group, g => getter(g).ToString(), (g, s) =>
-                {
-                    ulong val;
-                    if (ulong.TryParse(s, out val))
-                        setter(g, val);
-                    else
-                        return "Please supply a valid number.";
-                    return null;
-                }, notes);
+                    if (errors != null)
+                        return false;
 
-            public static Setting BoolDefault(string key, string group, Func<Guild, bool> getter, Action<Guild, bool> setter, string notes = "")
-                => Default(key, group, g => getter(g).ToString(), (g, s) =>
-                {
-                    bool val;
-                    if (bool.TryParse(s, out val))
-                        setter(g, val);
-                    else
-                        return "Please supply a valid boolean (true or false)";
-                    return null;
-                }, notes);
+                    Setter(context.GuildData, Converter(result));
+                    context.Database.Guilds.Upsert(context.GuildData).Wait();
+                    return true;
+                }
 
-            public static Setting ChannelDefault(string key, string group, Func<Guild, ulong> getter, Action<Guild, ulong> setter, string notes = "")
-                => Default(key, group, g =>
-                {
-                    var val = getter(g);
-                    if (val == 0)
-                        return "Not set";
-                    return MentionUtils.MentionChannel(val);
-                }, (g, s) =>
-                {
-                    ulong val;
-                    if (MentionUtils.TryParseChannel(s, out val))
-                        setter(g, val);
-                    else
-                        return "That channel does not exist.";
-                    return null;
-                }, notes);
+                public override string Load(CmdContext context)
+                    => Viewer(Getter(context.GuildData), context);
 
-            public static Setting UserDefault(string key, string group, Func<Guild, ulong> getter, Action<Guild, ulong> setter, string notes = "")
-                => Default(key, group, g =>
+                private Action<Guild, TStore> CreateSetter(Expression<Func<Guild, TStore>> selector)
                 {
-                    var val = getter(g);
-                    if (val == 0)
-                        return "Not set";
-                    return MentionUtils.MentionUser(val);
-                }, (g, s) =>
-                {
-                    ulong val;
-                    if (MentionUtils.TryParseUser(s, out val))
-                        setter(g, val);
-                    else
-                        return "Invalid user";
-                    return null;
-                }, notes);
+                    var valueParam = Expression.Parameter(typeof(TStore));
+                    var body = Expression.Assign(selector.Body, valueParam);
+                    return Expression.Lambda<Action<Guild, TStore>>(body,
+                        selector.Parameters.Single(),
+                        valueParam).Compile();
+                }
+            }
+        }
 
-            public static Setting RoleDefault(string key, string group, Func<Guild, ulong> getter, Action<Guild, ulong> setter, string notes = "")
-                => Default(key, group, g =>
-                {
-                    var val = getter(g);
-                    if (val == 0)
-                        return "Not set";
-                    return MentionUtils.MentionRole(val);
-                }, (g, s) =>
-                {
-                    ulong val;
-                    if (MentionUtils.TryParseRole(s, out val))
-                        setter(g, val);
-                    else
-                        return "Invalid role";
-                    return null;
-                }, notes);
+        private class SettingGroup
+        {
+            public string GroupName { get; }
+            public string Description { get; }
+            public List<Setting> Settings { get; } = new List<Setting>();
+
+            internal SettingGroup(string groupName, string description)
+            {
+                GroupName = groupName;
+                Description = description;
+            }
+            internal SettingGroup(string groupName)
+            {
+                GroupName = groupName;
+            }
+
+            private string GetName<T>(Expression<Func<Guild, T>> property)
+                => ((property.Body as MemberExpression)?.Member as PropertyInfo)?.Name ?? "UNKOWN_PROPERTYNAME";
+
+            public SettingGroup Create<T>(Expression<Func<Guild, T>> property)
+                => Create(GetName(property), property);
+            public SettingGroup Create<T>(string name, Expression<Func<Guild, T>> property)
+                => Create(name, property, (v, c) => v?.ToString(), t => null);
+            public SettingGroup Create<T>(Expression<Func<Guild, T>> property, Func<T, CmdContext, string> viewer)
+                => Create(GetName(property), property, viewer);
+            public SettingGroup Create<T>(string name, Expression<Func<Guild, T>> property, Func<T, CmdContext, string> viewer)
+                => Create(name, property, viewer, t => null);
+            public SettingGroup Create<T>(Expression<Func<Guild, T>> property, Func<T, string> validator)
+                => Create(GetName(property), property, validator);
+            public SettingGroup Create<T>(string name, Expression<Func<Guild, T>> property, Func<T, string> validator)
+                => Create(name, property, (v, c) => v?.ToString(), validator);
+            public SettingGroup Create<T>(Expression<Func<Guild, T>> property, Func<T, CmdContext, string> viewer, Func<T, string> validator)
+                => Create(GetName(property), property, viewer, validator);
+            public SettingGroup Create<T>(string name, Expression<Func<Guild, T>> property, Func<T, CmdContext, string> viewer, Func<T, string> validator)
+                => Create(name, property, t => t, viewer, validator);
+
+            public SettingGroup Create<Ta, Ts>(Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter)
+                => Create(GetName(property), property, converter);
+            public SettingGroup Create<Ta, Ts>(string name, Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter)
+                => Create(name, property, converter, (v, c) => v?.ToString(), t => null);
+            public SettingGroup Create<Ta, Ts>(Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter, Func<Ts, CmdContext, string> viewer)
+                => Create(GetName(property), property, converter, viewer);
+            public SettingGroup Create<Ta, Ts>(string name, Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter, Func<Ts, CmdContext, string> viewer)
+                => Create(name, property, converter, viewer, t => null);
+            public SettingGroup Create<Ta, Ts>(Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter, Func<Ta, string> validator)
+                => Create(GetName(property), property, converter, validator);
+            public SettingGroup Create<Ta, Ts>(string name, Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter, Func<Ta, string> validator)
+                => Create(name, property, converter, (v, c) => v?.ToString(), validator);
+            public SettingGroup Create<Ta, Ts>(Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter, Func<Ts, CmdContext, string> viewer, Func<Ta, string> validator)
+                => Create(GetName(property), property, converter, viewer, validator);
+
+            public SettingGroup Create<Ts, Ta>(string name, Expression<Func<Guild, Ts>> property, Func<Ta, Ts> converter, Func<Ts, CmdContext, string> viewer, Func<Ta, string> validator)
+            {
+                Settings.Add(Setting.Create(name, property, converter, viewer, validator));
+                return this;
+            }
         }
     }
 }

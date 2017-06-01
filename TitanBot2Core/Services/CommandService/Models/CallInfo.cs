@@ -59,14 +59,14 @@ namespace TitanBot2.Services.CommandService.Models
             return ret.ToArray();
         }
 
-        public async Task<SignatureMatchResponse> ValidateSignature(CmdContext context, TypeReaderCollection.CachedReader readers)
+        public async Task<SignatureMatchResponse> ValidateSignature(CmdContext context)
         {
             if (!CheckSubcommand(context, out string[] args))
                 return SignatureMatchResponse.FromError();
 
-            var parsedArguments = await ReadArguments(readers, context, args);
+            var parsedArguments = await ReadArguments(context, args);
 
-            var flags = new FlagCollection(context, readers, Flags, context.Flags);
+            var flags = new FlagCollection(context, Flags, context.Flags);
 
             return SignatureMatchResponse.FromSuccess(parsedArguments.ToArray(), flags);
         }
@@ -87,7 +87,7 @@ namespace TitanBot2.Services.CommandService.Models
             return true;
         }
 
-        private async Task<ArgumentReadResponse[]> ReadArguments(TypeReaderCollection.CachedReader reader, CmdContext context, string[] args)
+        private async Task<ArgumentReadResponse[]> ReadArguments(CmdContext context, string[] args)
         {
             var res = new List<ArgumentReadResponse>();
             var temp = ArgumentPossibilities().ToArray();
@@ -117,7 +117,7 @@ namespace TitanBot2.Services.CommandService.Models
                     if (a == null)
                         return TypeReaderResponse.FromSuccess(Parameters[i].DefaultValue);
                     argEnumerable.MoveNext();
-                    return await reader.Read(a.ArgType, context, argEnumerable.Current);
+                    return await context.Readers.Read(a.ArgType, context, argEnumerable.Current);
                 });
 
                 var readResults = await Task.WhenAll(readerResults);

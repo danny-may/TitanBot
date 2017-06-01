@@ -31,18 +31,18 @@ namespace TitanBot2.Services.CommandService.Models
             Calls = CallInfo.FromCommandInfo(this);
         }
 
-        public Command CreateInstance(CmdContext context, TypeReaderCollection readers)
+        public Command CreateInstance(CmdContext context)
         {
             var res = Activator.CreateInstance(CommandType) as Command;
-            res.SetContext(context, readers);
+            res.SetContext(context);
             return res;
         }
 
-        public Task<Dictionary<CallInfo, CallCheckResponse>> CheckCalls(CmdContext context, TypeReaderCollection readers)
+        public Task<Dictionary<CallInfo, CallCheckResponse>> CheckCalls(CmdContext context)
         {
             if (Calls.Length == 0)
                 return Task.FromResult(new Dictionary<CallInfo, CallCheckResponse>());
-            var inst = CreateInstance(context, readers);
+            var inst = CreateInstance(context);
             return inst.CheckCallsAsync(Calls);
         }
 

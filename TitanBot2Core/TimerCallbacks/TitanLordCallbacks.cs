@@ -25,7 +25,7 @@ namespace TitanBot2.TimerCallbacks
                 if (guildData.TitanLord?.Channel != null)
                     tlChannel = context.Guild.GetTextChannel(guildData.TitanLord.Channel.Value) ?? tlChannel;
 
-                var messageText = FormatString(guildData.TitanLord?.NowText, new TimeSpan(0), context.User, clanQuest: guildData.TitanLord.CQ);
+                var messageText = FormatString(guildData.TitanLord?.NowText, new TimeSpan(0), context.User, clanQuest: guildData.TitanLord.CQ, completionTime: context.Timer.To);
 
                 var message = await tlChannel.SendMessageSafeAsync(messageText);
 
@@ -62,7 +62,8 @@ namespace TitanBot2.TimerCallbacks
                         await message.ModifySafeAsync(m => m.Content = FormatString(guildData.TitanLord.TimerText,
                                                                                     timeRemaining,
                                                                                     context.User,
-                                                                                    clanQuest: guildData.TitanLord.CQ));
+                                                                                    clanQuest: guildData.TitanLord.CQ, 
+                                                                                    completionTime: context.Timer.To));
                 }
 
                 var alertTimes = guildData.TitanLord.PrePings;
@@ -75,7 +76,7 @@ namespace TitanBot2.TimerCallbacks
                         var tlChannel = context.Channel;
                         if (guildData.TitanLord?.Channel != null)
                             tlChannel = context.Guild.GetTextChannel(guildData.TitanLord.Channel.Value) ?? tlChannel;
-                        await tlChannel.SendMessageSafeAsync(FormatString(guildData.TitanLord.InXText, timeRemaining, context.User, clanQuest: guildData.TitanLord.CQ));
+                        await tlChannel.SendMessageSafeAsync(FormatString(guildData.TitanLord.InXText, timeRemaining, context.User, clanQuest: guildData.TitanLord.CQ, completionTime: context.Timer.To));
                     }
                 }
             }
@@ -92,6 +93,9 @@ namespace TitanBot2.TimerCallbacks
 
                 var guildData = await context.Database.Guilds.GetGuild(context.Guild.Id);
 
+                if (!guildData.TitanLord.RoundPings)
+                    return;
+
                 var tlChannel = context.Channel;
                 if (guildData.TitanLord?.Channel != null)
                     tlChannel = context.Guild.GetTextChannel(guildData.TitanLord.Channel.Value) ?? tlChannel;
@@ -102,12 +106,13 @@ namespace TitanBot2.TimerCallbacks
             }
         }
 
-        public static string FormatString(string text, TimeSpan time, IUser user, int round = 0, int clanQuest = 0)
+        public static string FormatString(string text, TimeSpan time, IUser user, int round = 0, int clanQuest = 0, DateTime? completionTime = null)
         {
             return text.Replace("%TIME%", time.ToString())
                        .Replace("%USER%", user.Mention)
                        .Replace("%ROUND%", round.ToString())
-                       .Replace("%CQ%", clanQuest.Beautify());
+                       .Replace("%CQ%", clanQuest.Beautify())
+                       .Replace("%COMPLETE%", completionTime?.Beautify() ?? "%COMPLETE%");
         }
     }
 }

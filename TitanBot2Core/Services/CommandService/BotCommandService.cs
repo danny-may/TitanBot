@@ -52,7 +52,7 @@ namespace TitanBot2.Services.CommandService
             {
                 Dictionary<CallInfo, CallCheckResponse> callChecks = null;
                 if (context.Command != null)
-                    callChecks = await context.Command.CheckCalls(context, _readers);
+                    callChecks = await context.Command.CheckCalls(context);
 
                 var allowed = callChecks?.Where(c => c.Value.IsSuccess).Select(c => c.Key);
 
@@ -63,11 +63,10 @@ namespace TitanBot2.Services.CommandService
                     return;
                 }
 
-                var inst = context.Command.CreateInstance(context, _readers);
+                var inst = context.Command.CreateInstance(context);
 
                 Dictionary<CallInfo, SignatureMatchResponse> validationResults;
-                var reader = _readers.NewCache();
-                var validators = allowed.ToDictionary(c => c, c => c.ValidateSignature(context, reader));
+                var validators = allowed.ToDictionary(c => c, c => c.ValidateSignature(context));
                 await Task.WhenAll(validators.Select(v => v.Value));
                 validationResults = validators.ToDictionary(v => v.Key, v => v.Value.Result);
 
@@ -85,13 +84,16 @@ namespace TitanBot2.Services.CommandService
             });
         }
 
+        public TypeReaderCollection.CachedReader GetReader()
+            => _readers.NewCache();
+
         private async Task<bool> ExecuteAsync(CmdContext context, Dictionary<CallInfo, SignatureMatchResponse> calls)
         {
             var grouped = calls.GroupBy(c => c.Key.ParentInfo).OrderByDescending(g => g.Sum(c => c.Value.Weight));
             foreach (var group in grouped)
             {
-                var inst = group.Key.CreateInstance(context, _readers);
-                foreach (var call in group.Where(c => c.Value.IsSuccess).OrderBy(c => c.Value.Weight))
+                var inst = group.Key.CreateInstance(context);
+                foreach (var call in group.Where(c => c.Value.IsSuccess).OrderByDescending(c => c.Key.Subcalls.Length).ThenByDescending(c => c.Value.Weight))
                 {
                     foreach (var args in call.Value.Arguments.Where(a => a.IsSuccess))
                     {
@@ -135,7 +137,7 @@ namespace TitanBot2.Services.CommandService
         {
             var cmdInfos = Commands.Where(c => command == null || c.Alias.Select(a => a.ToLower()).Contains(command.ToLower()) || c.Name.ToLower() == command.ToLower());
 
-            var checkResults = cmdInfos.Select(c => c.CheckCalls(context, _readers));
+            var checkResults = cmdInfos.Select(c => c.CheckCalls(context));
             await Task.WhenAll(checkResults);
             return (await Task.WhenAll(checkResults)).SelectMany(c => c).ToDictionary(c => c.Key, c => c.Value);
             

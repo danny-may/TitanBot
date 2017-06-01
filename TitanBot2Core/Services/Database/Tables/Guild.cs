@@ -1,4 +1,5 @@
-﻿using LiteDB;
+﻿using Discord;
+using LiteDB;
 
 namespace TitanBot2.Services.Database.Tables
 {
@@ -23,6 +24,7 @@ namespace TitanBot2.Services.Database.Tables
             public string NowText { get; set; } = "@everyone there is a Titan Lord up right now! Lets make short work of it. - %USER%";
             public string RoundText { get; set; } = "@everyone ding ding! Its time for round %ROUND%";
             public bool PinTimer { get; set; } = false;
+            public bool RoundPings { get; set; } = true;
         }
     }
 }

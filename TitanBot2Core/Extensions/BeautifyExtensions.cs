@@ -31,6 +31,11 @@ namespace TitanBot2.Extensions
             return string.Format("{0:#,##0}", value);
         }
 
+        public static string Beautify(this DateTime date)
+        {
+            return date.ToString();
+        }
+
         public static string Beautify(this TimeSpan timespan)
         {
             var returnString = timespan > new TimeSpan() ? "" : "-";

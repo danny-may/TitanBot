@@ -14,14 +14,12 @@ namespace TitanBot2.Services.CommandService.Flags
     public class FlagCollection : IEnumerable<FlagValue>
     {
         private CmdContext Context { get; }
-        private TypeReaderCollection.CachedReader Readers { get; }
         public IReadOnlyCollection<FlagInfo> Flags { get; }
         public IReadOnlyCollection<FlagValue> Values { get; }
 
-        public FlagCollection(CmdContext context, TypeReaderCollection.CachedReader readers, IEnumerable<FlagInfo> flags, IEnumerable<FlagValue> values)
+        public FlagCollection(CmdContext context, IEnumerable<FlagInfo> flags, IEnumerable<FlagValue> values)
         {
             Context = context;
-            Readers = readers;
             Flags = flags.ToList().AsReadOnly();
             Values = values.ToList().AsReadOnly();
         }
@@ -36,7 +34,7 @@ namespace TitanBot2.Services.CommandService.Flags
             if (passedValues.First().Value?.GetType() != typeof(string))
                 return TypeReaderResponse.FromError("Invalid flag state");
 
-            return await Readers.Read(flagInfo.FlagType, Context, (string)passedValues.First().Value);
+            return await Context.Readers.Read(flagInfo.FlagType, Context, (string)passedValues.First().Value);
         }
 
         public bool TryGet<T>(string key, out T value)
