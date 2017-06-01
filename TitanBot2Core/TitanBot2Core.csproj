@@ -224,6 +224,7 @@
     <Compile Include="Commands\Data\PetsCommand.cs" />
     <Compile Include="Commands\Data\PrestigeCommand.cs" />
     <Compile Include="Commands\General\AboutCommand.cs" />
+    <Compile Include="Commands\General\Donate.cs" />
     <Compile Include="Commands\General\HelpCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\InviteCommand.cs" />

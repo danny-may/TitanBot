@@ -29,7 +29,8 @@ namespace TitanBot2.Commands.General
                           $"I can do a variety of things, all of which are better documented in my `{Context.Prefix}help` command!\n\n" +
                           $"Im always going to be taking suggestions, which can either be DM'd to {Context.Client.GetUser(135556895086870528).Username} (He has a terrible memory though) Or sent in the #suggestions channel on my support server!\n\n" +
                            "Public repository: <https://github.com/Titansmasher/TitanBot2>\n" +
-                           "Support server: <https://discord.gg/abQPtHu>\n\n" +
+                           "Support server: <https://discord.gg/abQPtHu>\n" +
+                           "My patreon page: <https://www.patreon.com/titansmasher>\n\n" +
                            ":sparkles: **Special thanks to** :sparkles:\n";
             var count = 1;
             foreach (var thanks in _specialThanks)
