@@ -61,7 +61,7 @@ namespace TitanBot2.Commands.Admin
 
         [Call]
         [Usage("Lists all settings available")]
-        async Task ListSettingsAsync([Dense]string settingGroup = null)
+        async Task ListSettingsAsync()//[Dense]string settingGroup = null)
         {
             var embed = new EmbedBuilder
             {
