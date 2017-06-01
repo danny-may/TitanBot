@@ -87,7 +87,7 @@ namespace TitanBot2
             if (string.IsNullOrWhiteSpace(config.Token))
                 return false;
 
-            //TimerService.Initialise();
+            TimerService.Initialise();
 
             await Client.LoginAsync(TokenType.Bot, config.Token);
             await Client.StartAsync();

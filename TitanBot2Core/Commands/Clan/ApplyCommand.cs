@@ -175,7 +175,7 @@ namespace TitanBot2.Commands.Clan
                 "MS",
                 "#Images",
                 "Global",
-                "Date"
+                "Last edit"
             });
             var pos = from + 1;
             foreach (var app in applications)
@@ -189,7 +189,7 @@ namespace TitanBot2.Commands.Clan
                     app.MaxStage.ToString(),
                     (app.Images?.Length ?? 0).ToString(),
                     app.GuildId != null ? "False" : "True",
-                    app.ApplyTime.ToShortDateString()
+                    (DateTime.Now - app.EditTime).Days + " day(s) ago"
                 });
                 if (table.Count == to - from)
                     break;
