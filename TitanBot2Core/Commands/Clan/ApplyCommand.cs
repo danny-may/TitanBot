@@ -69,7 +69,7 @@ namespace TitanBot2.Commands.Clan
             if (isNew && guildId == null)
                 await ReplyAsync("Your global application has been successful. Recruiters from any TT2 guild will be able to see your application and might choose to recruit you.", ReplyType.Success);
             else if (isNew)
-                await ReplyAsync("Your application has been successful. The clan recruiter will review your application and potentially get back to you.");
+                await ReplyAsync("Your application has been successful. The clan recruiter will review your application and potentially get back to you.", ReplyType.Success);
             else
                 await ReplyAsync("Your global application has been successfully updated", ReplyType.Success);
         }
@@ -167,7 +167,7 @@ namespace TitanBot2.Commands.Clan
             if (user.Id == Context.User.Id)
                 await ReplyAsync($"You have successfully removed your {(guildID == null ? "global " : "")}application{(guildID != null ? " for this guild" : "")}", ReplyType.Success);
             else
-                await ReplyAsync($"You have successfully removed the application by {user.Username} for this guild");
+                await ReplyAsync($"You have successfully removed the application by {user.Username} for this guild", ReplyType.Success);
         }
 
         [Call("Ignore")]
@@ -208,7 +208,8 @@ namespace TitanBot2.Commands.Clan
             applications = applications.Where(a => includeGlobal || a.GuildId != null)
                                        .Where(a => !(ignore.Contains(a.UserId) && a.GuildId == null))
                                        .OrderByDescending(a => a.MaxStage)
-                                       .ThenByDescending(a => a.Images?.Count() ?? 0)
+                                       .ThenByDescending(a => Math.Round(Math.Sqrt(a.Relics), 0))
+                                       .ThenByDescending(a => a.CQPerWeek)
                                        .ThenBy(a => a.ApplyTime)
                                        .FirstFor(a => a.UserId)
                                        .Skip(from);
