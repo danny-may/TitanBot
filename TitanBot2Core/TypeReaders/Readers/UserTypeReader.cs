@@ -18,13 +18,12 @@ namespace TitanBot2.TypeReaders.Readers
             var results = new Dictionary<ulong, TypeReaderValue>();
             IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?
             IReadOnlyCollection<IGuildUser> guildUsers = ImmutableArray.Create<IGuildUser>();
-            ulong id;
 
             if (context.Guild != null)
                 guildUsers = context.Guild.Users;
 
             //By Mention (1.0)
-            if (MentionUtils.TryParseUser(input, out id))
+            if (MentionUtils.TryParseUser(input, out ulong id))
             {
                 if (context.Guild != null)
                     AddResult(results, context.Guild.Users.FirstOrDefault(u => u.Id == id) as T, 1.00f);

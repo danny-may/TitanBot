@@ -79,7 +79,7 @@ namespace TitanBot2.DiscordHandlers
 
         private async Task CheckAndRunCommands(SocketMessage s)
         {
-            if (Configuration.Instance.FocusId != null && Configuration.Instance.FocusId != s.Channel.Id && Configuration.Instance.FocusId != (s.Channel as SocketGuildChannel).Guild.Id)
+            if (Configuration.Instance.FocusId != null && Configuration.Instance.FocusId != s.Channel.Id && Configuration.Instance.FocusId != (s.Channel as SocketGuildChannel)?.Guild.Id)
                 return;
 
             var msg = s as SocketUserMessage;

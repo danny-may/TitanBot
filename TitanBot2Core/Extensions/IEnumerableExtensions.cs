@@ -52,5 +52,17 @@ namespace TitanBot2.Extensions
 
         public static IEnumerable<TValue> SelectDistinct<TSource, TValue>(this IEnumerable<TSource> source, Func<TSource, TValue> selector)
             => source.Select(selector).Distinct();
+
+        public static IEnumerable<TSource> FirstFor<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            HashSet<TKey> seenKeys = new HashSet<TKey>();
+            foreach (TSource element in source)
+            {
+                if (seenKeys.Add(keySelector(element)))
+                {
+                    yield return element;
+                }
+            }
+        }
     }
 }
