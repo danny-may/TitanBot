@@ -76,5 +76,18 @@ namespace TitanBot2.Extensions
         {
             return endings.Any(e => text.EndsWith(e));
         }
+
+        public static string MaxLength(this string text, int maxLength, string overflowStyle = "...")
+        {
+            overflowStyle = overflowStyle ?? "";
+
+            if (text.Length < maxLength)
+                return text;
+
+            if (maxLength < overflowStyle.Length)
+                return text.Substring(0, maxLength);
+
+            return text.Substring(0, maxLength - overflowStyle.Length) + overflowStyle;
+        }
     }
 }

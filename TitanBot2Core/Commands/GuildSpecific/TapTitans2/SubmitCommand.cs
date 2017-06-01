@@ -93,7 +93,7 @@ namespace TitanBot2.Commands.GuildSpecific.TapTitans2
                 return;
             }
 
-            var imageExtensions = new string[] { ".png", ".jpg", ".gif" };
+            var imageExtensions = new string[] { ".png", ".jpg", ".gif", ".svg" };
 
             var urlString = Context.Message.Attachments.FirstOrDefault(a => a.Url.EndsWithAny(imageExtensions))?.Url;
             Uri imageUrl = null;
@@ -197,7 +197,7 @@ namespace TitanBot2.Commands.GuildSpecific.TapTitans2
         [Call("Reply")]
         [Usage("Replys to a given submission")]
         [DefaultPermission(8)]
-        async Task ReplyAsync(int id, [Dense]string reply)
+        async Task ReplySubmissionAsync(int id, [Dense]string reply)
         {
             var submission = await Context.Database.Submissions.Find(id);
             if (submission == null)
@@ -222,6 +222,66 @@ namespace TitanBot2.Commands.GuildSpecific.TapTitans2
                 await TrySend(submitter.Id, $"Your recent {submission.Type} titled `{submission.Title}` has just been replied to:\n\n{reply}\n - {Context.User}");
 
             await ReplyAsync("Reply has been accepted!", ReplyType.Success);
+        }
+
+        [Call("List")]
+        [Usage("Lists all unanswered submissions")]
+        [DefaultPermission(8)]
+        async Task ListAsync(TT2Submission.SubmissionType[] type = null)
+        {
+            if (type == null)
+                type = new TT2Submission.SubmissionType[]
+                {
+                    TT2Submission.SubmissionType.Bug,
+                    TT2Submission.SubmissionType.Question,
+                    TT2Submission.SubmissionType.Suggestion
+                };
+
+            var unanswered = await Context.Database.Submissions.Get(s => s.Response == null);
+            unanswered = unanswered.Where(s => type.Contains(s.Type));
+
+            if (unanswered.Count() == 0)
+            {
+                await ReplyAsync("There are no unanswered submissions!", ReplyType.Info);
+                return;
+            }
+
+            var table = new List<string[]>();
+            table.Add(new string[]
+            {
+                "id",
+                "Title",
+                "Type",
+                "Submitter"
+            });
+
+            foreach (var submission in unanswered)
+            {
+                var user = Context.Client.GetUser(submission.Submitter);
+                table.Add(new string[]{
+                    submission.Id.ToString(),
+                    submission.Title.MaxLength(50),
+                    $"[{submission.Type}]",
+                    user != null ? $"{user} ({user.Id})" : $"UNKNOWN USER ({submission.Id})"
+                });
+            }
+
+            await ReplyAsync($"```css\n{table.ToArray().Tableify()}```");
+        }
+
+        [Call("Show")]
+        [Usage("Pulls the text for any submission")]
+        [DefaultPermission(8)]
+        async Task ShowAsync(int id)
+        {
+            var submission = await Context.Database.Submissions.Find(id);
+            if (submission == null)
+                await ReplyAsync("I could not find that submission", ReplyType.Error);
+            else
+            {
+                await ReplyAsync("Ill DM you the submission!", ReplyType.Success);
+                await TrySend(Context.User.Id, "", embed: GetSubmissionMessage(submission));
+            }
         }
     }
 }
