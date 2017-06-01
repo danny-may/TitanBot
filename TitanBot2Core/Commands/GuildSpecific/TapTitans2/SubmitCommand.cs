@@ -205,11 +205,8 @@ namespace TitanBot2.Commands.GuildSpecific.TapTitans2
                 await ReplyAsync("There is no submission by that ID", ReplyType.Error);
                 return;
             }
-            if (submission.Response != null)
-            {
-                await ReplyAsync("That submission has already had a response!", ReplyType.Error);
-                return;
-            }
+
+            var alreadyReplied = submission.Response != null;
 
             submission.ReplyTime = DateTime.Now;
             submission.Response = reply;
@@ -221,7 +218,7 @@ namespace TitanBot2.Commands.GuildSpecific.TapTitans2
                 await message.ModifySafeAsync(m => m.Embed = GetSubmissionMessage(submission).Build());
 
             var submitter = Context.Client.GetUser(submission.Submitter);
-            if (submitter != null)
+            if (submitter != null && !alreadyReplied)
                 await TrySend(submitter.Id, $"Your recent {submission.Type} titled `{submission.Title}` has just been replied to:\n\n{reply}\n - {Context.User}");
 
             await ReplyAsync("Reply has been accepted!", ReplyType.Success);
