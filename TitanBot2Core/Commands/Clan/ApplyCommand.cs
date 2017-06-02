@@ -23,6 +23,7 @@ namespace TitanBot2.Commands.Clan
         [CallFlag(typeof(Uri[]), "i", "images", "Specifies a list of images to use with your application")]
         [CallFlag(typeof(int), "r", "relics", "Specifies how many relics you have earned")]
         [CallFlag(typeof(int), "a", "attacks", "Specifies how many attacks you aim to do per week")]
+        [CallFlag(typeof(int), "t", "taps", "Specifies how many taps you average per CQ")]
         [DefaultPermission(0)]
         [RequireContext(ContextType.Guild)]
         async Task RegisterGuildAsync(int maxStage, [Dense]string message)
@@ -38,6 +39,7 @@ namespace TitanBot2.Commands.Clan
         [CallFlag(typeof(Uri[]), "i", "images", "Specifies a list of images to use with your registration")]
         [CallFlag(typeof(int), "r", "relics", "Specifies how many relics you have earned")]
         [CallFlag(typeof(int), "a", "attacks", "Specifies how many attacks you aim to do per week")]
+        [CallFlag(typeof(int), "t", "taps", "Specifies how many taps you average per CQ")]
         [RequireContext(ContextType.DM|ContextType.Group)]
         Task RegisterGlobalAsync(int maxStage, [Dense]string message)
             => RegisterAsync(maxStage, message, null);
@@ -57,9 +59,11 @@ namespace TitanBot2.Commands.Clan
             if (images != null && images.Count() > 0)
                 current.Images = images;
             if (Flags.TryGet("r", out int relics))
-                current.Relics = relics;
+                current.Relics = relics.Clamp(0, 1000000000);
             if (Flags.TryGet("a", out int attacks))
                 current.CQPerWeek = attacks;
+            if (Flags.TryGet("t", out int taps))
+                current.Taps = taps.Clamp(0, 600);
             current.MaxStage = maxStage;
             current.Message = message;
             current.EditTime = DateTime.Now;
@@ -131,6 +135,7 @@ namespace TitanBot2.Commands.Clan
             }.AddInlineField("Max Stage", current.MaxStage)
              .AddInlineField("Relics", current.Relics)
              .AddInlineField("CQ/Week", current.CQPerWeek)
+             .AddInlineField("Taps/CQ", current.Taps)
              .AddField("Images", string.Join("\n", current.Images?.Select(i => i.AbsoluteUri) ?? new string[] { "None" }));
 
             await ReplyAsync("", embed: builder);
@@ -223,6 +228,7 @@ namespace TitanBot2.Commands.Clan
                 "Imgs",
                 "Relics",
                 "CQ/wk",
+                "Taps/CQ",
                 "Last edit",
                 ""
             });
@@ -239,6 +245,7 @@ namespace TitanBot2.Commands.Clan
                     (app.Images?.Length ?? 0).ToString(),
                     $"#{app.Relics}",
                     app.CQPerWeek.ToString(),
+                    app.Taps.ToString(),
                     (DateTime.Now - app.EditTime).Days + " day(s) ago",
                     app.GuildId == null ? "-g" : ""
                 });
