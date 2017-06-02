@@ -36,7 +36,7 @@ namespace TitanBot2.Extensions
         public static string Beautify(this int value)
         {
             if (value == int.MaxValue || value == int.MinValue)
-                return "∞";
+                return _infinity;
             return string.Format("{0:#,##0}", value);
         }
 
