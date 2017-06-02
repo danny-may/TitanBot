@@ -107,7 +107,7 @@ namespace TitanBot2.Services.CommandService
                     {
                         flags.Add(new FlagValue(flag.ToString(), null));
                     }
-                    flags.Add(new FlagValue(split[0].Last().ToString(), split[1]));
+                    flags.Add(new FlagValue(split[0].Last().ToString(), split[1].Trim()));
                 }
             }
 
