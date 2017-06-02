@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot2.Common;
 using TitanBot2.Extensions;
 using TitanBot2.Services.CommandService;
 using TitanBot2.Services.CommandService.Attributes;
@@ -47,7 +48,7 @@ namespace TitanBot2.Commands.Clan
         async Task RegisterAsync(int maxStage, string message, ulong? guildId)
         {
             Flags.TryGet("i", out Uri[] images);
-            images = images?.Where(i => i.AbsoluteUri.EndsWithAny(".png", ".jpg", ".gif", ".svg")).ToArray();
+            images = images?.Where(i => i.AbsoluteUri.MatchesAny(Configuration.Instance.ImageRegexes)).ToArray();
             var current = await Context.Database.Registrations.GetForUserOnGuild(Context.User.Id, guildId);
             var isNew = current == null;
             current = current ?? new Registration

@@ -93,9 +93,7 @@ namespace TitanBot2.Commands.Clan
                 return;
             }
 
-            var imageExtensions = new string[] { ".png", ".jpg", ".gif", ".svg" };
-
-            var urlString = Context.Message.Attachments.FirstOrDefault(a => a.Url.EndsWithAny(imageExtensions))?.Url;
+            var urlString = Context.Message.Attachments.FirstOrDefault(a => a.Url.MatchesAny(Configuration.Instance.ImageRegexes))?.Url;
             Uri imageUrl = null;
             if (urlString != null)
                 if (Flags.Has("i"))
@@ -107,7 +105,7 @@ namespace TitanBot2.Commands.Clan
                     imageUrl = new Uri(urlString);
             else if (Flags.Has("i"))
             {
-                if (!Flags.TryGet("i", out Uri flagUrl) || !flagUrl.AbsoluteUri.EndsWithAny(imageExtensions))
+                if (!Flags.TryGet("i", out Uri flagUrl) || !flagUrl.AbsoluteUri.MatchesAny(Configuration.Instance.ImageRegexes))
                 {
                     await ReplyAsync("The image you supplied is not a valid image!", ReplyType.Error);
                     return;

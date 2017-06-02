@@ -19,6 +19,11 @@ namespace TitanBot2.Common
         public ulong SubmissionChannel { get; set; } = 319164064414695429;
         public ulong? FocusId { get; set; } = null;
         public HighScoreSheetRef HighScoreSettings { get; set; } = new HighScoreSheetRef();
+        public string[] ImageRegexes { get; set; } = new string[]
+        {
+            @".*\.(png|jpg|gif|svg)",
+            @".*i.?mgur.com.*",
+        };
         public Dictionary<string, string> Versions { get; set; }
             = new Dictionary<string, string>
             {

@@ -73,9 +73,10 @@ namespace TitanBot2.Extensions
         }
 
         public static bool EndsWithAny(this string text, params string[] endings)
-        {
-            return endings.Any(e => text.EndsWith(e));
-        }
+            => endings.Any(e => text.EndsWith(e));
+
+        public static bool MatchesAny(this string text, params string[] patterns)
+            => patterns.Any(p => Regex.IsMatch(text, p));
 
         public static string MaxLength(this string text, int maxLength, string overflowStyle = "...")
         {
