@@ -17,20 +17,9 @@ namespace TitanBot2.Commands.Owner
     {
         [Call]
         [Usage("how should I know 0_o")]
-        [RequireContext(ContextType.Guild)]
-        [CallFlag("f", "flag", @"¯\_(ツ)_/¯")]
-        public async Task ExecuteAsync(TimeSpan? time = null, [Dense]string text = "default text")
+        public async Task ExecuteAsync(double value)
         {
-            var message = "";
-            message += $"Prefix: {Context.Prefix}\n";
-            message += $"Command: {Context.Command}\n";
-            message += $"Arg1: {time} ({typeof(TimeSpan?)})\n";
-            message += $"Arg2: {text} ({typeof(string)})\n";
-            message += $"Flag(F): {Flags.Has("f")}\n";
-
-            await Task.Delay(4000);
-
-            //await ReplyAsync(message);
+            await ReplyAsync(value.ToString());
         }
     }
 }

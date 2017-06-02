@@ -64,5 +64,14 @@ namespace TitanBot2.Extensions
                 }
             }
         }
+
+        public static IEnumerable<string> ToLower(this IEnumerable<string> text)
+        {
+            foreach (var s in text)
+                yield return s.ToLower();
+        }
+
+        public static string[] ToLower(this string[] text)
+            => text.Select(t => t.ToLower()).ToArray();
     }
 }

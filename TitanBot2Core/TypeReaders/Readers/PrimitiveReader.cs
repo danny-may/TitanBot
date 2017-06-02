@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot2.Extensions;
 using TitanBot2.Responses;
 using TitanBot2.Services.CommandService;
 
@@ -50,12 +51,12 @@ namespace TitanBot2.TypeReaders.Readers
             parserBuilder[typeof(byte)] = (TryParseDelegate<byte>)byte.TryParse;
             parserBuilder[typeof(short)] = (TryParseDelegate<short>)short.TryParse;
             parserBuilder[typeof(ushort)] = (TryParseDelegate<ushort>)ushort.TryParse;
-            parserBuilder[typeof(int)] = (TryParseDelegate<int>)int.TryParse;
+            parserBuilder[typeof(int)] = (TryParseDelegate<int>)BeautifyExtensions.TryUnbeautify;
             parserBuilder[typeof(uint)] = (TryParseDelegate<uint>)uint.TryParse;
             parserBuilder[typeof(long)] = (TryParseDelegate<long>)long.TryParse;
             parserBuilder[typeof(ulong)] = (TryParseDelegate<ulong>)ulong.TryParse;
             parserBuilder[typeof(float)] = (TryParseDelegate<float>)float.TryParse;
-            parserBuilder[typeof(double)] = (TryParseDelegate<double>)double.TryParse;
+            parserBuilder[typeof(double)] = (TryParseDelegate<double>)BeautifyExtensions.TryUnbeautify;
             parserBuilder[typeof(decimal)] = (TryParseDelegate<decimal>)decimal.TryParse;
             parserBuilder[typeof(DateTime)] = (TryParseDelegate<DateTime>)DateTime.TryParse;
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;

@@ -1,27 +1,36 @@
 ﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using TitanBot2.Models.Enums;
 
 namespace TitanBot2.Extensions
 {
     public static class BeautifyExtensions
     {
+        private static readonly string _alphabet = "abcdefghijklmnopqrstuvwxyz";
+        private static readonly string[] _postfixes = new string[] { "", "K", "M", "B", "T" };
+        private static readonly string _infinity = "∞";
+
         public static string Beautify(this double value)
         {
             if (double.IsInfinity(value))
-                return "∞";
+                return _infinity;
             if (double.IsNaN(value))
                 return "NaN";
-            var postfixes = new string[] { "", "K", "M", "B", "T" };
+            if (value == 0)
+                return "0";
+            var isNegative = value < 0;
+            value = Math.Abs(value);
             var magnitude = (int)Math.Floor(Math.Log10(value)) / 3;
             string postfix;
 
-            if (magnitude > postfixes.Length - 1)
-                postfix = "abcdefghijklmnopqrstuvwxyz"[(magnitude - (postfixes.Length)) / 26].ToString() +
-                          "abcdefghijklmnopqrstuvwxyz"[(magnitude - (postfixes.Length)) % 26].ToString();
+            if (magnitude > _postfixes.Length - 1)
+                postfix = _alphabet[(magnitude - (_postfixes.Length)) / 26].ToString() +
+                          _alphabet[(magnitude - (_postfixes.Length)) % 26].ToString();
             else
-                postfix = postfixes[magnitude];
+                postfix = _postfixes[magnitude];
 
-            return string.Format("{0:0.##} " + postfix, value / (Math.Pow(10, magnitude * 3)));
+            return string.Format($"{(isNegative ? "-" : "")}{{0:0.##}}" + postfix, value / (Math.Pow(10, magnitude * 3)));
         }
 
         public static string Beautify(this int value)
@@ -251,5 +260,35 @@ namespace TitanBot2.Extensions
 
             }
         }
+
+        public static bool TryUnbeautify(this string s, out double result)
+        {
+            if (double.TryParse(s, out result))
+                return true;
+            double modifier = 0;
+            if (Regex.IsMatch(s, $@"\d *[{_alphabet}]{{2}}$", RegexOptions.IgnoreCase))
+            {
+                if (!double.TryParse(s.Substring(0, s.Length - 2), out result))
+                    return false;
+                modifier = _alphabet.IndexOf(s[s.Length - 2]) * 26 +
+                           _alphabet.IndexOf(s[s.Length - 1]) + _postfixes.Length;
+                modifier = Math.Pow(10, modifier * 3);
+            }
+            else if (Regex.IsMatch(s, $@"\d *[{string.Join("", _postfixes)}]$", RegexOptions.IgnoreCase))
+            {
+                if (!double.TryParse(s.Substring(0, s.Length - 1), out result))
+                    return false;
+                modifier = _postfixes.ToLower().ToList().IndexOf(s.Substring(s.Length - 1)) * 3;
+                modifier = Math.Pow(10, modifier);
+            }
+            else
+                return false;
+
+            result = result * modifier;
+            return true;
+        }
+
+        public static bool TryUnbeautify(this string s, out int result)
+            => int.TryParse(s.Replace(",", ""), out result);
     }
 }

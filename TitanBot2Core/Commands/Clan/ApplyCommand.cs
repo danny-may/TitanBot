@@ -22,7 +22,7 @@ namespace TitanBot2.Commands.Clan
         [Usage("Creates your application for this clan")]
         [CallFlag("g", "global", "Specifies that the application is a global application.")]
         [CallFlag(typeof(Uri[]), "i", "images", "Specifies a list of images to use with your application")]
-        [CallFlag(typeof(int), "r", "relics", "Specifies how many relics you have earned")]
+        [CallFlag(typeof(double), "r", "relics", "Specifies how many relics you have earned")]
         [CallFlag(typeof(int), "a", "attacks", "Specifies how many attacks you aim to do per week")]
         [CallFlag(typeof(int), "t", "taps", "Specifies how many taps you average per CQ")]
         [DefaultPermission(0)]
@@ -38,7 +38,7 @@ namespace TitanBot2.Commands.Clan
         [Call]
         [Usage("Creates a global application")]
         [CallFlag(typeof(Uri[]), "i", "images", "Specifies a list of images to use with your registration")]
-        [CallFlag(typeof(int), "r", "relics", "Specifies how many relics you have earned")]
+        [CallFlag(typeof(double), "r", "relics", "Specifies how many relics you have earned")]
         [CallFlag(typeof(int), "a", "attacks", "Specifies how many attacks you aim to do per week")]
         [CallFlag(typeof(int), "t", "taps", "Specifies how many taps you average per CQ")]
         [RequireContext(ContextType.DM|ContextType.Group)]
@@ -59,7 +59,7 @@ namespace TitanBot2.Commands.Clan
 
             if (images != null && images.Count() > 0)
                 current.Images = images;
-            if (Flags.TryGet("r", out int relics))
+            if (Flags.TryGet("r", out double relics))
                 current.Relics = relics.Clamp(0, 1000000000);
             if (Flags.TryGet("a", out int attacks))
                 current.CQPerWeek = attacks;
@@ -79,7 +79,7 @@ namespace TitanBot2.Commands.Clan
                 await ReplyAsync("Your global application has been successfully updated", ReplyType.Success);
         }
 
-        [Call("ViewMine")]
+        [Call("View")]
         [Usage("Views your registration for this guild")]
         [CallFlag("g", "global", "Specifies that the application is a global application.")]
         [RequireContext(ContextType.Guild)]
@@ -87,7 +87,7 @@ namespace TitanBot2.Commands.Clan
         Task ViewGuildRegistrationAsync()
             => ViewRegistrationAsync(Context.Guild.Id, Context.User);
 
-        [Call("ViewMine")]
+        [Call("View")]
         [Usage("Views your global registration")]
         [RequireContext(ContextType.DM|ContextType.Group)]
         Task ViewGlobalRegistrationAsync()
@@ -134,7 +134,7 @@ namespace TitanBot2.Commands.Clan
                     Text = $"{(current.GuildId == null ? "Global" : "Local")} application | Applied {current.ApplyTime} | Updated {current.EditTime}"
                 }
             }.AddInlineField("Max Stage", current.MaxStage)
-             .AddInlineField("Relics", current.Relics)
+             .AddInlineField("Relics", current.Relics.Beautify())
              .AddInlineField("CQ/Week", current.CQPerWeek)
              .AddInlineField("Taps/CQ", current.Taps)
              .AddField("Images", string.Join("\n", current.Images?.Select(i => i.AbsoluteUri) ?? new string[] { "None" }));
@@ -244,7 +244,7 @@ namespace TitanBot2.Commands.Clan
                     $"{user} ({user.Id})",
                     $"[{app.MaxStage}]",
                     (app.Images?.Length ?? 0).ToString(),
-                    $"#{app.Relics}",
+                    $"#{app.Relics.Beautify()}",
                     app.CQPerWeek.ToString(),
                     app.Taps.ToString(),
                     (DateTime.Now - app.EditTime).Days + " day(s) ago",
