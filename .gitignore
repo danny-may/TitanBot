@@ -12,3 +12,13 @@
 /Compiled/config
 /Compiled/database
 /Compiled/logs
+/DiscordBot/DiscordBot/bin/Debug
+/DiscordBot/.vs/DiscordBot/v15
+/DiscordBot/DiscordBot/obj/Debug
+/DiscordBot/packages
+/DiscordBot/QuickTest/bin/Debug
+/DiscordBot/QuickTest/obj/Debug
+/TitanBot2/.vs/TitanBot2/v15
+/TitanBot2/TitanBot2Console/obj/Debug
+/TitanBot2/TitanBot2Console/obj/Debug
+/TitanBot2/TitanBot2Core/obj/Debug
