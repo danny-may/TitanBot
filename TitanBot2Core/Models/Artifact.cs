@@ -80,6 +80,14 @@ namespace TitanBot2.Models
             return total;
         }
 
+        public int BudgetArtifact(double relics, int current)
+        {
+            var cost = CostOfLevel(current);
+            if (cost > relics)
+                return current - 1;
+            return BudgetArtifact(relics - cost, current + 1);
+        }
+
         public static ArtifactStatic Find(string name)
         {
             var matches = All.Where(a => a.Id.ToString() == name.ToString() ||

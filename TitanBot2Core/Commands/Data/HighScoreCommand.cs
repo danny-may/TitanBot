@@ -28,7 +28,7 @@ namespace TitanBot2.Commands.Data
             var start = from.Value;
             var end = to.Value;
 
-            IntExtensions.EnsureOrder(ref start, ref end);
+            NumberExtensions.EnsureOrder(ref start, ref end);
 
             var places = Enumerable.Range(start, end - start + 1)
                                    .Select(i => sheet.Users.FirstOrDefault(u => u.Ranking == i))

@@ -268,7 +268,7 @@
     <Compile Include="Common\PerformanceMonitor.cs" />
     <Compile Include="Extensions\ICsvLineExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
-    <Compile Include="Extensions\IntExtensions.cs" />
+    <Compile Include="Extensions\NumberExtensions.cs" />
     <Compile Include="Extensions\IUserMessageExtensions.cs" />
     <Compile Include="GuildSpecificHandler\GuildSpecificHandler.cs" />
     <Compile Include="GuildSpecificHandler\YortKingdom.cs" />

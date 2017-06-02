@@ -203,7 +203,7 @@ namespace TitanBot2.Commands.Clan
         {
             var from = start ?? 0;
             var to = end ?? from + 20;
-            IntExtensions.EnsureOrder(ref from, ref to);
+            NumberExtensions.EnsureOrder(ref from, ref to);
             to.Clamp(from, from + 30);
 
             var includeGlobal = Flags.Has("g");

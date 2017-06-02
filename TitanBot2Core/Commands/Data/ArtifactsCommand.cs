@@ -21,7 +21,7 @@ namespace TitanBot2.Commands.Data
 
         [Call("List")]
         [Usage("Lists all artifacts available.")]
-        private async Task ListArtifactsAsync()
+        async Task ListArtifactsAsync()
         {
             var artifacts = await Context.TT2DataService.GetAllArtifacts(true);
 
@@ -50,7 +50,7 @@ namespace TitanBot2.Commands.Data
             await ReplyAsync("", embed: builder.Build());
         }
 
-        private EmbedBuilder GetBaseEmbed(Artifact artifact)
+        EmbedBuilder GetBaseEmbed(Artifact artifact)
         {
             var builder = new EmbedBuilder
             {
@@ -76,9 +76,18 @@ namespace TitanBot2.Commands.Data
             return builder;
         }
 
+        [Call("Budget")]
+        [Usage("Shows you what the maximum level you can get an artifact to is with a given relic budget")]
+        Task GetBudgetAsync([Dense]Artifact artifact, double relics, int currentLevel = 0)
+        {
+            relics = relics.Clamp(0, double.MaxValue);
+            currentLevel = currentLevel.Clamp(0, artifact.MaxLevel ?? int.MaxValue);
+            return ShowArtifactAsync(artifact, currentLevel, artifact.BudgetArtifact(relics, currentLevel ));
+        }
+
         [Call]
         [Usage("Shows stats for a given artifact on the given levels.")]
-        private async Task ShowArtifactAsync([Dense]Artifact artifact, int? from = null, int? to = null)
+        async Task ShowArtifactAsync([Dense]Artifact artifact, int? from = null, int? to = null)
         {
             var builder = GetBaseEmbed(artifact);
 
