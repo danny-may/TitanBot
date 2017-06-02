@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot2.Common;
@@ -66,7 +67,16 @@ namespace TitanBot2.Commands.General
 
             var callInfos = classes.First();
 
-            var usage = string.Join("\n", callInfos.Select(c => $"`{Context.Prefix + name + (" " + string.Join(" ", c.Subcalls.Concat(c.GetParameters()))).TrimEnd()}` - {c.Usage}"));
+            var usages = new List<string>();
+            foreach (var call in callInfos)
+            {
+                var pfx = Context.Prefix;
+                var nme = name;
+                var parm = " " + string.Join(" ", call.Subcalls.Concat(call.GetParameters()));
+                var flgs = " " + (call.Flags.Length > 0 ? "-" + string.Join("", call.Flags.Select(f => f.ShortKey)) : "");
+                usages.Add($"`{pfx + nme + parm.TrimEnd() + flgs.TrimEnd()}` - {call.Usage}");
+            }
+            var usage = string.Join("\n", usages);
             if (string.IsNullOrWhiteSpace(usage))
                 usage = "No usage available!";
             else

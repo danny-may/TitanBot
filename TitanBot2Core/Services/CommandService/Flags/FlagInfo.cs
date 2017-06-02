@@ -22,6 +22,6 @@ namespace TitanBot2.Services.CommandService.Flags
         }
 
         public override string ToString()
-            => $"`--{LongKey}`/`-{ShortKey}` = {Description}";
+            => $"`-{ShortKey}`/`--{LongKey}`{(FlagType == null ? "" : " `<value>`")} = {Description}";
     }
 }

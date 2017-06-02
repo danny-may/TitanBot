@@ -23,7 +23,7 @@ namespace TitanBot2.Services.CommandService.Attributes
         public CallFlagAttribute(string shortKey, string description)
             : this(shortKey, null, description) { }
         public CallFlagAttribute(string shortKey, string longKey, string description)
-            => Flag = new FlagInfo(typeof(bool), shortKey, longKey, description);
+            => Flag = new FlagInfo(null, shortKey, longKey, description);
 
 
         public static FlagInfo[] GetFrom(CallInfo info)
