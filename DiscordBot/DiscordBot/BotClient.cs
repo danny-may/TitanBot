@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using DiscordBot.Database;
 using System;
 using System.Collections.Generic;
@@ -10,18 +11,20 @@ namespace DiscordBot
 {
     public class BotClient : IDisposable
     {
-        public DiscordSocketClient DiscordClient { get; }
+        public IDiscordClient DiscordClient { get; }
         public IBotDb Database { get; }
 
 
         public BotClient(string dbLocation)
         {
             Database = new BotDb(dbLocation);
+            DiscordClient = new DiscordSocketClient();
         }
 
         public void Dispose()
         {
-            Database.Dispose();
+            Database?.Dispose();
+            DiscordClient?.Dispose();
         }
     }
 }
