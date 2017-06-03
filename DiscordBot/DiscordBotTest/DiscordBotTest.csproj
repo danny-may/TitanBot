@@ -137,7 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotClientUnitTests.cs" />
+    <Compile Include="DependencyManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UtilTests\ReflectionUtilTests.cs" />
+    <Compile Include="UtilTests\FileUtilTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

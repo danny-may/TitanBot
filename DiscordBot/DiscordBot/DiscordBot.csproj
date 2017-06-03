@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotClient.cs" />
+    <Compile Include="BotClientConfig.cs" />
     <Compile Include="Database\BotDb.cs" />
     <Compile Include="Database\BotDbTable.cs" />
     <Compile Include="Database\BotDbTransaction.cs" />
@@ -137,7 +138,17 @@
     <Compile Include="Database\Interfaces\IBotDbTable.cs" />
     <Compile Include="Database\Interfaces\IBotDbTransaction.cs" />
     <Compile Include="Database\Tables\Guild.cs" />
+    <Compile Include="Dependencies\DependencyManager.cs" />
+    <Compile Include="Dependencies\IDependencyManager.cs" />
+    <Compile Include="Logger\Interfaces\ILoggable.cs" />
+    <Compile Include="Logger\Interfaces\ILogger.cs" />
+    <Compile Include="Logger\LogEntry.cs" />
+    <Compile Include="Logger\BotLogger.cs" />
+    <Compile Include="Logger\LogSeverity.cs" />
+    <Compile Include="Logger\LogType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\FileUtil.cs" />
+    <Compile Include="Util\ReflectionUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -1,47 +1,26 @@
-﻿using LiteDB;
+﻿using DiscordBot.Logger;
+using LiteDB;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Database
 {
-    class BotDb : IBotDb
+    public class BotDb : IBotDb
     {
         readonly LiteDatabase _database;
         readonly object _syncLock = new object();
+        readonly ILogger _logger;
 
         public int TotalCalls { get; private set; } = 0;
 
-        public BotDb(string connectionString)
+        public BotDb(string connectionString, ILogger logger)
         {
             _database = new LiteDatabase(connectionString);
+            _logger = logger;
         }
 
         public Task QueryAsync(Action<IBotDbTransaction> query)
-        {
-            return Task.Run(() =>
-            {
-                lock (_syncLock)
-                {
-                    TotalCalls++;
-                    using (var conn = new BotDbTransaction(_database))
-                    {
-                        try
-                        {
-                            query(conn);
-                            conn.Commit();
-                        }
-                        catch (Exception)
-                        {
-                            //TODO: Add logger here
-                            conn.Rollback();
-                        }
-                    }
-                }
-            });
-        }
+            => QueryAsync<object>(conn => { query(conn); return null; });
 
         public Task<T> QueryAsync<T>(Func<IBotDbTransaction, T> query)
         {
@@ -58,9 +37,9 @@ namespace DiscordBot.Database
                             result = query(conn);
                             conn.Commit();
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-                            //TODO: Add logger here
+                            _logger.Log(ex, "DatabaseQuery");
                             conn.Rollback();
                         }
                     }

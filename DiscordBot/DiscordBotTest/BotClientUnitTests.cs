@@ -14,7 +14,7 @@ namespace DiscordBotTest
         [TestMethod]
         public void BasicConstructAndStart()
         {
-            using (var bot = new BotClient(@".\database.db"))
+            using (var bot = new BotClient())
             {
                 Assert.IsNotNull(bot.Database);
                 Assert.IsNotNull(bot.DiscordClient);

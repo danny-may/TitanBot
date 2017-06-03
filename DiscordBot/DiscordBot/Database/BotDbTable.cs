@@ -3,12 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DiscordBot.Database
 {
-    class BotDbTable<TRecord> : IBotDbTable<TRecord>
+    public class BotDbTable<TRecord> : IBotDbTable<TRecord>
         where TRecord : IBotDbRecord
     {
         private readonly LiteCollection<TRecord> _collection;
