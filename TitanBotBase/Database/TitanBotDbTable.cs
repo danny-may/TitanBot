@@ -6,12 +6,12 @@ using System.Linq.Expressions;
 
 namespace TitanBotBase.Database
 {
-    public class BotDbTable<TRecord> : IBotDbTable<TRecord>
-        where TRecord : IBotDbRecord
+    public class TitanBotDbTable<TRecord> : IDbTable<TRecord>
+        where TRecord : IDbRecord
     {
         private readonly LiteCollection<TRecord> _collection;
 
-        internal BotDbTable(LiteCollection<TRecord> collection)
+        internal TitanBotDbTable(LiteCollection<TRecord> collection)
         {
             _collection = collection;
         }
@@ -26,6 +26,10 @@ namespace TitanBotBase.Database
             => _collection.Find(predicate, skip, limit);
         public TRecord FindOne(Expression<Func<TRecord, bool>> predicate)
             => _collection.FindOne(predicate);
+        public TRecord FindById(ulong id)
+            => _collection.FindById(id);
+        public IEnumerable<TRecord> FindById(IEnumerable<ulong> ids)
+            => ids.Select(i => FindById(i)).ToList();
         public void Insert(TRecord record)
             => _collection.Insert(record);
         public void Insert(IEnumerable<TRecord> records)
@@ -38,5 +42,9 @@ namespace TitanBotBase.Database
             => _collection.Upsert(record);
         public void Upsert(IEnumerable<TRecord> records)
             => _collection.Upsert(records);
+        public bool Delete(ulong id)
+            => _collection.Delete(id);
+        public int Delete(IEnumerable<ulong> ids)
+            => ids.Select(i => Delete(i)).Count(r => r);
     }
 }

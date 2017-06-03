@@ -1,8 +1,8 @@
 ﻿namespace TitanBotBase.Database.Tables
 {
-    public class Guild : IBotDbRecord
+    public class Guild : IDbRecord
     {
-        public ulong GuildId { get; set; }
+        public ulong Id { get; set; }
         public string TestText { get; set; }
     }
 }

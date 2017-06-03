@@ -49,11 +49,19 @@ namespace TitanBotBase.Dependencies
         public bool TryConstruct<T>(out T obj)
         {
             obj = default(T);
-            var type = typeof(T);
+            if (!TryConstruct(typeof(T), out object res))
+                return false;
+            obj = (T)res;
+            return true;
+        }
+
+        public bool TryConstruct(Type type, out object obj)
+        {
+            obj = ReflectionUtil.Default(type);
             var constructors = type.GetConstructors().ToDictionary(c => c, c => c.GetParameters().Select(p => p.ParameterType).ToArray());
             foreach (var ctor in constructors.OrderByDescending(c => c.Value.Count()))
             {
-                if (TryConstruct(out obj, ctor.Value))
+                if (TryConstruct(type, out obj, ctor.Value))
                     return true;
             }
             return false;
@@ -62,7 +70,16 @@ namespace TitanBotBase.Dependencies
         public bool TryConstruct<T>(out T obj, params Type[] pattern)
         {
             obj = default(T);
-            var ctor = typeof(T).GetConstructor(pattern);
+            if (!TryConstruct(typeof(T), out object res, pattern))
+                return false;
+            obj = (T)res;
+            return true;
+        }
+
+        public bool TryConstruct(Type type, out object obj, params Type[] pattern)
+        {
+            obj = ReflectionUtil.Default(type);
+            var ctor = type.GetConstructor(pattern);
             if (ctor == null)
                 return false;
             var args = new List<object>();
@@ -75,7 +92,7 @@ namespace TitanBotBase.Dependencies
                 else
                     return false;
             }
-            obj = (T)ctor.Invoke(args.ToArray());
+            obj = ctor.Invoke(args.ToArray());
             return true;
         }
 

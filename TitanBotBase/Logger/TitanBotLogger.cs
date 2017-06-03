@@ -9,12 +9,12 @@ using Discord;
 
 namespace TitanBotBase.Logger
 {
-    public class BotLogger : ILogger
+    public class TitanBotLogger : ILogger
     {
         private readonly string _logPath;
         private readonly object _syncLock;
 
-        public BotLogger(string logLocation)
+        public TitanBotLogger(string logLocation)
         {
             _logPath = logLocation;
         }

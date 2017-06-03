@@ -14,5 +14,7 @@ namespace TitanBotBase.Dependencies
         bool TryGet(Type type, out object result);
         bool TryConstruct<T>(out T obj);
         bool TryConstruct<T>(out T obj, params Type[] pattern);
+        bool TryConstruct(Type type, out object obj);
+        bool TryConstruct(Type type, out object obj, params Type[] pattern);
     }
 }

@@ -2,20 +2,20 @@
 
 namespace TitanBotBase.Database
 {
-    public class BotDbTransaction : IBotDbTransaction
+    public class TitanBotDbTransaction : IDbTransaction
     {
         private readonly LiteDatabase _database;
         private readonly LiteTransaction _transaction;
 
-        internal BotDbTransaction(LiteDatabase database)
+        internal TitanBotDbTransaction(LiteDatabase database)
         {
             _database = database;
             _transaction = database.BeginTrans();
         }
 
-        public IBotDbTable<TRecord> GetTable<TRecord>()
-            where TRecord : IBotDbRecord
-            => new BotDbTable<TRecord>(_database.GetCollection<TRecord>());
+        public IDbTable<TRecord> GetTable<TRecord>()
+            where TRecord : IDbRecord
+            => new TitanBotDbTable<TRecord>(_database.GetCollection<TRecord>());
 
         public void Commit()
             => _transaction.Commit();
