@@ -35,7 +35,8 @@ namespace TitanBot2.Commands.General
             var count = 1;
             foreach (var thanks in _specialThanks)
             {
-                message = message + $"  {count++}. {Context.Client.GetUser(thanks.Key).Username}#{Context.Client.GetUser(thanks.Key).Discriminator} - {thanks.Value}\n";
+                var user = Context.Client.GetUser(thanks.Key);
+                message = message + $"  {count++}. {user?.Username}#{user?.Discriminator} - {thanks.Value}\n";
             }
             message = message + $"  {count++}. Everyone from the {Context.Client.GetGuild(255058878268571649)?.Name} clan for giving {Context.Client.GetUser(135556895086870528).Username} the initial idea\n";
             message = message +"\nI also took heavy inspiration from a fellow bot, Blargbot, who was created by Stupid Cat (thats his username, not me being mean :3)\n" +

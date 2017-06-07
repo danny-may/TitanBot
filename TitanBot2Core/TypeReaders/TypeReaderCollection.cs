@@ -14,16 +14,14 @@ namespace TitanBot2.TypeReaders
 {
     public class TypeReaderCollection
     {
-        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _customReaders;
-        private readonly ConcurrentDictionary<Type, TypeReader> _defaultReaders;
+        private readonly ConcurrentDictionary<Type, ConcurrentBag<TypeReader>> _typeReaders;
         private readonly ImmutableList<Tuple<Type, Type>> _entityReaders;
 
         private object _lock = new object();
 
         public TypeReaderCollection()
         {
-            _customReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
-            _defaultReaders = new ConcurrentDictionary<Type, TypeReader>();
+            _typeReaders = new ConcurrentDictionary<Type, ConcurrentBag<TypeReader>>();
             var entityTypeReaders = ImmutableList.CreateBuilder<Tuple<Type, Type>>();
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IMessage), typeof(MessageTypeReader<>)));
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IChannel), typeof(ChannelTypeReader<>)));
@@ -32,58 +30,51 @@ namespace TitanBot2.TypeReaders
             _entityReaders = entityTypeReaders.ToImmutable();
 
             foreach (var type in PrimitiveParsers.SupportedTypes)
-                _defaultReaders[type] = PrimitiveTypeReader.Create(type);
+                AddTypeReader(type, PrimitiveTypeReader.Create(type));
         }
 
         public void AddTypeReader<T>(TypeReader reader)
-        {
-            var readers = _customReaders.GetOrAdd(typeof(T), x => new ConcurrentDictionary<Type, TypeReader>());
-            readers[reader.GetType()] = reader;
-        }
+            => AddTypeReader(typeof(T), reader);
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            var readers = _customReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
-            readers[reader.GetType()] = reader;
+            var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentBag<TypeReader>());
+            readers.Add(reader);
         }
 
-        private IDictionary<Type, TypeReader> GetTypeReaders(Type type)
+        IEnumerable<TypeReader> GetReaders(Type type)
         {
-            var readers = GetCustomTypeReaders(type) ?? new ConcurrentDictionary<Type, TypeReader>();
-            var defaultReader = GetDefaultTypeReader(type);
-            if (defaultReader != null && !readers.Keys.Contains(type))
-                readers.Add(type, defaultReader);
-
-            return readers;
+            var knownReaders = _typeReaders.GetOrAdd(type, x => new ConcurrentBag<TypeReader>());
+            return knownReaders;
         }
 
-        IDictionary<Type, TypeReader> GetCustomTypeReaders(Type type)
+        IEnumerable<TypeReader> GetTypeReaders(Type type)
         {
-            ConcurrentDictionary<Type, TypeReader> definedTypeReaders;
-            if (_customReaders.TryGetValue(type, out definedTypeReaders))
-                return definedTypeReaders;
-            return null;
+            var readers = new List<TypeReader>();
+            readers.AddRange(GetCustomTypeReaders(type));
+
+            return new ConcurrentBag<TypeReader>(readers);
         }
 
-        private TypeReader GetDefaultTypeReader(Type type)
+        IEnumerable<TypeReader> GetCustomTypeReaders(Type type)
         {
-            TypeReader reader;
-            if (_defaultReaders.TryGetValue(type, out reader))
-                return reader;
+            var readerInstances = GetReaders(type);
+
+            if (readerInstances.Count() > 0)
+                return readerInstances;
+
             var typeInfo = type.GetTypeInfo();
-
             //Is this an enum?
             if (typeInfo.IsEnum)
             {
-                reader = EnumTypeReader.GetReader(type);
-                _defaultReaders[type] = reader;
-                return reader;
+                var reader = EnumTypeReader.GetReader(type);
+                AddTypeReader(type, reader);
             }
 
             if (typeInfo.IsArray)
             {
-                reader = ArrayTypeReader.GetReader(type, t => GetTypeReaders(t).Select(r => r.Value).FirstOrDefault());
-                _defaultReaders[type] = reader;
-                return reader;
+                var arrReaders = ArrayTypeReader.GetReaders(type, GetTypeReaders);
+                foreach (var reader in arrReaders)
+                    AddTypeReader(type, reader);
             }
 
             //Is this an entity?
@@ -91,12 +82,12 @@ namespace TitanBot2.TypeReaders
             {
                 if (type == _entityReaders[i].Item1 || typeInfo.ImplementedInterfaces.Contains(_entityReaders[i].Item1))
                 {
-                    reader = Activator.CreateInstance(_entityReaders[i].Item2.MakeGenericType(type)) as TypeReader;
-                    _defaultReaders[type] = reader;
-                    return reader;
+                    var reader = Activator.CreateInstance(_entityReaders[i].Item2.MakeGenericType(type)) as TypeReader;
+                    AddTypeReader(type, reader);
                 }
             }
-            return null;
+
+            return GetReaders(type);
         }
 
         public async Task<TypeReaderResponse> Read(Type type, CmdContext context, string text)
@@ -105,7 +96,7 @@ namespace TitanBot2.TypeReaders
 
             var readers = GetTypeReaders(type);
 
-            var resultTasks = readers.Select(r => r.Value.Read(context, text)).ToArray();
+            var resultTasks = readers.Select(r => r.Read(context, text)).ToArray();
 
             var results = await Task.WhenAll(resultTasks);
 

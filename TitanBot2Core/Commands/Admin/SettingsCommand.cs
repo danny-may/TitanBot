@@ -38,6 +38,7 @@ namespace TitanBot2.Commands.Admin
                          .Create(g => g.TitanLord.RoundText, v => v.Length > 500 ? "You cannot have more than 500 characters for this setting" : null)
                          .Create(g => g.TitanLord.PinTimer)
                          .Create(g => g.TitanLord.RoundPings)
+                         .Create(g => g.TitanLord.PrePings, (TimeSpan[] t) => t.Select(v => (int)v.TotalSeconds).ToArray(), (v,c) => string.Join(", ", v.Select(t => new TimeSpan(0,0,t))))
                          .Create("ClanQuest", g => g.TitanLord.CQ, v => v < 0 ? "Your clan quest cannot be negative" : null)
                          .Create("TimerChannel", g => g.TitanLord.Channel, (IMessageChannel c) => c?.Id, (v, c) => v == null ? "" : $"<#{v}>"),
                 new SettingGroup("General").Create(g => g.PermOverride)
@@ -91,7 +92,7 @@ namespace TitanBot2.Commands.Admin
 
         [Call("Set")]
         [Usage("Sets the given setting to the given value.")]
-        async Task SetSettingAsync(string key, [Dense] string value = null)
+        async Task SetSettingAsync(string key, [Dense]string value = null)
         {
             var setting = _settingGroups.SelectMany(g => g.Settings)
                                         .FirstOrDefault(s => s.Name.ToLower() == key.ToLower());
@@ -99,10 +100,26 @@ namespace TitanBot2.Commands.Admin
                 await ReplyAsync("Could not find setting", ReplyType.Error);
             else
             {
+                var oldValue = setting.Load(Context);
+
                 if (!setting.Save(Context, value, out string errors))
                     await ReplyAsync(errors, ReplyType.Error);
                 else
-                    await ReplyAsync("Setting has been set succesfully", ReplyType.Success);
+                {
+                    var builder = new EmbedBuilder
+                    {
+                        Title = $"{setting.Name} has changed",
+                        Footer = new EmbedFooterBuilder
+                        {
+                            IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
+                            Text = Context.Client.CurrentUser.Username,
+                        },
+                        Timestamp = DateTime.Now,
+                        Color = System.Drawing.Color.SkyBlue.ToDiscord(),
+                    }.AddField("Old value", oldValue)
+                     .AddField("New value", setting.Load(Context));
+                    await ReplyAsync("", embed: builder.Build());
+                }
             }
         }
 

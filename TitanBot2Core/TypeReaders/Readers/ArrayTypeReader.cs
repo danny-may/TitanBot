@@ -10,11 +10,12 @@ namespace TitanBot2.TypeReaders.Readers
 {
     public static class ArrayTypeReader
     {
-        public static TypeReader GetReader(Type type, Func<Type, TypeReader> readers)
+        public static IEnumerable<TypeReader> GetReaders(Type type, Func<Type, IEnumerable<TypeReader>> getReaders)
         {
             Type baseType = type.GetElementType();
             var constructor = typeof(ArrayTypeReader<>).MakeGenericType(baseType).GetTypeInfo().DeclaredConstructors.First();
-            return (TypeReader)constructor.Invoke(new object[] { type, readers(baseType) });
+            var readers = getReaders(baseType);
+            return readers.Select(r => (TypeReader)constructor.Invoke(new object[] { type, r }));
         }
     }
     public class ArrayTypeReader<T> : TypeReader
