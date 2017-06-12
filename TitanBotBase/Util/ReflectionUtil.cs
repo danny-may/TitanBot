@@ -9,11 +9,6 @@ namespace TitanBotBase.Util
 {
     public static class ReflectionUtil
     {
-        public static T Default<T>()
-            => default(T);
-        public static object Default(Type type)
-            => typeof(ReflectionUtil).GetMethod("Default", new Type[0])
-                                     .MakeGenericMethod(type)
-                                     .Invoke(null, null);
+        
     }
 }

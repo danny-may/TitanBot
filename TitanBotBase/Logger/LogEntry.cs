@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TitanBotBase.Logger
 {
-    class LogEntry : ILoggable
+    public class LogEntry : ILoggable
     {
         public LogSeverity Severity { get; }
 
@@ -26,5 +26,8 @@ namespace TitanBotBase.Logger
             Source = source;
             LogTime = DateTime.Now;
         }
+
+        public override string ToString()
+            => $"[{LogTime}][{Severity}][{LogType}][{Source}]{Message}";
     }
 }

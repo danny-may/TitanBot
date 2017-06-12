@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TitanBotBase.SchedulerService
+namespace TitanBotBase.Scheduler
 {
     public interface IScheduler
     {
@@ -21,5 +21,6 @@ namespace TitanBotBase.SchedulerService
         Task Cancel(IEnumerable<ulong> ids);
         Task StartAsync();
         Task StopAsync();
+        Task<int> ActiveCount();
     }
 }

@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using TitanBotBase.Util;
 
 namespace TitanBotBase.Database
 {
-    public class TitanBotDbTable<TRecord> : IDbTable<TRecord>
+    class TitanBotDbTable<TRecord> : IDbTable<TRecord>
         where TRecord : IDbRecord
     {
         private readonly LiteCollection<TRecord> _collection;
@@ -27,7 +28,7 @@ namespace TitanBotBase.Database
         public TRecord FindOne(Expression<Func<TRecord, bool>> predicate)
             => _collection.FindOne(predicate);
         public TRecord FindById(ulong id)
-            => _collection.FindById(id);
+            => _collection.FindOne(r => r.Id == id);
         public IEnumerable<TRecord> FindById(IEnumerable<ulong> ids)
             => ids.Select(i => FindById(i)).ToList();
         public void Insert(TRecord record)
@@ -46,5 +47,9 @@ namespace TitanBotBase.Database
             => _collection.Delete(id);
         public int Delete(IEnumerable<ulong> ids)
             => ids.Select(i => Delete(i)).Count(r => r);
+        public void Ensure(TRecord record)
+            => _collection.Upsert(_collection.FindOne(r => r.Id == record.Id).IfDefault(record));
+        public void Ensure(IEnumerable<TRecord> records)
+            => records.ToList().ForEach(r => Ensure(r));
     }
 }

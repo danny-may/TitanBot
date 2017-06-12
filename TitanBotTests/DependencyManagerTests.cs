@@ -12,8 +12,8 @@ namespace DiscordBotTest
         {
             var expected = new TestObject();
 
-            var manager = new DependencyManager();
-            manager.Add(expected);
+            var manager = new DependencyFactory();
+            manager.Store(expected);
             Assert.IsTrue(manager.TryGet(out TestObject actual));
 
             Assert.AreEqual(expected, actual);
@@ -24,8 +24,8 @@ namespace DiscordBotTest
         {
             var expected = new TestObject();
 
-            var manager = new DependencyManager();
-            manager.Add(typeof(TestObject), expected);
+            var manager = new DependencyFactory();
+            manager.Store(typeof(TestObject), expected);
             Assert.IsTrue(manager.TryGet(typeof(TestObject), out object actual));
 
             Assert.AreEqual(expected, actual);
@@ -36,8 +36,8 @@ namespace DiscordBotTest
         {
             var expected = new TestInheretedObject();
 
-            var manager = new DependencyManager();
-            manager.Add(expected);
+            var manager = new DependencyFactory();
+            manager.Store(expected);
             Assert.IsTrue(manager.TryGet(typeof(TestObject), out object actual));
 
             Assert.AreEqual(expected, actual);
@@ -48,8 +48,8 @@ namespace DiscordBotTest
         {
             var expected = new TestObject();
 
-            var manager = new DependencyManager();
-            manager.Add(expected);
+            var manager = new DependencyFactory();
+            manager.Store(expected);
 
             if (!manager.TryConstruct(out TestConstructableObject actual))
                 Assert.Fail();
@@ -62,8 +62,8 @@ namespace DiscordBotTest
         {
             var expected = new TestInheretedObject();
 
-            var manager = new DependencyManager();
-            manager.Add(expected);
+            var manager = new DependencyFactory();
+            manager.Store(expected);
 
             if (!manager.TryConstruct(out TestConstructableObject actual))
                 Assert.Fail();
@@ -74,7 +74,7 @@ namespace DiscordBotTest
         [TestMethod]
         public void UnableToConstruct()
         {
-            var manager = new DependencyManager();
+            var manager = new DependencyFactory();
 
             Assert.IsFalse(manager.TryConstruct(out TestConstructableObject actual));
         }
@@ -82,13 +82,13 @@ namespace DiscordBotTest
         [TestMethod]
         public void ConstructWithOptionalParams()
         {
-            var manager = new DependencyManager();
-            manager.Add(new TestObject());
+            var manager = new DependencyFactory();
+            manager.Store(new TestObject());
 
             Assert.IsTrue(manager.TryConstruct(out TestConstructableObject_Optional obj));
             Assert.AreEqual(13, obj.Var);
 
-            manager.Add(10);
+            manager.Store(10);
             Assert.IsTrue(manager.TryConstruct(out TestConstructableObject_Optional obj2));
             Assert.AreEqual(10, obj2.Var);
         }

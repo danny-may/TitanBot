@@ -12,30 +12,36 @@ namespace TitanBotBase.Logger
     public class TitanBotLogger : ILogger
     {
         private readonly string _logPath;
-        private readonly object _syncLock;
+        private readonly object _syncLock = new object();
+        private readonly LogSeverity _logLevel;
 
-        public TitanBotLogger(string logLocation)
+        public TitanBotLogger() : this($@".\logs\{FileUtil.GetTimestamp()}.log") { }
+        public TitanBotLogger(string logLocation) : this(LogSeverity.Critical | LogSeverity.Info, logLocation) { }
+        public TitanBotLogger(LogSeverity logLevel, string logLocation)
         {
-            _logPath = logLocation;
+            _logPath = FileUtil.GetAbsolutePath(logLocation);
+            _logLevel = logLevel;
         }
 
-        public void Log(ILoggable entry)
+        public virtual void Log(ILoggable entry)
         {
+            if (!ShouldLog(entry.Severity))
+                return;
             lock (_syncLock)
             {
-                FileUtil.EnsureExists(_logPath);
-                File.AppendAllText(_logPath, $"[{entry.LogTime}][{entry.Severity}][{entry.LogType}][{entry.Source}]{entry.Message}");
+                FileUtil.EnsureDirectory(_logPath);
+                File.AppendAllText(_logPath, entry.ToString());
             }
         }
+
+        protected virtual bool ShouldLog(LogSeverity severity)
+            => (_logLevel & severity) != 0;
 
         public void Log(LogSeverity severity, LogType type, string message, string source)
             => Log(new LogEntry(severity, type, message, source));
 
         public void Log(Exception ex, string source)
             => Log(new LogEntry(LogSeverity.Error, LogType.Exception, ex.ToString(), source));
-
-        public void Log(LogMessage msg)
-            => Log(new LogEntry(LogSeverity.Critical, LogType.Client, msg.Message, msg.Source));
 
         public Task LogAsync(ILoggable entry)
             => Task.Run(() => Log(entry));
@@ -45,8 +51,5 @@ namespace TitanBotBase.Logger
 
         public Task LogAsync(Exception ex, string source)
             => Task.Run(() => Log(ex, source));
-
-        public Task LogAsync(LogMessage msg)
-            => Task.Run(() => Log(msg));
     }
 }

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace TitanBotBase.Database
 {
-    public interface IDbTable<TRecord> 
+    public interface IDbTable<TRecord>
         where TRecord : IDbRecord
     {
         IEnumerable<TRecord> Find(Expression<Func<TRecord, bool>> predicate, int skip = 0, int limit = 2147483647);
@@ -22,5 +22,7 @@ namespace TitanBotBase.Database
         void Update(IEnumerable<TRecord> records);
         void Upsert(TRecord record);
         void Upsert(IEnumerable<TRecord> records);
+        void Ensure(TRecord record);
+        void Ensure(IEnumerable<TRecord> records);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,29 @@ namespace TitanBotBase.Util
             foreach (var item in source)
             {
                 action(item);
+            }
+        }
+
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
+        {
+            var index = 0;
+            foreach (var item in source)
+            {
+                action(item, index);
+                index++;
+            }
+        }
+
+        public static IEnumerable<bool[]> BinomialMask(int optionCount)
+        {
+            var counter = (int)Math.Pow(2, optionCount);
+            while (counter-- > 0)
+            {
+                yield return new BitArray(new int[] { counter })
+                                    .Cast<bool>()
+                                    .Take(optionCount)
+                                    .Reverse()
+                                    .ToArray();
             }
         }
     }

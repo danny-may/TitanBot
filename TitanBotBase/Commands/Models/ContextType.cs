@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TT2BotCore
+namespace TitanBotBase.Commands
 {
-    public class Class1
+    public enum ContextType
     {
+        Guild = 1,
+        DM = 2,
+        Group = 4,
     }
 }

@@ -9,59 +9,107 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TitanBotBase.SchedulerService;
+using TitanBotBase.Scheduler;
+using System.Threading;
+using System.Reflection;
+using TitanBotBase.DiscordHandlers;
+using TitanBotBase.Util;
+using TitanBotBase.Commands;
+using TitanBotBase.TypeReaders;
+using TitanBotBase.Formatter;
 
 namespace TitanBotBase
 {
     public class BotClient : IDisposable
     {
-        public IDiscordClient DiscordClient { get; private set; }
+        public DiscordSocketClient DiscordClient { get; private set; }
         public ILogger Logger { get; private set; }
         public IDatabase Database { get; private set; }
-        public IDependencyManager DependencyManager { get; private set; }
+        public IDependencyFactory DependencyFactory { get; private set; }
         public IScheduler Scheduler { get; private set; }
+        public ICommandService CommandService { get; private set; }
+        public ITypeReaderCollection TypeReaders { get; private set; }
+        public IReadOnlyList<ulong> Owners => _honoraryOwners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
+                                                             .ToList().AsReadOnly();
+        internal List<ulong> _honoraryOwners { get; } = new List<ulong>();
+        private List<DiscordHandlerBase> Handlers { get; } = new List<DiscordHandlerBase>();
 
-        public BotClient()
-            : this(new BotClientConfig()) { }
+        private ManualResetEvent readyEvent = new ManualResetEvent(false);
 
-        public BotClient(string dbLocation, string loggerLocation)
-        {
-            var config = new BotClientConfig();
-            config.Logger = new TitanBotLogger(loggerLocation);
-            config.Database = new TitanBotDb(dbLocation, config.Logger);
-            LoadFrom(config);
-            BuildDependencies();
+        public BotClient() : this(null, null) { }
+
+        public BotClient(Action<IDependencyFactory> mapper) : this(null, mapper) { }
+
+        public BotClient(IDependencyFactory factory, Action<IDependencyFactory> mapper)
+        { 
+            mapper = mapper ?? (f => { });
+            DependencyFactory = factory ?? new DependencyFactory();
+
+            DependencyFactory.Store(this);
+            DependencyFactory.TryMap<ILogger, TitanBotLogger>();
+            DependencyFactory.TryMap<IDatabase, TitanBotDb>();
+            DependencyFactory.TryMap<IScheduler, TitanBotScheduler>();
+            DependencyFactory.TryMap<ICommandService, CommandService>();
+            DependencyFactory.TryMap<IReplier, Replier>();
+            DependencyFactory.TryMap<ICommandContext, CommandContext>();
+            DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
+            DependencyFactory.TryMap<IPermissionChecker, PermissionChecker>();
+            DependencyFactory.TryMap<OutputFormatter, BaseFormatter>();
+            mapper(DependencyFactory);
+
+            Logger = DependencyFactory.ConstructAndStore<ILogger>();
+            DiscordClient = DependencyFactory.ConstructAndStore<DiscordSocketClient>();
+            TypeReaders = DependencyFactory.ConstructAndStore<ITypeReaderCollection>();
+            Database = DependencyFactory.ConstructAndStore<IDatabase>();
+            Scheduler = DependencyFactory.ConstructAndStore<IScheduler>();
+            CommandService = DependencyFactory.ConstructAndStore<ICommandService>();
+
+            SubscribeEvents();
+
+            Install(Assembly.GetExecutingAssembly());
         }
 
-        public BotClient(BotClientConfig config)
+        public void Install(Assembly assembly)
         {
-            LoadFrom(config);
-            BuildDependencies();
+            var handlers = assembly.GetTypes()
+                                   .Where(t => t.IsSubclassOf(typeof(DiscordHandlerBase)));
+            foreach (var handler in handlers)
+            {
+                if (DependencyFactory.TryConstruct(handler, out object obj))
+                    Handlers.Add((DiscordHandlerBase)obj);
+            }
+            CommandService.Install(assembly);
         }
 
-        private void LoadFrom(BotClientConfig config)
+        private void SubscribeEvents()
         {
-            config = config ?? new BotClientConfig();
-            DiscordClient = config.DiscordClient ?? new DiscordSocketClient();
-            Logger = config.Logger ?? new TitanBotLogger($@".\logs\{DateTime.Now}.log");
-            Database = config.Database ?? new TitanBotDb(@".\database\bot.db", Logger);
-            DependencyManager = config.DependencyManager ?? new DependencyManager();
-            Scheduler = config.Scheduler ?? new Scheduler(DependencyManager, Database, Logger);
+            DiscordClient.Ready += () => Task.Run(() => readyEvent.Set());
+            DiscordClient.Log += m => Logger.LogAsync(DiscordUtil.ToLoggable(m));
         }
 
-        private void BuildDependencies()
+        public async Task StartAsync(string token)
         {
-            DependencyManager.Add(DiscordClient);
-            DependencyManager.Add(Logger);
-            DependencyManager.Add(Database);
-            DependencyManager.Add(Scheduler);
+            if (DiscordClient.LoginState != LoginState.LoggedOut)
+                return;
+            await DiscordClient.LoginAsync(TokenType.Bot, token);
+            await DiscordClient.StartAsync();
+            readyEvent.WaitOne();
+            readyEvent.Reset();
+
+            await Scheduler.StartAsync();
+        }
+
+        public async Task StopAsync()
+        {
+            await Scheduler.StopAsync();
+            await DiscordClient.LogoutAsync();
         }
 
         public void Dispose()
         {
             Database?.Dispose();
             DiscordClient?.Dispose();
-            DependencyManager?.Dispose();
+            DependencyFactory?.Dispose();
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace TitanBotBase.Database
 {
-    public class TitanBotDbTransaction : IDbTransaction
+    class TitanBotDbTransaction : IDbTransaction
     {
         private readonly LiteDatabase _database;
         private readonly LiteTransaction _transaction;

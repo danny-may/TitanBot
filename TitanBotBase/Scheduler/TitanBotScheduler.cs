@@ -8,12 +8,12 @@ using TitanBotBase.Dependencies;
 using TitanBotBase.Logger;
 using TitanBotBase.Util;
 
-namespace TitanBotBase.SchedulerService
+namespace TitanBotBase.Scheduler
 {
-    public class Scheduler : IScheduler
+    public class TitanBotScheduler : IScheduler
     {
         private readonly IDatabase _database;
-        private readonly IDependencyManager _dependencyManager;
+        private readonly IDependencyFactory _dependencyManager;
         private readonly ILogger _logger;
         private readonly Dictionary<Type, object> _cachedHandlers = new Dictionary<Type, object>();
         private Task _mainLoop;
@@ -25,7 +25,7 @@ namespace TitanBotBase.SchedulerService
                                 !_mainLoop.IsCompleted &&
                                 !_mainLoop.IsFaulted;
 
-        public Scheduler(IDependencyManager manager, IDatabase database, ILogger logger)
+        public TitanBotScheduler(IDependencyFactory manager, IDatabase database, ILogger logger)
         {
             _dependencyManager = manager;
             _database = database;
@@ -40,7 +40,7 @@ namespace TitanBotBase.SchedulerService
             => Queue<T>(from, TimeSpan.MaxValue, to);
         public ulong Queue<T>(DateTime from, TimeSpan interval, DateTime to) where T : ISchedulerCallback
         {
-            var record = new SchedulerRecord
+            var record = new TitanBotSchedulerRecord
             {
                 Callback = typeof(T),
                 EndTime = to,
@@ -113,16 +113,19 @@ namespace TitanBotBase.SchedulerService
             return true;
         }
 
-        private Task<IEnumerable<SchedulerRecord>> FindActives(DateTime pollTime)
-            => _database.Find((SchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
+        private Task<IEnumerable<TitanBotSchedulerRecord>> FindActives(DateTime pollTime)
+            => _database.Find((TitanBotSchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
 
         public Task Cancel(ulong id)
             => Cancel(new List<ulong> { id });
 
         public async Task Cancel(IEnumerable<ulong> ids)
-            => await Cancel(await _database.FindById<SchedulerRecord>(ids));
+            => await Cancel(await _database.FindById<TitanBotSchedulerRecord>(ids));
 
-        private Task Cancel(IEnumerable<SchedulerRecord> records)
+        private Task Cancel(IEnumerable<TitanBotSchedulerRecord> records)
             => _database.Upsert(records.ForEach(r => { r.Complete = true; return r; }));
+
+        public async Task<int> ActiveCount()
+            => (await FindActives(DateTime.Now)).Count();
     }
 }

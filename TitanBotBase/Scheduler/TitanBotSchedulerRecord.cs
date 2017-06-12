@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TitanBotBase.Database;
 
-namespace TitanBotBase.SchedulerService
+namespace TitanBotBase.Scheduler
 {
-    public sealed class SchedulerRecord : IDbRecord
+    sealed class TitanBotSchedulerRecord : IDbRecord
     {
         public ulong Id { get; set; }
         public bool Complete { get; set; }

@@ -12,7 +12,5 @@ namespace TitanBotBase.Logger
         Task LogAsync(ILoggable entry);
         void Log(Exception ex, string source);
         Task LogAsync(Exception ex, string source);
-        void Log(LogMessage msg);
-        Task LogAsync(LogMessage msg);
     }
 }
