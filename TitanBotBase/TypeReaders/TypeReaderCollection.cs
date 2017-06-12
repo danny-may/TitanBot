@@ -13,8 +13,8 @@ namespace TitanBotBase.TypeReaders
     public class TypeReaderCollection : ITypeReaderCollection
     {
         private readonly ConcurrentDictionary<Type, ConcurrentBag<TypeReader>> _typeReaders;
-        private readonly ImmutableList<Tuple<Type, Type>> _entityReaders;
-        private ConcurrentDictionary<(Type, string), TypeReaderResponse> _results = new ConcurrentDictionary<ValueTuple<Type, string>, TypeReaderResponse>();
+        private readonly ImmutableList<(Type Entity, Type Reader)> _entityReaders;
+        private ConcurrentDictionary<(Type, string), TypeReaderResponse> _results = new ConcurrentDictionary<(Type, string), TypeReaderResponse>();
 
         private object _lock = new object();
 
@@ -28,11 +28,11 @@ namespace TitanBotBase.TypeReaders
         public TypeReaderCollection()
         {
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentBag<TypeReader>>();
-            var entityTypeReaders = ImmutableList.CreateBuilder<Tuple<Type, Type>>();
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IMessage), typeof(MessageTypeReader<>)));
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IChannel), typeof(ChannelTypeReader<>)));
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IRole), typeof(RoleTypeReader<>)));
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IUser), typeof(UserTypeReader<>)));
+            var entityTypeReaders = ImmutableList.CreateBuilder<(Type, Type)>();
+            entityTypeReaders.Add((typeof(IMessage), typeof(MessageTypeReader<>)));
+            entityTypeReaders.Add((typeof(IChannel), typeof(ChannelTypeReader<>)));
+            entityTypeReaders.Add((typeof(IRole), typeof(RoleTypeReader<>)));
+            entityTypeReaders.Add((typeof(IUser), typeof(UserTypeReader<>)));
             _entityReaders = entityTypeReaders.ToImmutable();
 
             foreach (var type in PrimitiveParsers.SupportedTypes)
@@ -86,9 +86,9 @@ namespace TitanBotBase.TypeReaders
             //Is this an entity?
             for (int i = 0; i < _entityReaders.Count; i++)
             {
-                if (type == _entityReaders[i].Item1 || typeInfo.ImplementedInterfaces.Contains(_entityReaders[i].Item1))
+                if (type == _entityReaders[i].Entity || typeInfo.ImplementedInterfaces.Contains(_entityReaders[i].Entity))
                 {
-                    var reader = Activator.CreateInstance(_entityReaders[i].Item2.MakeGenericType(type)) as TypeReader;
+                    var reader = Activator.CreateInstance(_entityReaders[i].Reader.MakeGenericType(type)) as TypeReader;
                     AddTypeReader(type, reader);
                 }
             }
@@ -98,8 +98,7 @@ namespace TitanBotBase.TypeReaders
 
         public async Task<TypeReaderResponse> Read(Type type, ICommandContext context, string text)
         {
-            var key = ValueTuple.Create(type, text);
-            if (_results.TryGetValue(key, out TypeReaderResponse result))
+            if (_results.TryGetValue((type, text), out TypeReaderResponse result))
                 return result;
 
             type = Nullable.GetUnderlyingType(type) ?? type;
