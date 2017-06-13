@@ -36,7 +36,8 @@ namespace TitanBotBase.Commands
             Note = NotesAttribute.GetFor(type);
             RequireOwner = RequireOwnerAttribute.ExistsOn(type);
             RequireGuild = RequireGuildAttribute.GetFor(type);
-            Calls = CallInfo.BuildFrom(CommandType).ToList().AsReadOnly();
+            Calls = null;
+            Calls = CallInfo.BuildFrom(this).ToList().AsReadOnly();
         }
 
         internal static IEnumerable<CommandInfo> BuildFrom(IEnumerable<Type> types)
@@ -49,5 +50,8 @@ namespace TitanBotBase.Commands
                 yield return built;
             }
         }
+
+        public override string ToString()
+            => Name;
     }
 }

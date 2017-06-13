@@ -103,6 +103,12 @@ namespace TitanBotBase.Commands
                 await replier.ReplyAsync(context.Channel, context.Author, "You cannot use that command here!", ReplyType.Error);
                 return;
             }
+            calls = CheckSubcommands(calls, context);
+            if (calls.Count() == 0)
+            {
+                await replier.ReplyAsync(context.Channel, context.Author, $"That is not a recognised subcommand for `{context.Prefix}{context.CommandText}`! Try using `{context.Prefix}help {context.CommandText}` for usage info.", ReplyType.Error);
+                return;
+            }
             foreach (var call in calls)
             {
                 response = await MatchArguments(call, context);
@@ -126,7 +132,19 @@ namespace TitanBotBase.Commands
                 }
             }
             await replier.ReplyAsync(context.Channel, context.Author, response.ErrorMessage, ReplyType.Error);
-        } 
+        }
+
+        private CallInfo[] CheckSubcommands (CallInfo[] calls, ICommandContext context)
+        {
+            var noSubcalls = calls.Where(c => c.SubCall == null);
+            var subcalls = calls.Where(c => c.SubCall != null).GroupBy(c => c.SubCall);
+            foreach (var group in subcalls)
+            {
+                if (context.Message.Content.Substring(context.ArgPos).ToLower().Trim().StartsWith(group.Key.ToLower()))
+                    return group.ToArray();
+            }
+            return noSubcalls.ToArray();
+        }
 
         private async Task<ArgumentCheckResponse> MatchArguments(CallInfo call, ICommandContext context)
         {
@@ -150,17 +168,17 @@ namespace TitanBotBase.Commands
             if (call.SubCall != null)
             {
                 if (argStrings.Length == 0)
-                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"You have not specified which sub call you would like to use.");
+                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"You have not specified which sub call you would like to use! Try using `{context.Prefix}help {context.CommandText}` for usage info.");
                 if (call.SubCall.ToLower() != argStrings[0].ToLower())
-                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"The sub call `{argStrings[0]}` is not recognised");
+                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"The sub call `{argStrings[0]}` is not recognised! Try using `{context.Prefix}help {context.CommandText}` for usage info.");
                 argStrings = argStrings.Skip(1).ToArray();
             }
 
             var acceptedLength = argPattern.Count(a => !a.UseDefault);
             if (argStrings.Length > acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Too many arguments were supplied. Expected {acceptedLength}, got {argStrings.Length}");
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Too many arguments were supplied. Try using `{context.Prefix}help {context.CommandText}` for usage info.");
             else if (argStrings.Length < acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Expected {acceptedLength}, got {argStrings.Length}");
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Try using `{context.Prefix}help {context.CommandText}` for usage info.");
 
             var argResults = new object[argPattern.Length];
             var argIterator = argStrings.GetEnumerator();
@@ -171,7 +189,7 @@ namespace TitanBotBase.Commands
                 else
                 {
                     if (!argIterator.MoveNext())
-                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Expected {acceptedLength}, got {argStrings.Length}");
+                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Try using `{context.Prefix}help {context.CommandText}` for usage info.");
                     var readRes = await reader.Read(argPattern[i].Type, context, (string)argIterator.Current);
                     if (!readRes.IsSuccess)
                         return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, readRes.Message);

@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System.Collections.Generic;
-using TitanBotBase.Database.Tables;
+using TitanBotBase.Settings;
 
 namespace TitanBotBase.Commands
 {
@@ -11,7 +10,7 @@ namespace TitanBotBase.Commands
         IMessageChannel Channel { get; }
         DiscordSocketClient Client { get; }
         IGuild Guild { get; }
-        Guild GuildData { get; }
+        GuildSettings GuildData { get; }
         IUserMessage Message { get; }
         int ArgPos { get; }
         string Prefix { get; }

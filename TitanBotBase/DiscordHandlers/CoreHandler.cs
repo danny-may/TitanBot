@@ -9,6 +9,7 @@ using TitanBotBase.Commands;
 using Discord;
 using TitanBotBase.Database;
 using TitanBotBase.Database.Tables;
+using TitanBotBase.Settings;
 
 namespace TitanBotBase.DiscordHandlers
 {
@@ -21,16 +22,6 @@ namespace TitanBotBase.DiscordHandlers
             CommandService = cmdService;
             Database = database;
             client.MessageReceived += MessageRecievedAsync;
-            client.GuildAvailable += GuildAvailableAsync;
-        }
-
-        private Task GuildAvailableAsync(SocketGuild arg)
-        {
-            Database.QueryAsync(conn => conn.GetTable<Guild>().Ensure(new Guild
-            {
-                Id = arg.Id
-            }));
-            return Task.CompletedTask;
         }
 
         private Task MessageRecievedAsync(SocketMessage arg)

@@ -18,9 +18,10 @@ namespace TitanBotBase.Commands
         public bool HasDefaultValue { get; }
         public string Name { get; }
         public bool UseDefault { get; }
+        public CallInfo Parent { get; }
         public FlagDefinition Flag { get; }
 
-        private ArgumentInfo(ParameterInfo parameter, bool useDefault)
+        private ArgumentInfo(ParameterInfo parameter, CallInfo call, bool useDefault)
         {
             Parameter = parameter;
             UseDefault = useDefault;
@@ -30,14 +31,15 @@ namespace TitanBotBase.Commands
             IsRawArgument = RawArgumentsAttribute.ExistsOn(parameter);
             HasDefaultValue = Parameter.HasDefaultValue;
             Name = NameAttribute.GetFor(Parameter);
+            Parent = call;
             Flag = CallFlagAttribute.GetFor(Parameter);
             if (IsDense && Flag != null)
                 throw new InvalidOperationException("Cannot have a dense flag parameter");
         }
 
-        internal static IEnumerable<ArgumentInfo[]> BuildPermetations(MethodInfo method)
+        internal static IEnumerable<ArgumentInfo[]> BuildPermetations(CallInfo call)
         {
-            var parameters = method.GetParameters().TakeWhile(p => !CallFlagAttribute.ExistsOn(p));
+            var parameters = call.Call.GetParameters().TakeWhile(p => !CallFlagAttribute.ExistsOn(p));
             var required = parameters.Where(p => !p.HasDefaultValue);
             var optional = parameters.Where(p => p.HasDefaultValue);
 
@@ -47,14 +49,14 @@ namespace TitanBotBase.Commands
             foreach (var optionalMask in IEnumerableUtil.BinomialMask(optional.Count()))
             {
                 var fullMask = requiredMask.Concat(optionalMask).ToArray();
-                var args = parameters.Select((p, i) => new ArgumentInfo(p, !fullMask[i])).ToArray();
+                var args = parameters.Select((p, i) => new ArgumentInfo(p, call, !fullMask[i])).ToArray();
                 if (args.Count(a => a.IsDense) <= 1)
                     yield return args;
             }
         }
 
-        internal static ArgumentInfo[] BuildFrom(MethodInfo call)
-            => call.GetParameters().Select(p => new ArgumentInfo(p, false)).ToArray();
+        internal static ArgumentInfo[] BuildFrom(CallInfo call)
+            => call.Call.GetParameters().Select(p => new ArgumentInfo(p, call, false)).ToArray();
 
         public override string ToString()
         {

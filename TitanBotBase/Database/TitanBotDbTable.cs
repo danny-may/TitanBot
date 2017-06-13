@@ -20,7 +20,7 @@ namespace TitanBotBase.Database
         public int Delete(Expression<Func<TRecord, bool>> predicate)
             => _collection.Delete(predicate);
         public bool Delete(TRecord row)
-            => _collection.Delete(r => r.GetHashCode() == row.GetHashCode()) > 0;
+            => _collection.Delete(row.Id);
         public int Delete(IEnumerable<TRecord> rows)
             => rows.Select(r => Delete(r)).Count(r => r);
         public IEnumerable<TRecord> Find(Expression<Func<TRecord, bool>> predicate, int skip = 0, int limit = 2147483647)

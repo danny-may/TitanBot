@@ -32,7 +32,7 @@ namespace TitanBotBase.Commands
             => info.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm ?? GetPermFor(info.DeclaringType);
 
         public static string GetKeyFor(Type info)
-            => info.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? info.Name;
+            => info.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? NameAttribute.GetFor(info);
 
         public static ulong GetPermFor(Type info)
             => info.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm ?? 0;

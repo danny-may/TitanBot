@@ -20,9 +20,10 @@ namespace TitanBotBase.Commands
         //public FlagInfo[] Flags { get; }
         public string SubCall { get; }
         public ArgumentInfo[] Parameters { get; }
+        public CommandInfo Parent { get; }
         public FlagDefinition[] Flags { get; }
 
-        private CallInfo(MethodInfo method)
+        private CallInfo(MethodInfo method, CommandInfo info)
         {
             Call = method;
             if (!CallAttribute.ExistsOn(Call))
@@ -33,20 +34,25 @@ namespace TitanBotBase.Commands
             RequiredContexts = RequireContextAttribute.GetFor(Call);
             RequireOwner = RequireOwnerAttribute.ExistsOn(Call);
             SubCall = CallAttribute.GetFor(Call);
-            var args = ArgumentInfo.BuildFrom(Call);
+            Parent = info;
+            Parameters = null;
+            Flags = null;
+            ArgumentPermatations = null;
+
+            var args = ArgumentInfo.BuildFrom(this);
             if (args.SkipWhile(p => p.Flag == null).Select(p => p.Flag).Contains(null))
                 throw new InvalidOperationException("All optional arguments after the first flag must also be flags");
             Parameters = args.TakeWhile(a => a.Flag == null).ToArray();
             Flags = args.SkipWhile(a => a.Flag == null).Select(a => a.Flag).ToArray();
-            ArgumentPermatations = ArgumentInfo.BuildPermetations(Call).ToList().AsReadOnly();
+            ArgumentPermatations = ArgumentInfo.BuildPermetations(this).ToList().AsReadOnly();
         }
 
-        internal static IEnumerable<CallInfo> BuildFrom(Type type)
+        internal static IEnumerable<CallInfo> BuildFrom(CommandInfo info)
         {
-            foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(m => m.ReturnType == typeof(Task) && CallAttribute.ExistsOn(m)))
+            foreach (var method in info.CommandType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(m => m.ReturnType == typeof(Task) && CallAttribute.ExistsOn(m) && !DoNotInstallAttribute.ExistsOn(m)))
             {
-                var built = new CallInfo(method);
+                var built = new CallInfo(method, info);
                 if (built.ArgumentPermatations.Count == 0)
                     continue;
                 yield return built;
@@ -58,5 +64,8 @@ namespace TitanBotBase.Commands
 
         public string GetFlags()
             => ("-" + string.Join("", Flags.Select(f => f.ShortKey))).TrimEnd('-');
+
+        public override string ToString()
+            => PermissionKey;
     }
 }

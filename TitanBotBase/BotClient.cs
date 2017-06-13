@@ -17,6 +17,7 @@ using TitanBotBase.Util;
 using TitanBotBase.Commands;
 using TitanBotBase.TypeReaders;
 using TitanBotBase.Formatter;
+using TitanBotBase.Settings;
 
 namespace TitanBotBase
 {
@@ -29,9 +30,10 @@ namespace TitanBotBase
         public IScheduler Scheduler { get; private set; }
         public ICommandService CommandService { get; private set; }
         public ITypeReaderCollection TypeReaders { get; private set; }
-        public IReadOnlyList<ulong> Owners => _honoraryOwners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
-                                                             .ToList().AsReadOnly();
-        internal List<ulong> _honoraryOwners { get; } = new List<ulong>();
+        public ISettingsManager SettingsManager { get; private set; }
+        public GlobalSetting GlobalSettings => SettingsManager.GetGlobalSettings();
+        public IReadOnlyList<ulong> Owners => GlobalSettings.Owners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
+                                                                   .ToList().AsReadOnly();
         private List<DiscordHandlerBase> Handlers { get; } = new List<DiscordHandlerBase>();
 
         private ManualResetEvent readyEvent = new ManualResetEvent(false);
@@ -55,6 +57,7 @@ namespace TitanBotBase
             DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
             DependencyFactory.TryMap<IPermissionChecker, PermissionChecker>();
             DependencyFactory.TryMap<OutputFormatter, BaseFormatter>();
+            DependencyFactory.TryMap<ISettingsManager, SettingsManager>();
             mapper(DependencyFactory);
 
             Logger = DependencyFactory.ConstructAndStore<ILogger>();
@@ -63,6 +66,7 @@ namespace TitanBotBase
             Database = DependencyFactory.ConstructAndStore<IDatabase>();
             Scheduler = DependencyFactory.ConstructAndStore<IScheduler>();
             CommandService = DependencyFactory.ConstructAndStore<ICommandService>();
+            SettingsManager = DependencyFactory.ConstructAndStore<ISettingsManager>();
 
             SubscribeEvents();
 

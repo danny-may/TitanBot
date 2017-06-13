@@ -29,7 +29,7 @@ namespace TitanBotBase.Commands.DefautlCommands.General
         async Task SetPrefixAsync(string newPrefix)
         {
             GuildData.Prefix = newPrefix.ToLower();
-            await Database.QueryAsync(conn => conn.GetTable<Guild>().Update(GuildData));
+            SettingsManager.SaveSettingsGroup(GuildData);
             await ReplyAsync($"Your guilds prefix has been set to `{GuildData.Prefix}`", ReplyType.Success);
         }
     }

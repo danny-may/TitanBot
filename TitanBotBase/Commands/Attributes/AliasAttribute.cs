@@ -9,7 +9,7 @@ namespace TitanBotBase.Commands
     {
         private string[] Value { get; }
 
-        public AliasAttribute(string[] names = null)
+        public AliasAttribute(params string[] names)
         {
             Value = names;
         }

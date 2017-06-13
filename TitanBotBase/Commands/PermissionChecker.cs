@@ -14,10 +14,12 @@ namespace TitanBotBase.Commands
     public class PermissionChecker : IPermissionChecker
     {
         private IDatabase Database { get; }
+        private BotClient BotClient { get; }
 
-        public PermissionChecker(IDatabase database)
+        public PermissionChecker(IDatabase database, BotClient botClient)
         {
             Database = database;
+            BotClient = botClient;
         }
 
         public PermissionCheckResponse CheckAllowed(ICommandContext context, CallInfo[] calls)
@@ -26,8 +28,8 @@ namespace TitanBotBase.Commands
             if (permitted.Count() == 0)
                 return PermissionCheckResponse.FromError("You cannot use that command here!");
 
-            //if (Client.Owners.Contains(context.Author.Id))
-            //    return PermissionCheckResponse.FromSuccess(calls);
+            if (BotClient.Owners.Contains(context.Author.Id))
+                return PermissionCheckResponse.FromSuccess(calls);
 
             permitted = CheckOwner(context, permitted);
             if (permitted.Count() == 0)
@@ -108,7 +110,7 @@ namespace TitanBotBase.Commands
                 if (permission == null)
                     return true;
                 if (permission.Blacklisted != null)
-                    return permission.Blacklisted.Contains(context.Channel.Id);
+                    return !permission.Blacklisted.Contains(context.Channel.Id);
                 return true;
             }).ToArray();
         }

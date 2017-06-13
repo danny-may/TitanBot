@@ -12,6 +12,7 @@ using TitanBotBase.Dependencies;
 using TitanBotBase.Formatter;
 using TitanBotBase.Logger;
 using TitanBotBase.Scheduler;
+using TitanBotBase.Settings;
 using TitanBotBase.Util;
 
 namespace TitanBotBase.Commands
@@ -37,7 +38,8 @@ namespace TitanBotBase.Commands
         protected IGuildUser GuildAuthor => Author as IGuildUser;
         protected IGuildChannel GuildChannel => Channel as IGuildChannel;
         protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
-        protected Guild GuildData { get; private set; }
+        protected ISettingsManager SettingsManager { get; private set; }
+        protected GuildSettings GuildData { get; private set; }
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
         protected IReplier Replier { get; private set; }
@@ -67,12 +69,13 @@ namespace TitanBotBase.Commands
             CommandService = factory.Get<ICommandService>();
             Scheduler = factory.Get<IScheduler>();
             Replier = factory.WithInstance(this).Construct<IReplier>();
+            SettingsManager = factory.Get<ISettingsManager>();
             var userData = Database.AddOrGet(context.Author.Id, () => new UserSetting()).Result;
             Formatter = factory.WithInstance(userData.AltFormat)
                                .WithInstance(context)
                                .Construct<OutputFormatter>();
             if (Guild != null)
-                GuildData = Database.Query(conn => conn.GetTable<Guild>().FindById(Guild.Id));
+                GuildData = Database.Query(conn => conn.GetTable<GuildSettings>().FindById(Guild.Id));
             Prefix = context.Prefix;
             CommandName = context.CommandText;
         }

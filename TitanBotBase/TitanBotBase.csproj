@@ -139,6 +139,7 @@
     <Compile Include="Commands\Attributes\DefaultPermissionAttribute.cs" />
     <Compile Include="Commands\Attributes\DenseAttribute.cs" />
     <Compile Include="Commands\Attributes\DescriptionAttribute.cs" />
+    <Compile Include="Commands\Attributes\DoNotInstallAttribute.cs" />
     <Compile Include="Commands\Attributes\GroupAttribute.cs" />
     <Compile Include="Commands\Attributes\NameAttribute.cs" />
     <Compile Include="Commands\Attributes\NotesAttribute.cs" />
@@ -148,11 +149,13 @@
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
     <Compile Include="Commands\CommandContext.cs" />
+    <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\HelpCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\InfoCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\InviteCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PrefixCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\Owner\AddOwnerCommand.cs" />
     <Compile Include="Commands\FlagDefinition.cs" />
     <Compile Include="Commands\Interfaces\ICommandContext.cs" />
     <Compile Include="Commands\Interfaces\IReplier.cs" />
@@ -179,7 +182,7 @@
     <Compile Include="Database\Interfaces\IDbRecord.cs" />
     <Compile Include="Database\Interfaces\IDbTable.cs" />
     <Compile Include="Database\Interfaces\IDbTransaction.cs" />
-    <Compile Include="Database\Tables\Guild.cs" />
+    <Compile Include="Settings\Default\GeneralSettings.cs" />
     <Compile Include="Dependencies\DependencyFactory.cs" />
     <Compile Include="Dependencies\Interfaces\IDependencyFactory.cs" />
     <Compile Include="Dependencies\Interfaces\IInstanceBuilder.cs" />
@@ -199,6 +202,10 @@
     <Compile Include="Scheduler\Interfaces\ISchedulerCallback.cs" />
     <Compile Include="Scheduler\TitanBotScheduler.cs" />
     <Compile Include="Scheduler\TitanBotSchedulerRecord.cs" />
+    <Compile Include="Settings\Default\GlobalSetting.cs" />
+    <Compile Include="Settings\Interfaces\ISetting.cs" />
+    <Compile Include="Settings\Interfaces\ISettingsManager.cs" />
+    <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="TypeReaders\ITypeReaderCollection.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ChannelTypeReader.cs" />
