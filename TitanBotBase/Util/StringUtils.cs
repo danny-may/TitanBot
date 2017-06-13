@@ -128,9 +128,9 @@ namespace TitanBotBase.Util
             }
         }
 
-        public static string[] SmartSplit(this string text, out string[] flags)
+        public static string[] SmartSplit(this string text, out (string Key, string Value)[] flags)
             => SmartSplit(text, null, null, out flags);
-        public static string[] SmartSplit(this string text, int? maxLength, int? squeezePosition, out string[] flags)
+        public static string[] SmartSplit(this string text, int? maxLength, int? squeezePosition, out (string Key, string Value)[] flags)
         {
             var splitIndexes = text.GetBlockRanges().ToArray();
             var blocks = text.BlockString(splitIndexes);
@@ -144,7 +144,26 @@ namespace TitanBotBase.Util
             if (maxLength < 0)
                 throw new ArgumentException("Cannot have negative block counts");
 
-            flags = flagBlocks.ToArray();
+            var flagKeyValues = new List<(string Key, string Value)>();
+            foreach (var block in flagBlocks)
+            {
+                var split = block.Split(new char[] { ' ' }, 2);
+                if (block.StartsWith("--"))
+                {
+                    if (split.Length == 1)
+                        flagKeyValues.Add((split[0].Substring(2), null));
+                    else
+                        flagKeyValues.Add((split[0].Substring(2), split[1]));
+                }
+                else if (block.StartsWith("-"))
+                {
+                    var flagCount = split[0].Substring(1).Length;
+                    var flagValues = new string[flagCount];
+                    flagValues[flagCount-1] = split.Length == 2 ? split[1] : null;
+                    flagKeyValues.AddRange(flagValues.Zip(split[0].Substring(1), (v, k) => (k.ToString(), v)));
+                }
+            }
+            flags = flagKeyValues.ToArray();
             
             if (maxLength == 0)
                 return new string[0];

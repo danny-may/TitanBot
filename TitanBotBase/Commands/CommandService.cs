@@ -119,7 +119,7 @@ namespace TitanBotBase.Commands
                         instance.Install(context, DependencyFactory);
                         using (context.Channel.EnterTypingState())
                         {
-                            await (Task)call.Call.Invoke(instance, response.ParsedArguments);
+                            await (Task)call.Call.Invoke(instance, response.CallArguments);
                         }
                     }
                     return;
@@ -136,8 +136,8 @@ namespace TitanBotBase.Commands
             {
                 var denseIndex = argPattern.Select((a, i) => a.IsDense ? i : (int?)null).FirstOrDefault(i => i != null);
                 var maxLength = denseIndex.HasValue ? argPattern.Count(a => !a.UseDefault) + (call.SubCall != null ? 1 : 0) : (int?)null;
-                var stringArgs = context.SplitArguments(out string[] flags, maxLength, denseIndex);
-                var readResult = await ReadArguments(context, reader, stringArgs, flags, argPattern, call);
+                var stringArgs = context.SplitArguments(out (string Key, string Value)[] flagStrings, maxLength, denseIndex);
+                var readResult = await ReadArguments(context, reader, stringArgs, flagStrings, argPattern, call);
                 if (readResult.SuccessStatus == ArgumentCheckResult.Successful)
                     return readResult;
                 responses.Add(readResult);
@@ -145,41 +145,63 @@ namespace TitanBotBase.Commands
             return responses.Last();
         }
 
-        private async Task<ArgumentCheckResponse> ReadArguments(ICommandContext context, ITypeReaderCollection reader, string[] arguments, string[] flags, ArgumentInfo[] argPattern, CallInfo call)
+        private async Task<ArgumentCheckResponse> ReadArguments(ICommandContext context, ITypeReaderCollection reader, string[] argStrings, (string Key, string Value)[] flags, ArgumentInfo[] argPattern, CallInfo call)
         {
             if (call.SubCall != null)
             {
-                if (arguments.Length == 0)
+                if (argStrings.Length == 0)
                     return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"You have not specified which sub call you would like to use.");
-                if (call.SubCall.ToLower() != arguments[0].ToLower())
-                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"The sub call `{arguments[0]}` is not recognised");
-                arguments = arguments.Skip(1).ToArray();
+                if (call.SubCall.ToLower() != argStrings[0].ToLower())
+                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"The sub call `{argStrings[0]}` is not recognised");
+                argStrings = argStrings.Skip(1).ToArray();
             }
 
             var acceptedLength = argPattern.Count(a => !a.UseDefault);
-            if (arguments.Length > acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Too many arguments were supplied. Expected {acceptedLength}, got {arguments.Length}");
-            else if (arguments.Length < acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Expected {acceptedLength}, got {arguments.Length}");
+            if (argStrings.Length > acceptedLength)
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Too many arguments were supplied. Expected {acceptedLength}, got {argStrings.Length}");
+            else if (argStrings.Length < acceptedLength)
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Expected {acceptedLength}, got {argStrings.Length}");
 
-            var result = new object[argPattern.Length];
-            var argIterator = arguments.GetEnumerator();
-            for (int i = 0; i < result.Length; i++)
+            var argResults = new object[argPattern.Length];
+            var argIterator = argStrings.GetEnumerator();
+            for (int i = 0; i < argResults.Length; i++)
             {
                 if (argPattern[i].UseDefault)
-                    result[i] = argPattern[i].DefaultValue;
+                    argResults[i] = argPattern[i].DefaultValue;
                 else
                 {
                     if (!argIterator.MoveNext())
-                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Expected {acceptedLength}, got {arguments.Length}");
+                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Expected {acceptedLength}, got {argStrings.Length}");
                     var readRes = await reader.Read(argPattern[i].Type, context, (string)argIterator.Current);
                     if (!readRes.IsSuccess)
                         return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, readRes.Message);
-                    result[i] = readRes.Best;
+                    argResults[i] = readRes.Best;
                 }
             }
 
-            return ArgumentCheckResponse.FromSuccess(result, new object[0]);
+            var flagResults = call.Flags.Select(f => f.DefaultValue).ToArray();
+            for (int i = 0; i < call.Flags.Length; i++)
+            {
+                var flag = call.Flags[i];
+                var flagVals = flags.Where(f => f.Key.ToLower() == flag.LongKey?.ToLower() ||
+                                                f.Key.ToLower() == flag.ShortKey.ToString().ToLower());
+                foreach (var val in flagVals)
+                {
+                    if (!flag.RequiresInput)
+                        flagResults[i] = true;
+                    else
+                    {
+                        var readResult = await reader.Read(flag.Type, context, val.Value);
+                        if (readResult.IsSuccess)
+                        {
+                            flagResults[i] = readResult.Best;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return ArgumentCheckResponse.FromSuccess(argResults, flagResults);
         }
     }
 }

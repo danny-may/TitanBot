@@ -18,6 +18,7 @@ namespace TitanBotBase.Commands
         public bool HasDefaultValue { get; }
         public string Name { get; }
         public bool UseDefault { get; }
+        public FlagDefinition Flag { get; }
 
         private ArgumentInfo(ParameterInfo parameter, bool useDefault)
         {
@@ -29,13 +30,16 @@ namespace TitanBotBase.Commands
             IsRawArgument = RawArgumentsAttribute.ExistsOn(parameter);
             HasDefaultValue = Parameter.HasDefaultValue;
             Name = NameAttribute.GetFor(Parameter);
+            Flag = CallFlagAttribute.GetFor(Parameter);
+            if (IsDense && Flag != null)
+                throw new InvalidOperationException("Cannot have a dense flag parameter");
         }
 
         internal static IEnumerable<ArgumentInfo[]> BuildPermetations(MethodInfo method)
         {
-            var parameters = method.GetParameters();
-            var required = parameters.Where(p => !p.IsOptional);
-            var optional = parameters.Where(p => p.IsOptional);
+            var parameters = method.GetParameters().TakeWhile(p => !CallFlagAttribute.ExistsOn(p));
+            var required = parameters.Where(p => !p.HasDefaultValue);
+            var optional = parameters.Where(p => p.HasDefaultValue);
 
             var requiredMask = Enumerable.Range(0, required.Count())
                                          .Select(v => true)
@@ -51,5 +55,22 @@ namespace TitanBotBase.Commands
 
         internal static ArgumentInfo[] BuildFrom(MethodInfo call)
             => call.GetParameters().Select(p => new ArgumentInfo(p, false)).ToArray();
+
+        public override string ToString()
+        {
+            if (Flag != null)
+                return Flag.ToString();
+
+            var format = "{0}";
+            if (HasDefaultValue)
+                format = string.Format("[{0}]", format);
+            else
+                format = string.Format("<{0}>", format);
+
+            if (typeof(IEnumerable<>).IsAssignableFrom(Type) || Type.IsArray)
+                format = string.Format("{0}...", format);
+
+            return string.Format(format, Name);
+        }
     }
 }

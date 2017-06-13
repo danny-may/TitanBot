@@ -135,6 +135,7 @@
     <Compile Include="BotClient.cs" />
     <Compile Include="Commands\Attributes\AliasAttribute.cs" />
     <Compile Include="Commands\Attributes\CallAttribute.cs" />
+    <Compile Include="Commands\Attributes\CallFlagAttribute.cs" />
     <Compile Include="Commands\Attributes\DefaultPermissionAttribute.cs" />
     <Compile Include="Commands\Attributes\DenseAttribute.cs" />
     <Compile Include="Commands\Attributes\DescriptionAttribute.cs" />
@@ -152,6 +153,7 @@
     <Compile Include="Commands\DefaultCommands\General\InviteCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PrefixCommand.cs" />
+    <Compile Include="Commands\FlagDefinition.cs" />
     <Compile Include="Commands\Interfaces\ICommandContext.cs" />
     <Compile Include="Commands\Interfaces\IReplier.cs" />
     <Compile Include="Commands\Interfaces\IPermissionChecker.cs" />

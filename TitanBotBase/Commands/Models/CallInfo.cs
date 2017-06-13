@@ -20,6 +20,7 @@ namespace TitanBotBase.Commands
         //public FlagInfo[] Flags { get; }
         public string SubCall { get; }
         public ArgumentInfo[] Parameters { get; }
+        public FlagDefinition[] Flags { get; }
 
         private CallInfo(MethodInfo method)
         {
@@ -32,7 +33,11 @@ namespace TitanBotBase.Commands
             RequiredContexts = RequireContextAttribute.GetFor(Call);
             RequireOwner = RequireOwnerAttribute.ExistsOn(Call);
             SubCall = CallAttribute.GetFor(Call);
-            Parameters = ArgumentInfo.BuildFrom(Call).ToArray();
+            var args = ArgumentInfo.BuildFrom(Call);
+            if (args.SkipWhile(p => p.Flag == null).Select(p => p.Flag).Contains(null))
+                throw new InvalidOperationException("All optional arguments after the first flag must also be flags");
+            Parameters = args.TakeWhile(a => a.Flag == null).ToArray();
+            Flags = args.SkipWhile(a => a.Flag == null).Select(a => a.Flag).ToArray();
             ArgumentPermatations = ArgumentInfo.BuildPermetations(Call).ToList().AsReadOnly();
         }
 
@@ -48,20 +53,10 @@ namespace TitanBotBase.Commands
             }
         }
 
-        public string[] GetParameters(string requiredFormat = "<{0}>", string optionalFormat = "[{0}]", string arrayFormat = "{0}...")
-        {
-            var pars = Call.GetParameters();
+        public string[] GetParameters()
+            => Parameters.Select(p => p.ToString()).ToArray();
 
-            var ret = new List<string>();
-
-            foreach (var param in pars)
-            {
-                var paramFormat = param.IsOptional ? optionalFormat : requiredFormat;
-                paramFormat = string.Format(paramFormat, typeof(IEnumerable<>).IsAssignableFrom(param.ParameterType) || param.ParameterType.IsArray ? arrayFormat : "{0}");
-                ret.Add(string.Format(paramFormat, NameAttribute.GetFor(param)));
-            }
-
-            return ret.ToArray();
-        }
+        public string GetFlags()
+            => ("-" + string.Join("", Flags.Select(f => f.ShortKey))).TrimEnd('-');
     }
 }

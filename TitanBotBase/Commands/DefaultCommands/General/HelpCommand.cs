@@ -22,7 +22,6 @@ namespace TitanBotBase.Commands.DefautlCommands.General
 
         [Call]
         [Usage("Displays a list of all commands, or help for a single command")]
-        //[CallFlag(typeof(string), "c", "Command to show help for")]
         async Task HelpAsync(string command = null)
         {
             if (command == null)
@@ -94,8 +93,8 @@ namespace TitanBotBase.Commands.DefautlCommands.General
                 var pfx = Context.Prefix;
                 var nme = name;
                 var parm = " " + call.SubCall + string.Join(" ", call.GetParameters());
-                //var flgs = " " + (call.Flags.Length > 0 ? "-" + string.Join("", call.Flags.Select(f => f.ShortKey)) : "");
-                usages.Add($"`{pfx + nme + parm.TrimEnd() /*+ flgs.TrimEnd()*/}` - {call.Usage}");
+                var flgs = " " + call.GetFlags();
+                usages.Add($"`{pfx + nme + parm.TrimEnd() + flgs.TrimEnd()}` - {call.Usage}");
             }
             var usage = string.Join("\n", usages);
             if (string.IsNullOrWhiteSpace(usage))
@@ -107,7 +106,9 @@ namespace TitanBotBase.Commands.DefautlCommands.General
             
             var group = command.Group ?? "No categories!";
             
-            //var flags = string.Join("\n", permitted.SelectMany(c => c.Flags).GroupBy(f => f.ShortKey.ToLower()).Select(g => g.First()));
+            var flags = string.Join("\n", permitted.SelectMany(c => c.Flags)
+                                                   .GroupBy(f => f.ShortKey)
+                                                   .Select(g => g.First()));
             
             var notes = command.Note;
             
@@ -128,8 +129,8 @@ namespace TitanBotBase.Commands.DefautlCommands.General
             if (!string.IsNullOrWhiteSpace(aliases))
                 builder.AddInlineField("Aliases", Format.Sanitize(aliases));
             builder.AddField("Usage", usage);
-            //if (!string.IsNullOrWhiteSpace(flags))
-            //    builder.AddField("Flags", flags);
+            if (!string.IsNullOrWhiteSpace(flags))
+                builder.AddField("Flags", flags);
             if (!string.IsNullOrWhiteSpace(notes))
                 builder.AddField("Notes", notes);
             

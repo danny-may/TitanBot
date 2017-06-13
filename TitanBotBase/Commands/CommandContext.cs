@@ -63,7 +63,7 @@ namespace TitanBotBase.Commands
             ArgPos = prefixLength + commandLength;
         }
 
-        public string[] SplitArguments(out string[] flags, int? maxLength = null, int? densePos = null)
+        public string[] SplitArguments(out (string Key, string Value)[] flags, int? maxLength = null, int? densePos = null)
         {
             var argText = Message.Content.Substring(ArgPos).Trim();
             return argText.SmartSplit(maxLength, densePos, out flags);

@@ -120,7 +120,7 @@ namespace TitanBotBase.TypeReaders
                 result = TypeReaderResponse.FromError($"Unable to read the value `{text}` as `{type.Name}`");
             else
                 result = TypeReaderResponse.FromError($"No reader found for type `{type.FullName}`");
-            return _results.GetOrAdd(key, result);
+            return _results.GetOrAdd((type, text), result);
         }
 
         public ITypeReaderCollection NewCache()

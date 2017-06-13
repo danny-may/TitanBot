@@ -1,32 +1,34 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using TitanBot2.Services.CommandService.Flags;
-using TitanBot2.Services.CommandService.Models;
 
-namespace TitanBot2.Services.CommandService.Attributes
+namespace TitanBotBase.Commands
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-    class CallFlagAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = true, Inherited = false)]
+    public class CallFlagAttribute : Attribute
     {
-        public FlagInfo Flag { get; }
+        public char ShortKey { get; }
+        public string LongKey { get; }
+        public string Description { get; }
 
-        public CallFlagAttribute(Type type, string shortKey)
-            : this(type, shortKey, null, null) { }
-        public CallFlagAttribute(Type type, string shortKey, string description)
-            : this(type, shortKey, null, description) { }
-        public CallFlagAttribute(Type type, string shortKey, string longKey, string description)
-            => Flag = new FlagInfo(type, shortKey, longKey, description);
+        public CallFlagAttribute(char shortKey, string description)
+        {
+            ShortKey = shortKey;
+            Description = description;
+        }
+        public CallFlagAttribute(char shortKey, string longKey, string description)
+        {
+            ShortKey = shortKey;
+            LongKey = longKey;
+            Description = description;
+        }
 
-        public CallFlagAttribute(string shortKey)
-            : this(shortKey, null, null) { }
-        public CallFlagAttribute(string shortKey, string description)
-            : this(shortKey, null, description) { }
-        public CallFlagAttribute(string shortKey, string longKey, string description)
-            => Flag = new FlagInfo(null, shortKey, longKey, description);
+        private FlagDefinition BuildFrom(ParameterInfo info)
+            => new FlagDefinition(this, info);
 
-
-        public static FlagInfo[] GetFrom(CallInfo info)
-            => info.Call.GetCustomAttributes<CallFlagAttribute>().Select(a => a.Flag).ToArray();
+        public static FlagDefinition GetFor(ParameterInfo info)
+            => info.GetCustomAttribute<CallFlagAttribute>()?.BuildFrom(info);
+        public static bool ExistsOn(ParameterInfo info)
+            => info.GetCustomAttribute<CallFlagAttribute>() != null;
     }
 }
