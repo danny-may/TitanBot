@@ -23,7 +23,7 @@ namespace TitanBotBase.Commands.DefaultCommands.Owner
     [Description("Allows for arbitrary code execution")]
     [Alias("Eval", "Run")]
     [RequireOwner]
-    [Notes("")]
+    [Notes("https://github.com/Titansmasher/TitanBot/blob/rewrite/TitanBotBase/Commands/DefaultCommands/Owner/ExecCommand.cs#L111")]
     public class ExecCommand : Command
     {
         ICommandContext Context { get; }
