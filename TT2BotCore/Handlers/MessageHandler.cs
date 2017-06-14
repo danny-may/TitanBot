@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Discord.WebSocket;
+using System.Threading.Tasks;
 using TitanBotBase.Commands;
 using TitanBotBase.DiscordHandlers;
 using TitanBotBase.Logger;

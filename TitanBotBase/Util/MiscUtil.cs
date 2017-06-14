@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TitanBotBase.Util
 {
@@ -14,5 +15,24 @@ namespace TitanBotBase.Util
                 return otherwise();
             return value;
         }
+
+        public static (T Result, TimeSpan Time) TimeExecution<T>(Func<T> action)
+        {
+            var start = DateTime.Now;
+            var result = action();
+            return (result, DateTime.Now - start);
+        }
+
+        public static (T Result, TimeSpan Time) TimeAsyncExecution<T>(Func<Task<T>> action)
+        {
+            var start = DateTime.Now;
+            var result = action().Result;
+            return (result, DateTime.Now - start);
+        }
+
+        public static TimeSpan TimeExecution(Action action)
+            => TimeExecution<object>(() => { action(); return null; }).Time;
+        public static TimeSpan TimeAsyncExecution(Func<Task> action)
+            => TimeAsyncExecution<object>(async () => { await action(); return null; }).Time;
     }
 }

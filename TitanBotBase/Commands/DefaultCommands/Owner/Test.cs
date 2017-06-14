@@ -2,6 +2,7 @@
 
 namespace TitanBotBase.Commands.DefaultCommands.Owner
 {
+    [RequireOwner]
     class Test : Command
     {
         [Call]

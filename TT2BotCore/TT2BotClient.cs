@@ -16,7 +16,7 @@ namespace TT2BotCore
             Client.Install(Assembly.GetExecutingAssembly());
         }
 
-        public async Task StartAsync(Func<string> getToken)
+        public async Task StartAsync(Func<string, string> getToken)
         {
             await Client.StartAsync(getToken);
         }

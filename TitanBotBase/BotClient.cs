@@ -1,8 +1,10 @@
 ﻿using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -100,17 +102,26 @@ namespace TitanBotBase
         }
 
         public Task StartAsync()
-            => StartAsync(() => GlobalSettings.Token);
+            => StartAsync(x => GlobalSettings.Token);
         public Task StartAsync(string token)
-            => StartAsync(() => token);
-        public async Task StartAsync(Func<string> tokenInput)
+            => StartAsync(x => token);
+        public async Task StartAsync(Func<string, string> tokenInput)
         {
-            var token = tokenInput() ?? GlobalSettings.Token;
+            var token = tokenInput(GlobalSettings.Token) ?? GlobalSettings.Token;
             token = string.IsNullOrWhiteSpace(token) ? GlobalSettings.Token : token;
             GlobalSettings.Token = token;
             if (DiscordClient.LoginState != LoginState.LoggedOut)
                 return;
-            await DiscordClient.LoginAsync(TokenType.Bot, token);
+            try
+            {
+                await DiscordClient.LoginAsync(TokenType.Bot, token);
+            }
+            catch (HttpException ex)
+            {
+                if (ex.HttpCode == HttpStatusCode.Unauthorized)
+                    GlobalSettings.Token = null;
+                throw;
+            }
             await DiscordClient.StartAsync();
             readyEvent.WaitOne();
             readyEvent.Reset();

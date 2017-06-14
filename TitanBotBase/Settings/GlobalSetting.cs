@@ -67,7 +67,7 @@ namespace TitanBotBase.Settings
         {
             public ulong Id { get; set; } = 0;
             public string DefaultPrefix { get; set; } = "t$";
-            public string Token { get; set; } = "";
+            public string Token { get; set; }
             public ulong[] Owners { get; set; } = new ulong[0];
             public Dictionary<string, string> Additional { get; set; } = new Dictionary<string, string>();
         }

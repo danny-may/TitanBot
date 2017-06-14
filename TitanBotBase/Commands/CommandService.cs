@@ -185,6 +185,8 @@ namespace TitanBotBase.Commands
             {
                 if (argPattern[i].UseDefault)
                     argResults[i] = argPattern[i].DefaultValue;
+                else if (argPattern[i].IsRawArgument)
+                    argResults[i] = context.Message.Content.Substring(context.ArgPos);
                 else
                 {
                     if (!argIterator.MoveNext())
