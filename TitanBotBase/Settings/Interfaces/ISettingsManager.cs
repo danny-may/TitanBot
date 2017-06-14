@@ -7,5 +7,7 @@ namespace TitanBotBase.Settings
         GlobalSetting GlobalSettings { get; }
         T GetGroup<T>(ulong id);
         void SaveGroup<T>(ulong id, T settings);
+        T GetCustomGlobal<T>();
+        void SaveCustomGlobal<T>(T setting);
     }
 }

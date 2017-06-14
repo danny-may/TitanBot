@@ -9,5 +9,11 @@ namespace TitanBotBase.Commands.DefaultCommands.Admin
 
     class SettingsCommand : Command
     {
+
+
+        public class SettingGroup
+        {
+
+        }
     }
 }

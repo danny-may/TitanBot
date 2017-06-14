@@ -185,6 +185,8 @@
     <Compile Include="Database\Interfaces\IDbRecord.cs" />
     <Compile Include="Database\Interfaces\IDbTable.cs" />
     <Compile Include="Database\Interfaces\IDbTransaction.cs" />
+    <Compile Include="Downloader\CachedDownloader.cs" />
+    <Compile Include="Downloader\IDownloader.cs" />
     <Compile Include="Settings\Default\GeneralSettings.cs" />
     <Compile Include="Dependencies\DependencyFactory.cs" />
     <Compile Include="Dependencies\Interfaces\IDependencyFactory.cs" />
@@ -206,7 +208,6 @@
     <Compile Include="Scheduler\TitanBotScheduler.cs" />
     <Compile Include="Scheduler\TitanBotSchedulerRecord.cs" />
     <Compile Include="Settings\GlobalSetting.cs" />
-    <Compile Include="Settings\Interfaces\ICustomGlobalSetting.cs" />
     <Compile Include="Settings\Interfaces\ISettingsManager.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingsManager.cs" />

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TitanBotBase.Database;
 using TitanBotBase.Database.Tables;
 using TitanBotBase.Dependencies;
+using TitanBotBase.Downloader;
 using TitanBotBase.Formatter;
 using TitanBotBase.Logger;
 using TitanBotBase.Scheduler;
@@ -44,6 +45,7 @@ namespace TitanBotBase.Commands
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
         protected IReplier Replier { get; private set; }
+        protected IDownloader Downloader { get; private set; }
         protected OutputFormatter Formatter { get; private set; }
         protected string[] AcceptedPrefixes => new string[] { BotUser.Mention, BotUser.Username, SettingsManager.GlobalSettings.DefaultPrefix, GuildData?.Prefix }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
         protected object GlobalCommandLock => _commandLocks.GetOrAdd(GetType(), new object());
@@ -71,6 +73,7 @@ namespace TitanBotBase.Commands
             Scheduler = factory.Get<IScheduler>();
             Replier = factory.WithInstance(this).Construct<IReplier>();
             SettingsManager = factory.Get<ISettingsManager>();
+            Downloader = factory.Get<IDownloader>();
             var userData = Database.AddOrGet(context.Author.Id, () => new UserSetting()).Result;
             Formatter = factory.WithInstance(userData.AltFormat)
                                .WithInstance(context)

@@ -18,6 +18,7 @@ using TitanBotBase.Commands;
 using TitanBotBase.TypeReaders;
 using TitanBotBase.Formatter;
 using TitanBotBase.Settings;
+using TitanBotBase.Downloader;
 
 namespace TitanBotBase
 {
@@ -58,6 +59,7 @@ namespace TitanBotBase
             DependencyFactory.TryMap<IPermissionChecker, PermissionChecker>();
             DependencyFactory.TryMap<OutputFormatter, BaseFormatter>();
             DependencyFactory.TryMap<ISettingsManager, SettingsManager>();
+            DependencyFactory.TryMap<IDownloader, CachedDownloader>();
             mapper(DependencyFactory);
 
             Logger = DependencyFactory.ConstructAndStore<ILogger>();
@@ -67,6 +69,7 @@ namespace TitanBotBase
             SettingsManager = DependencyFactory.ConstructAndStore<ISettingsManager>();
             Scheduler = DependencyFactory.ConstructAndStore<IScheduler>();
             CommandService = DependencyFactory.ConstructAndStore<ICommandService>();
+            DependencyFactory.ConstructAndStore<IDownloader>();
 
             SubscribeEvents();
 

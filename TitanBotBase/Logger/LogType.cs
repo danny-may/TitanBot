@@ -15,6 +15,7 @@ namespace TitanBotBase.Logger
         Exception,
         Client,
         Scheduler,
-        Message
+        Message,
+        Downloader
     }
 }
