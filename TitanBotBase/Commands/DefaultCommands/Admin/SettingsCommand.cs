@@ -1,19 +1,115 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
+using TitanBotBase.Settings;
+using TitanBotBase.TypeReaders;
+using TitanBotBase.Util;
 
 namespace TitanBotBase.Commands.DefaultCommands.Admin
 {
-
-    class SettingsCommand : Command
+    [Description("Allows the retrieval and changing of existing settings for the server")]
+    [DefaultPermission(8)]
+    [RequireContext(ContextType.Guild)]
+    public class SettingsCommand : Command
     {
+        ITypeReaderCollection Readers { get; }
+        ICommandContext Context { get; }
 
-
-        public class SettingGroup
+        public SettingsCommand(ITypeReaderCollection readers, ICommandContext context)
         {
+            Readers = readers;
+            Context = context;
+        }
 
+        [Call]
+        [Usage("Lists all settings available")]
+        async Task ListSettingsAsync([Dense]string settingGroup = null)
+        {
+            var builder = new EmbedBuilder
+            {
+                Color = System.Drawing.Color.SkyBlue.ToDiscord(),
+                Timestamp = DateTime.Now,
+                Footer = new EmbedFooterBuilder
+                {
+                    IconUrl = Author.GetAvatarUrl(),
+                    Text = $"{Author.Username} | Settings"
+                }
+            };
+
+            if (settingGroup == null)
+            {
+                builder.WithTitle($"Please select a setting group from the following:")
+                       .WithDescription(string.Join("\n", SettingsManager.EditableSettingGroups.Select(g => g.GroupName)));
+                if (string.IsNullOrWhiteSpace(builder.Description))
+                    builder.Description = "No settings groups available!";
+                await ReplyAsync("", embed: builder.Build());
+                return;
+            }
+            var groups = SettingsManager.EditableSettingGroups.Where(g => g.GroupName.ToLower() == settingGroup.ToLower());
+            if (groups.Count() == 0)
+            {
+                await ReplyAsync("That isnt a valid setting group!");
+                return;
+            }
+
+            builder.WithTitle($"Here are all the settings for the group `{groups.First().GroupName}`");
+            foreach (var setting in groups.SelectMany(g => g.Settings))
+            {
+                var value = setting.Display(SettingsManager, Guild.Id);
+                if (string.IsNullOrWhiteSpace(value))
+                    value = "Not Set";
+                builder.AddInlineField(setting.Name, value);
+            }
+            var descriptions = string.Join("\n", groups.Select(g => g.Description));
+            if (!string.IsNullOrWhiteSpace(descriptions))
+                builder.WithDescription(descriptions);
+            await ReplyAsync("", embed: builder.Build());
+        }
+
+        [Call("Set")]
+        [Usage("Sets the given setting to the given value.")]
+        async Task SetSettingAsync(string key, [Dense]string value = null)
+        {
+            var setting = SettingsManager.EditableSettingGroups.SelectMany(g => g.Settings)
+                                 .FirstOrDefault(s => s.Name.ToLower() == key.ToLower());
+            if (setting == null)
+                await ReplyAsync("Could not find setting", ReplyType.Error);
+            else
+            {
+                var readerResult = await Readers.Read(setting.Type, Context, value);
+
+                if (!readerResult.IsSuccess)
+                {
+                    await ReplyAsync($"`{value}` is not a valid value for the setting {setting.Name}");
+                    return;
+                }
+
+                var oldValue = setting.Display(SettingsManager, Guild.Id);
+
+                if (!setting.TrySave(SettingsManager, Guild.Id, readerResult.Best, out string errors))
+                    await ReplyAsync(errors, ReplyType.Error);
+                else
+                {
+                    var newValue = setting.Display(SettingsManager, Guild.Id);
+                    var builder = new EmbedBuilder
+                    {
+                        Title = $"{setting.Name} has changed",
+                        Footer = new EmbedFooterBuilder
+                        {
+                            IconUrl = BotUser.GetAvatarUrl(),
+                            Text = BotUser.Username,
+                        },
+                        Timestamp = DateTime.Now,
+                        Color = System.Drawing.Color.SkyBlue.ToDiscord(),
+                    }.AddField("Old value", string.IsNullOrWhiteSpace(oldValue) ? "Not Set" : oldValue)
+                     .AddField("New value", string.IsNullOrWhiteSpace(newValue) ? "Not Set" : newValue);
+                    await ReplyAsync("", embed: builder.Build());
+                }
+            }
         }
     }
 }

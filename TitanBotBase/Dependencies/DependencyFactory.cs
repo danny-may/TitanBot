@@ -5,6 +5,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using TitanBotBase.Logger;
+using TitanBotBase.Database;
+using TitanBotBase.Scheduler;
+using TitanBotBase.Commands;
+using TitanBotBase.TypeReaders;
+using TitanBotBase.Formatter;
+using TitanBotBase.Settings;
+using TitanBotBase.Downloader;
 
 namespace TitanBotBase.Dependencies
 {
@@ -91,12 +99,19 @@ namespace TitanBotBase.Dependencies
             => GetBuilder().Construct(type, pattern);
 
         public void Map<From, To>() where To : From
-            => _map[typeof(From)] = typeof(To);
-        public bool TryMap<From, To>() where To : From
+            => Map(typeof(From), typeof(To));
+        public void Map(Type from, Type to)
         {
-            if (!_map.ContainsKey(typeof(From)))
+            _map[from] = to;
+        }
+
+        public bool TryMap<From, To>() where To : From
+            => TryMap(typeof(From), typeof(To));
+        public bool TryMap(Type from, Type to)
+        {
+            if (!_map.ContainsKey(from))
             {
-                Map<From, To>();
+                Map(from, to);
                 return true;
             }
             return false;

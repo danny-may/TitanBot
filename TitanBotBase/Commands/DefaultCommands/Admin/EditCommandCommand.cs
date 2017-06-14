@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TitanBotBase.Database;
 using TitanBotBase.Database.Tables;
 
-namespace TitanBotBase.Commands.DefautlCommands.Admin
+namespace TitanBotBase.Commands.DefaultCommands.Admin
 {
     [Description("Used to allow people with varying roles or permissions to use different commands.")]
     [Notes("To work out just what permission id you need, give the [permission calculator](https://discordapi.com/permissions.html) a try!")]

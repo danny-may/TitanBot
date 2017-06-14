@@ -41,7 +41,7 @@ namespace TitanBotBase.Commands
         protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
         protected ISettingsManager SettingsManager { get; private set; }
         protected GlobalSetting GlobalSettings => SettingsManager.GlobalSettings;
-        protected GuildSettings GuildData { get; private set; }
+        protected GeneralSettings GuildData { get; private set; }
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
         protected IReplier Replier { get; private set; }
@@ -79,7 +79,7 @@ namespace TitanBotBase.Commands
                                .WithInstance(context)
                                .Construct<OutputFormatter>();
             if (Guild != null)
-                GuildData = SettingsManager.GetGroup<GuildSettings>(Guild.Id);
+                GuildData = SettingsManager.GetGroup<GeneralSettings>(Guild.Id);
             Prefix = context.Prefix;
             CommandName = context.CommandText;
         }

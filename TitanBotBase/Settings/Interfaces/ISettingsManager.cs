@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 
 namespace TitanBotBase.Settings
 {
@@ -9,5 +10,7 @@ namespace TitanBotBase.Settings
         void SaveGroup<T>(ulong id, T settings);
         T GetCustomGlobal<T>();
         void SaveCustomGlobal<T>(T setting);
+        IEditableSettingBuilder<T> Register<T>();
+        IReadOnlyList<IEditableSettingGroup> EditableSettingGroups { get; }
     }
 }

@@ -67,7 +67,7 @@ namespace TitanBotBase.Dependencies
         public bool TryConstruct(Type type, out object obj)
         {
             obj = null;
-            if (!_map.TryGetValue(type, out Type targetType))
+            if (!TryFindMapping(type, out Type targetType))
                 targetType = type;
             var constructors = targetType.GetConstructors(CtorFlags).ToDictionary(c => c, c => c.GetParameters().Select(p => p.ParameterType).ToArray());
             foreach (var ctor in constructors.OrderByDescending(c => c.Value.Count()))
@@ -77,6 +77,25 @@ namespace TitanBotBase.Dependencies
             }
             if (TryConstruct(targetType, out obj, Type.EmptyTypes))
                 return true;
+            return false;
+        }
+
+        private bool TryFindMapping(Type input, out Type mapped)
+        {
+            mapped = null;
+            if (_map.TryGetValue(input, out mapped))
+                return true;
+            if (input.IsGenericType)
+            {
+                foreach (var mapping in _map)
+                {
+                    if (input.GetGenericTypeDefinition() == mapping.Key)
+                    {
+                        mapped = mapping.Value.MakeGenericType(input.GenericTypeArguments);
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 

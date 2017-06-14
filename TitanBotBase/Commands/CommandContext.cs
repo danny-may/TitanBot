@@ -14,7 +14,7 @@ namespace TitanBotBase.Commands
         public IUserMessage Message { get; }
         public IUser Author { get; }
         public DiscordSocketClient Client { get; }
-        public GuildSettings GuildData { get; }
+        public GeneralSettings GuildData { get; }
         public int ArgPos { get; private set; }
         public string Prefix { get; private set; }
         public string CommandText { get; private set; }
@@ -31,7 +31,7 @@ namespace TitanBotBase.Commands
             Author = message.Author;
             Guild = (message.Channel as IGuildChannel)?.Guild;
             if (Guild != null)
-                GuildData = settings.GetGroup<GuildSettings>(Guild.Id);
+                GuildData = settings.GetGroup<GeneralSettings>(Guild.Id);
         }
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)

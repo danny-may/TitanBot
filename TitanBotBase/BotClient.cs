@@ -47,19 +47,8 @@ namespace TitanBotBase
         { 
             mapper = mapper ?? (f => { });
             DependencyFactory = factory ?? new DependencyFactory();
-
-            DependencyFactory.Store(this);
-            DependencyFactory.TryMap<ILogger, TitanBotLogger>();
-            DependencyFactory.TryMap<IDatabase, TitanBotDb>();
-            DependencyFactory.TryMap<IScheduler, TitanBotScheduler>();
-            DependencyFactory.TryMap<ICommandService, CommandService>();
-            DependencyFactory.TryMap<IReplier, Replier>();
-            DependencyFactory.TryMap<ICommandContext, CommandContext>();
-            DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
-            DependencyFactory.TryMap<IPermissionChecker, PermissionChecker>();
-            DependencyFactory.TryMap<OutputFormatter, BaseFormatter>();
-            DependencyFactory.TryMap<ISettingsManager, SettingsManager>();
-            DependencyFactory.TryMap<IDownloader, CachedDownloader>();
+            
+            MapDefaults();
             mapper(DependencyFactory);
 
             Logger = DependencyFactory.ConstructAndStore<ILogger>();
@@ -74,6 +63,24 @@ namespace TitanBotBase
             SubscribeEvents();
 
             Install(Assembly.GetExecutingAssembly());
+        }
+
+        public void MapDefaults()
+        {
+            DependencyFactory.Store(this);
+            DependencyFactory.TryMap<ILogger, TitanBotLogger>();
+            DependencyFactory.TryMap<IDatabase, TitanBotDb>();
+            DependencyFactory.TryMap<IScheduler, TitanBotScheduler>();
+            DependencyFactory.TryMap<ICommandService, CommandService>();
+            DependencyFactory.TryMap<IReplier, Replier>();
+            DependencyFactory.TryMap<ICommandContext, CommandContext>();
+            DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
+            DependencyFactory.TryMap<IPermissionChecker, PermissionChecker>();
+            DependencyFactory.TryMap<OutputFormatter, BaseFormatter>();
+            DependencyFactory.TryMap<ISettingsManager, SettingsManager>();
+            DependencyFactory.TryMap<IDownloader, CachedDownloader>();
+            DependencyFactory.TryMap<IEditableSettingGroup, EditableSettingGroup>();
+            DependencyFactory.TryMap(typeof(IEditableSettingBuilder<>), typeof(EditableSettingBuilder<>));
         }
 
         public void Install(Assembly assembly)

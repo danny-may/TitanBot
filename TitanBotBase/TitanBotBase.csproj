@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=6.1.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.1.0\lib\net45\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Net.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Net.Core.1.0.0-rc3-00746\lib\net45\Discord.Net.Core.dll</HintPath>
     </Reference>
@@ -207,7 +210,10 @@
     <Compile Include="Scheduler\Interfaces\ISchedulerCallback.cs" />
     <Compile Include="Scheduler\TitanBotScheduler.cs" />
     <Compile Include="Scheduler\TitanBotSchedulerRecord.cs" />
+    <Compile Include="Settings\EditableSettingBuilder.cs" />
     <Compile Include="Settings\GlobalSetting.cs" />
+    <Compile Include="Settings\Interfaces\IEditableSettingGroup.cs" />
+    <Compile Include="Settings\Interfaces\IEditableSettingBuilder.cs" />
     <Compile Include="Settings\Interfaces\ISettingsManager.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingsManager.cs" />

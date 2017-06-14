@@ -35,6 +35,9 @@ namespace TitanBotBase.TypeReaders
             if (_parser == null)
                 return TypeReaderResponse.FromError($"No reader found for `{typeof(T)}`");
 
+            if (value == null)
+                return TypeReaderResponse.FromSuccess(new T[0]);
+
             foreach (var item in value.Split(','))
             {
                 var response = await _parser?.Read(context, item.Trim());

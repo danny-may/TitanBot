@@ -13,8 +13,10 @@ namespace TitanBotBase.Dependencies
         void Store(params object[] values);
         void Map<From, To>()
             where To : From;
+        void Map(Type from, Type to);
         bool TryMap<From, To>()
             where To : From;
+        bool TryMap(Type from, Type to);
         bool TryGet<T>(out T result);
         bool TryGet(Type type, out object result);
         T Get<T>();

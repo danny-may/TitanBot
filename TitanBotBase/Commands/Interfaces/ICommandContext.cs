@@ -10,7 +10,7 @@ namespace TitanBotBase.Commands
         IMessageChannel Channel { get; }
         DiscordSocketClient Client { get; }
         IGuild Guild { get; }
-        GuildSettings GuildData { get; }
+        GeneralSettings GuildData { get; }
         IUserMessage Message { get; }
         int ArgPos { get; }
         string Prefix { get; }

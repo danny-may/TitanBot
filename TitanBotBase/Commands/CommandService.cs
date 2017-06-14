@@ -152,7 +152,7 @@ namespace TitanBotBase.Commands
         {
             var reader = Readers.NewCache();
             var responses = new List<ArgumentCheckResponse>();
-            foreach (var argPattern in call.ArgumentPermatations.OrderByDescending(p => p.Count(a => a.UseDefault)))
+            foreach (var argPattern in call.ArgumentPermatations.OrderByDescending(p => p.Count(a => !a.UseDefault)))
             {
                 var denseIndex = argPattern.Select((a, i) => a.IsDense ? i : (int?)null).FirstOrDefault(i => i != null);
                 var maxLength = denseIndex.HasValue ? argPattern.Count(a => !a.UseDefault) + (call.SubCall != null ? 1 : 0) : (int?)null;
