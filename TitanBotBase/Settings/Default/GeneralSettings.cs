@@ -1,8 +1,7 @@
 ﻿namespace TitanBotBase.Settings
 {
-    public class GuildSettings : ISettingGroup
+    public class GuildSettings
     {
-        public ulong Id { get; set; }
         public string Prefix { get; set; }
         public ulong PermOverride { get; set; } = 8;
         public ulong[] RoleOverride { get; set; }

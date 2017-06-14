@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Reflection;
 using TitanBotBase.Database;
 
@@ -10,27 +12,32 @@ namespace TitanBotBase.Settings
 
         public GlobalSetting GlobalSettings { get; }
 
+        public T GetCustomGlobal<T>()
+            => GlobalSettings.GetCustom<T>();
+        public void SaveCustomGlobal<T>(T setting)
+            => GlobalSettings.SaveCustom(setting);
+
         internal SettingsManager(IDatabase database)
         {
             Database = database;
             GlobalSettings = new GlobalSetting(this, database);
         }
 
-        public T GetGroup<T>(ulong id)
-            where T : ISettingGroup, new()
+        public T GetGroup<T>(ulong guildId)
         {
-            return Database.AddOrGet(id, () => new T { Id = id }).Result;
+            var targetType = typeof(T).FullName;
+            var setting = Database.FindOne<Setting>(s => s.Id == guildId && s.Type == targetType).Result?.Serialized ?? "{}";
+            return JsonConvert.DeserializeObject<T>(setting);
         }
 
-        public void SaveGroup<T>(T settings) 
-            where T : ISettingGroup, new()
+        public void SaveGroup<T>(ulong guildId, T settings)
         {
-            Database.Upsert(settings);
-        }
-
-        public void Install(Assembly assembly)
-        {
-            
+            Database.Upsert(new Setting
+            {
+                Id = guildId,
+                Type = typeof(T).FullName,
+                Serialized = JsonConvert.SerializeObject(settings)
+            }).Wait();
         }
     }
 }

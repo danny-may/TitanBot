@@ -156,7 +156,9 @@
     <Compile Include="Commands\DefaultCommands\General\InviteCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PrefixCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\Owner\GlobalPrefix.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\OwnerCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\Owner\Test.cs" />
     <Compile Include="Commands\FlagDefinition.cs" />
     <Compile Include="Commands\Interfaces\ICommandContext.cs" />
     <Compile Include="Commands\Interfaces\IReplier.cs" />
@@ -203,10 +205,10 @@
     <Compile Include="Scheduler\Interfaces\ISchedulerCallback.cs" />
     <Compile Include="Scheduler\TitanBotScheduler.cs" />
     <Compile Include="Scheduler\TitanBotSchedulerRecord.cs" />
-    <Compile Include="Settings\Default\GlobalSetting.cs" />
+    <Compile Include="Settings\GlobalSetting.cs" />
     <Compile Include="Settings\Interfaces\ICustomGlobalSetting.cs" />
-    <Compile Include="Settings\Interfaces\ISetting.cs" />
     <Compile Include="Settings\Interfaces\ISettingsManager.cs" />
+    <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="TypeReaders\ITypeReaderCollection.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />

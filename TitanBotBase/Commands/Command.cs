@@ -76,7 +76,7 @@ namespace TitanBotBase.Commands
                                .WithInstance(context)
                                .Construct<OutputFormatter>();
             if (Guild != null)
-                GuildData = Database.Query(conn => conn.GetTable<GuildSettings>().FindById(Guild.Id));
+                GuildData = SettingsManager.GetGroup<GuildSettings>(Guild.Id);
             Prefix = context.Prefix;
             CommandName = context.CommandText;
         }
