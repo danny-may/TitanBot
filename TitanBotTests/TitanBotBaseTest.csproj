@@ -140,7 +140,6 @@
     <Compile Include="DependencyManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UtilTests\IEnumerableUtilTests.cs" />
-    <Compile Include="UtilTests\ReflectionUtilTests.cs" />
     <Compile Include="UtilTests\FileUtilTests.cs" />
   </ItemGroup>
   <ItemGroup>

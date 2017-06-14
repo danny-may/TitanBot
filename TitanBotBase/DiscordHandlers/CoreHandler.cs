@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Discord;
 using Discord.WebSocket;
-using TitanBotBase.Logger;
+using System.Threading.Tasks;
 using TitanBotBase.Commands;
-using Discord;
 using TitanBotBase.Database;
-using TitanBotBase.Database.Tables;
-using TitanBotBase.Settings;
+using TitanBotBase.Logger;
 
 namespace TitanBotBase.DiscordHandlers
 {

@@ -1,18 +1,7 @@
-﻿using TitanBotBase.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using TitanBotBase.Logger;
-using TitanBotBase.Database;
-using TitanBotBase.Scheduler;
-using TitanBotBase.Commands;
-using TitanBotBase.TypeReaders;
-using TitanBotBase.Formatter;
-using TitanBotBase.Settings;
-using TitanBotBase.Downloader;
+using TitanBotBase.Util;
 
 namespace TitanBotBase.Dependencies
 {

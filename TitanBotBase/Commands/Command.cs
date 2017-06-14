@@ -2,19 +2,15 @@
 using Discord.WebSocket;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBotBase.Database;
-using TitanBotBase.Database.Tables;
 using TitanBotBase.Dependencies;
 using TitanBotBase.Downloader;
 using TitanBotBase.Formatter;
 using TitanBotBase.Logger;
 using TitanBotBase.Scheduler;
 using TitanBotBase.Settings;
-using TitanBotBase.Util;
 
 namespace TitanBotBase.Commands
 {

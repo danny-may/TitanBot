@@ -1,11 +1,11 @@
-﻿using TitanBotBase.Logger;
-using LiteDB;
+﻿using LiteDB;
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using TitanBotBase.Util;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using TitanBotBase.Logger;
+using TitanBotBase.Util;
 
 namespace TitanBotBase.Database
 {

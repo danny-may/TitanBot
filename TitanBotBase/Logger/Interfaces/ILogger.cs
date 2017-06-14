@@ -1,5 +1,4 @@
-﻿using Discord;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace TitanBotBase.Logger

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Discord;
+using System;
 using System.Threading.Tasks;
-using Discord;
-using TitanBotBase.Util;
 using TitanBotBase.Logger;
+using TitanBotBase.Util;
 
 namespace TitanBotBase.Commands
 {

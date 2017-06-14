@@ -1,21 +1,18 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Discord;
+using TitanBotBase.Commands.Responses;
+using TitanBotBase.Database;
 using TitanBotBase.Dependencies;
 using TitanBotBase.Logger;
-using TitanBotBase.Util;
-using Discord.WebSocket;
-using TitanBotBase.Commands.DefautlCommands.General;
-using TitanBotBase.Commands.Responses;
-using TitanBotBase.TypeReaders;
-using TitanBotBase.Database;
-using TitanBotBase.Database.Tables;
-using System.Text.RegularExpressions;
 using TitanBotBase.Settings;
+using TitanBotBase.TypeReaders;
+using TitanBotBase.Util;
 
 namespace TitanBotBase.Commands
 {

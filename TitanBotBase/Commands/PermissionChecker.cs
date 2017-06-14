@@ -1,9 +1,6 @@
 ﻿using Discord;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TitanBotBase.Commands.Responses;
 using TitanBotBase.Database;
 using TitanBotBase.Database.Tables;

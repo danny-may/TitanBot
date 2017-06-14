@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBotBase;
 using TitanBotBase.Dependencies;
-using TitanBotBase.Logger;
 
 namespace TT2BotCore
 {
