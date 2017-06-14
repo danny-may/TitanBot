@@ -31,7 +31,7 @@ namespace TitanBotBase.Commands
             Author = message.Author;
             Guild = (message.Channel as IGuildChannel)?.Guild;
             if (Guild != null)
-                GuildData = settings.GetSettingGroup<GuildSettings>(Guild.Id);
+                GuildData = settings.GetGroup<GuildSettings>(Guild.Id);
         }
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)

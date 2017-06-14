@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using TitanBotBase;
 using TitanBotBase.Dependencies;
 using TitanBotBase.Logger;
-using TT2BotCore.Common;
 
 namespace TT2BotCore
 {
@@ -19,12 +18,11 @@ namespace TT2BotCore
         {
             Client = new BotClient(mapper);
             Client.Install(Assembly.GetExecutingAssembly());
-            Client.CommandService.DefaultPrefix = Configuration.Instance.Prefix;
         }
 
-        public async Task StartAsync()
+        public async Task StartAsync(Func<string> getToken)
         {
-            await Client.StartAsync(Configuration.Instance.Token);
+            await Client.StartAsync(getToken);
         }
 
         public Task StopAsync()

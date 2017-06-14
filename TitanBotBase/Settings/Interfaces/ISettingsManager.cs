@@ -1,9 +1,12 @@
-﻿namespace TitanBotBase.Settings
+﻿using System.Reflection;
+
+namespace TitanBotBase.Settings
 {
     public interface ISettingsManager
     {
-        GlobalSetting GetGlobalSettings();
-        T GetSettingGroup<T>(ulong id) where T : ISettingGroup, new();
-        void SaveSettingsGroup<T>(T settings) where T : ISettingGroup, new();
+        GlobalSetting GlobalSettings { get; }
+        T GetGroup<T>(ulong id) where T : ISettingGroup, new();
+        void SaveGroup<T>(T settings) where T : ISettingGroup, new();
+        void Install(Assembly assembly);
     }
 }

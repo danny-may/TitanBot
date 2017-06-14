@@ -15,18 +15,19 @@ using TitanBotBase.TypeReaders;
 using TitanBotBase.Database;
 using TitanBotBase.Database.Tables;
 using System.Text.RegularExpressions;
+using TitanBotBase.Settings;
 
 namespace TitanBotBase.Commands
 {
     public class CommandService : ICommandService
     {
         public IReadOnlyList<CommandInfo> Commands { get; }
-        public string DefaultPrefix { get; set; } = "t$";
         private List<CommandInfo> _commands { get; } = new List<CommandInfo>();
         private IDependencyFactory DependencyFactory { get; }
         private ILogger Logger { get; }
         private ITypeReaderCollection Readers { get; }
         private IDatabase Database { get; }
+        private ISettingsManager SettingsManager { get; }
         private BotClient Client { get; }
         private DiscordSocketClient DiscordClient { get; }
 
@@ -39,6 +40,7 @@ namespace TitanBotBase.Commands
             Readers = factory.Get<ITypeReaderCollection>();
             Database = factory.Get<IDatabase>();
             Commands = _commands.AsReadOnly();
+            SettingsManager = factory.Get<ISettingsManager>();
         }
 
         public void Install(Assembly assembly)
@@ -81,7 +83,7 @@ namespace TitanBotBase.Commands
         {
             var context = DependencyFactory.WithInstance(message)
                                            .Construct<ICommandContext>();
-            context.CheckCommand(this, DefaultPrefix);
+            context.CheckCommand(this, SettingsManager.GlobalSettings.DefaultPrefix);
             if (!context.IsCommand && !context.ExplicitPrefix)
                 return Task.CompletedTask;
             else if (!context.IsCommand)

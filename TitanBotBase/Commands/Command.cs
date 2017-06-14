@@ -39,12 +39,13 @@ namespace TitanBotBase.Commands
         protected IGuildChannel GuildChannel => Channel as IGuildChannel;
         protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
         protected ISettingsManager SettingsManager { get; private set; }
+        protected GlobalSetting GlobalSettings => SettingsManager.GlobalSettings;
         protected GuildSettings GuildData { get; private set; }
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
         protected IReplier Replier { get; private set; }
         protected OutputFormatter Formatter { get; private set; }
-        protected string[] AcceptedPrefixes => new string[] { BotUser.Mention, BotUser.Username, CommandService.DefaultPrefix, GuildData?.Prefix }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+        protected string[] AcceptedPrefixes => new string[] { BotUser.Mention, BotUser.Username, SettingsManager.GlobalSettings.DefaultPrefix, GuildData?.Prefix }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
         protected object GlobalCommandLock => _commandLocks.GetOrAdd(GetType(), new object());
         protected object GuildCommandLock => _guildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
         protected object ChannelCommandLock => _channelLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong, object>()).GetOrAdd(Context.Channel.Id, new object());

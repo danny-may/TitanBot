@@ -52,6 +52,10 @@ namespace TitanBotBase.Database
             where T : IDbRecord;
         Task Upsert<T>(IEnumerable<T> records)
             where T : IDbRecord;
+        Task<T> GetUpsert<T>(T record)
+            where T : IDbRecord;
+        Task<IEnumerable<T>> GetUpsert<T>(IEnumerable<T> records)
+            where T : IDbRecord;
         Task<T> AddOrGet<T>(ulong Id, T record)
             where T : IDbRecord;
         Task<T> AddOrGet<T>(ulong Id, Func<T> record)

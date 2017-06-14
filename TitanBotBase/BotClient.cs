@@ -31,7 +31,7 @@ namespace TitanBotBase
         public ICommandService CommandService { get; private set; }
         public ITypeReaderCollection TypeReaders { get; private set; }
         public ISettingsManager SettingsManager { get; private set; }
-        public GlobalSetting GlobalSettings => SettingsManager.GetGlobalSettings();
+        public GlobalSetting GlobalSettings => SettingsManager.GlobalSettings;
         public IReadOnlyList<ulong> Owners => GlobalSettings.Owners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
                                                                    .ToList().AsReadOnly();
         private List<DiscordHandlerBase> Handlers { get; } = new List<DiscordHandlerBase>();
@@ -64,9 +64,9 @@ namespace TitanBotBase
             DiscordClient = DependencyFactory.ConstructAndStore<DiscordSocketClient>();
             TypeReaders = DependencyFactory.ConstructAndStore<ITypeReaderCollection>();
             Database = DependencyFactory.ConstructAndStore<IDatabase>();
+            SettingsManager = DependencyFactory.ConstructAndStore<ISettingsManager>();
             Scheduler = DependencyFactory.ConstructAndStore<IScheduler>();
             CommandService = DependencyFactory.ConstructAndStore<ICommandService>();
-            SettingsManager = DependencyFactory.ConstructAndStore<ISettingsManager>();
 
             SubscribeEvents();
 
@@ -91,8 +91,15 @@ namespace TitanBotBase
             DiscordClient.Log += m => Logger.LogAsync(DiscordUtil.ToLoggable(m));
         }
 
-        public async Task StartAsync(string token)
+        public Task StartAsync()
+            => StartAsync(() => GlobalSettings.Token);
+        public Task StartAsync(string token)
+            => StartAsync(() => token);
+        public async Task StartAsync(Func<string> tokenInput)
         {
+            var token = tokenInput() ?? GlobalSettings.Token;
+            token = string.IsNullOrWhiteSpace(token) ? GlobalSettings.Token : token;
+            GlobalSettings.Token = token;
             if (DiscordClient.LoginState != LoginState.LoggedOut)
                 return;
             await DiscordClient.LoginAsync(TokenType.Bot, token);

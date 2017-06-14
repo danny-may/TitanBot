@@ -105,6 +105,10 @@ namespace TitanBotBase.Database
             => QueryAsync(conn => conn.GetTable<T>().Upsert(record));
         public Task Upsert<T>(IEnumerable<T> records) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Delete(records));
+        public Task<T> GetUpsert<T>(T record) where T : IDbRecord
+            => QueryAsync(conn => { conn.GetTable<T>().Upsert(record); return conn.GetTable<T>().FindById(record.Id); });
+        public Task<IEnumerable<T>> GetUpsert<T>(IEnumerable<T> records) where T : IDbRecord
+            => QueryAsync(conn => { conn.GetTable<T>().Upsert(records); return conn.GetTable<T>().FindById(records.Select(r => r.Id).ToList()); });
 
         public Task<T> AddOrGet<T>(ulong id, T record) where T : IDbRecord
             => AddOrGet(id, () => record);

@@ -17,7 +17,8 @@ namespace TT2BotConsole
         public async Task Start()
         {
             var client = new TT2BotClient(f => f.Map<ILogger, Logger>());
-            await client.StartAsync();
+            Console.WriteLine("Please enter a bot token (leave blank to use default):");
+            await client.StartAsync(Console.ReadLine);
 
             await Task.Delay(-1);
         }
