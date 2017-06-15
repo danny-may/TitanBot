@@ -12,7 +12,7 @@ using TitanBotBase.Logger;
 
 namespace TitanBotBase.Util
 {
-    static class DiscordUtil
+    public static class DiscordUtil
     {
         public static ILoggable ToLoggable(this Discord.LogMessage log)
             => new LogEntry(Logger.LogSeverity.Critical, LogType.Client, log.Message, log.Source);

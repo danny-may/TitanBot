@@ -151,10 +151,13 @@ namespace TitanBotBase.Commands
             var responses = new List<ArgumentCheckResponse>();
             foreach (var argPattern in call.ArgumentPermatations.OrderByDescending(p => p.Count(a => !a.UseDefault)))
             {
+                var ignoreFlags = !argPattern.Any(f => f.Flag != null);
                 var denseIndex = argPattern.Select((a, i) => a.IsDense ? i : (int?)null).FirstOrDefault(i => i != null);
+                if (call.SubCall != null)
+                    denseIndex ++;
                 var maxLength = denseIndex.HasValue ? argPattern.Count(a => !a.UseDefault) + (call.SubCall != null ? 1 : 0) : (int?)null;
-                var stringArgs = context.SplitArguments(out (string Key, string Value)[] flagStrings, maxLength, denseIndex);
-                var readResult = await ReadArguments(context, reader, stringArgs, flagStrings, argPattern, call);
+                var stringArgs = context.SplitArguments(ignoreFlags, out(string Key, string Value)[] flagStrings, maxLength, denseIndex);
+                var readResult = await ReadArguments(context, reader, stringArgs.Select(s => s.Trim()).ToArray(), flagStrings, argPattern, call);
                 if (readResult.SuccessStatus == ArgumentCheckResult.Successful)
                     return readResult;
                 responses.Add(readResult);

@@ -48,7 +48,7 @@ namespace TitanBotBase.Commands.DefaultCommands.Admin
             var groups = SettingsManager.EditableSettingGroups.Where(g => g.GroupName.ToLower() == settingGroup.ToLower());
             if (groups.Count() == 0)
             {
-                await ReplyAsync("That isnt a valid setting group!");
+                await ReplyAsync($"`{settingGroup}`isnt a valid setting group!", ReplyType.Error);
                 return;
             }
 
@@ -61,8 +61,11 @@ namespace TitanBotBase.Commands.DefaultCommands.Admin
                 builder.AddInlineField(setting.Name, value);
             }
             var descriptions = string.Join("\n", groups.Select(g => g.Description));
+            var notes = string.Join("\n", groups.Select(g => g.Notes));
             if (!string.IsNullOrWhiteSpace(descriptions))
                 builder.WithDescription(descriptions);
+            if (!string.IsNullOrWhiteSpace(notes))
+                builder.AddField("Notes", notes);
             await ReplyAsync("", embed: builder.Build());
         }
 
@@ -73,14 +76,14 @@ namespace TitanBotBase.Commands.DefaultCommands.Admin
             var setting = SettingsManager.EditableSettingGroups.SelectMany(g => g.Settings)
                                  .FirstOrDefault(s => s.Name.ToLower() == key.ToLower());
             if (setting == null)
-                await ReplyAsync("Could not find setting", ReplyType.Error);
+                await ReplyAsync($"Could not find the `{key}` setting", ReplyType.Error);
             else
             {
                 var readerResult = await Readers.Read(setting.Type, Context, value);
 
                 if (!readerResult.IsSuccess)
                 {
-                    await ReplyAsync($"`{value}` is not a valid value for the setting {setting.Name}");
+                    await ReplyAsync($"`{value}` is not a valid value for the setting {setting.Name}", ReplyType.Error);
                     return;
                 }
 

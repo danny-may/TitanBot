@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace TitanBotBase.Scheduler
 {
     public interface ISchedulerCallback
     {
-        void Handle(ulong id, DateTime from, TimeSpan interval, DateTime to, DateTime current);
+        void Handle(ISchedulerRecord record, DateTime eventTime);
+        void Complete(ISchedulerRecord record, bool wasCancelled);
     }
 }

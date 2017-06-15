@@ -10,6 +10,7 @@ namespace TitanBotBase.Settings
     {
         string Name { get; set; } = typeof(TGroup).Name;
         string Description { get; set; }
+        string Notes { get; set; }
         List<EditableSetting> Settings { get; } = new List<EditableSetting>();
         bool hasFinalised = false;
         Dictionary<Type, IEditableSettingGroup> Groups { get; }
@@ -30,7 +31,8 @@ namespace TitanBotBase.Settings
                                                       .WithInstance(Settings)
                                                       .Construct<IEditableSettingGroup>()
                                                       .WithDescription(Description)
-                                                      .WithName(Name);
+                                                      .WithName(Name)
+                                                      .WithNotes(Notes);
         }
 
         public IEditableSettingBuilder<TGroup> WithName(string name)
@@ -42,6 +44,12 @@ namespace TitanBotBase.Settings
         public IEditableSettingBuilder<TGroup> WithDescription(string description)
         {
             Description = description;
+            return this;
+        }
+
+        public IEditableSettingBuilder<TGroup> WithNotes(string notes)
+        {
+            Notes = notes;
             return this;
         }
 

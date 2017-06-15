@@ -19,7 +19,7 @@ namespace TitanBotBase.Commands.DefautlCommands.General
             var userCount = Client.Guilds.SelectMany(g => g.Users).Distinct().Count();
             var ramAvailable = PerformanceUtil.getAvailableRAM();
             var cpuUsage = PerformanceUtil.getCurrentCPUUsage();
-            var timersActive = await Scheduler.ActiveCount();
+            var timersActive = Scheduler.ActiveCount();
             DateTime startTime;
             long ramUsage;
             using (var proc = Process.GetCurrentProcess())

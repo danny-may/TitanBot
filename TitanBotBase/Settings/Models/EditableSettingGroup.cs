@@ -7,6 +7,7 @@ namespace TitanBotBase.Settings
     class EditableSettingGroup : IEditableSettingGroup
     {
         public string GroupName { get; private set; }
+        public string Notes { get; private set; }
         public string Description { get; private set; }
         public List<EditableSetting> Settings { get; }
         public Type GroupType { get; }
@@ -26,6 +27,11 @@ namespace TitanBotBase.Settings
         public IEditableSettingGroup WithDescription(string description)
         {
             Description = description;
+            return this;
+        }
+        public IEditableSettingGroup WithNotes(string notes)
+        {
+            Notes = notes;
             return this;
         }
     }

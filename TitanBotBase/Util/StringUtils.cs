@@ -127,14 +127,14 @@ namespace TitanBotBase.Util
             }
         }
 
-        public static string[] SmartSplit(this string text, out (string Key, string Value)[] flags)
-            => SmartSplit(text, null, null, out flags);
-        public static string[] SmartSplit(this string text, int? maxLength, int? squeezePosition, out (string Key, string Value)[] flags)
+        public static string[] SmartSplit(this string text, bool ignoreFlags, out (string Key, string Value)[] flags)
+            => SmartSplit(text, null, null, ignoreFlags, out flags);
+        public static string[] SmartSplit(this string text, int? maxLength, int? squeezePosition, bool ignoreFlags, out (string Key, string Value)[] flags)
         {
             var splitIndexes = text.GetBlockRanges().ToArray();
             var blocks = text.BlockString(splitIndexes);
-            var flagBlocks = blocks.SkipWhile(b => b[0] != '-');
-            var argBlocks = blocks.TakeWhile(b => b[0] != '-');
+            var flagBlocks = blocks.SkipWhile(b => b[0] != '-' || ignoreFlags);
+            var argBlocks = blocks.TakeWhile(b => b[0] != '-' || ignoreFlags);
             var argIndexes = splitIndexes.Take(argBlocks.Count());
 
 

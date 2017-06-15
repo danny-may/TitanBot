@@ -12,5 +12,6 @@ namespace TitanBotBase.Settings
         void Finalise();
         IEditableSettingBuilder<TGroup> WithDescription(string description);
         IEditableSettingBuilder<TGroup> WithName(string name);
+        IEditableSettingBuilder<TGroup> WithNotes(string notes);
     }
 }

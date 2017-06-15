@@ -60,5 +60,8 @@ namespace TitanBotBase.Database
             where T : IDbRecord;
         Task<T> AddOrGet<T>(ulong Id, Func<T> record)
             where T : IDbRecord;
+        Task Drop<T>()
+            where T : IDbRecord;
+        Task Drop(string table);
     }
 }

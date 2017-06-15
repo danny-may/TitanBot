@@ -37,6 +37,9 @@ namespace TitanBotBase.TypeReaders
 
             foreach (var type in PrimitiveParsers.SupportedTypes)
                 AddTypeReader(type, PrimitiveTypeReader.Create(type));
+
+            AddTypeReader<TimeSpan>(new TimeSpanTypeReader());
+            AddTypeReader<System.Drawing.Color>(new ColourTypeReader());
         }
 
         public void AddTypeReader<T>(TypeReader reader)

@@ -20,6 +20,6 @@ namespace TitanBotBase.Commands
         bool ExplicitPrefix { get; }
 
         void CheckCommand(ICommandService commandService, string defaultPrefix);
-        string[] SplitArguments(out (string Key, string Value)[] flags, int? maxLength = null, int? densePos = null);
+        string[] SplitArguments(bool ignoreFlags, out (string Key, string Value)[] flags, int? maxLength = null, int? densePos = null);
     }
 }

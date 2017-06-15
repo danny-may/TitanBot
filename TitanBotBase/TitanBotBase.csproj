@@ -188,6 +188,7 @@
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
     <Compile Include="Commands\CommandContext.cs" />
+    <Compile Include="Commands\DefaultCommands\Admin\DbPurgeCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\SettingsCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\HelpCommand.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="Database\Interfaces\IDbTransaction.cs" />
     <Compile Include="Downloader\CachedDownloader.cs" />
     <Compile Include="Downloader\IDownloader.cs" />
+    <Compile Include="Scheduler\Interfaces\ISchedulerRecord.cs" />
     <Compile Include="Settings\Default\GeneralSettings.cs" />
     <Compile Include="Dependencies\DependencyFactory.cs" />
     <Compile Include="Dependencies\Interfaces\IDependencyFactory.cs" />

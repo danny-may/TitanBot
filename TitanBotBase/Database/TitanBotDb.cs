@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -76,13 +77,13 @@ namespace TitanBotBase.Database
             => _database.Dispose();
 
         public Task<IEnumerable<T>> Find<T>(Expression<Func<T, bool>> predicate, int skip = 0, int limit = int.MaxValue)where T : IDbRecord
-            => QueryAsync(conn => conn.GetTable<T>().Find(predicate, skip, limit));
+            => QueryAsync(conn => conn.GetTable<T>().Find(predicate, skip, limit).ToList() as IEnumerable<T>);
         public Task<T> FindOne<T>(Expression<Func<T, bool>> predicate) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().FindOne(predicate));
         public Task<T> FindById<T>(ulong id) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().FindById(id));
         public Task<IEnumerable<T>> FindById<T>(IEnumerable<ulong> ids) where T : IDbRecord
-            => QueryAsync(conn => conn.GetTable<T>().FindById(ids));
+            => QueryAsync(conn => conn.GetTable<T>().FindById(ids).ToList() as IEnumerable<T>);
         public Task<int> Delete<T>(Expression<Func<T, bool>> predicate) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Delete(predicate));
         public Task<bool> Delete<T>(T row) where T : IDbRecord
@@ -104,11 +105,11 @@ namespace TitanBotBase.Database
         public Task Upsert<T>(T record) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Upsert(record));
         public Task Upsert<T>(IEnumerable<T> records) where T : IDbRecord
-            => QueryAsync(conn => conn.GetTable<T>().Delete(records));
+            => QueryAsync(conn => conn.GetTable<T>().Upsert(records));
         public Task<T> GetUpsert<T>(T record) where T : IDbRecord
             => QueryAsync(conn => { conn.GetTable<T>().Upsert(record); return conn.GetTable<T>().FindById(record.Id); });
         public Task<IEnumerable<T>> GetUpsert<T>(IEnumerable<T> records) where T : IDbRecord
-            => QueryAsync(conn => { conn.GetTable<T>().Upsert(records); return conn.GetTable<T>().FindById(records.Select(r => r.Id).ToList()); });
+            => QueryAsync(conn => { conn.GetTable<T>().Upsert(records); return conn.GetTable<T>().FindById(records.Select(r => r.Id).ToList()).ToList() as IEnumerable<T>; });
 
         public Task<T> AddOrGet<T>(ulong id, T record) where T : IDbRecord
             => AddOrGet(id, () => record);
@@ -126,5 +127,11 @@ namespace TitanBotBase.Database
                 return current;
             });
         }
+
+        public Task Drop<T>() where T : IDbRecord
+            => Drop(typeof(T).Name);
+
+        public Task Drop(string table)
+            => QueryAsync(conn => _database.DropCollection(table));
     }
 }
