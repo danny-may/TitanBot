@@ -92,7 +92,7 @@ namespace TitanBotBase.Commands.DefautlCommands.General
             {
                 var pfx = Context.Prefix;
                 var nme = name;
-                var parm = " " + call.SubCall + string.Join(" ", call.GetParameters());
+                var parm = " " + call.SubCall + " " + string.Join(" ", call.GetParameters());
                 var flgs = " " + call.GetFlags();
                 usages.Add($"`{pfx + nme + parm.TrimEnd() + flgs.TrimEnd()}` - {call.Usage}");
             }

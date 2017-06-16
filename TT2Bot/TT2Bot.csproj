@@ -164,13 +164,18 @@
   <ItemGroup>
     <Compile Include="Callbacks\TitanLordRoundCallback.cs" />
     <Compile Include="Callbacks\TitanLordTickCallback.cs" />
+    <Compile Include="Commands\Clan\ApplyCommand.cs" />
     <Compile Include="Commands\Clan\TitanLordCommand.cs" />
     <Compile Include="Commands\CommandTemplate.cs" />
     <Compile Include="Handlers\MessageHandler.cs" />
     <Compile Include="Helpers\Calculator.cs" />
     <Compile Include="Helpers\TimerExtensions.cs" />
-    <Compile Include="Models\TitanLordSettings.cs" />
-    <Compile Include="Models\TitanLordTimerData.cs" />
+    <Compile Include="Models\Database\PlayerData.cs" />
+    <Compile Include="Models\Database\Registration.cs" />
+    <Compile Include="Models\Settings\RegistrationSettings.cs" />
+    <Compile Include="Models\Settings\TT2GlobalSettings.cs" />
+    <Compile Include="Models\Settings\TitanLordSettings.cs" />
+    <Compile Include="Models\Settings\TitanLordTimerData.cs" />
     <Compile Include="Overrides\Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

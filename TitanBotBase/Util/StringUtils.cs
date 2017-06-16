@@ -41,6 +41,8 @@ namespace TitanBotBase.Util
                         isArray = true;
                         break;
                     case '-':
+                        if (text.Length <= i + 1 || !"abcdefghijklmnopqrstuvwxyzABCDEFGHIKLMNOPQRSTUVWXYZ-".Contains(text[i + 1]))
+                            continue;
                         if (prevWasSpace && isFlag)
                         {
                             yield return (previousSplit, i - 1);
@@ -133,8 +135,9 @@ namespace TitanBotBase.Util
         {
             var splitIndexes = text.GetBlockRanges().ToArray();
             var blocks = text.BlockString(splitIndexes);
-            var flagBlocks = blocks.SkipWhile(b => b[0] != '-' || ignoreFlags);
-            var argBlocks = blocks.TakeWhile(b => b[0] != '-' || ignoreFlags);
+            Func<string, bool> argCheck = (b => ignoreFlags || b.StartsWith("---") || !b.StartsWith("-") || b.TrimStart('-').Length == 0);
+            var flagBlocks = blocks.SkipWhile(argCheck);
+            var argBlocks = blocks.TakeWhile(argCheck);
             var argIndexes = splitIndexes.Take(argBlocks.Count());
 
 
@@ -170,6 +173,56 @@ namespace TitanBotBase.Util
             argIndexes = argIndexes.Squeeze(maxLength ?? -1, squeezePosition ?? -1);
 
             return text.BlockString(argIndexes.ToArray()).Select(b => b.RemoveControls()).ToArray();
+        }
+
+        public static string Tableify(this object[][] data, string cellFormat = "{0} ", string headerFormat = null)
+        {
+            var builder = new StringBuilder();
+            data = data.ForceColumns();
+            var maxWidth = data.Rotate().Select(c => c.Max(v => v.ToString().Length)).ToList();
+            for (int row = 0; row < data.Length; row++)
+            {
+                for (int col = 0; col < data[row].Length; col++)
+                {
+                    if (row == 0 && headerFormat != null)
+                        builder.Append(string.Format(headerFormat, data[row][col].ToString().PadRight(maxWidth[col])));
+                    else
+                        builder.Append(string.Format(cellFormat, data[row][col].ToString().PadRight(maxWidth[col])));
+                }
+                builder.Append("\n");
+            }
+
+            return builder.ToString();
+        }
+
+        public static T[][] Rotate<T>(this T[][] data)
+        {
+            var ret = new T[data.Max(r => r.Length)][];
+            for (int y = 0; y < data.Length; y++)
+            {
+                for (int x = 0; x < data[y].Length; x++)
+                {
+                    ret[x] = ret[x] ?? new T[data.Length];
+                    ret[x][y] = data[y][x];
+                }
+            }
+            return ret;
+        }
+
+        public static T[][] ForceColumns<T>(this T[][] data)
+        {
+            var columns = data.Max(r => r.Length);
+            var ret = data.Select(r => new T[columns]).ToArray();
+            for (int y = 0; y < data.Length; y++)
+            {
+                ret[y] = new T[columns];
+                for (int x = 0; x < data[y].Length; x++)
+                {
+                    ret[y][x] = data[y][x];
+                }
+            }
+
+            return ret;
         }
     }
 }

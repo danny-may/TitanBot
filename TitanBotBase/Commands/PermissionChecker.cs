@@ -26,7 +26,7 @@ namespace TitanBotBase.Commands
                 return PermissionCheckResponse.FromError("You cannot use that command here!");
 
             if (BotClient.Owners.Contains(context.Author.Id))
-                return PermissionCheckResponse.FromSuccess(calls);
+                return PermissionCheckResponse.FromSuccess(permitted);
 
             permitted = CheckOwner(context, permitted);
             if (permitted.Count() == 0)

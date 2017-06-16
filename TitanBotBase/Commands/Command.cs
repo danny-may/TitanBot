@@ -26,17 +26,17 @@ namespace TitanBotBase.Commands
         protected BotClient Bot { get; set; }
         protected ILogger Logger { get; private set; }
         protected ICommandService CommandService { get; private set; }
-        protected IUserMessage Message => Context.Message;
-        protected DiscordSocketClient Client => Context.Client;
-        protected IUser Author => Context.Author;
-        protected IMessageChannel Channel => Context.Channel;
-        protected SocketSelfUser BotUser => Client.CurrentUser;
-        protected IGuild Guild => Context.Guild;
+        protected IUserMessage Message => Context?.Message;
+        protected DiscordSocketClient Client => Context?.Client;
+        protected IUser Author => Context?.Author;
+        protected IMessageChannel Channel => Context?.Channel;
+        protected SocketSelfUser BotUser => Client?.CurrentUser;
+        protected IGuild Guild => Context?.Guild;
         protected IGuildUser GuildAuthor => Author as IGuildUser;
         protected IGuildChannel GuildChannel => Channel as IGuildChannel;
         protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
         protected ISettingsManager SettingsManager { get; private set; }
-        protected GlobalSetting GlobalSettings => SettingsManager.GlobalSettings;
+        protected GlobalSetting GlobalSettings => SettingsManager?.GlobalSettings;
         protected GeneralSettings GuildData { get; private set; }
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
@@ -57,7 +57,6 @@ namespace TitanBotBase.Commands
         public Command()
         {
             TotalCommands++;
-            StartReplyCountdown();
         }
 
         internal void Install(ICommandContext context, IDependencyFactory factory)
@@ -79,6 +78,7 @@ namespace TitanBotBase.Commands
                 GuildData = SettingsManager.GetGroup<GeneralSettings>(Guild.Id);
             Prefix = context.Prefix;
             CommandName = context.CommandText;
+            StartReplyCountdown();
         }
 
         void StartReplyCountdown()
