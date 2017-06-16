@@ -7,16 +7,16 @@ namespace TitanBotBase.Dependencies
 {
     public class InstanceBuilder : IInstanceBuilder
     {
-        private readonly Dictionary<Type, object> _objStore;
-        private readonly Dictionary<Type, Type> _map;
-        private Type[] _availableTypes => _objStore.Keys.Cast<Type>().ToArray();
+        private readonly Dictionary<Type, object> BuildingObjects;
+        private readonly Dictionary<Type, Type> TypeMap;
+        private Type[] KnownTypes => BuildingObjects.Keys.Cast<Type>().ToArray();
 
         private static readonly BindingFlags CtorFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
 
         public InstanceBuilder(Dictionary<Type, object> parentStore, Dictionary<Type, Type> parentMap)
         {
-            _objStore = parentStore.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            _map = parentMap;
+            BuildingObjects = parentStore.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            TypeMap = parentMap;
         }
 
         bool TryGet<T>(out T result)
@@ -32,12 +32,12 @@ namespace TitanBotBase.Dependencies
 
         bool TryGet(Type type, out object result)
         {
-            if (_objStore.TryGetValue(type, out result))
+            if (BuildingObjects.TryGetValue(type, out result))
                 return true;
-            foreach (var key in _availableTypes)
+            foreach (var key in KnownTypes)
             {
                 if (type.IsAssignableFrom(key))
-                    return _objStore.TryGetValue(key, out result);
+                    return BuildingObjects.TryGetValue(key, out result);
             }
             return false;
         }
@@ -80,11 +80,11 @@ namespace TitanBotBase.Dependencies
         private bool TryFindMapping(Type input, out Type mapped)
         {
             mapped = null;
-            if (_map.TryGetValue(input, out mapped))
+            if (TypeMap.TryGetValue(input, out mapped))
                 return true;
             if (input.IsGenericType)
             {
-                foreach (var mapping in _map)
+                foreach (var mapping in TypeMap)
                 {
                     if (input.GetGenericTypeDefinition() == mapping.Key)
                     {
@@ -120,7 +120,7 @@ namespace TitanBotBase.Dependencies
                     args.Add(res);
                 else if (param.HasDefaultValue)
                     args.Add(param.DefaultValue);
-                else if (param.ParameterType != type && _map.TryGetValue(param.ParameterType, out Type mapped) && TryConstruct(mapped, out res))
+                else if (param.ParameterType != type && TypeMap.TryGetValue(param.ParameterType, out Type mapped) && TryConstruct(mapped, out res))
                     args.Add(res);
                 else
                     return false;
@@ -153,7 +153,7 @@ namespace TitanBotBase.Dependencies
 
         public IInstanceBuilder WithInstance(Type type, object value)
         {
-            _objStore[type] = value;
+            BuildingObjects[type] = value;
             return this;
         }
     }

@@ -12,9 +12,9 @@ namespace TitanBotBase.Database
 {
     public class TitanBotDb : IDatabase
     {
-        readonly LiteDatabase _database;
-        readonly object _syncLock = new object();
-        readonly ILogger _logger;
+        LiteDatabase Database { get; }
+        object SyncLock { get; } = new object();
+        ILogger Logger { get; }
 
         public int TotalCalls { get; private set; } = 0;
 
@@ -22,15 +22,9 @@ namespace TitanBotBase.Database
         public TitanBotDb(string connectionString, ILogger logger)
         {
             FileUtil.EnsureDirectory(connectionString);
-            _database = new LiteDatabase(connectionString);
-            _logger = logger;
+            Database = new LiteDatabase(connectionString);
+            Logger = logger;
         }
-
-        public void Query(Action<IDbTransaction> query)
-            => QueryAsync(query).Wait();
-
-        public T Query<T>(Func<IDbTransaction, T> query)
-            => QueryAsync(query).Result;
 
         public Task QueryAsync(Action<IDbTransaction> query)
             => QueryAsync<object>(conn => { query(conn); return null; });
@@ -40,10 +34,10 @@ namespace TitanBotBase.Database
             return Task.Run(() =>
             {
                 T result = default(T);
-                lock (_syncLock)
+                lock (SyncLock)
                 {
                     TotalCalls++;
-                    using (var conn = new TitanBotDbTransaction(_database))
+                    using (var conn = new TitanBotDbTransaction(Database))
                     {
                         try
                         {
@@ -52,7 +46,7 @@ namespace TitanBotBase.Database
                         }
                         catch (Exception ex)
                         {
-                            _logger.Log(ex, "DatabaseQuery");
+                            Logger.Log(ex, "DatabaseQuery");
                             conn.Rollback();
                         }
                     }
@@ -67,14 +61,8 @@ namespace TitanBotBase.Database
         public Task<R> QueryTableAsync<T, R>(Func<IDbTable<T>, R> query) where T : IDbRecord
             => QueryAsync(conn => query(conn.GetTable<T>()));
 
-        public void QueryTable<T>(Action<IDbTable<T>> query) where T : IDbRecord
-            => Query(conn => query(conn.GetTable<T>()));
-
-        public R QueryTable<T, R>(Func<IDbTable<T>, R> query) where T : IDbRecord
-            => Query(conn => query(conn.GetTable<T>()));
-
         public void Dispose()
-            => _database.Dispose();
+            => Database.Dispose();
 
         public Task<IEnumerable<T>> Find<T>(Expression<Func<T, bool>> predicate, int skip = 0, int limit = int.MaxValue)where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Find(predicate, skip, limit).ToList() as IEnumerable<T>);
@@ -132,6 +120,6 @@ namespace TitanBotBase.Database
             => Drop(typeof(T).Name);
 
         public Task Drop(string table)
-            => QueryAsync(conn => _database.DropCollection(table));
+            => QueryAsync(conn => Database.DropCollection(table));
     }
 }

@@ -10,45 +10,45 @@ namespace TitanBotBase.Database
     class TitanBotDbTable<TRecord> : IDbTable<TRecord>
         where TRecord : IDbRecord
     {
-        private readonly LiteCollection<TRecord> _collection;
+        private LiteCollection<TRecord> Collection { get; }
 
         internal TitanBotDbTable(LiteCollection<TRecord> collection)
         {
-            _collection = collection;
+            Collection = collection;
         }
 
         public int Delete(Expression<Func<TRecord, bool>> predicate)
-            => _collection.Delete(predicate);
+            => Collection.Delete(predicate);
         public bool Delete(TRecord row)
-            => _collection.Delete(row.Id);
+            => Collection.Delete(row.Id);
         public int Delete(IEnumerable<TRecord> rows)
             => rows.Select(r => Delete(r)).Count(r => r);
         public IEnumerable<TRecord> Find(Expression<Func<TRecord, bool>> predicate, int skip = 0, int limit = 2147483647)
-            => _collection.Find(predicate, skip, limit);
+            => Collection.Find(predicate, skip, limit);
         public TRecord FindOne(Expression<Func<TRecord, bool>> predicate)
-            => _collection.FindOne(predicate);
+            => Collection.FindOne(predicate);
         public TRecord FindById(ulong id)
-            => _collection.FindOne(r => r.Id == id);
+            => Collection.FindOne(r => r.Id == id);
         public IEnumerable<TRecord> FindById(IEnumerable<ulong> ids)
             => ids.Select(i => FindById(i)).ToList();
         public void Insert(TRecord record)
-            => _collection.Insert(record);
+            => Collection.Insert(record);
         public void Insert(IEnumerable<TRecord> records)
-            => _collection.Insert(records);
+            => Collection.Insert(records);
         public void Update(TRecord record)
-            => _collection.Update(record);
+            => Collection.Update(record);
         public void Update(IEnumerable<TRecord> records)
-            => _collection.Update(records);
+            => Collection.Update(records);
         public void Upsert(TRecord record)
-            => _collection.Upsert(record);
+            => Collection.Upsert(record);
         public void Upsert(IEnumerable<TRecord> records)
-            => _collection.Upsert(records);
+            => Collection.Upsert(records);
         public bool Delete(ulong id)
-            => _collection.Delete(id);
+            => Collection.Delete(id);
         public int Delete(IEnumerable<ulong> ids)
             => ids.Select(i => Delete(i)).Count(r => r);
         public void Ensure(TRecord record)
-            => _collection.Upsert(_collection.FindOne(r => r.Id == record.Id).IfDefault(record));
+            => Collection.Upsert(Collection.FindOne(r => r.Id == record.Id).IfDefault(record));
         public void Ensure(IEnumerable<TRecord> records)
             => records.ToList().ForEach(r => Ensure(r));
     }

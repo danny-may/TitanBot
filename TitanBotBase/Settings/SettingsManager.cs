@@ -15,8 +15,8 @@ namespace TitanBotBase.Settings
 
         public GlobalSetting GlobalSettings { get; }
         
-        public IReadOnlyList<IEditableSettingGroup> EditableSettingGroups => _groups.Select(g => g.Value).ToList().AsReadOnly();
-        private Dictionary<Type, IEditableSettingGroup> _groups { get; } = new Dictionary<Type, IEditableSettingGroup>();
+        public IReadOnlyList<IEditableSettingGroup> EditableSettingGroups => Groups.Select(g => g.Value).ToList().AsReadOnly();
+        private Dictionary<Type, IEditableSettingGroup> Groups { get; } = new Dictionary<Type, IEditableSettingGroup>();
 
         public T GetCustomGlobal<T>()
             => GlobalSettings.GetCustom<T>();
@@ -55,6 +55,6 @@ namespace TitanBotBase.Settings
         }
 
         public IEditableSettingBuilder<T> Register<T>()
-            => DependencyFactory.WithInstance(_groups).Construct<IEditableSettingBuilder<T>>();
+            => DependencyFactory.WithInstance(Groups).Construct<IEditableSettingBuilder<T>>();
     }
 }

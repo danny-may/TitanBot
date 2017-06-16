@@ -11,7 +11,7 @@ namespace TitanBotBase.Downloader
 {
     public class CachedDownloader : IDownloader
     {
-        private ConcurrentDictionary<Uri, CacheObject> _cache
+        private ConcurrentDictionary<Uri, CacheObject> CacheStore
             = new ConcurrentDictionary<Uri, CacheObject>();
         private ILogger Logger { get; }
 
@@ -21,12 +21,12 @@ namespace TitanBotBase.Downloader
         }
 
         public void WipeCache()
-            => _cache.Clear();
+            => CacheStore.Clear();
         
         public void HardReset(Uri url)
         {
-            if (_cache.ContainsKey(url))
-                _cache.TryRemove(url, out CacheObject removed);
+            if (CacheStore.ContainsKey(url))
+                CacheStore.TryRemove(url, out CacheObject removed);
         }
 
         public async Task<string> GetString(Uri url, Encoding encoding = null, int freshness = 3600, int timeout = 5000)
@@ -51,7 +51,7 @@ namespace TitanBotBase.Downloader
         {
             if (!url.IsWellFormedOriginalString())
                 throw new UriFormatException($"{url} is not a well formatted URI");
-            var cache = _cache.GetOrAdd(url, x => new CacheObject(x, Logger));
+            var cache = CacheStore.GetOrAdd(url, x => new CacheObject(x, Logger));
             try
             {
                 return await cache.Get(freshness, timeout);

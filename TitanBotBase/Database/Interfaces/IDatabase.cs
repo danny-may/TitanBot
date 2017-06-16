@@ -15,12 +15,6 @@ namespace TitanBotBase.Database
             where T : IDbRecord;
         Task<R> QueryTableAsync<T,R>(Func<IDbTable<T>, R> query)
             where T : IDbRecord;
-        void Query(Action<IDbTransaction> query);
-        T Query<T>(Func<IDbTransaction, T> query);
-        void QueryTable<T>(Action<IDbTable<T>> query)
-            where T : IDbRecord;
-        R QueryTable<T, R>(Func<IDbTable<T>, R> query)
-            where T : IDbRecord;
 
         Task<IEnumerable<T>> Find<T>(Expression<Func<T, bool>> predicate, int skip = 0, int limit = 2147483647)
             where T : IDbRecord;

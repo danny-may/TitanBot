@@ -15,7 +15,7 @@ namespace TitanBotBase.Commands
         int ArgPos { get; }
         string Prefix { get; }
         string CommandText { get; }
-        CommandInfo Command { get; }
+        CommandInfo? Command { get; }
         bool IsCommand { get; }
         bool ExplicitPrefix { get; }
 

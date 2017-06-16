@@ -16,12 +16,12 @@ namespace TitanBotBase.Commands
 {
     public abstract class Command
     {
-        private static ConcurrentDictionary<Type, object> _commandLocks = new ConcurrentDictionary<Type, object>();
-        private static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> _guildLocks = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
-        private static ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>> _channelLocks = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>>();
-        private bool HasReplied;
-        private IUserMessage awaitMessage;
-        private ICommandContext Context { get; set; }
+        static ConcurrentDictionary<Type, object> CommandLocks { get; } = new ConcurrentDictionary<Type, object>();
+        static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> GuildLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
+        static ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>> ChannelLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>>();
+        bool HasReplied { get; set; }
+        IUserMessage AwaitMessage { get; set; }
+        ICommandContext Context { get; set; }
 
         protected BotClient Bot { get; set; }
         protected ILogger Logger { get; private set; }
@@ -44,9 +44,9 @@ namespace TitanBotBase.Commands
         protected IDownloader Downloader { get; private set; }
         protected OutputFormatter Formatter { get; private set; }
         protected string[] AcceptedPrefixes => new string[] { BotUser.Mention, BotUser.Username, SettingsManager.GlobalSettings.DefaultPrefix, GuildData?.Prefix }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
-        protected object GlobalCommandLock => _commandLocks.GetOrAdd(GetType(), new object());
-        protected object GuildCommandLock => _guildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
-        protected object ChannelCommandLock => _channelLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong, object>()).GetOrAdd(Context.Channel.Id, new object());
+        protected object GlobalCommandLock => CommandLocks.GetOrAdd(GetType(), new object());
+        protected object GuildCommandLock => GuildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
+        protected object ChannelCommandLock => ChannelLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong, object>()).GetOrAdd(Context.Channel.Id, new object());
         protected object InstanceCommandLock { get; } = new object();
 
         protected string Prefix { get; private set; }
@@ -57,6 +57,7 @@ namespace TitanBotBase.Commands
         public Command()
         {
             TotalCommands++;
+            StartReplyCountdown();
         }
 
         internal void Install(ICommandContext context, IDependencyFactory factory)
@@ -80,15 +81,28 @@ namespace TitanBotBase.Commands
             CommandName = context.CommandText;
         }
 
-        private void RegisterReply()
+        void StartReplyCountdown()
+        {
+            Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                lock (InstanceCommandLock)
+                {
+                    if (!HasReplied)
+                        AwaitMessage = Replier.Reply(Channel, Author, "This seems to be taking longer than expected...");
+                }
+            });
+        }
+
+        void RegisterReply()
         {
             lock (InstanceCommandLock)
             {
                 HasReplied = true;
-                if (awaitMessage != null)
+                if (AwaitMessage != null)
                 {
-                    var temp = awaitMessage;
-                    awaitMessage = null;
+                    var temp = AwaitMessage;
+                    AwaitMessage = null;
                     temp.DeleteAsync().Wait();
                 }
             }

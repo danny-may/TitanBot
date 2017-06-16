@@ -35,7 +35,7 @@ namespace TitanBotBase.Commands
             if (context.Channel is IDMChannel || context.Channel is IGroupChannel || context.Guild.OwnerId == context.Author.Id)
                 return PermissionCheckResponse.FromSuccess(permitted);
 
-            var guildPermissions = Database.QueryTable((IDbTable<CallPermission> table) => table.Find(p => p.GuildId == context.Guild.Id));
+            var guildPermissions = Database.QueryTableAsync((IDbTable<CallPermission> table) => table.Find(p => p.GuildId == context.Guild.Id)).Result;
 
             permitted = CheckBlacklist(context, permitted, guildPermissions);
             if (permitted.Count() == 0)

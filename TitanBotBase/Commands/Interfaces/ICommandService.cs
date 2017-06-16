@@ -7,7 +7,7 @@ namespace TitanBotBase.Commands
 {
     public interface ICommandService
     {
-        IReadOnlyList<CommandInfo> Commands { get; }
+        IReadOnlyList<CommandInfo> CommandList { get; }
         void Install(Assembly assembly);
         Task ParseAndExecute(IUserMessage message);
         CommandInfo? Search(string command, out int commandLength);

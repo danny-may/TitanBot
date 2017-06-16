@@ -4,26 +4,26 @@ namespace TitanBotBase.Database
 {
     class TitanBotDbTransaction : IDbTransaction
     {
-        private readonly LiteDatabase _database;
-        private readonly LiteTransaction _transaction;
+        private LiteDatabase Database { get; }
+        private LiteTransaction Transaction { get; }
 
         internal TitanBotDbTransaction(LiteDatabase database)
         {
-            _database = database;
-            _transaction = database.BeginTrans();
+            Database = database;
+            Transaction = database.BeginTrans();
         }
 
         public IDbTable<TRecord> GetTable<TRecord>()
             where TRecord : IDbRecord
-            => new TitanBotDbTable<TRecord>(_database.GetCollection<TRecord>());
+            => new TitanBotDbTable<TRecord>(Database.GetCollection<TRecord>());
 
         public void Commit()
-            => _transaction.Commit();
+            => Transaction.Commit();
 
         public void Dispose()
-            => _transaction.Dispose();
+            => Transaction.Dispose();
 
         public void Rollback()
-            => _transaction.Rollback();
+            => Transaction.Rollback();
     }
 }

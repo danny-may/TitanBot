@@ -32,7 +32,7 @@ namespace TitanBotBase.Commands.DefautlCommands.General
 
 
         CommandInfo[] FindPermitted()
-            => CommandService.Commands.Where(c => FindPermitted(c).IsSuccess).ToArray();
+            => CommandService.CommandList.Where(c => FindPermitted(c).IsSuccess).ToArray();
 
         PermissionCheckResponse FindPermitted(CommandInfo command)
             => PermChecker.CheckAllowed(Context, command.Calls.ToArray());

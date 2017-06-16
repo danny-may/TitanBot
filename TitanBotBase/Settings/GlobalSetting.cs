@@ -10,7 +10,7 @@ namespace TitanBotBase.Settings
         private SettingsManager Manager { get; }
         private IDatabase Database { get; }
         private GlobalSettingRecord Record { get; set; }
-        private object _lock = new object();
+        private object SyncLock = new object();
 
         internal GlobalSetting(SettingsManager manager, IDatabase database)
         {
@@ -37,7 +37,7 @@ namespace TitanBotBase.Settings
 
         public T GetCustom<T>()
         {
-            lock (_lock)
+            lock (SyncLock)
             {
                 string obj = "{}";
                 if (Record.Additional.ContainsKey(typeof(T).FullName))
@@ -48,7 +48,7 @@ namespace TitanBotBase.Settings
 
         public void SaveCustom<T>(T settings)
         {
-            lock(_lock)
+            lock(SyncLock)
             {
                 Record.Additional[typeof(T).FullName] = JsonConvert.SerializeObject(settings);
             }
@@ -56,7 +56,7 @@ namespace TitanBotBase.Settings
 
         private void ModifySafe(Action<GlobalSettingRecord> edit)
         {
-            lock (_lock)
+            lock (SyncLock)
             {
                 edit(Record);
                 Record = Database.GetUpsert(Record).Result;

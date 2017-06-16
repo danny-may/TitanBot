@@ -18,8 +18,8 @@ namespace TitanBotBase.Commands
 {
     public class CommandService : ICommandService
     {
-        public IReadOnlyList<CommandInfo> Commands { get; }
-        private List<CommandInfo> _commands { get; } = new List<CommandInfo>();
+        public IReadOnlyList<CommandInfo> CommandList { get; }
+        private List<CommandInfo> Command { get; } = new List<CommandInfo>();
         private IDependencyFactory DependencyFactory { get; }
         private ILogger Logger { get; }
         private ITypeReaderCollection Readers { get; }
@@ -36,7 +36,7 @@ namespace TitanBotBase.Commands
             Client = factory.Get<BotClient>();
             Readers = factory.Get<ITypeReaderCollection>();
             Database = factory.Get<IDatabase>();
-            Commands = _commands.AsReadOnly();
+            CommandList = Command.AsReadOnly();
             SettingsManager = factory.Get<ISettingsManager>();
         }
 
@@ -45,7 +45,7 @@ namespace TitanBotBase.Commands
             var commandTypes = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(Command)) &&
                                                               !t.IsAbstract);
             var built = CommandInfo.BuildFrom(commandTypes).ToList();
-            _commands.AddRange(built);
+            Command.AddRange(built);
             var builtCount = built.Count();
             var callCount = built.SelectMany(c => c.Calls).Count();
             var argCombCount = built.SelectMany(c => c.Calls).SelectMany(c => c.ArgumentPermatations).Count();
@@ -54,7 +54,7 @@ namespace TitanBotBase.Commands
 
         public CommandInfo? Search(string command, out int commandLength)
         {
-            foreach (var cmd in Commands)
+            foreach (var cmd in CommandList)
             {
                 var match = Regex.Match(command, $@"^{cmd.Name} *", RegexOptions.IgnoreCase);
                 if (match.Success)
@@ -90,13 +90,18 @@ namespace TitanBotBase.Commands
 
         private async Task TryExecute(ICommandContext context)
         {
-            var instance = DependencyFactory.WithInstance(context).Construct(context.Command.CommandType) as Command;
+            if (context.Command == null)
+                return;
+
+            var command = context.Command.Value;
+
+            var instance = DependencyFactory.WithInstance(context).Construct(command.CommandType) as Command;
             if (instance == null)
-                throw new InvalidOperationException($"Unable to create an instance of the {context.Command.CommandType} command");
+                throw new InvalidOperationException($"Unable to create an instance of the {command.CommandType} command");
             var replier = DependencyFactory.WithInstance(instance).Construct<IReplier>();
             var permissionChecker = DependencyFactory.Construct<IPermissionChecker>();
             ArgumentCheckResponse response = default(ArgumentCheckResponse);
-            var calls = permissionChecker.CheckContext(context, context.Command.Calls.ToArray());
+            var calls = permissionChecker.CheckContext(context, command.Calls.ToArray());
             if (calls.Count() == 0)
             {
                 await replier.ReplyAsync(context.Channel, context.Author, "You cannot use that command here!", ReplyType.Error);

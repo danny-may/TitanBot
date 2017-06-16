@@ -8,11 +8,11 @@ namespace TT2Bot.Handlers
 {
     class MessageHandler : DiscordHandlerBase
     {
-        private readonly ICommandService _commandService;
+        private readonly ICommandService CommandService;
 
         public MessageHandler(DiscordSocketClient client, ILogger logger, ICommandService commandService) : base(client, logger)
         {
-            _commandService = commandService;
+            CommandService = commandService;
 
             Client.MessageReceived += MessageRecieved;
         }

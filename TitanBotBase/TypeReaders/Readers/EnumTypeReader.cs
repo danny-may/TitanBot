@@ -20,29 +20,29 @@ namespace TitanBotBase.TypeReaders
 
     class EnumTypeReader<T> : TypeReader
     {
-        private readonly IReadOnlyDictionary<string, object> _enumsByName;
-        private readonly IReadOnlyDictionary<T, object> _enumsByValue;
-        private readonly Type _enumType;
-        private readonly TryParseDelegate<T> _tryParse;
+        private readonly IReadOnlyDictionary<string, object> EnumByName;
+        private readonly IReadOnlyDictionary<T, object> EnumByValue;
+        private readonly Type EnumType;
+        private readonly TryParseDelegate<T> TryParse;
 
         public EnumTypeReader(Type type, TryParseDelegate<T> parser)
         {
-            _enumType = type;
-            _tryParse = parser;
+            EnumType = type;
+            TryParse = parser;
 
             var byNameBuilder = ImmutableDictionary.CreateBuilder<string, object>();
             var byValueBuilder = ImmutableDictionary.CreateBuilder<T, object>();
 
-            foreach (var v in Enum.GetNames(_enumType))
+            foreach (var v in Enum.GetNames(EnumType))
             {
-                var parsedValue = Enum.Parse(_enumType, v);
+                var parsedValue = Enum.Parse(EnumType, v);
                 byNameBuilder.Add(v.ToLower(), parsedValue);
                 if (!byValueBuilder.ContainsKey((T)parsedValue))
                     byValueBuilder.Add((T)parsedValue, parsedValue);
             }
 
-            _enumsByName = byNameBuilder.ToImmutable();
-            _enumsByValue = byValueBuilder.ToImmutable();
+            EnumByName = byNameBuilder.ToImmutable();
+            EnumByValue = byValueBuilder.ToImmutable();
         }
 
         internal override Task<TypeReaderResponse> Read(ICommandContext context, string input)
@@ -50,19 +50,19 @@ namespace TitanBotBase.TypeReaders
             T baseValue;
             object enumValue;
 
-            if (_tryParse(input, out baseValue))
+            if (TryParse(input, out baseValue))
             {
-                if (_enumsByValue.TryGetValue(baseValue, out enumValue))
+                if (EnumByValue.TryGetValue(baseValue, out enumValue))
                     return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {EnumType.Name}"));
             }
             else
             {
-                if (_enumsByName.TryGetValue(input.ToLower(), out enumValue))
+                if (EnumByName.TryGetValue(input.ToLower(), out enumValue))
                     return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {EnumType.Name}"));
             }
         }
     }

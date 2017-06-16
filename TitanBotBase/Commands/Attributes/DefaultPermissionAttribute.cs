@@ -6,35 +6,35 @@ namespace TitanBotBase.Commands
     [AttributeUsage(AttributeTargets.Method|AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class DefaultPermissionAttribute : Attribute
     {
-        private ulong _defaultPerm { get; }
-        private string _permissionKey { get; }
+        ulong DefaultPerm { get; }
+        string PermissionKey { get; }
 
         public DefaultPermissionAttribute(ulong defaultPerm, string permissionKey = null)
         {
-            _defaultPerm = defaultPerm;
-            _permissionKey = permissionKey;
+            DefaultPerm = defaultPerm;
+            PermissionKey = permissionKey;
         }
 
         public static bool ExistsOn(MethodInfo info)
-            => info.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey != null || ExistsOn(info.DeclaringType);
+            => info.GetCustomAttribute<DefaultPermissionAttribute>()?.PermissionKey != null || ExistsOn(info.DeclaringType);
         public static bool ExistsOn(Type info)
-            => info.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey != null;
+            => info.GetCustomAttribute<DefaultPermissionAttribute>()?.PermissionKey != null;
 
         public static string GetKeyFor(MethodInfo info)
         {
-            if (info.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey != null)
-                return GetKeyFor(info.DeclaringType) + ("." + info.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? "").TrimEnd('.');
+            if (info.GetCustomAttribute<DefaultPermissionAttribute>()?.PermissionKey != null)
+                return GetKeyFor(info.DeclaringType) + ("." + info.GetCustomAttribute<DefaultPermissionAttribute>()?.PermissionKey ?? "").TrimEnd('.');
             else
                 return GetKeyFor(info.DeclaringType) + ("." + CallAttribute.GetFor(info)).TrimEnd('.');
         }
 
         public static ulong GetPermFor(MethodInfo info)
-            => info.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm ?? GetPermFor(info.DeclaringType);
+            => info.GetCustomAttribute<DefaultPermissionAttribute>()?.DefaultPerm ?? GetPermFor(info.DeclaringType);
 
         public static string GetKeyFor(Type info)
-            => info.GetCustomAttribute<DefaultPermissionAttribute>()?._permissionKey ?? NameAttribute.GetFor(info);
+            => info.GetCustomAttribute<DefaultPermissionAttribute>()?.PermissionKey ?? NameAttribute.GetFor(info);
 
         public static ulong GetPermFor(Type info)
-            => info.GetCustomAttribute<DefaultPermissionAttribute>()?._defaultPerm ?? 0;
+            => info.GetCustomAttribute<DefaultPermissionAttribute>()?.DefaultPerm ?? 0;
     }
 }

@@ -18,10 +18,9 @@ namespace TitanBotBase.Commands
         public int ArgPos { get; private set; }
         public string Prefix { get; private set; }
         public string CommandText { get; private set; }
-        public CommandInfo Command => _command.Value;
-        public bool IsCommand => _command != null;
+        public bool IsCommand => Command != null;
         public bool ExplicitPrefix { get; private set; }
-        private CommandInfo? _command { get; set; }
+        public CommandInfo? Command { get; set; }
 
         internal CommandContext(IUserMessage message, DiscordSocketClient client, IDatabase database, ISettingsManager settings)
         {
@@ -53,7 +52,7 @@ namespace TitanBotBase.Commands
             Prefix = Message.Content.Substring(0, prefixLength).Trim();
 
             var remaining = Message.Content.Substring(prefixLength).TrimStart();
-            _command = commandService.Search(remaining, out int commandLength);
+            Command = commandService.Search(remaining, out int commandLength);
             CommandText = remaining.Substring(0, commandLength).Trim();
             ArgPos = prefixLength + commandLength;
         }

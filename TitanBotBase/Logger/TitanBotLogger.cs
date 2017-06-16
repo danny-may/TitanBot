@@ -7,31 +7,31 @@ namespace TitanBotBase.Logger
 {
     public class TitanBotLogger : ILogger
     {
-        private readonly string _logPath;
-        private readonly object _syncLock = new object();
-        private readonly LogSeverity _logLevel;
+        private readonly string LogPath;
+        private readonly object SyncLock = new object();
+        private readonly LogSeverity LogLevel;
 
         public TitanBotLogger() : this($@".\logs\{FileUtil.GetTimestamp()}.log") { }
         public TitanBotLogger(string logLocation) : this(LogSeverity.Critical | LogSeverity.Info, logLocation) { }
         public TitanBotLogger(LogSeverity logLevel, string logLocation)
         {
-            _logPath = FileUtil.GetAbsolutePath(logLocation);
-            _logLevel = logLevel;
+            LogPath = FileUtil.GetAbsolutePath(logLocation);
+            LogLevel = logLevel;
         }
 
         public virtual void Log(ILoggable entry)
         {
             if (!ShouldLog(entry.Severity))
                 return;
-            lock (_syncLock)
+            lock (SyncLock)
             {
-                FileUtil.EnsureDirectory(_logPath);
-                File.AppendAllText(_logPath, entry.ToString());
+                FileUtil.EnsureDirectory(LogPath);
+                File.AppendAllText(LogPath, entry.ToString());
             }
         }
 
         protected virtual bool ShouldLog(LogSeverity severity)
-            => (_logLevel & severity) != 0;
+            => (LogLevel & severity) != 0;
 
         public void Log(LogSeverity severity, LogType type, string message, string source)
             => Log(new LogEntry(severity, type, message, source));

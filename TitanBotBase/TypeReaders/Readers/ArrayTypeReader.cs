@@ -19,20 +19,20 @@ namespace TitanBotBase.TypeReaders
     }
     class ArrayTypeReader<T> : TypeReader
     {
-        private readonly Type _arrayType;
-        private readonly TypeReader _parser;
+        private readonly Type ArrayType;
+        private readonly TypeReader Parser;
 
         public ArrayTypeReader(Type type, TypeReader parser)
         {
-            _arrayType = type;
-            _parser = parser;
+            ArrayType = type;
+            Parser = parser;
         }
 
         internal override async Task<TypeReaderResponse> Read(ICommandContext context, string value)
         {
             var values = new List<T>();
 
-            if (_parser == null)
+            if (Parser == null)
                 return TypeReaderResponse.FromError($"No reader found for `{typeof(T)}`");
 
             if (value == null)
@@ -40,7 +40,7 @@ namespace TitanBotBase.TypeReaders
 
             foreach (var item in value.Split(','))
             {
-                var response = await _parser?.Read(context, item.Trim());
+                var response = await Parser?.Read(context, item.Trim());
                 if (response.IsSuccess)
                     values.Add((T)response.Best);
                 else

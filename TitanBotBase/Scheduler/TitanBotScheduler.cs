@@ -13,26 +13,26 @@ namespace TitanBotBase.Scheduler
 {
     public class TitanBotScheduler : IScheduler
     {
-        private readonly IDatabase _database;
-        private readonly IDependencyFactory _dependencyManager;
-        private readonly ILogger _logger;
-        private readonly Dictionary<Type, object> _cachedHandlers = new Dictionary<Type, object>();
-        private Task _mainLoop;
-        private bool _shouldStop;
+        private readonly IDatabase Database;
+        private readonly IDependencyFactory DependencyManager;
+        private readonly ILogger Logger;
+        private readonly Dictionary<Type, object> CachedHandlers = new Dictionary<Type, object>();
+        private Task LoopTask;
+        private bool ShouldStop;
         public int PollingPeriod = 1000;
         private static ulong PrevId { get; set; }
 
-        public bool IsRunning => _mainLoop != null &&
-                                !_mainLoop.IsCanceled &&
-                                !_mainLoop.IsCompleted &&
-                                !_mainLoop.IsFaulted;
+        public bool IsRunning => LoopTask != null &&
+                                !LoopTask.IsCanceled &&
+                                !LoopTask.IsCompleted &&
+                                !LoopTask.IsFaulted;
 
         public TitanBotScheduler(IDependencyFactory manager, IDatabase database, ILogger logger)
         {
-            _dependencyManager = manager;
-            _database = database;
-            _logger = logger;
-            PrevId = _database.Find<TitanBotSchedulerRecord>(r => true).Result.Select(r => r.Id).OrderByDescending(r => r).FirstOrDefault();
+            DependencyManager = manager;
+            Database = database;
+            Logger = logger;
+            PrevId = Database.Find<TitanBotSchedulerRecord>(r => true).Result.Select(r => r.Id).OrderByDescending(r => r).FirstOrDefault();
         }
 
 
@@ -50,7 +50,7 @@ namespace TitanBotBase.Scheduler
                 Interval = period ?? TimeSpan.MaxValue,
                 Data = data
             };
-            _database.Insert(record).Wait();
+            Database.Insert(record).Wait();
             return record.Id;
         }
 
@@ -58,27 +58,27 @@ namespace TitanBotBase.Scheduler
         {
             if (IsRunning)
                 throw new InvalidOperationException("Scheduler is already running");
-            _shouldStop = false;
-            _mainLoop = Task.Run((Action)MainLoop);
+            ShouldStop = false;
+            LoopTask = Task.Run((Action)MainLoop);
             return Task.CompletedTask;
         }
 
         public Task StopAsync()
         {
-            if (_shouldStop || !IsRunning)
+            if (ShouldStop || !IsRunning)
                 throw new InvalidOperationException("Scheduler is already stopped/stopping");
-            _shouldStop = true;
-            return _mainLoop;
+            ShouldStop = true;
+            return LoopTask;
         }
 
         private async void MainLoop()
         {
             var pollTime = DateTime.MinValue;
-            while (!_shouldStop)
+            while (!ShouldStop)
             {
                 var msSincePrev = (int)(DateTime.Now - pollTime).TotalMilliseconds;
                 if (pollTime != DateTime.MinValue && msSincePrev > PollingPeriod)
-                    _logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {msSincePrev - PollingPeriod}ms", "MainLoop");
+                    Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {msSincePrev - PollingPeriod}ms", "MainLoop");
                 await Task.Delay((PollingPeriod - msSincePrev).Clamp(0, int.MaxValue));
                 pollTime = DateTime.Now;
                 var actives = await FindActives(pollTime);
@@ -100,21 +100,21 @@ namespace TitanBotBase.Scheduler
         {
             callback = null;
             var type = JsonConvert.DeserializeObject<Type>(serialisedType);
-            if (!_cachedHandlers.ContainsKey(type))
+            if (!CachedHandlers.ContainsKey(type))
             {
-                if (!_dependencyManager.TryConstruct(type, out object constructed))
+                if (!DependencyManager.TryConstruct(type, out object constructed))
                     return false;
-                _cachedHandlers.Add(type, constructed);
+                CachedHandlers.Add(type, constructed);
             }
-            callback = (ISchedulerCallback)_cachedHandlers[type];
+            callback = (ISchedulerCallback)CachedHandlers[type];
             return true;
         }
 
         private Task<IEnumerable<TitanBotSchedulerRecord>> FindActives(DateTime pollTime)
-            => _database.Find((TitanBotSchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
+            => Database.Find((TitanBotSchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
 
         public ISchedulerRecord[] Complete(IEnumerable<ulong> ids, bool wasCancelled = true)
-            => Complete(_database.FindById<TitanBotSchedulerRecord>(ids).Result, wasCancelled);
+            => Complete(Database.FindById<TitanBotSchedulerRecord>(ids).Result, wasCancelled);
 
         private ISchedulerRecord[] Complete(IEnumerable<TitanBotSchedulerRecord> records, bool wasCancelled = true)
         {
@@ -125,7 +125,7 @@ namespace TitanBotBase.Scheduler
                 record.Complete = true;
                 record.EndTime = DateTime.Now;
             }
-            _database.Upsert(records).Wait();
+            Database.Upsert(records).Wait();
             return records.ToArray();
         }
 
@@ -138,9 +138,9 @@ namespace TitanBotBase.Scheduler
             var type = JsonConvert.SerializeObject(typeof(T));
             IEnumerable<TitanBotSchedulerRecord> records;
             if (userId != null)
-                records = _database.Find<TitanBotSchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type && r.UserId == userId).Result;
+                records = Database.Find<TitanBotSchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type && r.UserId == userId).Result;
             else 
-                records = _database.Find<TitanBotSchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type).Result;
+                records = Database.Find<TitanBotSchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type).Result;
 
             return Complete(records, wasCancelled);
         }
@@ -151,7 +151,7 @@ namespace TitanBotBase.Scheduler
         public ISchedulerRecord GetMostRecent<T>(ulong guildId) where T : ISchedulerCallback
         {
             var type = JsonConvert.SerializeObject(typeof(T));
-            return _database.Find<TitanBotSchedulerRecord>(r => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
+            return Database.Find<TitanBotSchedulerRecord>(r => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
         }
     }
 }

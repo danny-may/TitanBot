@@ -7,9 +7,9 @@ namespace TitanBotBase.Dependencies
 {
     public class DependencyFactory : IDependencyFactory
     {
-        private readonly Dictionary<Type, object> _objStore = new Dictionary<Type, object>();
-        private readonly Dictionary<Type, Type> _map = new Dictionary<Type, Type>();
-        private Type[] _availableTypes => _objStore.Keys.Cast<Type>().ToArray();
+        private readonly Dictionary<Type, object> BuildingObjects = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, Type> TypeMap = new Dictionary<Type, Type>();
+        private Type[] KnownTypes => BuildingObjects.Keys.Cast<Type>().ToArray();
 
         public DependencyFactory()
         {
@@ -19,7 +19,7 @@ namespace TitanBotBase.Dependencies
         public void Store<T>(T value)
             => Store(typeof(T), value);
         public void Store(Type type, object value)
-            => _objStore.Add(type, value);
+            => BuildingObjects.Add(type, value);
         public void Store(params object[] values)
             => values.ForEach(v => Store(v.GetType(), v));
 
@@ -36,19 +36,19 @@ namespace TitanBotBase.Dependencies
 
         public bool TryGet(Type type, out object result)
         {
-            if (_objStore.TryGetValue(type, out result))
+            if (BuildingObjects.TryGetValue(type, out result))
                 return true;
-            foreach (var key in _availableTypes)
+            foreach (var key in KnownTypes)
             {
                 if (type.IsAssignableFrom(key))
-                    return _objStore.TryGetValue(key, out result);
+                    return BuildingObjects.TryGetValue(key, out result);
             }
             return false;
         }
 
         public void Dispose()
         {
-            _objStore.Clear();
+            BuildingObjects.Clear();
         }
 
         public T Get<T>()
@@ -62,7 +62,7 @@ namespace TitanBotBase.Dependencies
         }
 
         IInstanceBuilder GetBuilder()
-            => new InstanceBuilder(_objStore, _map);
+            => new InstanceBuilder(BuildingObjects, TypeMap);
 
         public IInstanceBuilder WithInstance<T>(T value)
             => GetBuilder().WithInstance(value);
@@ -91,14 +91,14 @@ namespace TitanBotBase.Dependencies
             => Map(typeof(From), typeof(To));
         public void Map(Type from, Type to)
         {
-            _map[from] = to;
+            TypeMap[from] = to;
         }
 
         public bool TryMap<From, To>() where To : From
             => TryMap(typeof(From), typeof(To));
         public bool TryMap(Type from, Type to)
         {
-            if (!_map.ContainsKey(from))
+            if (!TypeMap.ContainsKey(from))
             {
                 Map(from, to);
                 return true;

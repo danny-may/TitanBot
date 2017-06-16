@@ -14,7 +14,7 @@ namespace TitanBotBase.Commands.DefaultCommands.Admin
     class EditCommandCommand : Command
     {
         IEnumerable<CallInfo> FindCalls(string[] cmds)
-            =>  CommandService.Commands.SelectMany(c => c.Calls)
+            =>  CommandService.CommandList.SelectMany(c => c.Calls)
                                        .Select(c => (Call: c, Path: c.PermissionKey.Split('.')))
                                        .Where(c => cmds.Count(t => c.Path.Zip(t.Split('.'), (p, v) => p.ToLower() == v.ToLower()).All(a => a)) > 0)
                                        .Select(c => c.Call);
