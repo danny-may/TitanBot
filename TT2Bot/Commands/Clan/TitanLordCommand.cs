@@ -9,11 +9,11 @@ using TitanBotBase.Commands;
 using TitanBotBase.Scheduler;
 using TitanBotBase.Settings;
 using TitanBotBase.Util;
-using TT2BotCore.Callbacks;
-using TT2BotCore.Helpers;
-using TT2BotCore.Models;
+using TT2Bot.Callbacks;
+using TT2Bot.Helpers;
+using TT2Bot.Models;
 
-namespace TT2BotCore.Commands.Clan
+namespace TT2Bot.Commands.Clan
 {
     [Description("Used for Titan Lord timers and management")]
     [DefaultPermission(8)]

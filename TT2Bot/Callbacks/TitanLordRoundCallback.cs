@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using TitanBotBase.Scheduler;
 using TitanBotBase.Settings;
 using TitanBotBase.Util;
-using TT2BotCore.Models;
+using TT2Bot.Models;
 
-namespace TT2BotCore.Callbacks
+namespace TT2Bot.Callbacks
 {
     class TitanLordRoundCallback : ISchedulerCallback
     {

@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using TitanBotBase;
 using TitanBotBase.Dependencies;
-using TT2BotCore.Models;
+using TT2Bot.Models;
 
-namespace TT2BotCore
+namespace TT2Bot
 {
     public class TT2BotClient
     {

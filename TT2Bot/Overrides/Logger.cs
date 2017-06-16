@@ -1,7 +1,7 @@
 ﻿using System;
 using TitanBotBase.Logger;
 
-namespace TT2BotConsole
+namespace TT2Bot
 {
     class Logger : TitanBotLogger
     {

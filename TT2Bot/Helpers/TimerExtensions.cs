@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TitanBotBase.Scheduler;
-using TT2BotCore.Models;
+using TT2Bot.Models;
 
-namespace TT2BotCore.Helpers
+namespace TT2Bot.Helpers
 {
     static class TimerExtensions
     {

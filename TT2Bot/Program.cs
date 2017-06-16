@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TitanBotBase.Logger;
-using TT2BotCore;
+using TT2Bot;
 
 namespace TT2BotConsole
 {

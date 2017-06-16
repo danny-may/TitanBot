@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using TitanBotBase.Commands;
 
-namespace TT2BotCore.Commands
+namespace TT2Bot.Commands
 {
     [Description("Put the Description of your command here")]
     [RequireContext(ContextType.Guild)] //Means the command can only be used on guilds, not in DM or on group chats

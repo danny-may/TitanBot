@@ -4,7 +4,7 @@ using TitanBotBase.Commands;
 using TitanBotBase.DiscordHandlers;
 using TitanBotBase.Logger;
 
-namespace TT2BotCore.Handlers
+namespace TT2Bot.Handlers
 {
     class MessageHandler : DiscordHandlerBase
     {

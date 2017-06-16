@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TT2BotCore.Helpers
+namespace TT2Bot.Helpers
 {
     class Calculator
     {
