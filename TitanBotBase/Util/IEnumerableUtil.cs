@@ -33,7 +33,7 @@ namespace TitanBotBase.Util
             }
         }
 
-        public static IEnumerable<bool[]> BinomialMask(int optionCount)
+        public static IEnumerable<bool[]> BooleanMask(int optionCount)
         {
             var counter = (int)Math.Pow(2, optionCount);
             while (counter-- > 0)

@@ -16,7 +16,7 @@ namespace TitanBotBaseTest.UtilTests
                 new bool[]{true},
                 new bool[]{false}
             };
-            var actual = IEnumerableUtil.BinomialMask(1).ToList();
+            var actual = IEnumerableUtil.BooleanMask(1).ToList();
             Assert.AreEqual(expected.Count, actual.Count);
             Assert.IsTrue(actual.Zip(expected, (a, e) => a.Zip(e, (av, ev) => av == ev).All(v => v)).All(v => v));
         }
@@ -30,7 +30,7 @@ namespace TitanBotBaseTest.UtilTests
                 new bool[]{false,true},
                 new bool[]{false,false},
             };
-            var actual = IEnumerableUtil.BinomialMask(2).ToList();
+            var actual = IEnumerableUtil.BooleanMask(2).ToList();
             Assert.AreEqual(expected.Count, actual.Count);
             Assert.IsTrue(actual.Zip(expected, (a, e) => a.Zip(e, (av, ev) => av == ev).All(v => v)).All(v => v));
         }
@@ -48,7 +48,7 @@ namespace TitanBotBaseTest.UtilTests
                 new bool[]{false,false,true},
                 new bool[]{false,false,false},
             };
-            var actual = IEnumerableUtil.BinomialMask(3).ToList();
+            var actual = IEnumerableUtil.BooleanMask(3).ToList();
             Assert.AreEqual(expected.Count, actual.Count);
             Assert.IsTrue(actual.Zip(expected, (a, e) => a.Zip(e, (av, ev) => av == ev).All(v => v)).All(v => v));
         }

@@ -44,7 +44,7 @@ namespace TitanBotBase.Commands
             var requiredMask = Enumerable.Range(0, required.Count())
                                          .Select(v => true)
                                          .ToArray();
-            foreach (var optionalMask in IEnumerableUtil.BinomialMask(optional.Count()))
+            foreach (var optionalMask in IEnumerableUtil.BooleanMask(optional.Count()))
             {
                 var fullMask = requiredMask.Concat(optionalMask).ToArray();
                 var args = parameters.Select((p, i) => new ArgumentInfo(p, call, !fullMask[i])).ToArray();
