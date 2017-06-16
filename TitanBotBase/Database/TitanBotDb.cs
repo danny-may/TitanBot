@@ -22,6 +22,9 @@ namespace TitanBotBase.Database
         public TitanBotDb(string connectionString, ILogger logger)
         {
             FileUtil.EnsureDirectory(connectionString);
+
+            BsonMapper.Global.RegisterAutoId(u => u == 0, (e, s) => (ulong)DateTime.UtcNow.Ticks);
+
             Database = new LiteDatabase(connectionString);
             Logger = logger;
         }

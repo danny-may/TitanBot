@@ -16,7 +16,7 @@ namespace TitanBotBase.Settings
         {
             Manager = manager;
             Database = database;
-            Record = Database.AddOrGet(0, () => new GlobalSettingRecord()).Result;
+            Record = Database.AddOrGet(1, () => new GlobalSettingRecord()).Result;
         }
 
         public string DefaultPrefix
@@ -65,7 +65,7 @@ namespace TitanBotBase.Settings
 
         private class GlobalSettingRecord : IDbRecord
         {
-            public ulong Id { get; set; } = 0;
+            public ulong Id { get; set; } = 1;
             public string DefaultPrefix { get; set; } = "t$";
             public string Token { get; set; }
             public ulong[] Owners { get; set; } = new ulong[0];
