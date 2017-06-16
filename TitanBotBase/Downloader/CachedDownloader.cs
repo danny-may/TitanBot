@@ -118,13 +118,15 @@ namespace TitanBotBase.Downloader
                 catch (WebException ex)
                 {
                     if (ex.Status != WebExceptionStatus.RequestCanceled)
-                        throw;
-                    Logger.Log(LogSeverity.Info, LogType.Downloader, "Download cancelled", "CachedDownloader");
-
+                        Logger.Log(ex, "CachedDownloader");
+                    else
+                        Logger.Log(LogSeverity.Info, LogType.Downloader, "Download cancelled", "CachedDownloader");
                 }
-
-                if (queryOwner)
-                    WebQuery = null;
+                finally
+                {
+                    if (queryOwner)
+                        WebQuery = null;
+                }
 
                 return Data;
             }

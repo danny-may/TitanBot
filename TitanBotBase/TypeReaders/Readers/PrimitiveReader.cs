@@ -24,7 +24,7 @@ namespace TitanBotBase.TypeReaders
             _tryParse = PrimitiveParsers.Get<T>();
         }
 
-        internal override Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResponse> Read(ICommandContext context, string input)
         {
             if (_tryParse(input, out T value))
                 return Task.FromResult(TypeReaderResponse.FromSuccess(value));

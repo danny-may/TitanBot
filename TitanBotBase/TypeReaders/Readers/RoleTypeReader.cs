@@ -11,7 +11,7 @@ namespace TitanBotBase.TypeReaders
     class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
-        internal override Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResponse> Read(ICommandContext context, string input)
         {
             ulong id;
 

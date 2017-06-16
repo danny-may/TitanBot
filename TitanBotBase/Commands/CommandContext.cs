@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using System;
 using TitanBotBase.Database;
+using TitanBotBase.Dependencies;
 using TitanBotBase.Settings;
 using TitanBotBase.Util;
 
@@ -10,6 +11,7 @@ namespace TitanBotBase.Commands
     public class CommandContext : ICommandContext
     {
         public IMessageChannel Channel { get; }
+        public IDependencyFactory DependencyFactory { get; }
         public IGuild Guild { get; }
         public IUserMessage Message { get; }
         public IUser Author { get; }
@@ -22,15 +24,16 @@ namespace TitanBotBase.Commands
         public bool ExplicitPrefix { get; private set; }
         public CommandInfo? Command { get; set; }
 
-        internal CommandContext(IUserMessage message, DiscordSocketClient client, IDatabase database, ISettingsManager settings)
+        internal CommandContext(IUserMessage message, IDependencyFactory factory)
         {
-            Client = client;
+            DependencyFactory = factory;
+            Client = DependencyFactory.Get<DiscordSocketClient>();
             Message = message;
             Channel = message.Channel;
             Author = message.Author;
             Guild = (message.Channel as IGuildChannel)?.Guild;
             if (Guild != null)
-                GuildData = settings.GetGroup<GeneralSettings>(Guild.Id);
+                GuildData = DependencyFactory.Get<ISettingsManager>().GetGroup<GeneralSettings>(Guild.Id);
         }
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)

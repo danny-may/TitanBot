@@ -34,6 +34,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Csv, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Csv.1.0.11\lib\dotnet\Csv.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Net.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Net.Core.1.0.0-rc3-00746\lib\net45\Discord.Net.Core.dll</HintPath>
     </Reference>
@@ -168,20 +171,47 @@
     <Compile Include="Commands\Clan\ExcuseCommand.cs" />
     <Compile Include="Commands\Clan\TitanLordCommand.cs" />
     <Compile Include="Commands\CommandTemplate.cs" />
+    <Compile Include="Commands\Data\ArtifactsCommand.cs" />
+    <Compile Include="Commands\Data\ClaimCommand.cs" />
+    <Compile Include="Commands\Data\ClanStatsCommand.cs" />
+    <Compile Include="Commands\Data\EquipmentsCommand.cs" />
+    <Compile Include="Commands\Data\HelpersCommand.cs" />
+    <Compile Include="Commands\Data\HighScoreCommand.cs" />
+    <Compile Include="Commands\Data\PetsCommand.cs" />
+    <Compile Include="Commands\Data\PrestigeCommand.cs" />
     <Compile Include="Handlers\MessageHandler.cs" />
     <Compile Include="Helpers\Calculator.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\TimerExtensions.cs" />
+    <Compile Include="Helpers\TT2DataService.cs" />
     <Compile Include="Models\Database\Excuse.cs" />
     <Compile Include="Models\Database\PlayerData.cs" />
     <Compile Include="Models\Database\Registration.cs" />
+    <Compile Include="Models\Settings\HighScoreSettings.cs" />
     <Compile Include="Models\Settings\RegistrationSettings.cs" />
     <Compile Include="Models\Settings\TT2GlobalSettings.cs" />
     <Compile Include="Models\Settings\TitanLordSettings.cs" />
     <Compile Include="Models\Settings\TitanLordTimerData.cs" />
+    <Compile Include="Models\TT2\Artifact.cs" />
+    <Compile Include="Models\TT2\Enums\ArtifactTier.cs" />
+    <Compile Include="Models\TT2\Enums\BonusType.cs" />
+    <Compile Include="Models\TT2\Enums\EquipmentClass.cs" />
+    <Compile Include="Models\TT2\Enums\EquipmentRarity.cs" />
+    <Compile Include="Models\TT2\Enums\EquipmentSource.cs" />
+    <Compile Include="Models\TT2\Enums\HelperType.cs" />
+    <Compile Include="Models\TT2\Equipment.cs" />
+    <Compile Include="Models\TT2\Helper.cs" />
+    <Compile Include="Models\TT2\HelperSkill.cs" />
+    <Compile Include="Models\TT2\HighScoreSheet.cs" />
+    <Compile Include="Models\TT2\Pet.cs" />
     <Compile Include="Overrides\Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TT2BotClient.cs" />
+    <Compile Include="TypeReaders\ArtifactTypeReader.cs" />
+    <Compile Include="TypeReaders\EquipmentTypeReader.cs" />
+    <Compile Include="TypeReaders\HelperTypeReader.cs" />
+    <Compile Include="TypeReaders\PetTypeReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TitanBotBase\TitanBotBase.csproj">

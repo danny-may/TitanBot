@@ -120,8 +120,8 @@ namespace TitanBotBase.Commands.DefautlCommands.General
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
-                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl(),
-                    Text = $"{Context.Client.CurrentUser.Username} | Help"
+                    IconUrl = BotUser.GetAvatarUrl(),
+                    Text = $"{BotUser.Username} | Help"
                 }
             };
             

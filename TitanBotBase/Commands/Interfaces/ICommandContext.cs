@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using TitanBotBase.Dependencies;
 using TitanBotBase.Settings;
 
 namespace TitanBotBase.Commands
@@ -7,6 +8,7 @@ namespace TitanBotBase.Commands
     public interface ICommandContext
     {
         IUser Author { get; }
+        IDependencyFactory DependencyFactory { get; }
         IMessageChannel Channel { get; }
         DiscordSocketClient Client { get; }
         IGuild Guild { get; }

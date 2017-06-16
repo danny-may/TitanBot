@@ -12,5 +12,7 @@ namespace TT2Bot.Models
         public ulong BotBugChannel { get; set; }
         public ulong BotSuggestChannel { get; set; }
         public ulong GHFeedbackChannel { get; set; }
+        public Dictionary<string, string> DataVersions { get; set; } = new Dictionary<string, string>();
+        public string DefaultVersion { get; set; } = "1.4";
     }
 }

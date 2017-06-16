@@ -5,7 +5,7 @@ namespace TitanBotBase.TypeReaders
 {
     class PermissionTypeReader : TypeReader
     {
-        internal override Task<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override Task<TypeReaderResponse> Read(ICommandContext context, string value)
         {
             return null;
         }

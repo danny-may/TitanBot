@@ -11,7 +11,7 @@ namespace TitanBotBase.TypeReaders
     class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
-        internal override async Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override async Task<TypeReaderResponse> Read(ICommandContext context, string input)
         {
             if (context.Guild != null)
             {

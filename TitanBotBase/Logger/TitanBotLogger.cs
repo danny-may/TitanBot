@@ -12,7 +12,7 @@ namespace TitanBotBase.Logger
         private readonly LogSeverity LogLevel;
 
         public TitanBotLogger() : this($@".\logs\{FileUtil.GetTimestamp()}.log") { }
-        public TitanBotLogger(string logLocation) : this(LogSeverity.Critical | LogSeverity.Info, logLocation) { }
+        public TitanBotLogger(string logLocation) : this(LogSeverity.Critical | LogSeverity.Info | LogSeverity.Error, logLocation) { }
         public TitanBotLogger(LogSeverity logLevel, string logLocation)
         {
             LogPath = FileUtil.GetAbsolutePath(logLocation);

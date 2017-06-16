@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TT2Bot.Helpers
 {
-    class Calculator
+    public static class Calculator
     {
         private static int[] BossAttackCosts { get; } = new int[] { 0, 5, 25, 50, 75, 100, 125, 150 };
 

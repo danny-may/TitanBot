@@ -275,6 +275,7 @@
     <Compile Include="Util\DiscordUtil.cs" />
     <Compile Include="Util\FileUtil.cs" />
     <Compile Include="Util\IEnumerableUtil.cs" />
+    <Compile Include="Util\ImageUtil.cs" />
     <Compile Include="Util\MiscUtil.cs" />
     <Compile Include="Util\NumericUtil.cs" />
     <Compile Include="Util\PerformanceUtil.cs" />

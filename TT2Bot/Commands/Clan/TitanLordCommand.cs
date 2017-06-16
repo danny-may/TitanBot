@@ -10,6 +10,7 @@ using TitanBotBase.Scheduler;
 using TitanBotBase.Settings;
 using TitanBotBase.Util;
 using TT2Bot.Callbacks;
+using TT2Bot.Commands.Data;
 using TT2Bot.Helpers;
 using TT2Bot.Models;
 
@@ -100,10 +101,10 @@ namespace TT2Bot.Commands.Clan
                 await ReplyAsync($"There will be a Titan Lord in {current.EndTime - DateTime.Now}", ReplyType.Info);
         }
 
-        //[Call("Info")]
-        //[Usage("Gets information about the clans current level")]
-        //private Task TitanLordInfoAsync()
-        //    => ReplyAsync("", embed: ClanStatsCommand.StatsBuilder(Context.Client.CurrentUser, Context.GuildData.TitanLord.CQ, 4000, 500, new int[] { 20, 30, 40, 50 }).Build());
+        [Call("Info")]
+        [Usage("Gets information about the clans current level")]
+        private Task TitanLordInfoAsync()
+            => ReplyAsync("", embed: ClanStatsCommand.StatsBuilder(Formatter, BotUser, TitanLordSettings.CQ, 4000, 500, new int[] { 20, 30, 40, 50 }).Build());
 
         [Call("Stop")]
         [Usage("Stops any currently running timers.")]

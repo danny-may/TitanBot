@@ -23,6 +23,8 @@ namespace TitanBotBase.Commands
         IUserMessage AwaitMessage { get; set; }
         ICommandContext Context { get; set; }
 
+        protected string DelayMessage = "This seems to be taking longer than expected...";
+
         protected BotClient Bot { get; set; }
         protected ILogger Logger { get; private set; }
         protected ICommandService CommandService { get; private set; }
@@ -89,7 +91,7 @@ namespace TitanBotBase.Commands
                 lock (InstanceCommandLock)
                 {
                     if (!HasReplied)
-                        AwaitMessage = Replier.Reply(Channel, Author, "This seems to be taking longer than expected...");
+                        AwaitMessage = Replier.Reply(Channel, Author, DelayMessage);
                 }
             });
         }

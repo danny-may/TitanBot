@@ -7,7 +7,7 @@ namespace TitanBotBase.TypeReaders
 {
     class TimeSpanTypeReader : TypeReader
     {
-        internal override Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResponse> Read(ICommandContext context, string input)
         {
             var days = 0;
             var hours = 0;

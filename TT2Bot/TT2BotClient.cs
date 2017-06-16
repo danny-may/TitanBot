@@ -5,7 +5,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using TitanBotBase;
 using TitanBotBase.Dependencies;
+using TT2Bot.Helpers;
 using TT2Bot.Models;
+using TT2Bot.TypeReaders;
 
 namespace TT2Bot
 {
@@ -17,6 +19,19 @@ namespace TT2Bot
         {
             Client = new BotClient(mapper);
             Client.Install(Assembly.GetExecutingAssembly());
+
+            RegisterSettings();
+            RegisterTypeReaders();
+            PopulateMapper();
+        }
+
+        private void PopulateMapper()
+        {
+            Client.DependencyFactory.ConstructAndStore<TT2DataService>();
+        }
+
+        private void RegisterSettings()
+        {
             Func<string, string> strLengthValidator = ((string s) => s.Length < 500 ? null : "You cannot have more than 500 characters for this setting");
             Client.SettingsManager.Register<TitanLordSettings>().WithName("TitanLord")
                                                                 .WithDescription("These are the settings surrounding the `t$titanlord` command")
@@ -36,6 +51,14 @@ namespace TT2Bot
                                                                 .AddSetting("ClanQuest", s => s.CQ, validator: v => v > 0 ? null : "Your clan quest cannot be negative")
                                                                 .AddSetting("TimerChannel", s => s.Channel, (IMessageChannel c) => c?.Id, viewer: v => v == null ? null : $"<#{v}>")
                                                                 .Finalise();
+        }
+
+        private void RegisterTypeReaders()
+        {
+            Client.TypeReaders.AddTypeReader<Artifact>(new ArtifactTypeReader());
+            Client.TypeReaders.AddTypeReader<Pet>(new PetTypeReader());
+            Client.TypeReaders.AddTypeReader<Equipment>(new EquipmentTypeReader());
+            Client.TypeReaders.AddTypeReader<Helper>(new HelperTypeReader());
         }
 
         public async Task StartAsync(Func<string, string> getToken)
