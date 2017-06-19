@@ -48,10 +48,7 @@ namespace TitanBotBase.Settings
 
         public void SaveCustom<T>(T settings)
         {
-            lock(SyncLock)
-            {
-                Record.Additional[typeof(T).FullName] = JsonConvert.SerializeObject(settings);
-            }
+            ModifySafe(r => r.Additional[typeof(T).FullName] = JsonConvert.SerializeObject(settings));
         }
 
         private void ModifySafe(Action<GlobalSettingRecord> edit)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TitanBotBase.Commands.DefaultCommands.Admin
+namespace TitanBotBase.Commands.DefaultCommands.Owner
 {
     [Description("Wipes any database table clean")]
     [RequireOwner]

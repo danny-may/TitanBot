@@ -51,6 +51,9 @@ namespace TitanBotBase.Util
                         if (prevWasSpace)
                             isFlag = true;
                         break;
+                    case '\n':
+                    case '\r':
+                    case '\t':
                     case ' ':
                         if (!isArray && !isQuote)
                             prevWasSpace = true;
@@ -64,7 +67,7 @@ namespace TitanBotBase.Util
                         isArray = false;
                         break;
                 }
-                prevWasSpace = prevWasSpace && text[i] == ' ';
+                prevWasSpace = prevWasSpace && (text[i] == ' ' || text[i] == '\n' || text[i] == '\r' || text[i] == '\t');
             }
             if (previousSplit != text.Length)
                 yield return (previousSplit, text.Length);

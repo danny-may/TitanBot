@@ -11,15 +11,19 @@ namespace TitanBotBase.Settings
         public abstract bool TrySave(ISettingsManager manager, ulong guildId, object value, out string errors);
         public abstract string Display(ISettingsManager manager, ulong guildId);
 
-        public static EditableSetting Create<TGroup, TStore, TAccept>(string name,
+        public static EditableSetting Create<TGroup, TStore, TAccept>(Func<ISettingsManager, ulong, TGroup> retriever,
+                                                                Action<ISettingsManager, ulong, TGroup> saver,
+                                                                string name,
                                                                 Expression<Func<TGroup, TStore>> property,
                                                                 Func<TAccept, TStore> converter,
                                                                 Func<TStore, string> viewer,
                                                                 Func<TAccept, string> validator)
-            => new TypedSetting<TGroup, TStore, TAccept>(name, property, converter, viewer, validator);
+            => new TypedSetting<TGroup, TStore, TAccept>(retriever, saver, name, property, converter, viewer, validator);
 
         private class TypedSetting<TGroup, TStore, TAccept> : EditableSetting
         {
+            Func<ISettingsManager, ulong, TGroup> Retriever { get; }
+            Action<ISettingsManager, ulong, TGroup> Saver { get; }
             Func<TAccept, TStore> Converter { get; }
             Func<TStore, string> Viewer { get; }
             Func<TAccept, string> Validator { get; }
@@ -28,22 +32,26 @@ namespace TitanBotBase.Settings
 
             public override Type Type => typeof(TAccept);
 
-            internal TypedSetting(string name,
+            internal TypedSetting(Func<ISettingsManager, ulong, TGroup> retriever,
+                                  Action<ISettingsManager, ulong, TGroup> saver,
+                                  string name,
                                   Expression<Func<TGroup, TStore>> property,
                                   Func<TAccept, TStore> converter,
                                   Func<TStore, string> viewer,
                                   Func<TAccept, string> validator)
             {
                 Name = name;
+                Retriever = retriever;
                 Setter = CreateSetter(property);
                 Getter = property.Compile();
                 Converter = converter;
                 Viewer = viewer ?? (s => s?.ToString());
                 Validator = validator ?? (s => null);
+                Saver = saver;
             }
 
             public override string Display(ISettingsManager manager, ulong guildId)
-                => Viewer(Getter(manager.GetGroup<TGroup>(guildId)));
+                => Viewer(Getter(Retriever(manager, guildId)));
 
             public override bool TrySave(ISettingsManager manager, ulong guildId, object value, out string errors)
             {
@@ -55,9 +63,9 @@ namespace TitanBotBase.Settings
                 if (errors != null)
                     return false;
 
-                var group = manager.GetGroup<TGroup>(guildId);
+                var group = Retriever(manager, guildId);
                 Setter(group, Converter((TAccept)value));
-                manager.SaveGroup(guildId, group);
+                Saver(manager, guildId, group);
                 return true;
             }
 

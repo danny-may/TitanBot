@@ -18,6 +18,9 @@ namespace TitanBotBase.Settings
         public IReadOnlyList<IEditableSettingGroup> EditableSettingGroups => Groups.Select(g => g.Value).ToList().AsReadOnly();
         private Dictionary<Type, IEditableSettingGroup> Groups { get; } = new Dictionary<Type, IEditableSettingGroup>();
 
+        public IReadOnlyList<IEditableSettingGroup> EditableGlobalSettingsGroups => GlobalGroups.Select(g => g.Value).ToList().AsReadOnly();
+        private Dictionary<Type, IEditableSettingGroup> GlobalGroups { get; } = new Dictionary<Type, IEditableSettingGroup>();
+
         public T GetCustomGlobal<T>()
             => GlobalSettings.GetCustom<T>();
         public void SaveCustomGlobal<T>(T setting)
@@ -35,6 +38,12 @@ namespace TitanBotBase.Settings
                                        .AddSetting(s => s.PermOverride)
                                        .AddSetting(s => s.RoleOverride, (IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: r => string.Join(", ", r?.Select(id => $"<@&{id}>")))
                                        .Finalise();
+
+            RegisterGlobal((m, id) => m.GlobalSettings, (m, id, o) => { }).WithName("General")
+                                                                          .WithDescription("General global settings")
+                                                                          .AddSetting(s => s.DefaultPrefix)
+                                                                          .AddSetting(s => s.Owners, (IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: u => string.Join(", ", u.Select(p => $"<@{p}>")))
+                                                                          .Finalise();
         }
 
         public T GetGroup<T>(ulong guildId)
@@ -55,6 +64,15 @@ namespace TitanBotBase.Settings
         }
 
         public IEditableSettingBuilder<T> Register<T>()
-            => DependencyFactory.WithInstance(Groups).Construct<IEditableSettingBuilder<T>>();
+            => Register((m, id) => m.GetGroup<T>(id), (m, id, o) => m.SaveGroup(id, o));
+
+        public IEditableSettingBuilder<T> RegisterGlobal<T>()
+            => RegisterGlobal((m, id) => m.GetCustomGlobal<T>(), (m, id, o) => m.SaveCustomGlobal(o));
+
+        public IEditableSettingBuilder<T> Register<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver)
+            => DependencyFactory.WithInstance(Groups).WithInstance(retriever).WithInstance(saver).Construct<IEditableSettingBuilder<T>>();
+
+        public IEditableSettingBuilder<T> RegisterGlobal<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver)
+            => DependencyFactory.WithInstance(GlobalGroups).WithInstance(retriever).WithInstance(saver).Construct<IEditableSettingBuilder<T>>();
     }
 }

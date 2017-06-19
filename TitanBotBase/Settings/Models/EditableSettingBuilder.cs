@@ -15,11 +15,15 @@ namespace TitanBotBase.Settings
         bool hasFinalised = false;
         Dictionary<Type, IEditableSettingGroup> Groups { get; }
         IDependencyFactory DependencyFactory { get; }
+        Func<ISettingsManager, ulong, TGroup> Retriever { get; }
+        Action<ISettingsManager, ulong, TGroup> Saver { get; }
 
-        internal EditableSettingBuilder(Dictionary<Type, IEditableSettingGroup> groups, IDependencyFactory factory)
+        internal EditableSettingBuilder(Dictionary<Type, IEditableSettingGroup> groups, IDependencyFactory factory, Func<ISettingsManager, ulong, TGroup> retriever, Action<ISettingsManager, ulong, TGroup> saver)
         {
             Groups = groups;
             DependencyFactory = factory;
+            Retriever = retriever;
+            Saver = saver;
         }
 
         public void Finalise()
@@ -64,7 +68,7 @@ namespace TitanBotBase.Settings
 
         public IEditableSettingBuilder<TGroup> AddSetting<TStore, TAccept>(string name, Expression<Func<TGroup, TStore>> property, Func<TAccept, TStore> converter, Func<TStore, string> viewer = null, Func<TAccept, string> validator = null)
         {
-            Settings.Add(EditableSetting.Create(name, property, converter, viewer, validator));
+            Settings.Add(EditableSetting.Create(Retriever, Saver, name, property, converter, viewer, validator));
             return this;
         }
         public IEditableSettingBuilder<TGroup> AddSetting<TAccept, TStore>(Expression<Func<TGroup, TStore>> property, Func<TAccept, TStore> converter, Func<TStore, string> viewer = null, Func<TAccept, string> validator = null)

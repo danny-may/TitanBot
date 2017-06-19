@@ -151,7 +151,7 @@ namespace TitanBotBase.Scheduler
         public ISchedulerRecord GetMostRecent<T>(ulong guildId) where T : ISchedulerCallback
         {
             var type = JsonConvert.SerializeObject(typeof(T));
-            return Database.Find<TitanBotSchedulerRecord>(r => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
+            return Database.Find((TitanBotSchedulerRecord r) => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
         }
     }
 }

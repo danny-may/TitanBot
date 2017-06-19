@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -51,6 +52,30 @@ namespace TT2Bot
                                                                 .AddSetting("ClanQuest", s => s.CQ, validator: v => v > 0 ? null : "Your clan quest cannot be negative")
                                                                 .AddSetting("TimerChannel", s => s.Channel, (IMessageChannel c) => c?.Id, viewer: v => v == null ? null : $"<#{v}>")
                                                                 .Finalise();
+
+            Client.SettingsManager.RegisterGlobal<TT2GlobalSettings>().WithName("TT2")
+                                                                      .WithDescription("These are the global settings for titanbot")
+                                                                      .AddSetting(s => s.BotBugChannel, (IMessageChannel c) => c.Id, viewer: v => $"<#{v}>")
+                                                                      .AddSetting(s => s.BotSuggestChannel, (IMessageChannel c) => c.Id, viewer: v => $"<#{v}>")
+                                                                      .AddSetting(s => s.GHFeedbackChannel, (IMessageChannel c) => c.Id, viewer: v => $"<#{v}>")
+                                                                      .AddSetting(s => s.ImageRegex)
+                                                                      .AddSetting(s => s.DefaultVersion)
+                                                                      .Finalise();
+
+            Client.SettingsManager.RegisterGlobal((m, id) => m.GetCustomGlobal<TT2GlobalSettings.DataFileVersions>(),
+                                                  (m, id, o) =>
+                                                  {
+                                                      var parent = m.GetCustomGlobal<TT2GlobalSettings>();
+                                                      parent.FileVersions = o;
+                                                      m.SaveCustomGlobal(parent);
+                                                  }).WithName("FileVersions")
+                                                    .WithDescription("These are the versions used for the data commands")
+                                                    .AddSetting(s => s.Artifact)
+                                                    .AddSetting(s => s.Equipment)
+                                                    .AddSetting(s => s.Helper)
+                                                    .AddSetting(s => s.HelperSkill)
+                                                    .AddSetting(s => s.Pet)
+                                                    .Finalise();
         }
 
         private void RegisterTypeReaders()

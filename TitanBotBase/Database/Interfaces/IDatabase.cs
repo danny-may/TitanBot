@@ -10,52 +10,52 @@ namespace TitanBotBase.Database
         int TotalCalls { get; }
 
         Task QueryAsync(Action<IDbTransaction> query);
-        Task<T> QueryAsync<T>(Func<IDbTransaction, T> query);
-        Task QueryTableAsync<T>(Action<IDbTable<T>> query)
-            where T : IDbRecord;
-        Task<R> QueryTableAsync<T,R>(Func<IDbTable<T>, R> query)
-            where T : IDbRecord;
+        Task<TReturn> QueryAsync<TReturn>(Func<IDbTransaction, TReturn> query);
+        Task QueryTableAsync<TRecord>(Action<IDbTable<TRecord>> query)
+            where TRecord : IDbRecord;
+        Task<TReturn> QueryTableAsync<TRecord, TReturn>(Func<IDbTable<TRecord>, TReturn> query)
+            where TRecord : IDbRecord;
 
-        Task<IEnumerable<T>> Find<T>(Expression<Func<T, bool>> predicate, int skip = 0, int limit = 2147483647)
-            where T : IDbRecord;
-        Task<T> FindOne<T>(Expression<Func<T, bool>> predicate)
-            where T : IDbRecord;
-        Task<T> FindById<T>(ulong id)
-            where T : IDbRecord;
-        Task<IEnumerable<T>> FindById<T>(IEnumerable<ulong> ids)
-            where T : IDbRecord;
-        Task<int> Delete<T>(Expression<Func<T, bool>> predicate)
-            where T : IDbRecord;
-        Task<bool> Delete<T>(T row)
-            where T : IDbRecord;
-        Task<bool> Delete<T>(ulong id)
-            where T : IDbRecord;
-        Task<int> Delete<T>(IEnumerable<T> rows)
-            where T : IDbRecord;
-        Task<int> Delete<T>(IEnumerable<ulong> ids)
-            where T : IDbRecord;
-        Task Insert<T>(T record)
-            where T : IDbRecord;
-        Task Insert<T>(IEnumerable<T> records)
-            where T : IDbRecord;
-        Task Update<T>(T record)
-            where T : IDbRecord;
-        Task Update<T>(IEnumerable<T> records)
-            where T : IDbRecord;
-        Task Upsert<T>(T record)
-            where T : IDbRecord;
-        Task Upsert<T>(IEnumerable<T> records)
-            where T : IDbRecord;
-        Task<T> GetUpsert<T>(T record)
-            where T : IDbRecord;
-        Task<IEnumerable<T>> GetUpsert<T>(IEnumerable<T> records)
-            where T : IDbRecord;
-        Task<T> AddOrGet<T>(ulong Id, T record)
-            where T : IDbRecord;
-        Task<T> AddOrGet<T>(ulong Id, Func<T> record)
-            where T : IDbRecord;
-        Task Drop<T>()
-            where T : IDbRecord;
+        Task<IEnumerable<TRecord>> Find<TRecord>(Expression<Func<TRecord, bool>> predicate, int skip = 0, int limit = 2147483647)
+            where TRecord : IDbRecord;
+        Task<TRecord> FindOne<TRecord>(Expression<Func<TRecord, bool>> predicate)
+            where TRecord : IDbRecord;
+        Task<TRecord> FindById<TRecord>(ulong id)
+            where TRecord : IDbRecord;
+        Task<IEnumerable<TRecord>> FindById<TRecord>(IEnumerable<ulong> ids)
+            where TRecord : IDbRecord;
+        Task<int> Delete<TRecord>(Expression<Func<TRecord, bool>> predicate)
+            where TRecord : IDbRecord;
+        Task<bool> Delete<TRecord>(TRecord row)
+            where TRecord : IDbRecord;
+        Task<bool> Delete<TRecord>(ulong id)
+            where TRecord : IDbRecord;
+        Task<int> Delete<TRecord>(IEnumerable<TRecord> rows)
+            where TRecord : IDbRecord;
+        Task<int> Delete<TRecord>(IEnumerable<ulong> ids)
+            where TRecord : IDbRecord;
+        Task Insert<TRecord>(TRecord record)
+            where TRecord : IDbRecord;
+        Task Insert<TRecord>(IEnumerable<TRecord> records)
+            where TRecord : IDbRecord;
+        Task Update<TRecord>(TRecord record)
+            where TRecord : IDbRecord;
+        Task Update<TRecord>(IEnumerable<TRecord> records)
+            where TRecord : IDbRecord;
+        Task Upsert<TRecord>(TRecord record)
+            where TRecord : IDbRecord;
+        Task Upsert<TRecord>(IEnumerable<TRecord> records)
+            where TRecord : IDbRecord;
+        Task<TRecord> GetUpsert<TRecord>(TRecord record)
+            where TRecord : IDbRecord;
+        Task<IEnumerable<TRecord>> GetUpsert<TRecord>(IEnumerable<TRecord> records)
+            where TRecord : IDbRecord;
+        Task<TRecord> AddOrGet<TRecord>(ulong Id, TRecord record)
+            where TRecord : IDbRecord;
+        Task<TRecord> AddOrGet<TRecord>(ulong Id, Func<TRecord> record)
+            where TRecord : IDbRecord;
+        Task Drop<TRecord>()
+            where TRecord : IDbRecord;
         Task Drop(string table);
     }
 }

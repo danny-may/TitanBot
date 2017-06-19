@@ -62,7 +62,7 @@ namespace TitanBotBase.Commands
                 if ((c.RequiredContexts & ContextType.Group) != 0)
                     isValid = isValid || context.Channel is IGroupChannel;
 
-                return isValid;
+                return isValid && (c.Parent.RequireGuild == null || c.Parent.RequireGuild == context.Guild?.Id);
             }).ToArray();
         }
 

@@ -56,7 +56,7 @@ namespace TitanBotBase.Commands
         {
             foreach (var cmd in CommandList)
             {
-                var match = Regex.Match(command, $@"^{cmd.Name} +", RegexOptions.IgnoreCase);
+                var match = Regex.Match(command, $@"^{cmd.Name}(\b| +)", RegexOptions.IgnoreCase);
                 if (match.Success)
                 {
                     commandLength = match.Length;
@@ -64,7 +64,7 @@ namespace TitanBotBase.Commands
                 }
                 foreach (var alias in cmd.Alias)
                 {
-                    match = Regex.Match(command, $@"^{alias} +", RegexOptions.IgnoreCase);
+                    match = Regex.Match(command, $@"^{alias}(\b| +)", RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
                         commandLength = match.Length;
