@@ -16,7 +16,7 @@ namespace TT2Bot.Commands.Clan
         [Call]
         [Usage("Gets an excuse for why that person (or yourself) didnt attack the boss")]
         public async Task ExcuseUserAsync(IUser user = null,
-            [CallFlag('i', "id", "Specifies an ID to use")]int? excuseId = null)
+            [CallFlag('i', "id", "Specifies an ID to use")]ulong? excuseId = null)
         {
             user = user ?? Author;
 
@@ -26,7 +26,7 @@ namespace TT2Bot.Commands.Clan
                 return;
             }
 
-            var excuse = GetExcuse(excuseId, true, out int finalid);
+            var excuse = GetExcuse(excuseId, true);
 
             var submitter = Client.GetUser(excuse.CreatorId);
 
@@ -39,7 +39,7 @@ namespace TT2Bot.Commands.Clan
                 },
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Excuse #{finalid}",
+                    Text = $"Excuse #{excuse.Id}",
                 },
                 Timestamp = DateTime.Now.AddSeconds(-new Random().Next(120, 3600)),
                 Color = System.Drawing.Color.Green.ToDiscord(),
@@ -60,16 +60,16 @@ namespace TT2Bot.Commands.Clan
             };
             await Database.Insert(excuse);
 
-            await ReplyAsync($"Added the excuse as #{Database.Find<Excuse>(r => true).Result.Count(r => !r.Removed) - 1}", ReplyType.Success);
+            await ReplyAsync($"Added the excuse as #{excuse.Id}", ReplyType.Success);
         }
 
         [Call("Remove")]
         [Usage("Removes an excuse you made by ID")]
-        public async Task RemoveExcuseAsync(int id)
+        public async Task RemoveExcuseAsync(ulong id)
         {
-            var excuse = GetExcuse(id, false, out int finalid);
+            var excuse = GetExcuse(id, false);
 
-            if (excuse == null || id != finalid)
+            if (excuse == null || excuse.Id == 0)
             {
                 await ReplyAsync("There is no excuse with that ID", ReplyType.Error);
                 return;
@@ -85,29 +85,17 @@ namespace TT2Bot.Commands.Clan
 
             await Database.Upsert(excuse);
 
-            await ReplyAsync($"Removed excuse #{finalid}", ReplyType.Success);
+            await ReplyAsync($"Removed excuse #{excuse.Id}", ReplyType.Success);
         }
 
-        private Excuse GetExcuse(int? id, bool allowRandom, out int finalId)
+        private Excuse GetExcuse(ulong? id, bool allowRandom)
         {
-            finalId = 0;
-            Func<Excuse> def = () => new Excuse { CreatorId = Author.Id, Id = 0, ExcuseText = "Im uninteresting and havent made any excuses yet", SubmissionTime = DateTime.MinValue };
-            var excuses = Database.Find<Excuse>(r => true).Result.ToArray();
-            if (excuses.Length == 0)
-                return def();
-            if (id != null)
-                if (excuses.Length > id.Value && !excuses[id.Value].Removed)
-                {
-                    finalId = id.Value;
-                    return excuses[id.Value];
-                }
-            var valid = excuses.Where(e => !e.Removed).ToArray();
-            if (valid.Length == 0 || !allowRandom)
-                return def();
-            var final = valid[new Random((int)(DateTime.UtcNow.Ticks % int.MaxValue)).Next(valid.Length)];
-            finalId = excuses.ToList().IndexOf(final);
-            return final;
-                    
+            if (id.HasValue)
+                return Database.FindById<Excuse>(id.Value).Result;
+            var all = Database.Find<Excuse>(e => true).Result.ToArray();
+            if (all.Length == 0)
+                return new Excuse { CreatorId = Author.Id, Id = 0, ExcuseText = "Im uninteresting and havent made any excuses yet", SubmissionTime = DateTime.MinValue };
+            return all[new Random().Next(all.Length)];
         }
     }
 

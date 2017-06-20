@@ -23,7 +23,11 @@ namespace TitanBotBase.Database
         {
             FileUtil.EnsureDirectory(connectionString);
 
-            BsonMapper.Global.RegisterAutoId(u => u == 0, (e, s) => (ulong)DateTime.UtcNow.Ticks);
+            BsonMapper.Global.RegisterAutoId(u => u == 0, (e, s) =>
+            {
+                var max = e.Max(s, "_id");
+                return max.IsMaxValue ? 1 : (ulong)(max.AsInt64 + 1);
+            });
 
             Database = new LiteDatabase(connectionString);
             Logger = logger;
