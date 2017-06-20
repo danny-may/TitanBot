@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
-using TitanBotBase;
+using TitanBot;
 
 namespace TitanBotBaseTest
 {

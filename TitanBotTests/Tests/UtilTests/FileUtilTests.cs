@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TitanBotBase.Util;
+using TitanBot.Util;
 using TitanBotBaseTest.Helpers;
 
 namespace TitanBotBaseTest.Tests.UtilTests
