@@ -77,7 +77,6 @@ namespace TitanBot
             DependencyFactory.TryMap<ICommandContext, CommandContext>();
             DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
             DependencyFactory.TryMap<IPermissionChecker, PermissionChecker>();
-            DependencyFactory.TryMap<OutputFormatter, BaseFormatter>();
             DependencyFactory.TryMap<ISettingsManager, SettingsManager>();
             DependencyFactory.TryMap<IDownloader, CachedDownloader>();
             DependencyFactory.TryMap<IEditableSettingGroup, EditableSettingGroup>();

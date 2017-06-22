@@ -240,7 +240,6 @@
     <Compile Include="Dependencies\InstanceBuilder.cs" />
     <Compile Include="DiscordHandlers\DiscordHandlerBase.cs" />
     <Compile Include="DiscordHandlers\CoreHandler.cs" />
-    <Compile Include="Formatter\BaseFormatter.cs" />
     <Compile Include="Formatter\OutputFormatter.cs" />
     <Compile Include="Logger\Interfaces\ILoggable.cs" />
     <Compile Include="Logger\Interfaces\ILogger.cs" />
