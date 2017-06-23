@@ -9,25 +9,26 @@ namespace TitanBot.Logger
     {
         private readonly string LogPath;
         private readonly object SyncLock = new object();
-        private readonly LogSeverity LogLevel;
+        protected virtual LogSeverity LogLevel => LogSeverity.Critical | LogSeverity.Info | LogSeverity.Error;
 
         public TitanBotLogger() : this($@".\logs\{FileUtil.GetTimestamp()}.log") { }
-        public TitanBotLogger(string logLocation) : this(LogSeverity.Critical | LogSeverity.Info | LogSeverity.Error, logLocation) { }
-        public TitanBotLogger(LogSeverity logLevel, string logLocation)
-        {
-            LogPath = FileUtil.GetAbsolutePath(logLocation);
-            LogLevel = logLevel;
-        }
+        public TitanBotLogger(string logLocation)
+            => LogPath = FileUtil.GetAbsolutePath(logLocation);             
 
-        public virtual void Log(ILoggable entry)
+        public void Log(ILoggable entry)
         {
             if (!ShouldLog(entry.Severity))
                 return;
             lock (SyncLock)
             {
-                FileUtil.EnsureDirectory(LogPath);
-                File.AppendAllText(LogPath, entry.ToString());
+                WriteLog(entry);
             }
+        }
+
+        protected virtual void WriteLog(ILoggable entry)
+        {
+            FileUtil.EnsureDirectory(LogPath);
+            File.AppendAllText(LogPath, entry.ToString());
         }
 
         protected virtual bool ShouldLog(LogSeverity severity)

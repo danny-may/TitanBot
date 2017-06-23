@@ -24,6 +24,10 @@ namespace TitanBot.Logger
         }
 
         public override string ToString()
-            => $"[{LogTime}][{Severity}][{LogType}][{Source}]{Message}";
+        {
+            var core = $"[{LogTime}][{Severity}][{LogType}][{Source}]";
+            var padding = "\n".PadRight(core.Length + 1);
+            return $"{core}{Message.Replace("\n", padding)}";
+        }
     }
 }

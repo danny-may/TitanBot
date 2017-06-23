@@ -7,15 +7,18 @@ namespace TitanBot.Dependencies
 {
     public class InstanceBuilder : IInstanceBuilder
     {
-        private readonly Dictionary<Type, object> BuildingObjects;
+        private readonly Dictionary<Type, object> Store;
         private readonly Dictionary<Type, Type> TypeMap;
-        private Type[] KnownTypes => BuildingObjects.Keys.Cast<Type>().ToArray();
+        private Type[] KnownTypes => Store.Keys.Cast<Type>().ToArray();
+
+        private Dictionary<Type, object> ParentStore;
 
         private static readonly BindingFlags CtorFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
 
         public InstanceBuilder(Dictionary<Type, object> parentStore, Dictionary<Type, Type> parentMap)
         {
-            BuildingObjects = parentStore.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            Store = parentStore.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            ParentStore = parentStore;
             TypeMap = parentMap;
         }
 
@@ -32,12 +35,12 @@ namespace TitanBot.Dependencies
 
         bool TryGet(Type type, out object result)
         {
-            if (BuildingObjects.TryGetValue(type, out result))
+            if (Store.TryGetValue(type, out result))
                 return true;
             foreach (var key in KnownTypes)
             {
                 if (type.IsAssignableFrom(key))
-                    return BuildingObjects.TryGetValue(key, out result);
+                    return Store.TryGetValue(key, out result);
             }
             return false;
         }
@@ -148,12 +151,67 @@ namespace TitanBot.Dependencies
             return obj;
         }
 
+        public bool TryGetOrConstruct<T>(out T result)
+        {
+            result = default(T);
+            var res = TryGetOrConstruct(typeof(T), out object a);
+            if (res)
+                result = (T)a;
+            return res;
+        }
+        public bool TryGetOrConstruct(Type type, out object result)
+        {
+            if (TryGet(type, out result))
+                return true;
+            return TryConstruct(type, out result);
+        }
+
+        public T GetOrConstruct<T>()
+            => (T)GetOrConstruct(typeof(T));
+        public object GetOrConstruct(Type type)
+        {
+            if (TryGet(type, out object result))
+                return result;
+            return Construct(type);
+        }
+
+        public bool TryGetOrStore<T>(out T result)
+        {
+            result = default(T);
+            var res = TryGetOrStore(typeof(T), out object a);
+            if (res)
+                result = (T)a;
+            return res;
+        }
+        public bool TryGetOrStore(Type type, out object result)
+        {
+            if (TryGet(type, out result))
+                return true;
+            if (TryConstruct(type, out result))
+            {
+                ParentStore[type] = result;
+                return true;
+            }
+            return false;
+        }
+
+        public T GetOrStore<T>()
+            => (T)GetOrStore(typeof(T));
+        public object GetOrStore(Type type)
+        {
+            if (TryGet(type, out object result))
+                return result;
+            var res = Construct(type);
+            ParentStore[type] = res;
+            return res;
+        }
+
         public IInstanceBuilder WithInstance<T>(T value)
             => WithInstance(typeof(T), value);
 
         public IInstanceBuilder WithInstance(Type type, object value)
         {
-            BuildingObjects[type] = value;
+            Store[type] = value;
             return this;
         }
     }

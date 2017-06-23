@@ -52,14 +52,14 @@ namespace TitanBot
             MapDefaults();
             mapper(DependencyFactory);
 
-            Logger = DependencyFactory.ConstructAndStore<ILogger>();
-            DiscordClient = DependencyFactory.ConstructAndStore<DiscordSocketClient>();
-            TypeReaders = DependencyFactory.ConstructAndStore<ITypeReaderCollection>();
-            Database = DependencyFactory.ConstructAndStore<IDatabase>();
-            SettingsManager = DependencyFactory.ConstructAndStore<ISettingsManager>();
-            Scheduler = DependencyFactory.ConstructAndStore<IScheduler>();
-            CommandService = DependencyFactory.ConstructAndStore<ICommandService>();
-            DependencyFactory.ConstructAndStore<IDownloader>();
+            Logger = DependencyFactory.GetOrStore<ILogger>();
+            DiscordClient = DependencyFactory.GetOrStore<DiscordSocketClient>();
+            TypeReaders = DependencyFactory.GetOrStore<ITypeReaderCollection>();
+            Database = DependencyFactory.GetOrStore<IDatabase>();
+            SettingsManager = DependencyFactory.GetOrStore<ISettingsManager>();
+            Scheduler = DependencyFactory.GetOrStore<IScheduler>();
+            CommandService = DependencyFactory.GetOrStore<ICommandService>();
+            DependencyFactory.GetOrStore<IDownloader>();
 
             SubscribeEvents();
 

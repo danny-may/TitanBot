@@ -127,6 +127,7 @@ namespace TitanBot.Commands
                     else
                     {
                         instance.Install(context, DependencyFactory);
+                        LogCommand(context, call);
                         using (context.Channel.EnterTypingState())
                         {
                             await (Task)call.Call.Invoke(instance, response.CallArguments);
@@ -136,6 +137,26 @@ namespace TitanBot.Commands
                 }
             }
             await replier.ReplyAsync(context.Channel, context.Author, response.ErrorMessage, ReplyType.Error);
+        }
+
+        private void LogCommand(ICommandContext context, CallInfo call)
+        {
+            var record = new CommandRecord
+            {
+                AuthorId = context.Author.Id,
+                MessageId = context.Message.Id,
+                ChannelId = context.Channel.Id,
+                GuildId = context.Guild?.Id,
+                MessageContent = context.Message.Content,
+                UserName = context.Author.Username,
+                ChannelName = context.Channel.Name,
+                GuildName = context.Guild?.Name,
+                TimeStamp = context.Message.Timestamp,
+                Prefix = context.Prefix,
+                CommandName = context.Command?.Name
+            };
+            Logger.LogAsync(TitanBot.Logger.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
+            Database.Insert(record);
         }
 
         private CallInfo[] CheckSubcommands (CallInfo[] calls, ICommandContext context)
