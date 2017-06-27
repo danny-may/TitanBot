@@ -20,7 +20,6 @@ namespace TitanBot.Scheduler
         private Task LoopTask;
         private bool ShouldStop;
         public int PollingPeriod = 1000;
-        private static ulong PrevId { get; set; }
 
         public bool IsRunning => LoopTask != null &&
                                 !LoopTask.IsCanceled &&
@@ -31,7 +30,6 @@ namespace TitanBot.Scheduler
             DependencyManager = manager;
             Database = database;
             Logger = logger;
-            PrevId = Database.Find<TitanBotSchedulerRecord>(r => true).Result.Select(r => r.Id).OrderByDescending(r => r).FirstOrDefault();
         }
 
 
@@ -40,7 +38,6 @@ namespace TitanBot.Scheduler
         {
             var record = new TitanBotSchedulerRecord
             {
-                Id = ++PrevId,
                 Callback = JsonConvert.SerializeObject(typeof(T)),
                 UserId = userId,
                 GuildId = guildID,
