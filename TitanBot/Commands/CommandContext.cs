@@ -38,8 +38,8 @@ namespace TitanBot.Commands
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)
         {
-            if (Message.HasStringPrefix(defaultPrefix, out int prefixLength, StringComparison.InvariantCultureIgnoreCase) ||
-                (GuildData?.Prefix != null && Message.HasStringPrefix(GuildData.Prefix, out prefixLength, StringComparison.InvariantCultureIgnoreCase)))
+            if ((GuildData?.Prefix != null && Message.HasStringPrefix(GuildData.Prefix, out int prefixLength, StringComparison.InvariantCultureIgnoreCase)) || 
+                Message.HasStringPrefix(defaultPrefix, out prefixLength, StringComparison.InvariantCultureIgnoreCase))
                 ExplicitPrefix = true;
             else if (Message.HasStringPrefix(Client.CurrentUser.Username + " ", out prefixLength, StringComparison.InvariantCultureIgnoreCase) ||
                      Message.HasMentionPrefix(Client.CurrentUser, out prefixLength))
