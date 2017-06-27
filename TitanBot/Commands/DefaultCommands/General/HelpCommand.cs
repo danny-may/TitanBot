@@ -49,7 +49,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
-                    IconUrl = BotUser.GetAvatarUrl(),
+                    IconUrl = BotAvatar,
                     Text = $"{BotUser.Username} | Help"
                 }
             };
@@ -120,7 +120,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
-                    IconUrl = BotUser.GetAvatarUrl(),
+                    IconUrl = BotAvatar,
                     Text = $"{BotUser.Username} | Help"
                 }
             };

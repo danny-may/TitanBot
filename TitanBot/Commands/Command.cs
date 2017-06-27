@@ -40,6 +40,8 @@ namespace TitanBot.Commands
         protected ISettingsManager SettingsManager { get; private set; }
         protected GlobalSetting GlobalSettings => SettingsManager?.GlobalSettings;
         protected GeneralSettings GuildData { get; private set; }
+        protected Uri BotAvatar => new Uri(BotUser.GetAvatarUrl() ?? "https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
+        protected Uri AuthorAvatar => new Uri(Author.GetAvatarUrl() ?? "https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
         protected IReplier Replier { get; private set; }
@@ -131,10 +133,10 @@ namespace TitanBot.Commands
             => ReplyAsync(channel, message, ReplyType.None, isTTS, embed, options);
         
         protected Task<IUserMessage> ReplyAsync(IUser user, string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ReplyAsync(user.GetDMChannelAsync().Result, message, ReplyType.None, isTTS, embed, options);
+            => ReplyAsync(user.GetOrCreateDMChannelAsync().Result, message, ReplyType.None, isTTS, embed, options);
         
         protected Task<IUserMessage> ReplyAsync(IUser user, string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ReplyAsync(user.GetDMChannelAsync().Result, message, replyType, isTTS, embed, options);
+            => ReplyAsync(user.GetOrCreateDMChannelAsync().Result, message, replyType, isTTS, embed, options);
 
         protected IUserMessage Reply(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => Reply(Channel, message, ReplyType.None, isTTS, embed, options);
@@ -146,9 +148,9 @@ namespace TitanBot.Commands
             => Reply(channel, message, ReplyType.None, isTTS, embed, options);        
         
         protected IUserMessage Reply(IUser user, string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => Reply(user.GetDMChannelAsync().Result, message, ReplyType.None, isTTS, embed, options);
+            => Reply(user.GetOrCreateDMChannelAsync().Result, message, ReplyType.None, isTTS, embed, options);
         
         protected IUserMessage Reply(IUser user, string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => Reply(user.GetDMChannelAsync().Result, message, replyType, isTTS, embed, options);
+            => Reply(user.GetOrCreateDMChannelAsync().Result, message, replyType, isTTS, embed, options);
     }
 }

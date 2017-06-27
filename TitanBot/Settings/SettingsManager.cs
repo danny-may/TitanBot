@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,17 +50,25 @@ namespace TitanBot.Settings
         public T GetGroup<T>(ulong guildId)
         {
             var targetType = typeof(T).FullName;
-            var setting = Database.FindOne<Setting>(s => s.Id == guildId && s.Type == targetType).Result?.Serialized ?? "{}";
-            return JsonConvert.DeserializeObject<T>(setting);
+            var settings = JObject.Parse(Database.FindOne<Setting>(s => s.Id == guildId).Result?.Serialized ?? "{}");
+
+            if (settings.TryGetValue(typeof(T).ToString(), out JToken setting))
+                return setting.ToObject<T>();
+            return JsonConvert.DeserializeObject<T>("{}");
         }
 
         public void SaveGroup<T>(ulong guildId, T settings)
         {
+            var current = Database.FindOne<Setting>(s => s.Id == guildId).Result ?? new Setting { Id = guildId, Serialized = "{}" };
+
+            var settingsObj = JObject.Parse(current.Serialized);
+
+            settingsObj[typeof(T).ToString()] = JObject.FromObject(settings);
+
             Database.Upsert(new Setting
             {
                 Id = guildId,
-                Type = typeof(T).FullName,
-                Serialized = JsonConvert.SerializeObject(settings)
+                Serialized = settingsObj.ToString()
             }).Wait();
         }
 
