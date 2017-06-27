@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace TitanBot.Database
+namespace TitanBot.Storage
 {
     public interface IDatabase : IDisposable
     {

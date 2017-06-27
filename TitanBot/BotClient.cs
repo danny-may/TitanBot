@@ -9,13 +9,13 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using TitanBot.Commands;
-using TitanBot.Database;
+using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.DiscordHandlers;
 using TitanBot.Downloader;
 using TitanBot.Formatter;
-using TitanBot.Logger;
-using TitanBot.Scheduler;
+using TitanBot.Logging;
+using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.TypeReaders;
 using TitanBot.Util;
@@ -69,9 +69,9 @@ namespace TitanBot
         public void MapDefaults()
         {
             DependencyFactory.Store(this);
-            DependencyFactory.TryMap<ILogger, TitanBotLogger>();
-            DependencyFactory.TryMap<IDatabase, TitanBotDb>();
-            DependencyFactory.TryMap<IScheduler, TitanBotScheduler>();
+            DependencyFactory.TryMap<ILogger, Logger>();
+            DependencyFactory.TryMap<IDatabase, Database>();
+            DependencyFactory.TryMap<IScheduler, Scheduler>();
             DependencyFactory.TryMap<ICommandService, CommandService>();
             DependencyFactory.TryMap<IReplier, Replier>();
             DependencyFactory.TryMap<ICommandContext, CommandContext>();

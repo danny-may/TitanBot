@@ -1,7 +1,7 @@
 ﻿using Discord;
 using System;
 using System.Threading.Tasks;
-using TitanBot.Logger;
+using TitanBot.Logging;
 using TitanBot.Util;
 
 namespace TitanBot.Commands

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TitanBot.Scheduler
+namespace TitanBot.Scheduling
 {
     public interface ISchedulerCallback
     {

@@ -10,11 +10,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using TitanBot.Database;
+using TitanBot.Storage;
 using TitanBot.Downloader;
 using TitanBot.Formatter;
-using TitanBot.Logger;
-using TitanBot.Scheduler;
+using TitanBot.Logging;
+using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Util;
 

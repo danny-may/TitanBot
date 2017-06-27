@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace TitanBot.Scheduler
+namespace TitanBot.Scheduling
 {
     public interface IScheduler
     {

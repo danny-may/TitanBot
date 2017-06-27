@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using TitanBot.Commands.Responses;
-using TitanBot.Database;
-using TitanBot.Database.Tables;
+using TitanBot.Storage;
+using TitanBot.Storage.Tables;
 using TitanBot.Util;
 
 namespace TitanBot.Commands

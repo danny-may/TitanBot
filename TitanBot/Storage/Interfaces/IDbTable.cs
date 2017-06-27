@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace TitanBot.Database
+namespace TitanBot.Storage
 {
     public interface IDbTable<TRecord>
         where TRecord : IDbRecord

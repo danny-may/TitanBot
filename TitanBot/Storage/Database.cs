@@ -1,25 +1,24 @@
 ﻿using LiteDB;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using TitanBot.Logger;
+using TitanBot.Logging;
 using TitanBot.Util;
 
-namespace TitanBot.Database
+namespace TitanBot.Storage
 {
-    public class TitanBotDb : IDatabase
+    public class Database : IDatabase
     {
-        LiteDatabase Database { get; }
+        LiteDatabase LiteDatabase { get; }
         object SyncLock { get; } = new object();
         ILogger Logger { get; }
 
         public int TotalCalls { get; private set; } = 0;
 
-        public TitanBotDb(ILogger logger) : this(@".\database\bot.db", logger) { }
-        public TitanBotDb(string connectionString, ILogger logger)
+        public Database(ILogger logger) : this(@".\database\bot.db", logger) { }
+        public Database(string connectionString, ILogger logger)
         {
             FileUtil.EnsureDirectory(connectionString);
 
@@ -29,7 +28,7 @@ namespace TitanBot.Database
                 return max.IsMaxValue ? 1 : (ulong)(max.AsInt64 + 1);
             });
 
-            Database = new LiteDatabase(connectionString);
+            LiteDatabase = new LiteDatabase(connectionString);
             Logger = logger;
         }
 
@@ -44,7 +43,7 @@ namespace TitanBot.Database
                 lock (SyncLock)
                 {
                     TotalCalls++;
-                    using (var conn = new TitanBotDbTransaction(Database))
+                    using (var conn = new DbTransaction(LiteDatabase))
                     {
                         try
                         {
@@ -69,7 +68,7 @@ namespace TitanBot.Database
             => QueryAsync(conn => query(conn.GetTable<T>()));
 
         public void Dispose()
-            => Database.Dispose();
+            => LiteDatabase.Dispose();
 
         public Task<IEnumerable<T>> Find<T>(Expression<Func<T, bool>> predicate, int skip = 0, int limit = int.MaxValue)where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Find(predicate, skip, limit).ToList() as IEnumerable<T>);
@@ -127,6 +126,6 @@ namespace TitanBot.Database
             => Drop(typeof(T).Name);
 
         public Task Drop(string table)
-            => QueryAsync(conn => Database.DropCollection(table));
+            => QueryAsync(conn => LiteDatabase.DropCollection(table));
     }
 }

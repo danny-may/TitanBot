@@ -1,4 +1,4 @@
-﻿namespace TitanBot.Logger
+﻿namespace TitanBot.Logging
 {
     public enum LogSeverity
     {

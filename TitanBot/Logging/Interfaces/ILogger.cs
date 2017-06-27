@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TitanBot.Logger
+namespace TitanBot.Logging
 {
     public interface ILogger
     {

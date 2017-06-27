@@ -5,14 +5,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using TitanBot.Util;
 
-namespace TitanBot.Database
+namespace TitanBot.Storage
 {
-    class TitanBotDbTable<TRecord> : IDbTable<TRecord>
+    class DbTable<TRecord> : IDbTable<TRecord>
         where TRecord : IDbRecord
     {
         private LiteCollection<TRecord> Collection { get; }
 
-        internal TitanBotDbTable(LiteCollection<TRecord> collection)
+        internal DbTable(LiteCollection<TRecord> collection)
         {
             Collection = collection;
         }

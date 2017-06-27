@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TitanBot.Scheduler
+namespace TitanBot.Scheduling
 {
     public interface ISchedulerRecord
     {

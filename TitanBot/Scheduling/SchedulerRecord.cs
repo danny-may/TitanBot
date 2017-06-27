@@ -1,9 +1,9 @@
 ﻿using System;
-using TitanBot.Database;
+using TitanBot.Storage;
 
-namespace TitanBot.Scheduler
+namespace TitanBot.Scheduling
 {
-    sealed class TitanBotSchedulerRecord : IDbRecord, ISchedulerRecord
+    sealed class SchedulerRecord : IDbRecord, ISchedulerRecord
     {
         public ulong Id { get; set; }
         public ulong? GuildId { get; set; }

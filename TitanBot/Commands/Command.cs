@@ -4,12 +4,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot.Database;
+using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.Downloader;
 using TitanBot.Formatter;
-using TitanBot.Logger;
-using TitanBot.Scheduler;
+using TitanBot.Logging;
+using TitanBot.Scheduling;
 using TitanBot.Settings;
 
 namespace TitanBot.Commands

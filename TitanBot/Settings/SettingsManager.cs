@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TitanBot.Database;
+using TitanBot.Storage;
 using TitanBot.Dependencies;
 
 namespace TitanBot.Settings

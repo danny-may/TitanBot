@@ -3,16 +3,16 @@ using System.IO;
 using System.Threading.Tasks;
 using TitanBot.Util;
 
-namespace TitanBot.Logger
+namespace TitanBot.Logging
 {
-    public class TitanBotLogger : ILogger
+    public class Logger : ILogger
     {
         private readonly string LogPath;
         private readonly object SyncLock = new object();
         protected virtual LogSeverity LogLevel => LogSeverity.Critical | LogSeverity.Info | LogSeverity.Error;
 
-        public TitanBotLogger() : this($@".\logs\{FileUtil.GetTimestamp()}.log") { }
-        public TitanBotLogger(string logLocation)
+        public Logger() : this($@".\logs\{FileUtil.GetTimestamp()}.log") { }
+        public Logger(string logLocation)
             => LogPath = FileUtil.GetAbsolutePath(logLocation);             
 
         public void Log(ILoggable entry)

@@ -1,6 +1,6 @@
 ﻿using LiteDB;
 
-namespace TitanBot.Database
+namespace TitanBot.Storage
 {
     public interface IDbRecord
     {

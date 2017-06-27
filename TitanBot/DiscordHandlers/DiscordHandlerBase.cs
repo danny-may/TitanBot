@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using TitanBot.Logger;
+using TitanBot.Logging;
 
 namespace TitanBot.DiscordHandlers
 {
@@ -13,7 +13,7 @@ namespace TitanBot.DiscordHandlers
             Client = client;
             Logger = logger;
 
-            Logger.Log(new LogEntry(TitanBot.Logger.LogSeverity.Info, LogType.Handler, $"Built handler {GetType().Name} | Assembly: {GetType().Assembly}", GetType().Name));
+            Logger.Log(new LogEntry(TitanBot.Logging.LogSeverity.Info, LogType.Handler, $"Built handler {GetType().Name} | Assembly: {GetType().Assembly}", GetType().Name));
         }
     }
 }

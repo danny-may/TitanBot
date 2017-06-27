@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TitanBot.Database;
-using TitanBot.Logger;
+using TitanBot.Storage;
+using TitanBot.Logging;
 using TitanBotBaseTest.Helpers;
 using TitanBotBaseTest.MockModels;
 
@@ -16,7 +16,7 @@ namespace TitanBotBaseTest.Tests.DatabaseTests
             const string path = FilesAndFolders.DataBasePath;
             var mockLogger = new MockLogger();
 
-            var db = new TitanBotDb(path, mockLogger);
+            var db = new Database(path, mockLogger);
             Console.WriteLine();
 
             Assert.IsNotNull(db);

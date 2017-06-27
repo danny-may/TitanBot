@@ -8,14 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using TitanBot.Logger;
+using TitanBot.Logging;
 
 namespace TitanBot.Util
 {
     public static class DiscordUtil
     {
         public static ILoggable ToLoggable(this Discord.LogMessage log)
-            => new LogEntry(Logger.LogSeverity.Critical, LogType.Client, log.Message, log.Source);
+            => new LogEntry(Logging.LogSeverity.Critical, LogType.Client, log.Message, log.Source);
 
         public static Color ToDiscord(this System.Drawing.Color color)
             => new Color(color.R, color.G, color.B);

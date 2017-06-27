@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using TitanBot.Commands.Responses;
-using TitanBot.Database.Tables;
+using TitanBot.Storage.Tables;
 
 namespace TitanBot.Commands
 {

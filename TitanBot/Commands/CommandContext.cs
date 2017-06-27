@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
-using TitanBot.Database;
+using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.Settings;
 using TitanBot.Util;

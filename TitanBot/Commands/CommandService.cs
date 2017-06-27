@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TitanBot.Commands.Responses;
-using TitanBot.Database;
+using TitanBot.Storage;
 using TitanBot.Dependencies;
-using TitanBot.Logger;
+using TitanBot.Logging;
 using TitanBot.Settings;
 using TitanBot.TypeReaders;
 using TitanBot.Util;
@@ -49,7 +49,7 @@ namespace TitanBot.Commands
             var builtCount = built.Count();
             var callCount = built.SelectMany(c => c.Calls).Count();
             var argCombCount = built.SelectMany(c => c.Calls).SelectMany(c => c.ArgumentPermatations).Count();
-            Logger.Log(TitanBot.Logger.LogSeverity.Info, LogType.Command, $"Loaded {builtCount} command(s) | {callCount} call(s) | {argCombCount} argument combination(s)", "CommandService");
+            Logger.Log(TitanBot.Logging.LogSeverity.Info, LogType.Command, $"Loaded {builtCount} command(s) | {callCount} call(s) | {argCombCount} argument combination(s)", "CommandService");
         }
 
         public CommandInfo? Search(string command, out int commandLength)
@@ -155,7 +155,7 @@ namespace TitanBot.Commands
                 Prefix = context.Prefix,
                 CommandName = context.Command?.Name
             };
-            Logger.LogAsync(TitanBot.Logger.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
+            Logger.LogAsync(TitanBot.Logging.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
             Database.Insert(record);
         }
 

@@ -1,13 +1,13 @@
 ﻿using LiteDB;
 
-namespace TitanBot.Database
+namespace TitanBot.Storage
 {
-    class TitanBotDbTransaction : IDbTransaction
+    class DbTransaction : IDbTransaction
     {
         private LiteDatabase Database { get; }
         private LiteTransaction Transaction { get; }
 
-        internal TitanBotDbTransaction(LiteDatabase database)
+        internal DbTransaction(LiteDatabase database)
         {
             Database = database;
             Transaction = database.BeginTrans();
@@ -15,7 +15,7 @@ namespace TitanBot.Database
 
         public IDbTable<TRecord> GetTable<TRecord>()
             where TRecord : IDbRecord
-            => new TitanBotDbTable<TRecord>(Database.GetCollection<TRecord>());
+            => new DbTable<TRecord>(Database.GetCollection<TRecord>());
 
         public void Commit()
             => Transaction.Commit();

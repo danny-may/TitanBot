@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TitanBot.Logger
+namespace TitanBot.Logging
 {
     public class LogEntry : ILoggable
     {

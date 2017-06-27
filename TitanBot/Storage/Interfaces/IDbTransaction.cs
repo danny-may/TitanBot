@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TitanBot.Database
+namespace TitanBot.Storage
 {
     public interface IDbTransaction : IDisposable
     {

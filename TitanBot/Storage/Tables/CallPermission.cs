@@ -1,4 +1,4 @@
-﻿namespace TitanBot.Database.Tables
+﻿namespace TitanBot.Storage.Tables
 {
     public class CallPermission : IDbRecord
     {

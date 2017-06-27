@@ -2,16 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
-using TitanBot.Database;
 using TitanBot.Dependencies;
-using TitanBot.Logger;
+using TitanBot.Logging;
+using TitanBot.Storage;
 using TitanBot.Util;
 
-namespace TitanBot.Scheduler
+namespace TitanBot.Scheduling
 {
-    public class TitanBotScheduler : IScheduler
+    public class Scheduler : IScheduler
     {
         private readonly IDatabase Database;
         private readonly IDependencyFactory DependencyManager;
@@ -25,7 +24,7 @@ namespace TitanBot.Scheduler
                                 !LoopTask.IsCanceled &&
                                 !LoopTask.IsFaulted;
 
-        public TitanBotScheduler(IDependencyFactory manager, IDatabase database, ILogger logger)
+        public Scheduler(IDependencyFactory manager, IDatabase database, ILogger logger)
         {
             DependencyManager = manager;
             Database = database;
@@ -36,7 +35,7 @@ namespace TitanBot.Scheduler
 
         public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), string data = null) where T : ISchedulerCallback
         {
-            var record = new TitanBotSchedulerRecord
+            var record = new SchedulerRecord
             {
                 Callback = JsonConvert.SerializeObject(typeof(T)),
                 UserId = userId,
@@ -106,13 +105,13 @@ namespace TitanBot.Scheduler
             return true;
         }
 
-        private Task<IEnumerable<TitanBotSchedulerRecord>> FindActives(DateTime pollTime)
-            => Database.Find((TitanBotSchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
+        private Task<IEnumerable<SchedulerRecord>> FindActives(DateTime pollTime)
+            => Database.Find((SchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
 
         public ISchedulerRecord[] Complete(IEnumerable<ulong> ids, bool wasCancelled = true)
-            => Complete(Database.FindById<TitanBotSchedulerRecord>(ids).Result, wasCancelled);
+            => Complete(Database.FindById<SchedulerRecord>(ids).Result, wasCancelled);
 
-        private ISchedulerRecord[] Complete(IEnumerable<TitanBotSchedulerRecord> records, bool wasCancelled = true)
+        private ISchedulerRecord[] Complete(IEnumerable<SchedulerRecord> records, bool wasCancelled = true)
         {
             foreach (var record in records)
             {
@@ -132,11 +131,11 @@ namespace TitanBot.Scheduler
         {
             var callback = typeof(T);
             var type = JsonConvert.SerializeObject(typeof(T));
-            IEnumerable<TitanBotSchedulerRecord> records;
+            IEnumerable<SchedulerRecord> records;
             if (userId != null)
-                records = Database.Find<TitanBotSchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type && r.UserId == userId).Result;
+                records = Database.Find<SchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type && r.UserId == userId).Result;
             else 
-                records = Database.Find<TitanBotSchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type).Result;
+                records = Database.Find<SchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type).Result;
 
             return Complete(records, wasCancelled);
         }
@@ -147,7 +146,7 @@ namespace TitanBot.Scheduler
         public ISchedulerRecord GetMostRecent<T>(ulong guildId) where T : ISchedulerCallback
         {
             var type = JsonConvert.SerializeObject(typeof(T));
-            return Database.Find((TitanBotSchedulerRecord r) => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
+            return Database.Find((SchedulerRecord r) => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
         }
     }
 }

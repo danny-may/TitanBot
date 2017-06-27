@@ -5,7 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using TitanBot.Logger;
+using TitanBot.Logging;
 
 namespace TitanBot.Downloader
 {

@@ -1,4 +1,4 @@
-﻿using TitanBot.Database;
+﻿using TitanBot.Storage;
 
 namespace TitanBot.Settings
 {

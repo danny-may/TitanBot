@@ -1,4 +1,4 @@
-﻿namespace TitanBot.Database
+﻿namespace TitanBot.Storage
 {
     public class UserSetting : IDbRecord
     {

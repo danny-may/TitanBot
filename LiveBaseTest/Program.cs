@@ -1,6 +1,6 @@
 ﻿using System;
 using TitanBot;
-using TitanBot.Logger;
+using TitanBot.Logging;
 
 namespace LiveBaseTest
 {
@@ -8,12 +8,12 @@ namespace LiveBaseTest
     {
         static void Main(string[] args)
         {
-            var bot = new BotClient(m => m.Map<ILogger, Logger>());
+            var bot = new BotClient(m => m.Map<ILogger, ConsoleLogger>());
             bot.StartAsync(Console.ReadLine()).Wait();
             bot.UntilOffline.Wait();
         }
 
-        class Logger : TitanBotLogger
+        class ConsoleLogger : Logger
         {
             protected override LogSeverity LogLevel => LogSeverity.Critical | LogSeverity.Debug | LogSeverity.Error | LogSeverity.Info | LogSeverity.Verbose;
 
