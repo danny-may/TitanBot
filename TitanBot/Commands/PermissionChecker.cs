@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using TitanBot.Commands.Responses;
+using TitanBot.Settings;
 using TitanBot.Storage;
 using TitanBot.Storage.Tables;
 using TitanBot.Util;
+using System;
 
 namespace TitanBot.Commands
 {
@@ -12,11 +14,13 @@ namespace TitanBot.Commands
     {
         private IDatabase Database { get; }
         private BotClient BotClient { get; }
+        private ISettingsManager Settings { get; }
 
-        public PermissionChecker(IDatabase database, BotClient botClient)
+        public PermissionChecker(IDatabase database, BotClient botClient, ISettingsManager settings)
         {
             Database = database;
             BotClient = botClient;
+            Settings = settings;
         }
 
         public PermissionCheckResponse CheckAllowed(ICommandContext context, CallInfo[] calls)
@@ -35,6 +39,10 @@ namespace TitanBot.Commands
             if (context.Channel is IDMChannel || context.Channel is IGroupChannel || context.Guild.OwnerId == context.Author.Id)
                 return PermissionCheckResponse.FromSuccess(permitted);
 
+            var settings = Settings.GetGroup<GeneralSettings>(context.Guild.Id);
+            if (DoesOverride(context, settings))
+                return PermissionCheckResponse.FromSuccess(calls);
+
             var guildPermissions = Database.QueryTableAsync((IDbTable<CallPermission> table) => table.Find(p => p.GuildId == context.Guild.Id)).Result;
 
             permitted = CheckBlacklist(context, permitted, guildPermissions);
@@ -47,6 +55,15 @@ namespace TitanBot.Commands
 
             return PermissionCheckResponse.FromSuccess(permitted);
 
+        }
+
+        private bool DoesOverride(ICommandContext context, GeneralSettings settings)
+        {
+            if (settings.RoleOverride != null && ((context.Author as IGuildUser)?.RoleIds.Any(r => settings.RoleOverride.Contains(r)) ?? false))
+                return true;
+            if ((context.Author as IGuildUser)?.HasAll(settings.PermOverride) ?? false)
+                return true;
+            return false;
         }
 
         public CallInfo[] CheckContext(ICommandContext context, CallInfo[] calls)
