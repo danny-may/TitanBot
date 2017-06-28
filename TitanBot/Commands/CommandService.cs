@@ -162,7 +162,7 @@ namespace TitanBot.Commands
         private CallInfo[] CheckSubcommands (CallInfo[] calls, ICommandContext context)
         {
             var noSubcalls = calls.Where(c => c.SubCall == null);
-            var subcalls = calls.Where(c => c.SubCall != null).GroupBy(c => c.SubCall);
+            var subcalls = calls.Where(c => c.SubCall != null).GroupBy(c => c.SubCall).OrderByDescending(g => g.Key.Length);
             foreach (var group in subcalls)
             {
                 if (context.Message.Content.Substring(context.ArgPos).ToLower().Trim().StartsWith(group.Key.ToLower()))

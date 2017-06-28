@@ -63,14 +63,14 @@ namespace TitanBot.Commands
 
             var format = "{0}";
 
-            if (typeof(IEnumerable<>).IsAssignableFrom(Type) || Type.IsArray)
-                format = string.Format("{0}...", format);
+            
 
             if (HasDefaultValue)
-                format = string.Format("[{0}]", format);
+                format = string.Format(format, "[{0}]");
             else
-                format = string.Format("<{0}>", format);
-
+                format = string.Format(format, "<{0}>");
+            if (typeof(IEnumerable<>).IsAssignableFrom(Type) || Type.IsArray)
+                            format = string.Format(format, "{0}...");
             return string.Format(format, Name);
         }
     }
