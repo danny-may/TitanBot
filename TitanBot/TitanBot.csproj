@@ -177,6 +177,7 @@
     <Compile Include="Commands\Attributes\DescriptionAttribute.cs" />
     <Compile Include="Commands\Attributes\DoNotInstallAttribute.cs" />
     <Compile Include="Commands\Attributes\GroupAttribute.cs" />
+    <Compile Include="Commands\Attributes\HiddenAttribute.cs" />
     <Compile Include="Commands\Attributes\NameAttribute.cs" />
     <Compile Include="Commands\Attributes\NotesAttribute.cs" />
     <Compile Include="Commands\Attributes\RawArgumentsAttribute.cs" />

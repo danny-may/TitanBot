@@ -54,7 +54,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 }
             };
 
-            var commands = FindPermitted();
+            var commands = FindPermitted().Where(c => !c.Hidden);
 
             var groups = commands.GroupBy(c => c.Group);
             foreach (var group in groups)
@@ -85,7 +85,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 return;
             }
 
-            var permitted = permCheckResponse.Permitted;
+            var permitted = permCheckResponse.Permitted.Where(c => !c.Hidden);
 
             var usages = new List<string>();
             foreach (var call in permitted)

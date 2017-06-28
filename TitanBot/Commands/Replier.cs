@@ -19,7 +19,7 @@ namespace TitanBot.Commands
         {
             var formattedMessage = DiscordUtil.FormatMessage(message, (int)replyType);
             return await channel.SendMessageSafeAsync(formattedMessage, async e => {
-                await (await user.GetOrCreateDMChannelAsync()).SendMessageSafeAsync(DiscordUtil.FormatMessage("I was unable to reply to you! This is the message I tried to send:\n" + formattedMessage, 1));
+                await (await user.GetOrCreateDMChannelAsync()).SendMessageSafeAsync(DiscordUtil.FormatMessage("I was unable to reply to you! This is the message I tried to send:\n" + formattedMessage, 1), embed: embed);
                 await Logger.LogAsync(e, $"Command: {GetType().Name}");
                 await (handler?.Invoke(e) ?? Task.CompletedTask);
             }, isTTS, embed, options);

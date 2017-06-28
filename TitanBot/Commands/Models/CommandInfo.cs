@@ -18,6 +18,7 @@ namespace TitanBot.Commands
         public string Note { get; }
         public bool RequireOwner { get; }
         public ulong? RequireGuild { get; }
+        public bool Hidden { get; }
 
         private CommandInfo(Type type)
         {
@@ -34,8 +35,10 @@ namespace TitanBot.Commands
             Note = NotesAttribute.GetFor(type);
             RequireOwner = RequireOwnerAttribute.ExistsOn(type);
             RequireGuild = RequireGuildAttribute.GetFor(type);
+            Hidden = false;
             Calls = null;
             Calls = CallInfo.BuildFrom(this).ToList().AsReadOnly();
+            Hidden = HiddenAttribute.ExistsOn(type) || Calls.All(c => c.Hidden);
         }
 
         internal static IEnumerable<CommandInfo> BuildFrom(IEnumerable<Type> types)

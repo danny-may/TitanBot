@@ -20,6 +20,7 @@ namespace TitanBot.Commands
         public ArgumentInfo[] Parameters { get; }
         public CommandInfo Parent { get; }
         public FlagDefinition[] Flags { get; }
+        public bool Hidden { get; }
 
         private CallInfo(MethodInfo method, CommandInfo info)
         {
@@ -32,6 +33,7 @@ namespace TitanBot.Commands
             RequiredContexts = RequireContextAttribute.GetFor(Call);
             RequireOwner = RequireOwnerAttribute.ExistsOn(Call);
             SubCall = CallAttribute.GetFor(Call);
+            Hidden = HiddenAttribute.ExistsOn(Call);
             Parent = info;
             Parameters = null;
             Flags = null;
