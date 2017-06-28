@@ -35,7 +35,7 @@ namespace TitanBot
         public GlobalSetting GlobalSettings => SettingsManager.GlobalSettings;
         public IReadOnlyList<ulong> Owners => GlobalSettings.Owners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
                                                                    .ToList().AsReadOnly();
-        public Task UntilOffline => Task.Run(async () => { while (DiscordClient.ConnectionState != ConnectionState.Disconnected) { await Task.Delay(10); } });
+        public Task UntilOffline => Task.Run(async () => { while (DiscordClient.LoginState != LoginState.LoggedOut) { await Task.Delay(10); } });
         private List<DiscordHandlerBase> Handlers { get; } = new List<DiscordHandlerBase>();
 
         private ManualResetEvent readyEvent = new ManualResetEvent(false);
