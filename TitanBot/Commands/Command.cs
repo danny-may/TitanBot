@@ -40,8 +40,6 @@ namespace TitanBot.Commands
         protected ISettingsManager SettingsManager { get; private set; }
         protected GlobalSetting GlobalSettings => SettingsManager?.GlobalSettings;
         protected GeneralSettings GuildData { get; private set; }
-        protected Uri BotAvatar => new Uri(BotUser.GetAvatarUrl() ?? "https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
-        protected Uri AuthorAvatar => new Uri(Author.GetAvatarUrl() ?? "https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
         protected IReplier Replier { get; private set; }
