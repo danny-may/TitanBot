@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace TitanBot.Util
 {
@@ -26,6 +27,19 @@ namespace TitanBot.Util
                 time = DateTime.Now;
 
             return $"{time.Day}{time.Month}{time.Year}_{time.Hour}{time.Minute}{time.Second}";
+        }
+
+        public static long GetDirectorySize(this DirectoryInfo d)
+        {
+            long size = 0;
+
+            var files = d.GetFiles();
+            size += files.Sum(f => f.Length);
+
+            var dirs = d.GetDirectories();
+            size += dirs.Sum(dir => GetDirectorySize(dir));
+
+            return size;
         }
     }
 }

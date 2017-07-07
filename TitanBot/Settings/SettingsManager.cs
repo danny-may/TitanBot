@@ -38,6 +38,7 @@ namespace TitanBot.Settings
                                        .AddSetting(s => s.Prefix)
                                        .AddSetting(s => s.PermOverride)
                                        .AddSetting(s => s.RoleOverride, (IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: r => string.Join(", ", r?.Select(id => $"<@&{id}>")))
+                                       .AddSetting(s => s.DateTimeFormat)
                                        .Finalise();
 
             RegisterGlobal((m, id) => m.GlobalSettings, (m, id, o) => { }).WithName("General")
