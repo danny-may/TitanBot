@@ -57,7 +57,7 @@ namespace TitanBot.Commands
             var remaining = Message.Content.Substring(prefixLength).TrimStart();
             Command = commandService.Search(remaining, out int commandLength);
             CommandText = remaining.Substring(0, commandLength).Trim();
-            ArgPos = prefixLength + commandLength;
+            ArgPos = Message.Content.IndexOf(CommandText) + commandLength;
         }
 
         public string[] SplitArguments(bool ignoreFlags, out (string Key, string Value)[] flags, int? maxLength = null, int? densePos = null)

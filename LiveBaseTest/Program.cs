@@ -9,7 +9,12 @@ namespace LiveBaseTest
         static void Main(string[] args)
         {
             var bot = new BotClient(m => m.Map<ILogger, ConsoleLogger>());
-            bot.StartAsync(Console.ReadLine()).Wait();
+
+            bot.StartAsync(c =>
+            {
+                Console.WriteLine("Please enter a bot token:");
+                return Console.ReadLine();
+            }).Wait();
             bot.UntilOffline.Wait();
         }
 

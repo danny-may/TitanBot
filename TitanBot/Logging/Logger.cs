@@ -28,7 +28,7 @@ namespace TitanBot.Logging
         protected virtual void WriteLog(ILoggable entry)
         {
             FileUtil.EnsureDirectory(LogPath);
-            File.AppendAllText(LogPath, entry.ToString());
+            File.AppendAllText(LogPath, entry.ToString()+"\n");
         }
 
         protected virtual bool ShouldLog(LogSeverity severity)

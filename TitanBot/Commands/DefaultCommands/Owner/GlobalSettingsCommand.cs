@@ -30,7 +30,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
-                    IconUrl = BotAvatar,
+                    IconUrl = BotUser.GetAvatarUrl(),
                     Text = $"{Author.Username} | Settings"
                 }
             };
@@ -98,7 +98,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                         Title = $"{setting.Name} has changed",
                         Footer = new EmbedFooterBuilder
                         {
-                            IconUrl = BotAvatar,
+                            IconUrl = BotUser.GetAvatarUrl(),
                             Text = BotUser.Username,
                         },
                         Timestamp = DateTime.Now,
