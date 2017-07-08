@@ -39,6 +39,7 @@ namespace TitanBot.Settings
                                        .AddSetting(s => s.PermOverride)
                                        .AddSetting(s => s.RoleOverride, (IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: r => string.Join(", ", r?.Select(id => $"<@&{id}>")))
                                        .AddSetting(s => s.DateTimeFormat)
+                                       .WithNotes("For DateTimeFormat, you can use [this link](https://www.codeproject.com/Articles/19677/Formats-for-DateTime-ToString) to help determine what is and is not valid!")
                                        .Finalise();
 
             RegisterGlobal((m, id) => m.GlobalSettings, (m, id, o) => { }).WithName("General")
