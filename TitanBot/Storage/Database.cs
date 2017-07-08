@@ -83,7 +83,7 @@ namespace TitanBot.Storage
         public Task<bool> Delete<T>(T row) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Delete(row));
         public Task<bool> Delete<T>(ulong id) where T : IDbRecord
-            => QueryAsync(conn => conn.GetTable<T>().Delete(id));
+            => QueryAsync(conn => conn.GetTable<T>().Delete(r => r.Id == id) > 0);
         public Task<int> Delete<T>(IEnumerable<T> rows) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Delete(rows));
         public Task<int> Delete<T>(IEnumerable<ulong> ids) where T : IDbRecord
