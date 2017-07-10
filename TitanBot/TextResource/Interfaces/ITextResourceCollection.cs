@@ -11,5 +11,6 @@ namespace TitanBot.TextResource
         string Format(string key, params object[] items);
         string GetResource(string key);
         string this[string index] { get; }
+        double Coverage { get; }
     }
 }

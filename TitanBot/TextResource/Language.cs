@@ -183,6 +183,7 @@ namespace TitanBot.TextResource
         UG,         //Uyghur
         UK,         //Ukrainian
         UR,         //Urdu
+        US,         //USA
         UZ,         //Uzbek
         VE,         //Venda
         VI,         //Vietnamese

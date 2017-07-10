@@ -9,11 +9,13 @@ namespace TitanBot.TextResource
     class TextResourceCollection : ITextResourceCollection
     {
         private Dictionary<string, (string defaultText, string langText)> Values { get; }
+        public double Coverage { get; }
 
         public string this[string key] => GetResource(key);
 
-        public TextResourceCollection(Dictionary<string, (string defaultText, string langText)> values)
+        public TextResourceCollection(double coverage, Dictionary<string, (string defaultText, string langText)> values)
         {
+            Coverage = coverage;
             Values = values;
         }
 

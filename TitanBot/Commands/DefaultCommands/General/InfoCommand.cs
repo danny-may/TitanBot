@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot.TextResource;
 using TitanBot.Util;
 
 namespace TitanBot.Commands.DefautlCommands.General
@@ -12,6 +13,8 @@ namespace TitanBot.Commands.DefautlCommands.General
     public class InfoCommand : Command
     {
         public static List<Action<EmbedBuilder, InfoCommand>> BuildActions { get; } = new List<Action<EmbedBuilder, InfoCommand>>();
+        private ITextResourceManager TextManager { get; }
+
 
         static InfoCommand()
         {
@@ -26,6 +29,27 @@ namespace TitanBot.Commands.DefautlCommands.General
             BuildActions.Add((b, c) => b.AddInlineField("CPU", c.Formatter.Beautify(PerformanceUtil.getCurrentCPUUsage())));
             BuildActions.Add((b, c) => b.AddInlineField("Active Timers", c.Formatter.Beautify(c.Scheduler.ActiveCount())));
             BuildActions.Add((b, c) => b.AddInlineField("Uptime", c.Formatter.Beautify(DateTime.Now - Process.GetCurrentProcess().StartTime)));
+        }
+
+        public InfoCommand(ITextResourceManager textManager)
+        {
+            TextManager = textManager;
+        }
+
+        [Call("Language")]
+        [Usage("Displays info about what languages are supported")]
+        async Task ShowLanguageInfo()
+        {
+            var builder = new EmbedBuilder
+            {
+                Description = TextResource.GetResource("INFO_LANGUAGE_EMBED_DESCRIPTION")
+            };
+            foreach (var lang in TextManager.SupportedLanguages)
+            {
+                builder.AddInlineField(lang.ToString(), Formatter.Beautify(TextManager.GetLanguageCoverage(lang)*100) + "% Coverage");
+            }
+
+            await ReplyAsync("", embed: builder.Build());
         }
 
         [Call]
