@@ -85,5 +85,10 @@ namespace TitanBot.Settings
 
         public IEditableSettingBuilder<T> RegisterGlobal<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver)
             => DependencyFactory.WithInstance(GlobalGroups).WithInstance(retriever).WithInstance(saver).Construct<IEditableSettingBuilder<T>>();
+
+        public async void ResetSettings(ulong guildId)
+        {
+            await Database.Delete<Setting>(s => s.Id == guildId);
+        }
     }
 }

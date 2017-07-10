@@ -4,7 +4,7 @@ namespace TitanBot.Commands.DefautlCommands.General
 {
     [Description("Gets or sets a custom prefix that is required to use my commands")]
     [DefaultPermission(8)]
-    class PrefixCommand : Command
+    public class PrefixCommand : Command
     {
         [Call]
         [DefaultPermission(0, "Show")]

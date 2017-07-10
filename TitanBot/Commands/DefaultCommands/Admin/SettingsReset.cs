@@ -1,17 +1,20 @@
-﻿using Discord;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using TitanBot.Settings;
-using TitanBot.Storage.Tables;
 
 namespace TitanBot.Commands.DefaultCommands.Admin
 {
     [Description("Resets all settings and command permissions for a guild.")]
-    class SettingsReset : Command
+    public class SettingsReset : Command
     {
+        IPermissionManager PermissionManager { get; }
+        ICommandContext Context { get; }
+
+        public SettingsReset(IPermissionManager permissionManager, ICommandContext context)
+        {
+            PermissionManager = permissionManager;
+            Context = context;
+        }
+
         [DefaultPermission(8)]
         [Call]
         [RequireContext(ContextType.Guild)]
@@ -26,8 +29,9 @@ namespace TitanBot.Commands.DefaultCommands.Admin
         [RequireOwner]
         async Task ResetGuild(ulong guildId)
         {
-            var success = await Database.Delete<Setting>(guildId);
-            await Database.Delete<CallPermission>(p => p.GuildId == guildId);
+            var calls = CommandService.CommandList.SelectMany(c => c.Calls).ToArray();
+            PermissionManager.ResetPermissions(Context, calls);
+            SettingsManager.ResetSettings(Context.Guild.Id);
             var guild = Client.GetGuild(guildId);
             if (guild == null)
                 await ReplyAsync("That guild does not exist.", ReplyType.Error);

@@ -27,6 +27,7 @@ namespace TitanBot.Commands
         private ISettingsManager SettingsManager { get; }
         private BotClient Client { get; }
         private DiscordSocketClient DiscordClient { get; }
+        private IPermissionManager PermissionManager { get; }
 
         public CommandService(IDependencyFactory factory)
         {
@@ -38,18 +39,24 @@ namespace TitanBot.Commands
             Database = factory.Get<IDatabase>();
             CommandList = Command.AsReadOnly();
             SettingsManager = factory.Get<ISettingsManager>();
+            PermissionManager = factory.GetOrStore<IPermissionManager>();
         }
 
         public void Install(Assembly assembly)
         {
             var commandTypes = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(Command)) &&
                                                               !t.IsAbstract);
+            Install(commandTypes.ToArray());
+        }
+
+        public void Install(params Type[] commandTypes)
+        {
             var built = CommandInfo.BuildFrom(commandTypes).ToList();
             Command.AddRange(built);
             var builtCount = built.Count();
             var callCount = built.SelectMany(c => c.Calls).Count();
             var argCombCount = built.SelectMany(c => c.Calls).SelectMany(c => c.ArgumentPermatations).Count();
-            Logger.Log(TitanBot.Logging.LogSeverity.Info, LogType.Command, $"Loaded {builtCount} command(s) | {callCount} call(s) | {argCombCount} argument combination(s)", "CommandService");
+            Logger.Log(Logging.LogSeverity.Info, LogType.Command, $"Loaded {builtCount} command(s) | {callCount} call(s) | {argCombCount} argument combination(s)", "CommandService");
         }
 
         public CommandInfo? Search(string command, out int commandLength)
@@ -99,9 +106,8 @@ namespace TitanBot.Commands
             if (instance == null)
                 throw new InvalidOperationException($"Unable to create an instance of the {command.CommandType} command");
             var replier = DependencyFactory.WithInstance(instance).Construct<IReplier>();
-            var permissionChecker = DependencyFactory.Construct<IPermissionChecker>();
             ArgumentCheckResponse response = default(ArgumentCheckResponse);
-            var calls = permissionChecker.CheckContext(context, command.Calls.ToArray());
+            var calls = PermissionManager.CheckContext(context, command.Calls.ToArray());
             if (calls.Count() == 0)
             {
                 await replier.ReplyAsync(context.Channel, context.Author, "You cannot use that command here!", ReplyType.Error);
@@ -118,7 +124,7 @@ namespace TitanBot.Commands
                 response = await MatchArguments(call, context);
                 if (response.SuccessStatus == ArgumentCheckResult.Successful)
                 {
-                    var permCheck = permissionChecker.CheckAllowed(context, new CallInfo[] { call });
+                    var permCheck = PermissionManager.CheckAllowed(context, new CallInfo[] { call });
                     if (!permCheck.IsSuccess)
                     {
                         if (permCheck.ErrorMessage != null)

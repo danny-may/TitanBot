@@ -37,6 +37,7 @@ namespace TitanBot
                                                                    .ToList().AsReadOnly();
         public Task UntilOffline => Task.Run(async () => { while (DiscordClient.LoginState != LoginState.LoggedOut) { await Task.Delay(10); } });
         private List<DiscordHandlerBase> Handlers { get; } = new List<DiscordHandlerBase>();
+        public Type[] DefaultCommands => Assembly.GetAssembly(GetType()).GetTypes().Where(t => t.IsSubclassOf(typeof(Command))).ToArray();
 
         private ManualResetEvent readyEvent = new ManualResetEvent(false);
 
@@ -63,7 +64,7 @@ namespace TitanBot
 
             SubscribeEvents();
 
-            Install(Assembly.GetExecutingAssembly());
+            InstallHandlers(Assembly.GetExecutingAssembly());
         }
 
         public void MapDefaults()
@@ -76,14 +77,14 @@ namespace TitanBot
             DependencyFactory.TryMap<IReplier, Replier>();
             DependencyFactory.TryMap<ICommandContext, CommandContext>();
             DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
-            DependencyFactory.TryMap<IPermissionChecker, PermissionChecker>();
+            DependencyFactory.TryMap<IPermissionManager, PermissionManager>();
             DependencyFactory.TryMap<ISettingsManager, SettingsManager>();
             DependencyFactory.TryMap<IDownloader, CachedDownloader>();
             DependencyFactory.TryMap<IEditableSettingGroup, EditableSettingGroup>();
             DependencyFactory.TryMap(typeof(IEditableSettingBuilder<>), typeof(EditableSettingBuilder<>));
         }
 
-        public void Install(Assembly assembly)
+        public void InstallHandlers(Assembly assembly)
         {
             var handlers = assembly.GetTypes()
                                    .Where(t => t.IsSubclassOf(typeof(DiscordHandlerBase)));
@@ -92,7 +93,6 @@ namespace TitanBot
                 if (DependencyFactory.TryConstruct(handler, out object obj))
                     Handlers.Add((DiscordHandlerBase)obj);
             }
-            CommandService.Install(assembly);
         }
 
         private void SubscribeEvents()

@@ -4,7 +4,7 @@ using TitanBot.Commands;
 namespace TitanBot2.Commands.General
 {
     [Description("You.. youre thinking of donating? :open_mouth: This command will give you a link to my patreon page")]
-    class Donate : Command
+    public class Donate : Command
     {
         [Call]
         [Usage("Gives you the link you awesome person :heart:")]

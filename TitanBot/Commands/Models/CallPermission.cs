@@ -1,4 +1,6 @@
-﻿namespace TitanBot.Storage.Tables
+﻿using TitanBot.Storage;
+
+namespace TitanBot.Commands.Models
 {
     public class CallPermission : IDbRecord
     {

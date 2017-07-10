@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using TitanBot.Util;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
     [Description("Shuts me down")]
     [RequireOwner]
-    class ShutdownCommand : Command
+    public class ShutdownCommand : Command
     {
         [Call]
-        async Task ShutdownAsync()
+        Task ShutdownAsync()
         {
-            Bot.StopAsync();
+            Bot.StopAsync().DontWait();
+            return Task.CompletedTask;
         }
     }
 }

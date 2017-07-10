@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
     [Description("Wipes any database table clean")]
     [RequireOwner]
-    class DbPurgeCommand : Command
+    public class DbPurgeCommand : Command
     {
         [Call]
         [Usage("Wipes the given table.")]

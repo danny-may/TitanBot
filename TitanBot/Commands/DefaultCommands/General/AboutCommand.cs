@@ -5,7 +5,7 @@ using TitanBot.Commands;
 namespace TitanBot2.Commands.General
 {
     [Description("A tiny command that just displays some helpful links :)")]
-    class AboutCommand : Command
+    public class AboutCommand : Command
     {
         private readonly Dictionary<ulong, string> _specialThanks = new Dictionary<ulong, string>();
 

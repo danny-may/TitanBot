@@ -3,7 +3,7 @@
 namespace TitanBot.Commands.DefautlCommands.General
 {
     [Description("Provides a link to invite me to any guild")]
-    class InviteCommand : Command
+    public class InviteCommand : Command
     {
         [Call]
         [Usage("Shows the invite link")]

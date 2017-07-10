@@ -23,7 +23,8 @@ namespace TitanBot.Commands
         IUserMessage AwaitMessage { get; set; }
         ICommandContext Context { get; set; }
 
-        protected string DelayMessage = "This seems to be taking longer than expected...";
+        protected virtual string DelayMessage => "This seems to be taking longer than expected...";
+        protected virtual int DelayMessageMs => 3000;
 
         protected BotClient Bot { get; set; }
         protected ILogger Logger { get; private set; }
@@ -87,7 +88,7 @@ namespace TitanBot.Commands
         {
             Task.Run(async () =>
             {
-                await Task.Delay(3000);
+                await Task.Delay(DelayMessageMs);
                 lock (InstanceCommandLock)
                 {
                     if (!HasReplied)

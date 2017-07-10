@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,25 +9,29 @@ using TitanBot.Util;
 namespace TitanBot.Commands.DefautlCommands.General
 {
     [Description("Displays some technical information about me")]
-    class InfoCommand : Command
+    public class InfoCommand : Command
     {
+        public static List<Action<EmbedBuilder, InfoCommand>> BuildActions { get; } = new List<Action<EmbedBuilder, InfoCommand>>();
+
+        static InfoCommand()
+        {
+            BuildActions.Add((b, c) => b.AddInlineField("Guilds", c.Formatter.Beautify(c.Client.Guilds.Count)));
+            BuildActions.Add((b, c) => b.AddInlineField("Channels", c.Formatter.Beautify(c.Client.Guilds.Sum(g => g.Channels.Count))));
+            BuildActions.Add((b, c) => b.AddInlineField("Users", c.Formatter.Beautify(c.Client.Guilds.SelectMany(g => g.Users).Distinct().Count())));
+            BuildActions.Add((b, c) => b.AddInlineField("Loaded commands", c.Formatter.Beautify(c.CommandService.CommandList.Count)));
+            BuildActions.Add((b, c) => b.AddInlineField("Loaded calls", c.Formatter.Beautify(c.CommandService.CommandList.Sum(m => m.Calls.Count))));
+            BuildActions.Add((b, c) => b.AddInlineField("Commands used this session", c.Formatter.Beautify(TotalCommands)));
+            BuildActions.Add((b, c) => b.AddInlineField("Database queries", c.Formatter.Beautify(c.Database.TotalCalls)));
+            BuildActions.Add((b, c) => b.AddInlineField("RAM", $"{c.Formatter.Beautify((double)Process.GetCurrentProcess().PrivateMemorySize64 / (1024 * 1024))} / {c.Formatter.Beautify(PerformanceUtil.getAvailableRAM())}"));
+            BuildActions.Add((b, c) => b.AddInlineField("CPU", c.Formatter.Beautify(PerformanceUtil.getCurrentCPUUsage())));
+            BuildActions.Add((b, c) => b.AddInlineField("Active Timers", c.Formatter.Beautify(c.Scheduler.ActiveCount())));
+            BuildActions.Add((b, c) => b.AddInlineField("Uptime", c.Formatter.Beautify(DateTime.Now - Process.GetCurrentProcess().StartTime)));
+        }
+
         [Call]
         [Usage("Displays the info")]
         async Task ShowInfoAsync()
         {
-            var guildCount = Client.Guilds.Count;
-            var channelCount = Client.Guilds.Sum(g => g.Channels.Count);
-            var userCount = Client.Guilds.SelectMany(g => g.Users).Distinct().Count();
-            var ramAvailable = PerformanceUtil.getAvailableRAM();
-            var cpuUsage = PerformanceUtil.getCurrentCPUUsage();
-            var timersActive = Scheduler.ActiveCount();
-            DateTime startTime;
-            long ramUsage;
-            using (var proc = Process.GetCurrentProcess())
-            {
-                startTime = proc.StartTime;
-                ramUsage = proc.PrivateMemorySize64;
-            }
 
             var builder = new EmbedBuilder
             {
@@ -43,17 +48,10 @@ namespace TitanBot.Commands.DefautlCommands.General
                 Timestamp = DateTime.Now
             };
 
-            builder.AddInlineField("Guilds", Formatter.Beautify(guildCount))
-                   .AddInlineField("Channels", Formatter.Beautify(channelCount))
-                   .AddInlineField("Users", Formatter.Beautify(userCount))
-                   .AddInlineField("Loaded commands", Formatter.Beautify(CommandService.CommandList.Count))
-                   .AddInlineField("Loaded calls", Formatter.Beautify(CommandService.CommandList.Sum(c => c.Calls.Count)))
-                   .AddInlineField("Commands used this session", Formatter.Beautify(TotalCommands))
-                   .AddInlineField("Database queries", Formatter.Beautify(Database.TotalCalls))
-                   .AddInlineField("RAM", $"{Formatter.Beautify((double)ramUsage / (1024 * 1024))} / {Formatter.Beautify(ramAvailable)}")
-                   .AddInlineField("CPU", Formatter.Beautify(cpuUsage))
-                   .AddInlineField("Active Timers", Formatter.Beautify(timersActive))
-                   .AddInlineField("Uptime", Formatter.Beautify(DateTime.Now - startTime));
+            foreach (var action in BuildActions)
+            {
+                action(builder, this);
+            }
 
             await ReplyAsync("", embed: builder.Build());
         }

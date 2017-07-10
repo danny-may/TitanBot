@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using TitanBot.Commands.Models;
 using TitanBot.Dependencies;
-using TitanBot.Util;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
     [RequireOwner]
-    class SudoCommand : Command
+    public class SudoCommand : Command
     {
         private IDependencyFactory Factory { get; }
 

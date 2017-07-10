@@ -4,23 +4,35 @@ using System.Linq;
 using TitanBot.Commands.Responses;
 using TitanBot.Settings;
 using TitanBot.Storage;
-using TitanBot.Storage.Tables;
 using TitanBot.Util;
 using System;
+using TitanBot.Commands.Models;
+using System.Threading.Tasks;
 
 namespace TitanBot.Commands
 {
-    public class PermissionChecker : IPermissionChecker
+    class PermissionManager : IPermissionManager
     {
         private IDatabase Database { get; }
         private BotClient BotClient { get; }
         private ISettingsManager Settings { get; }
+        private List<CallPermission> CachedPermissions { get; set; }
 
-        public PermissionChecker(IDatabase database, BotClient botClient, ISettingsManager settings)
+        public PermissionManager(IDatabase database, BotClient botClient, ISettingsManager settings)
         {
             Database = database;
             BotClient = botClient;
             Settings = settings;
+            Task.Run(() => RefreshCache()).DontWait();
+        }
+
+        private async void RefreshCache()
+        {
+            while (true)
+            {
+                CachedPermissions = Database.Find<CallPermission>(x => true).Result.ToList();
+                await Task.Delay(10000);
+            }
         }
 
         public PermissionCheckResponse CheckAllowed(ICommandContext context, CallInfo[] calls)
@@ -43,13 +55,11 @@ namespace TitanBot.Commands
             if (DoesOverride(context, settings))
                 return PermissionCheckResponse.FromSuccess(calls);
 
-            var guildPermissions = Database.QueryTableAsync((IDbTable<CallPermission> table) => table.Find(p => p.GuildId == context.Guild.Id)).Result;
-
-            permitted = CheckBlacklist(context, permitted, guildPermissions);
+            permitted = CheckBlacklist(context, permitted);
             if (permitted.Count() == 0)
                 return PermissionCheckResponse.FromError();
 
-            permitted = CheckPermissions(context, permitted, guildPermissions);
+            permitted = CheckPermissions(context, permitted);
             if (permitted.Count() == 0)
                 return PermissionCheckResponse.FromError("You do not have permission to use that command!");
 
@@ -108,7 +118,7 @@ namespace TitanBot.Commands
             }).ToArray();
         }
 
-        public CallInfo[] CheckBlacklist(ICommandContext context, CallInfo[] calls, IEnumerable<CallPermission> permissions)
+        public CallInfo[] CheckBlacklist(ICommandContext context, CallInfo[] calls)
         {
             var guildUser = context.Author as IGuildUser;
 
@@ -120,7 +130,7 @@ namespace TitanBot.Commands
                     return new CallInfo[0];
 
             return calls.Where(c => {
-                var permission = permissions.FirstOrDefault(p => p.CallName.ToLower() == c.PermissionKey.ToLower());
+                var permission = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == c.PermissionKey.ToLower());
                 if (permission == null)
                     return true;
                 if (permission.Blacklisted != null)
@@ -129,17 +139,53 @@ namespace TitanBot.Commands
             }).ToArray();
         }
 
-        public CallInfo[] CheckPermissions(ICommandContext context, CallInfo[] calls, IEnumerable<CallPermission> permissions)
+        public CallInfo[] CheckPermissions(ICommandContext context, CallInfo[] calls)
         {
             var guildUser = context.Author as IGuildUser;
 
             return calls.Where(c =>
             {
-                var permission = permissions.FirstOrDefault(p => p.CallName.ToLower() == c.PermissionKey.ToLower());
+                var permission = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == c.PermissionKey.ToLower());
                 if (permission == null || (permission.Roles == null || permission.Roles.Count() == 0))
                     return guildUser.HasAll(permission?.Permission ?? c.DefaultPermissions);
                 return permission.Roles != null && guildUser.RoleIds.Any(r => permission.Roles.Contains(r));
             }).ToArray();
+        }
+
+        public async void SetPermissions(ICommandContext context, CallInfo[] calls, ulong? permission, ulong[] roles, ulong[] blacklist)
+        {
+            foreach (var call in calls)
+            {
+                var current = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == call.PermissionKey.ToLower() && p.GuildId == context.Guild.Id);
+                if (current == null)
+                {
+                    current = new CallPermission
+                    {
+                        CallName = call.PermissionKey,
+                        GuildId = context.Guild.Id,
+                    };
+                    CachedPermissions.Add(current);
+                }
+                if (permission != null)
+                    current.Permission = permission;
+                if (roles != null)
+                    current.Roles = roles;
+                if (blacklist != null)
+                    current.Blacklisted = blacklist;
+                await Database.Upsert(current);
+            }
+        }
+
+        public async void ResetPermissions(ICommandContext context, CallInfo[] calls)
+        {
+            foreach (var call in calls)
+            {
+                var current = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == call.PermissionKey.ToLower() && p.GuildId == context.Guild.Id);
+                if (current == null)
+                    continue;
+                CachedPermissions.Remove(current);
+                await Database.Delete(current);
+            }
         }
     }
 }

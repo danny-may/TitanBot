@@ -9,14 +9,14 @@ using TitanBot.Util;
 namespace TitanBot.Commands.DefautlCommands.General
 {
     [Description("Displays help for any command")]
-    class HelpCommand : Command
+    public class HelpCommand : Command
     {
-        private IPermissionChecker PermChecker { get; }
+        private IPermissionManager PermissionManager { get; }
         private ICommandContext Context { get; }
 
-        public HelpCommand(IPermissionChecker checker, ICommandContext context)
+        public HelpCommand(IPermissionManager checker, ICommandContext context)
         {
-            PermChecker = checker;
+            PermissionManager = checker;
             Context = context;
         }
 
@@ -35,7 +35,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             => CommandService.CommandList.Where(c => FindPermitted(c).IsSuccess).ToArray();
 
         PermissionCheckResponse FindPermitted(CommandInfo command)
-            => PermChecker.CheckAllowed(Context, command.Calls.ToArray());
+            => PermissionManager.CheckAllowed(Context, command.Calls.ToArray());
 
         async Task AllHelpAsync()
         {
@@ -68,7 +68,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         async Task HelpCommandAsync(string name)
         {
             var cmd = CommandService.Search(name, out int commandLength);
-            if (cmd == null)
+            if (cmd == null || cmd.Value.Hidden)
             {
                 await ReplyAsync($"`{name}` is not a recognised command. Use `{Context.Prefix}help` for a list of all available commands", ReplyType.Error);
                 return;
@@ -77,7 +77,7 @@ namespace TitanBot.Commands.DefautlCommands.General
 
             name = name.Substring(0, commandLength).Trim();
 
-            var permCheckResponse = PermChecker.CheckAllowed(Context, command.Calls.ToArray());
+            var permCheckResponse = PermissionManager.CheckAllowed(Context, command.Calls.ToArray());
             if (!permCheckResponse.IsSuccess)
             {
                 if (permCheckResponse.ErrorMessage != null)

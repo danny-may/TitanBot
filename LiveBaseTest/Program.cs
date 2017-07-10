@@ -9,6 +9,7 @@ namespace LiveBaseTest
         static void Main(string[] args)
         {
             var bot = new BotClient(m => m.Map<ILogger, ConsoleLogger>());
+            bot.CommandService.Install(bot.DefaultCommands);
 
             bot.StartAsync(c =>
             {

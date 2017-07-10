@@ -16,5 +16,6 @@ namespace TitanBot.Settings
         IEditableSettingBuilder<T> RegisterGlobal<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver);
         IReadOnlyList<IEditableSettingGroup> EditableSettingGroups { get; }
         IReadOnlyList<IEditableSettingGroup> EditableGlobalSettingsGroups { get; }
+        void ResetSettings(ulong id);
     }
 }
