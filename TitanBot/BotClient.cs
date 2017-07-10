@@ -19,6 +19,7 @@ using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.TypeReaders;
 using TitanBot.Util;
+using TitanBot.TextResource;
 
 namespace TitanBot
 {
@@ -32,6 +33,7 @@ namespace TitanBot
         public ICommandService CommandService { get; private set; }
         public ITypeReaderCollection TypeReaders { get; private set; }
         public ISettingsManager SettingsManager { get; private set; }
+        public ITextResourceManager TextResourceManager { get; private set; }
         public GlobalSetting GlobalSettings => SettingsManager.GlobalSettings;
         public IReadOnlyList<ulong> Owners => GlobalSettings.Owners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
                                                                    .ToList().AsReadOnly();
@@ -61,6 +63,7 @@ namespace TitanBot
             Scheduler = DependencyFactory.GetOrStore<IScheduler>();
             CommandService = DependencyFactory.GetOrStore<ICommandService>();
             DependencyFactory.GetOrStore<IDownloader>();
+            TextResourceManager = DependencyFactory.GetOrStore<ITextResourceManager>();
 
             SubscribeEvents();
 
@@ -82,6 +85,7 @@ namespace TitanBot
             DependencyFactory.TryMap<IDownloader, CachedDownloader>();
             DependencyFactory.TryMap<IEditableSettingGroup, EditableSettingGroup>();
             DependencyFactory.TryMap(typeof(IEditableSettingBuilder<>), typeof(EditableSettingBuilder<>));
+            DependencyFactory.TryMap<ITextResourceManager, TextResourceManager>();
         }
 
         public void InstallHandlers(Assembly assembly)

@@ -10,8 +10,8 @@ namespace TitanBot.Commands.DefautlCommands.General
         [Usage("Replies with a pong and what the current delay is.")]
         async Task SendPongAsync()
         {
-            var msg = await ReplyAsync($"| ~{Client.Latency} ms", ReplyType.Success);
-            await msg.ModifySafeAsync(m => m.Content = DiscordUtil.FormatMessage($"| {(msg.Timestamp - Message.Timestamp).TotalMilliseconds} ms", (int)ReplyType.Success));
+            var msg = await ReplyAsync(TextResource.Format("PING_INITIAL", Client.Latency), ReplyType.Success);
+            await msg.ModifySafeAsync(m => m.Content = DiscordUtil.FormatMessage(TextResource.Format("PING_VERIFY", (msg.Timestamp - Message.Timestamp).TotalMilliseconds), (int)ReplyType.Success));
         }
     }
 }

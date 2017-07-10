@@ -13,6 +13,7 @@ using TitanBot.Logging;
 using TitanBot.Settings;
 using TitanBot.TypeReaders;
 using TitanBot.Util;
+using TitanBot.TextResource;
 
 namespace TitanBot.Commands
 {

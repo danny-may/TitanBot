@@ -11,6 +11,7 @@ using TitanBot.Formatter;
 using TitanBot.Logging;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
+using TitanBot.TextResource;
 
 namespace TitanBot.Commands
 {
@@ -46,6 +47,7 @@ namespace TitanBot.Commands
         protected IReplier Replier { get; private set; }
         protected IDownloader Downloader { get; private set; }
         protected OutputFormatter Formatter { get; private set; }
+        protected ITextResourceCollection TextResource { get; private set; }
         protected string[] AcceptedPrefixes => new string[] { BotUser.Mention, BotUser.Username, SettingsManager.GlobalSettings.DefaultPrefix, GuildData?.Prefix }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
         protected object GlobalCommandLock => CommandLocks.GetOrAdd(GetType(), new object());
         protected object GuildCommandLock => GuildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
@@ -73,12 +75,14 @@ namespace TitanBot.Commands
             Replier = factory.WithInstance(this).Construct<IReplier>();
             SettingsManager = factory.Get<ISettingsManager>();
             Downloader = factory.Get<IDownloader>();
+            if (Guild != null)
+                GuildData = SettingsManager.GetGroup<GeneralSettings>(Guild.Id);
             var userData = Database.AddOrGet(context.Author.Id, () => new UserSetting()).Result;
             Formatter = factory.WithInstance(userData.AltFormat)
                                .WithInstance(context)
                                .Construct<OutputFormatter>();
-            if (Guild != null)
-                GuildData = SettingsManager.GetGroup<GeneralSettings>(Guild.Id);
+            TextResource = factory.GetOrStore<ITextResourceManager>()
+                                  .GetForLanguage(Guild == null ? userData.Language : GuildData.PreferredLanguage);
             Prefix = context.Prefix;
             CommandName = context.CommandText;
             StartReplyCountdown();

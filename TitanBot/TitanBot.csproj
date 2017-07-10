@@ -260,6 +260,11 @@
     <Compile Include="Settings\Interfaces\ISettingsManager.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
+    <Compile Include="TextResource\Interfaces\ITextResourceCollection.cs" />
+    <Compile Include="TextResource\Interfaces\ITextResourceManager.cs" />
+    <Compile Include="TextResource\Language.cs" />
+    <Compile Include="TextResource\TextResourceCollection.cs" />
+    <Compile Include="TextResource\TextResourceManager.cs" />
     <Compile Include="TypeReaders\ITypeReaderCollection.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ChannelTypeReader.cs" />
