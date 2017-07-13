@@ -222,6 +222,7 @@
     <Compile Include="Commands\Responses\PermissionCheckResponse.cs" />
     <Compile Include="Commands\Responses\ArgumentCheckResponse.cs" />
     <Compile Include="Commands\Models\CallPermission.cs" />
+    <Compile Include="Models\Range.cs" />
     <Compile Include="Storage\Tables\UserSetting.cs" />
     <Compile Include="Storage\Database.cs" />
     <Compile Include="Storage\DbTable.cs" />
