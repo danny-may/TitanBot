@@ -5,6 +5,8 @@ using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.Settings;
 using TitanBot.Util;
+using TitanBot.TextResource;
+using System.Collections.Generic;
 
 namespace TitanBot.Commands
 {

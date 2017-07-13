@@ -34,6 +34,11 @@ namespace TitanBot.Settings
             get => Record.Owners;
             set => ModifySafe(s => s.Owners = value);
         }
+        public ulong PreferredPermission
+        {
+            get => Record.PreferredPermission;
+            set => ModifySafe(s => s.PreferredPermission = value);
+        }
 
         public T GetCustom<T>()
         {
@@ -66,6 +71,7 @@ namespace TitanBot.Settings
             public string DefaultPrefix { get; set; } = "t$";
             public string Token { get; set; }
             public ulong[] Owners { get; set; } = new ulong[0];
+            public ulong PreferredPermission { get; set; } = 8;
             public Dictionary<string, string> Additional { get; set; } = new Dictionary<string, string>();
         }
     }

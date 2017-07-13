@@ -2,14 +2,14 @@
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
-    [Description("Provides a link to invite me to any guild")]
+    [Description("INVITE_HELP_DESCRIPTION")]
     public class InviteCommand : Command
     {
         [Call]
-        [Usage("Shows the invite link")]
+        [Usage("INVITE_HELP_USAGE")]
         async Task GetInviteAsync()
         {
-            await ReplyAsync($"Want to invite me to your guild? Click this link!\n<https://discordapp.com/oauth2/authorize?client_id={BotUser.Id}&scope=bot&permissions=8>", ReplyType.Success);
+            await ReplyAsync(TextResource.Format("INVITE_MESSAGE", ReplyType.Info, BotUser.Id, GlobalSettings.PreferredPermission));
         }
     }
 }

@@ -8,7 +8,7 @@ using TitanBot.Util;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
-    [Description("Displays help for any command")]
+    [Description("HELP_HELP_DESCRIPTION")]
     public class HelpCommand : Command
     {
         private IPermissionManager PermissionManager { get; }
@@ -21,7 +21,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         }
 
         [Call]
-        [Usage("Displays a list of all commands, or help for a single command")]
+        [Usage("HELP_HELP_USAGE")]
         async Task HelpAsync(string command = null)
         {
             if (command == null)
@@ -42,15 +42,13 @@ namespace TitanBot.Commands.DefautlCommands.General
             var builder = new EmbedBuilder()
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = $":information_source: These are the commands you can use",
-                Description = $"To use a command, type `<prefix><command>`\n  e.g. `{Prefix}help`\n"+
-                              $"To pass arguments, add a list of values after the command separated by space\n  e.g. `{Prefix}artifacts bos 200 500`\n" +
-                              $"You can use any of these prefixes: \"{string.Join("\", \"", AcceptedPrefixes)}\"",
+                Title = TextResource.GetResource("HELP_LIST_TITLE", ReplyType.Info),
+                Description = TextResource.Format("HELP_LIST_DESCRIPTION", Prefix, string.Join("\", \"", AcceptedPrefixes)),
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
                     IconUrl = BotUser.GetAvatarUrl(),
-                    Text = $"{BotUser.Username} | Help"
+                    Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Help")
                 }
             };
 
@@ -70,7 +68,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             var cmd = CommandService.Search(name, out int commandLength);
             if (cmd == null || cmd.Value.Hidden)
             {
-                await ReplyAsync($"`{name}` is not a recognised command. Use `{Context.Prefix}help` for a list of all available commands", ReplyType.Error);
+                await ReplyAsync(TextResource.Format("HELP_SINGLE_UNRECOGNISED", ReplyType.Error, name, Prefix));
                 return;
             }
             var command = cmd.Value;
@@ -94,18 +92,18 @@ namespace TitanBot.Commands.DefautlCommands.General
                 var nme = name;
                 var parm = " " + call.SubCall + " " + string.Join(" ", call.GetParameters());
                 var flgs = " " + call.GetFlags();
-                usages.Add($"`{pfx + nme + parm.TrimEnd() + flgs.TrimEnd()}` - {call.Usage}");
+                usages.Add($"`{pfx + nme + parm.TrimEnd() + flgs.TrimEnd()}` - {TextResource.GetResource(call.Usage)}");
             }
             var usage = string.Join("\n", usages);
             if (string.IsNullOrWhiteSpace(usage))
-                usage = "No usage available!";
+                usage = TextResource.GetResource("HELP_SINGLE_NOUSAGE");
             else
-                usage += "\n\n_`<param>` = required\n`[param]` = optional\n`<param...>` = accepts multiple (comma separated)_";
+                usage += TextResource.GetResource("HELP_SINGLE_USAGE_FOOTER");
             
             var aliases = command.Alias.Length == 0 ? "" : string.Join(", ", command.Alias.ToList());
             
-            var group = command.Group ?? "No categories!";
-            
+            var group = command.Group ?? TextResource.GetResource("HELP_SINGLE_NOGROUP");
+
             var flags = string.Join("\n", permitted.SelectMany(c => c.Flags)
                                                    .GroupBy(f => f.ShortKey)
                                                    .Select(g => g.First()));
@@ -115,24 +113,24 @@ namespace TitanBot.Commands.DefautlCommands.General
             var builder = new EmbedBuilder
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = DiscordUtil.FormatMessage($"Help for {command.Name}", 2),
-                Description = command.Description ?? "No description",
+                Title = TextResource.Format("HELP_SINGLE_TITLE", ReplyType.Info, command.Name),
+                Description = TextResource.GetResource(command.Description ?? "HELP_SINGLE_NODESCRIPTION"),
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
                     IconUrl = BotUser.GetAvatarUrl(),
-                    Text = $"{BotUser.Username} | Help"
+                    Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Help")
                 }
             };
             
-            builder.AddInlineField("Group", group);
+            builder.AddInlineField(TextResource.GetResource("GROUP"), group);
             if (!string.IsNullOrWhiteSpace(aliases))
-                builder.AddInlineField("Aliases", Format.Sanitize(aliases));
-            builder.AddField("Usage", usage);
+                builder.AddInlineField(TextResource.GetResource("ALIASES"), Format.Sanitize(aliases));
+            builder.AddField(TextResource.GetResource("USAGE"), usage);
             if (!string.IsNullOrWhiteSpace(flags))
-                builder.AddField("Flags", flags);
+                builder.AddField(TextResource.GetResource("FLAGS"), flags);
             if (!string.IsNullOrWhiteSpace(notes))
-                builder.AddField("Notes", notes);
+                builder.AddField(TextResource.GetResource("NOTES"), notes);
             
             await ReplyAsync("", embed: builder.Build());
         }

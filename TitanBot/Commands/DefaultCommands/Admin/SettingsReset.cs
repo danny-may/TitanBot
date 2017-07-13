@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace TitanBot.Commands.DefaultCommands.Admin
 {
-    [Description("Resets all settings and command permissions for a guild.")]
+    [Description("SETTINGSRESET_HELP_DESCRIPTION")]
     public class SettingsReset : Command
     {
         IPermissionManager PermissionManager { get; }
@@ -18,14 +18,14 @@ namespace TitanBot.Commands.DefaultCommands.Admin
         [DefaultPermission(8)]
         [Call]
         [RequireContext(ContextType.Guild)]
-        [Usage("Resets settings for this guild")]
+        [Usage("SETTINGSRESET_HELP_USAGE_THISGUILD")]
         async Task ResetGuild()
         {
             await ResetGuild(Guild.Id);
         }
 
         [Call]
-        [Usage("Resets the given guild")]
+        [Usage("SETTINGSRESET_HELP_USAGE_GIVENGUILD")]
         [RequireOwner]
         async Task ResetGuild(ulong guildId)
         {
@@ -34,9 +34,9 @@ namespace TitanBot.Commands.DefaultCommands.Admin
             SettingsManager.ResetSettings(Context.Guild.Id);
             var guild = Client.GetGuild(guildId);
             if (guild == null)
-                await ReplyAsync("That guild does not exist.", ReplyType.Error);
+                await ReplyAsync(TextResource.GetResource("SETTINGRESET_GUILD_NOTEXIST", ReplyType.Error));
             else
-                await ReplyAsync($"All settings deleted for {guild.Name}({guildId})", ReplyType.Success);
+                await ReplyAsync(TextResource.Format("SETTINGRESET_SUCCESS", ReplyType.Success, guild.Name, guild.Id));
         }
     }
 }

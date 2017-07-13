@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using TitanBot.Dependencies;
 using TitanBot.Settings;
+using TitanBot.TextResource;
 
 namespace TitanBot.Commands
 {

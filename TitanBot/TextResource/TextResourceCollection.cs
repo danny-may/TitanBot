@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TitanBot.Commands;
 
 namespace TitanBot.TextResource 
 {
@@ -29,5 +30,26 @@ namespace TitanBot.TextResource
 
         public string Format(string key, params object[] items)
             => string.Format(GetResource(key), items);
+
+        public string Format(string key, ReplyType replyType, params object[] items)
+            => GetReplyType(replyType) + Format(key, items);
+
+        public string GetResource(string key, ReplyType replyType)
+            => GetReplyType(replyType) + GetResource(key);
+
+        public string GetReplyType(ReplyType replyType)
+        {
+            switch (replyType)
+            {
+                case ReplyType.Success:
+                    return GetResource("REPLYTYPE_SUCCESS");
+                case ReplyType.Error:
+                    return GetResource("REPLYTYPE_ERROR");
+                case ReplyType.Info:
+                    return GetResource("REPLYTYPE_INFO");
+                default:
+                    return "";
+            }
+        }
     }
 }

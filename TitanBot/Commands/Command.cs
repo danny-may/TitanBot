@@ -72,7 +72,7 @@ namespace TitanBot.Commands
             Bot = factory.Get<BotClient>();
             CommandService = factory.Get<ICommandService>();
             Scheduler = factory.Get<IScheduler>();
-            Replier = factory.WithInstance(this).Construct<IReplier>();
+            Replier = factory.GetOrStore<IReplier>();
             SettingsManager = factory.Get<ISettingsManager>();
             Downloader = factory.Get<IDownloader>();
             if (Guild != null)

@@ -20,26 +20,6 @@ namespace TitanBot.Util
         public static Color ToDiscord(this System.Drawing.Color color)
             => new Color(color.R, color.G, color.B);
 
-        public static string FormatMessage(string message, int replyType)
-        {
-            switch (replyType)
-            {
-                case 0:
-                    message = ":white_check_mark: **Got it!** " + message;
-                    break;
-                case 1:
-                    message = ":no_entry_sign: **Oops!** " + message;
-                    break;
-                case 2:
-                    message = ":information_source: " + message;
-                    break;
-                default:
-                    break;
-            }
-
-            return message;
-        }
-
         public static IEnumerable<IChannel> AllChannels(this DiscordSocketClient client)
         {
             return client.Guilds.SelectMany(g => g.Channels).Cast<IChannel>()
@@ -73,7 +53,7 @@ namespace TitanBot.Util
                                 sw.Write(serialised);
                             sw.Flush();
                             ms.Position = 0;
-                            return await channel.SendFileAsync(ms, "Output.txt", FormatMessage("I tried to send a message that was too long!", 1), isTTS, options);
+                            return await channel.SendFileAsync(ms, "Output.txt", "I tried to send a message that was too long!", isTTS, options);
                         }
                     }
                 }

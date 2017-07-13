@@ -34,16 +34,17 @@ namespace TitanBot.Settings
             GlobalSettings = new GlobalSetting(this, database);
 
             Register<GeneralSettings>().WithName("General")
-                                       .WithDescription("General settings for the bot")
+                                       .WithDescription("SETTINGS_GENERAL_DESCRIPTION")
                                        .AddSetting(s => s.Prefix)
                                        .AddSetting(s => s.PermOverride)
                                        .AddSetting(s => s.RoleOverride, (IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: r => string.Join(", ", r?.Select(id => $"<@&{id}>")))
                                        .AddSetting(s => s.DateTimeFormat)
-                                       .WithNotes("For DateTimeFormat, you can use [this link](https://www.codeproject.com/Articles/19677/Formats-for-DateTime-ToString) to help determine what is and is not valid!")
+                                       .AddSetting(s => s.PreferredLanguage)
+                                       .WithNotes("SETTINGS_GENERAL_NOTES")
                                        .Finalise();
 
             RegisterGlobal((m, id) => m.GlobalSettings, (m, id, o) => { }).WithName("General")
-                                                                          .WithDescription("General global settings")
+                                                                          .WithDescription("SETTINGS_GLOBAL_GENERAL_DESCRIPTION")
                                                                           .AddSetting(s => s.DefaultPrefix)
                                                                           .AddSetting(s => s.Owners, (IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: u => string.Join(", ", u.Select(p => $"<@{p}>")))
                                                                           .Finalise();

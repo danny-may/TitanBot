@@ -188,6 +188,7 @@
     <Compile Include="Commands\CommandContext.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\SettingsCommand.cs" />
+    <Compile Include="Commands\CommandExecutor.cs" />
     <Compile Include="Commands\DefaultCommands\General\AboutCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\Donate.cs" />
     <Compile Include="Commands\DefaultCommands\General\HelpCommand.cs" />
