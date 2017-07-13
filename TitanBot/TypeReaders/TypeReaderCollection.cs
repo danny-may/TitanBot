@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot.Commands;
+using TitanBot.Models;
 
 namespace TitanBot.TypeReaders
 {
@@ -86,6 +87,13 @@ namespace TitanBot.TypeReaders
                     AddTypeReader(type, reader);
             }
 
+            if (IsSubclassOfRawGeneric(typeof(Range<>), typeInfo))
+            {
+                var rangeReaders = RangeTypeReader.GetReaders(type, GetTypeReaders);
+                foreach (var reader in rangeReaders)
+                    AddTypeReader(type, reader);
+            }
+
             //Is this an entity?
             for (int i = 0; i < EntityReaders.Count; i++)
             {
@@ -128,5 +136,19 @@ namespace TitanBot.TypeReaders
 
         public ITypeReaderCollection NewCache()
             => new TypeReaderCollection(this);
+
+        static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
+        {
+            while (toCheck != null && toCheck != typeof(object))
+            {
+                var cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                if (generic == cur)
+                {
+                    return true;
+                }
+                toCheck = toCheck.BaseType;
+            }
+            return false;
+        }
     }
 }

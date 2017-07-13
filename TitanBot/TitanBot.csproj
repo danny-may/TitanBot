@@ -275,6 +275,7 @@
     <Compile Include="TypeReaders\Readers\MessageTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PermissionTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PrimitiveReader.cs" />
+    <Compile Include="TypeReaders\Readers\RangeTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\RoleTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\TimeSpanTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\UserTypeReader.cs" />
