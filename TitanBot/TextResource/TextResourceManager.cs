@@ -108,6 +108,8 @@ namespace TitanBot.TextResource
             AddResource("SHUTDOWN_HELP_USAGE", "Shuts me down now, or in the time provided");
             AddResource("SUDOCOMMAND_HELP_DESCRIPTION", "Executes any command on behalf of another user. Requires a prefix in the message");
             AddResource("SUDOCOMMAND_HELP_USAGE", "Will execute any command as the given user");
+            AddResource("RELOAD_HELP_DESCRIPTION", "Reloads the various configurations for titanbot");
+            AddResource("RELOAD_HELP_USAGE", "Performs the reload");
 
             //Settings stuff
 
@@ -186,6 +188,7 @@ namespace TitanBot.TextResource
             AddResource("EXEC_TITLE_SUCCESS", ":white_check_mark: Execution Result");
             AddResource("SHUTDOWN_INTIME", "Shutting down in {0}");
             AddResource("SUDOCOMMAND_SUCCESS", "Executing `{0}` as {1}");
+            AddResource("RELOAD_COMPLETE", "Reload complete");
 
             //General stuff
 

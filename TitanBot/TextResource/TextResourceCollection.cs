@@ -22,6 +22,8 @@ namespace TitanBot.TextResource
 
         public string GetResource(string key)
         {
+            if (key == null)
+                return null;
             if (!Values.ContainsKey(key))
                 return key;
             var val = Values[key];

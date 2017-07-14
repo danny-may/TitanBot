@@ -108,7 +108,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                                                    .GroupBy(f => f.ShortKey)
                                                    .Select(g => g.First()));
             
-            var notes = command.Note;
+            var notes = TextResource.GetResource(command.Note);
             
             var builder = new EmbedBuilder
             {
