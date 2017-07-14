@@ -104,6 +104,10 @@ namespace TitanBot.TextResource
             AddResource("GLOBALSETTINGS_HELP_DESCRIPTION", "Allows the retrieval and changing of existing settings for the server");
             AddResource("GLOBALSETTINGS_HELP_USAGE_DEFAULT", "Lists all settings available");
             AddResource("GLOBALSETTINGS_HELP_USAGE_SET", "Sets the given setting to the given value.");
+            AddResource("SHUTDOWN_HELP_DESCRIPTION", "Shuts me down");
+            AddResource("SHUTDOWN_HELP_USAGE", "Shuts me down now, or in the time provided");
+            AddResource("SUDOCOMMAND_HELP_DESCRIPTION", "Executes any command on behalf of another user. Requires a prefix in the message");
+            AddResource("SUDOCOMMAND_HELP_USAGE", "Will execute any command as the given user");
 
             //Settings stuff
 
@@ -180,6 +184,8 @@ namespace TitanBot.TextResource
             AddResource("EXEC_OUTPUT_FORMAT", "Type: {0}\n```csharp\n{1)}\n```");
             AddResource("EXEC_TITLE_EXCEPTION", ":no_entry_sign: Execution Result");
             AddResource("EXEC_TITLE_SUCCESS", ":white_check_mark: Execution Result");
+            AddResource("SHUTDOWN_INTIME", "Shutting down in {0}");
+            AddResource("SUDOCOMMAND_SUCCESS", "Executing `{0}` as {1}");
 
             //General stuff
 
