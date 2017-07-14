@@ -10,14 +10,16 @@ namespace TitanBot.Formatting
     class TextResourceCollection : ITextResourceCollection
     {
         private Dictionary<string, (string defaultText, string langText)> Values { get; }
+        private ValueFormatter Formatter { get; }
         public double Coverage { get; }
 
         public string this[string key] => GetResource(key);
 
-        public TextResourceCollection(double coverage, Dictionary<string, (string defaultText, string langText)> values)
+        public TextResourceCollection(double coverage, ValueFormatter valueFormatter, Dictionary<string, (string defaultText, string langText)> values)
         {
             Coverage = coverage;
             Values = values;
+            Formatter = valueFormatter;
         }
 
         public string GetResource(string key)
@@ -33,7 +35,7 @@ namespace TitanBot.Formatting
         }
 
         public string Format(string key, params object[] items)
-            => string.Format(GetResource(key), items);
+            => string.Format(GetResource(key), items.Select(i => Formatter.Beautify(i)).ToArray());
 
         public string Format(string key, ReplyType replyType, params object[] items)
             => GetReplyType(replyType) + Format(key, items);

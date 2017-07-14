@@ -70,10 +70,10 @@ namespace TitanBot.Commands
             => InlineAction(() => Message = TextResource.GetResource(message, replyType));
 
         public IReplyContext WithMessage(string message, params object[] values)
-            => InlineAction(() => Message = TextResource.Format(message, values.Select(v => Formatter.Beautify(v)).ToArray()));
+            => InlineAction(() => Message = TextResource.Format(message, values));
 
         public IReplyContext WithMessage(string message, ReplyType replyType, params object[] values)
-            => InlineAction(() => Message = TextResource.Format(message, replyType, values.Select(v => Formatter.Beautify(v)).ToArray()));
+            => InlineAction(() => Message = TextResource.Format(message, replyType, values));
 
         public IReplyContext WithRequestOptions(RequestOptions options)
             => InlineAction(() => Options = options);

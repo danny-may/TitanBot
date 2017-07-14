@@ -45,9 +45,9 @@ namespace TitanBot.Formatting
             TextMap = TextMap.ToDictionary(v => v.Key.ToUpper().Replace(' ', '_'), v => v.Value);
         }
 
-        public ITextResourceCollection GetForLanguage(Locale language)
+        public ITextResourceCollection GetForLanguage(Locale language, ValueFormatter valueFormatter)
         {
-            return new TextResourceCollection( GetLanguageCoverage(language),
+            return new TextResourceCollection( GetLanguageCoverage(language), valueFormatter,
                 TextMap.SelectMany(k => k.Value.Select(v => (key: k.Key, language: v.Key, text: v.Value)))
                        .Where(v => v.language == language || v.language == Locale.DEFAULT)
                        .GroupBy(v => v.key)

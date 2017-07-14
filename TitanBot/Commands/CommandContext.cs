@@ -41,11 +41,11 @@ namespace TitanBot.Commands
             var userdata = database.AddOrGet(Author.Id, () => new UserSetting()).Result;
             if (Guild != null)
                 GuildData = DependencyFactory.Get<ISettingsManager>().GetGroup<GeneralSettings>(Guild.Id);
-            TextResource = DependencyFactory.Get<ITextResourceManager>()
-                                            .GetForLanguage(GuildData?.PreferredLanguage ?? userdata.Language);
             Formatter = DependencyFactory.WithInstance(userdata.AltFormat)
                                          .WithInstance(this)
                                          .Construct<ValueFormatter>();
+            TextResource = DependencyFactory.Get<ITextResourceManager>()
+                                            .GetForLanguage(GuildData?.PreferredLanguage ?? userdata.Language, Formatter);
             Replier = DependencyFactory.WithInstance(TextResource)
                                        .WithInstance(Formatter)
                                        .Construct<IReplier>();

@@ -27,6 +27,8 @@ namespace TitanBot.Formatting
 
         public string Beautify<T>(T value)
         {
+            if (typeof(T) == typeof(string))
+                return value as string;
             if (KnownTypes.Contains(typeof(T)))
                 return GetBeautify<T>()(value);
             else
