@@ -9,6 +9,6 @@ namespace TitanBot.Settings
         public ulong[] RoleOverride { get; set; } = new ulong[0];
         public ulong[] BlackListed { get; set; } = new ulong[0];
         public string DateTimeFormat { get; set; } = "hh:mm:ss";
-        public Language PreferredLanguage { get; set; } = Language.EN;
+        public Locale PreferredLanguage { get; set; } = Locale.DEFAULT;
     }
 }

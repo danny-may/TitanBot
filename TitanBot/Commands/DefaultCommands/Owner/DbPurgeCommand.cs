@@ -2,17 +2,17 @@
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description("Wipes any database table clean")]
+    [Description("DBPURGE_HELP_DESCRIPTION")]
     [RequireOwner]
     public class DbPurgeCommand : Command
     {
         [Call]
-        [Usage("Wipes the given table.")]
+        [Usage("DBPURGE_HELP_USAGE")]
         async Task DropAsync(string table)
         {
             await Database.Drop(table);
 
-            await ReplyAsync($"Attempted to drop all data from the `{table}` table", ReplyType.Success);
+            await ReplyAsync(TextResource.Format("DBPURGE_SUCCESS", ReplyType.Success, table));
         }
     }
 }

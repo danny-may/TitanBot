@@ -2,10 +2,10 @@
 {
     public interface ITextResourceManager
     {
-        void AddResource(string key, Language language, string text);
-        ITextResourceCollection GetForLanguage(Language language);
-        double GetLanguageCoverage(Language language);
-        Language[] SupportedLanguages { get; }
+        void AddResource(string key, Locale language, string text);
+        ITextResourceCollection GetForLanguage(Locale language);
+        double GetLanguageCoverage(Locale language);
+        Locale[] SupportedLanguages { get; }
         void Refresh();
     }
 }

@@ -20,10 +20,10 @@ using TitanBot.Util;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description("Allows for arbitrary code execution")]
+    [Description("EXEC_HELP_DESCRIPTION")]
     [Alias("Eval", "Run")]
     [RequireOwner]
-    [Notes("https://github.com/Titansmasher/TitanBot/blob/rewrite/TitanBotBase/Commands/DefaultCommands/Owner/ExecCommand.cs#L111")]
+    [Notes("EXEC_HELP_NOTES")]
     public class ExecCommand : Command
     {
         protected override int DelayMessageMs => 10000;
@@ -104,7 +104,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         }
 
         [Call]
-        [Usage("Executes arbitrary code")]
+        [Usage("EXEC_HELP_USAGE")]
         protected virtual async Task ExecAsync([Dense, RawArguments]string code)
         {
             var assemblies = GetAssemblies();
@@ -119,20 +119,20 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             if (!TryConstruct(codeWithUsings, assemblies.ToArray(), globals.GetType(), out var constructTime, out var constructRes))
             {
                 result = constructRes;
-                footerText = "Failed to construct";
+                footerText = TextResource.Format("EXEC_FOOTER_CONSTRUCTFAILED", constructTime);
             }
             else if (!TryCompile(constructRes as Script<object>, out var compileTime, out var compileRes))
             {
                 result = compileRes;
-                footerText = "Failed to compile";
+                footerText = TextResource.Format("EXEC_FOOTER_COMPILEFAILED", constructTime, compileTime);
             }
             else if (!TryExecute(constructRes as Script<object>, globals, out var execTime, out result))
             {
-                footerText = "Failed to execute";
+                footerText = TextResource.Format("EXEC_FOOTER_EXECUTEFAILED", constructTime, compileTime, execTime);
             }
             else
             {
-                footerText = $"Constructed in: {constructTime.TotalMilliseconds}ms | Compiled in: {compileTime.TotalMilliseconds}ms | Executed in: {execTime.TotalMilliseconds}ms";
+                footerText = TextResource.Format("EXEC_FOOTER_SUCCESS", constructTime, compileTime, execTime);
             }
 
             var builder = new EmbedBuilder
@@ -141,11 +141,11 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 {
                     Text = footerText
                 }
-            }.AddField("Input", $"```csharp\n{code}\n```");
+            }.AddField(TextResource.GetResource("INPUT"), TextResource.Format("EXEC_INPUT_FORMAT", code));
 
             if (result is Exception exception)
             {
-                builder.WithTitle($":no_entry_sign: Execution Result");
+                builder.WithTitle(TextResource.GetResource("EXEC_TITLE_EXCEPTION"));
                 builder.WithColor(System.Drawing.Color.Red.ToDiscord());
                 var exceptions = new List<Exception>();
                 if (exception is AggregateException aggex)
@@ -154,15 +154,15 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                     exceptions.Add(exception);
                 foreach (var ex in exceptions)
                 {
-                    builder.AddField("Error", $"Type: {Format.Sanitize(ex.GetType().ToString())}\n```csharp\n{Format.Sanitize(ex.Message)}\n```");
+                    builder.AddField(TextResource.GetResource("ERROR"), TextResource.Format("EXEC_OUTPUT_FORMAT", Format.Sanitize(ex.GetType().ToString()), Format.Sanitize(ex.Message)));
                 }
             }
             else
             {
-                builder.WithTitle($":white_check_mark: Execution Result");
+                builder.WithTitle(TextResource.GetResource("EXEC_TITLE_SUCCESS"));
                 builder.WithColor(System.Drawing.Color.LimeGreen.ToDiscord());
                 if (result == null)
-                    builder.AddField("Output", "No output from execution...");
+                    builder.AddField(TextResource.GetResource("OUTPUT"), TextResource.Format("EXEC_OUTPUT_NULL", null, null));
                 else
                 {
                     var resString = "";
@@ -170,7 +170,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                         resString = "[" + string.Join(", ", (result as IEnumerable<object>) ?? new List<string>()) + "]";
                     else
                         resString = result?.ToString();
-                    builder.AddField("Output", $"Type: {Format.Sanitize(result?.GetType().ToString() ?? "")}\n```csharp\n{Format.Sanitize(resString ?? "")}\n```");
+                    builder.AddField(TextResource.GetResource("OUTPUT"), TextResource.Format("EXEC_OUTPUT_FORMAT", Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
                 }
             }
 

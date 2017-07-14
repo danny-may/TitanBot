@@ -10,16 +10,16 @@ namespace TitanBot.TextResource
 {
     public class TextResourceManager : ITextResourceManager
     {
-        private Dictionary<string, Dictionary<Language, string>> TextMap { get; set; }
+        private Dictionary<string, Dictionary<Locale, string>> TextMap { get; set; }
 
-        public Language[] SupportedLanguages => TextMap.SelectMany(t => t.Value.Keys).Distinct().ToArray();
+        public Locale[] SupportedLanguages => TextMap.SelectMany(t => t.Value.Keys).Distinct().ToArray();
 
         public void AddResource(string key, string text)
-            => AddResource(key, Language.DEFAULT, text);
-        public void AddResource(string key, Language language, string text)
+            => AddResource(key, Locale.DEFAULT, text);
+        public void AddResource(string key, Locale language, string text)
         {
             if (!TextMap.ContainsKey(key))
-                TextMap.Add(key, new Dictionary<Language, string>());
+                TextMap.Add(key, new Dictionary<Locale, string>());
             TextMap[key][language] = text;
         }
 
@@ -42,19 +42,20 @@ namespace TitanBot.TextResource
                 LoadDefaults();
                 File.WriteAllText(file, JsonConvert.SerializeObject(TextMap, Formatting.Indented));
             }
-            TextMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Language, string>>>(File.ReadAllText(file));
+            TextMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Locale, string>>>(File.ReadAllText(file));
         }
 
-        public ITextResourceCollection GetForLanguage(Language language)
+        public ITextResourceCollection GetForLanguage(Locale language)
         {
             return new TextResourceCollection( GetLanguageCoverage(language),
                 TextMap.SelectMany(k => k.Value.Select(v => (key: k.Key, language: v.Key, text: v.Value)))
-                       .Where(v => v.language == language || v.language == Language.DEFAULT)
+                       .Where(v => v.language == language || v.language == Locale.DEFAULT)
                        .GroupBy(v => v.key)
-                       .ToDictionary(v => v.Key, v => (v.FirstOrDefault(l => l.language == Language.DEFAULT).text, v.FirstOrDefault(l => l.language == language).text)));
+                       .ToDictionary(v => v.Key, v => (v.FirstOrDefault(l => l.language == Locale.DEFAULT).text, v.FirstOrDefault(l => l.language == language).text))
+                );
         }
 
-        public double GetLanguageCoverage(Language language)
+        public double GetLanguageCoverage(Locale language)
         {
             var totalString = (double)TextMap.Count;
             var covered = (double)TextMap.Count(v => v.Value.ContainsKey(language));
@@ -63,7 +64,7 @@ namespace TitanBot.TextResource
 
         private void LoadDefaults()
         {
-            TextMap = new Dictionary<string, Dictionary<Language, string>>();
+            TextMap = new Dictionary<string, Dictionary<Locale, string>>();
 
             //Help Stuff
 
@@ -95,6 +96,11 @@ namespace TitanBot.TextResource
             AddResource("PREFIX_HELP_DESCRIPTION", "Gets or sets a custom prefix that is required to use my commands");
             AddResource("PREFIX_HELP_USAGE_SHOW", "Gets all the available current prefixes");
             AddResource("PREFIX_HELP_USAGE_SET", "Sets the custom prefix");
+            AddResource("DBPURGE_HELP_DESCRIPTION", "Wipes any database table clean");
+            AddResource("DBPURGE_HELP_USAGE", "Wipes the given table.");
+            AddResource("EXEC_HELP_DESCRIPTION", "Allows for arbitrary code execution");
+            AddResource("EXEC_HELP_NOTES", "https://github.com/Titansmasher/TitanBot/blob/rewrite/TitanBotBase/Commands/DefaultCommands/Owner/ExecCommand.cs#L111");
+            AddResource("EXEC_HELP_USAGE", "Executes arbitrary code");
 
             //Settings stuff
 
@@ -161,6 +167,16 @@ namespace TitanBot.TextResource
             AddResource("PREFIX_SHOW_NOPREFIX", "You do not require prefixes in this channel");
             AddResource("PREFIX_SHOW_MESSAGE", "Your available prefixes are {0)}");
             AddResource("PREFIX_SET_MESSAGE", "Your guilds prefix has been set to `{0}`");
+            AddResource("DBPURGE_SUCCESS", "Attempted to drop all data from the `{0}` table");
+            AddResource("EXEC_FOOTER_CONSTRUCTFAILED", "Failed to construct. Took {0}ms");
+            AddResource("EXEC_FOOTER_COMPILEFAILED", "Constructed in: {0}ms | Failed to compile. Took {1}ms");
+            AddResource("EXEC_FOOTER_EXECUTEFAILED", "Constructed in: {0}ms | Compiled in: {1}ms | Failed to execute. Took {2}ms");
+            AddResource("EXEC_FOOTER_SUCCESS", "Constructed in: {0}ms | Compiled in: {1}ms | Executed in: {2}ms");
+            AddResource("EXEC_INPUT_FORMAT", "```csharp\n{0}\n```");
+            AddResource("EXEC_OUTPUT_NULL", "No output from execution...");
+            AddResource("EXEC_OUTPUT_FORMAT", "Type: {0}\n```csharp\n{1)}\n```");
+            AddResource("EXEC_TITLE_EXCEPTION", ":no_entry_sign: Execution Result");
+            AddResource("EXEC_TITLE_SUCCESS", ":white_check_mark: Execution Result");
 
             //General stuff
 
@@ -173,6 +189,10 @@ namespace TitanBot.TextResource
             AddResource("ALIASES", "Aliases");
             AddResource("USAGE", "Usage");
             AddResource("FLAGS", "Flags");
+            AddResource("INPUT", "Input");
+            AddResource("ERROR", "Error");
+            AddResource("OUTPUT", "Output");
+
         }
     }
 }
