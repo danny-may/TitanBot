@@ -13,8 +13,12 @@ namespace LiveBaseTest
 
             bot.StartAsync(c =>
             {
-                Console.WriteLine("Please enter a bot token:");
-                return Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(c))
+                {
+                    Console.WriteLine("Please enter a bot token:");
+                    return Console.ReadLine();
+                }
+                return c;
             }).Wait();
             bot.UntilOffline.Wait();
         }

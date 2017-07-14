@@ -39,14 +39,14 @@ namespace TitanBot.Commands
         {
             var permitted = CheckContext(context, calls);
             if (permitted.Count() == 0)
-                return PermissionCheckResponse.FromError("You cannot use that command here!");
+                return PermissionCheckResponse.FromError("PERMISSIONMANAGER_DISALLOWED_NOTHERE");
 
             if (BotClient.Owners.Contains(context.Author.Id))
                 return PermissionCheckResponse.FromSuccess(permitted);
 
             permitted = CheckOwner(context, permitted);
             if (permitted.Count() == 0)
-                return PermissionCheckResponse.FromError("Only owners can use that command!");
+                return PermissionCheckResponse.FromError("PERMISSIONMANAGER_DISALLOWED_NOTOWNER");
 
             if (context.Channel is IDMChannel || context.Channel is IGroupChannel || context.Guild.OwnerId == context.Author.Id)
                 return PermissionCheckResponse.FromSuccess(permitted);
@@ -61,7 +61,7 @@ namespace TitanBot.Commands
 
             permitted = CheckPermissions(context, permitted);
             if (permitted.Count() == 0)
-                return PermissionCheckResponse.FromError("You do not have permission to use that command!");
+                return PermissionCheckResponse.FromError("PERMISSIONMANAGER_DISALLOWED_NOPERMISSION");
 
             return PermissionCheckResponse.FromSuccess(permitted);
 

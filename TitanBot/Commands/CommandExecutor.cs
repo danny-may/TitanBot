@@ -91,7 +91,7 @@ namespace TitanBot.Commands
                     if (!permCheck.IsSuccess)
                     {
                         if (permCheck.ErrorMessage != null)
-                            await Replier.ReplyAsync(Context.Channel, Context.Author, permCheck.ErrorMessage, ReplyType.Error);
+                            await Replier.ReplyAsync(Context.Channel, Context.Author, TextResource.Format(permCheck.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText));
                     }
                     else
                     {

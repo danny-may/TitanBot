@@ -7,6 +7,7 @@ using TitanBot.Settings;
 using TitanBot.Util;
 using TitanBot.TextResource;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TitanBot.Commands
 {
@@ -58,7 +59,10 @@ namespace TitanBot.Commands
 
             var remaining = Message.Content.Substring(prefixLength).TrimStart();
             Command = commandService.Search(remaining, out int commandLength);
-            CommandText = remaining.Substring(0, commandLength).Trim();
+            if (commandLength == 0)
+                CommandText = remaining.Split(' ').First();
+            else
+                CommandText = remaining.Substring(0, commandLength).Trim();
             ArgPos = Message.Content.IndexOf(CommandText) + commandLength;
         }
 

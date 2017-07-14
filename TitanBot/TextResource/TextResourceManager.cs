@@ -119,10 +119,13 @@ namespace TitanBot.TextResource
 
             //Bot stuff
 
-            AddResource("COMMANDEXECUTOR_COMMAND_UNKNOWN", "{0}{1} is not a recognised command! Try using `{0}help` for a complete command list.");
+            AddResource("COMMANDEXECUTOR_COMMAND_UNKNOWN", "`{0}{1}` is not a recognised command! Try using `{0}help` for a complete command list.");
             AddResource("COMMANDEXECUTOR_DISALLOWED_CHANNEL", "You cannot use that command here!");
             AddResource("COMMANDEXECUTOR_SUBCALL_UNKNOW", "That is not a recognised subcommand for `{0}{1}`! Try using `{0}help {1}` for usage info.");
             AddResource("COMMANDEXECUTOR_SUBCALL_UNSPECIFIED", "You have not specified which sub call you would like to use! Try using `{0}help {1}` for usage info.");
+            AddResource("PERMISSIONMANAGER_DISALLOWED_NOTHERE", "You cannot use that command here!");
+            AddResource("PERMISSIONMANAGER_DISALLOWED_NOTOWNER", "Only owners can use that command!");
+            AddResource("PERMISSIONMANAGER_DISALLOWED_NOPERMISSION", "You do not have permission to use that command!");
 
             //Command stuff
 
