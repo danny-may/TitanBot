@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TitanBot.Commands;
-using TitanBot.TypeReaders;
+using TitanBot.Util;
 
-namespace TitanBot.Formatter
+namespace TitanBot.Formatting
 {
-    public class OutputFormatter
+    public class ValueFormatter
     {
         private Dictionary<Type, Delegate> BeautifyDelegates { get; } = new Dictionary<Type, Delegate>();
+        private MethodInfo BeautifyGeneric { get; }
 
         protected IEnumerable<Type> KnownTypes => BeautifyDelegates.Keys;
 
@@ -16,10 +18,11 @@ namespace TitanBot.Formatter
 
         protected ICommandContext Context;
         protected bool AltFormat;
-        public OutputFormatter(ICommandContext context, bool altFormat)
+        public ValueFormatter(ICommandContext context, bool altFormat)
         {
             Context = context;
             AltFormat = altFormat;
+            BeautifyGeneric = MiscUtil.GetMethod<ValueFormatter>(v => v.Beautify<object>(null));
         }
 
         public string Beautify<T>(T value)
@@ -30,10 +33,12 @@ namespace TitanBot.Formatter
                 return value.ToString();
         }
 
+        public string Beautify(object value)
+            => (string)BeautifyGeneric.MakeGenericMethod(value.GetType())
+                                      .Invoke(this, new object[] { value });
+
         protected void Add<T>(BeautifyDelegate<T> beautify)
-        {
-            BeautifyDelegates[typeof(T)] = beautify;
-        }
+            => BeautifyDelegates[typeof(T)] = beautify;
 
         protected BeautifyDelegate<T> GetBeautify<T>()
             => (BeautifyDelegate<T>)BeautifyDelegates[typeof(T)];

@@ -9,7 +9,7 @@ using TitanBot.Dependencies;
 using TitanBot.Logging;
 using TitanBot.Settings;
 using TitanBot.Storage;
-using TitanBot.TextResource;
+using TitanBot.Formatting;
 using TitanBot.TypeReaders;
 using TitanBot.Util;
 
@@ -216,7 +216,7 @@ namespace TitanBot.Commands
                         return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, "COMMANDEXECUTOR_ARGUMENTS_TOOFEW");
                     var readRes = await reader.Read(argPattern[i].Type, Context, (string)argIterator.Current);
                     if (!readRes.IsSuccess)
-                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.ArgumentMismatch, readRes.Message.message, readRes.Message.values);
+                        return ArgumentCheckResponse.FromError(readRes);
                     argResults[i] = readRes.Best;
                 }
             }

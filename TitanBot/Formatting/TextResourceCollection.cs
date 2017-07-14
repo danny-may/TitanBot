@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TitanBot.Commands;
 
-namespace TitanBot.TextResource 
+namespace TitanBot.Formatting 
 {
     class TextResourceCollection : ITextResourceCollection
     {

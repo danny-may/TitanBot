@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Discord;
+using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Discord;
-using TitanBot.TextResource;
-using TitanBot.Formatter;
+using TitanBot.Formatting;
 
 namespace TitanBot.Commands
 {
     class ReplyContext : IReplyContext
     {
         private ITextResourceCollection TextResource { get; }
+        private ValueFormatter Formatter { get; }
         private IUser User { get; }
         private IMessageChannel Channel { get; }
         private string Message { get; set; } = "";
@@ -22,11 +20,12 @@ namespace TitanBot.Commands
 
         public event OnSendEventHandler OnSend;
         
-        public ReplyContext(IMessageChannel channel, IUser user, ITextResourceCollection textResource)
+        public ReplyContext(IMessageChannel channel, IUser user, ITextResourceCollection textResource, ValueFormatter formatter)
         {
             User = user;
             Channel = channel;
             TextResource = textResource;
+            Formatter = formatter;
             OnSend += (s, m) => Task.CompletedTask;
         }
 
@@ -71,10 +70,10 @@ namespace TitanBot.Commands
             => InlineAction(() => Message = TextResource.GetResource(message, replyType));
 
         public IReplyContext WithMessage(string message, params object[] values)
-            => InlineAction(() => Message = TextResource.Format(message, values));
+            => InlineAction(() => Message = TextResource.Format(message, values.Select(v => Formatter.Beautify(v)).ToArray()));
 
         public IReplyContext WithMessage(string message, ReplyType replyType, params object[] values)
-            => InlineAction(() => Message = TextResource.Format(message, replyType, values));
+            => InlineAction(() => Message = TextResource.Format(message, replyType, values.Select(v => Formatter.Beautify(v)).ToArray()));
 
         public IReplyContext WithRequestOptions(RequestOptions options)
             => InlineAction(() => Options = options);

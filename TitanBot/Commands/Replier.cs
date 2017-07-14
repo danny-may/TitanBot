@@ -1,11 +1,6 @@
 ﻿using Discord;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using TitanBot.Formatting;
 using TitanBot.Logging;
-using TitanBot.TextResource;
-using TitanBot.Util;
 
 namespace TitanBot.Commands
 {
@@ -13,14 +8,16 @@ namespace TitanBot.Commands
     {
         private ILogger Logger { get; }
         private ITextResourceCollection TextResource { get; }
+        private ValueFormatter Formatter { get; }
 
-        public Replier(ILogger logger, ITextResourceCollection textResource)
+        public Replier(ILogger logger, ITextResourceCollection textResource, ValueFormatter formatter)
         {
             Logger = logger;
             TextResource = textResource;
+            Formatter = formatter;
         }
 
         public IReplyContext Reply(IMessageChannel channel, IUser user)
-            => new ReplyContext(channel, user, TextResource);
+            => new ReplyContext(channel, user, TextResource, Formatter);
     }
 }

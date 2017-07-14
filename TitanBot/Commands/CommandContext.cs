@@ -1,14 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
-using TitanBot.Storage;
-using TitanBot.Dependencies;
-using TitanBot.Settings;
-using TitanBot.Util;
-using TitanBot.TextResource;
-using System.Collections.Generic;
 using System.Linq;
-using TitanBot.Formatter;
+using TitanBot.Dependencies;
+using TitanBot.Formatting;
+using TitanBot.Settings;
+using TitanBot.Storage;
+using TitanBot.Util;
 
 namespace TitanBot.Commands
 {
@@ -29,7 +27,7 @@ namespace TitanBot.Commands
         public CommandInfo? Command { get; set; }
         public IReplier Replier { get; }
         public ITextResourceCollection TextResource { get; }
-        public OutputFormatter Formatter { get; }
+        public ValueFormatter Formatter { get; }
 
         internal CommandContext(IUserMessage message, IDependencyFactory factory)
         {
@@ -47,7 +45,7 @@ namespace TitanBot.Commands
                                             .GetForLanguage(GuildData?.PreferredLanguage ?? userdata.Language);
             Formatter = DependencyFactory.WithInstance(userdata.AltFormat)
                                          .WithInstance(this)
-                                         .Construct<OutputFormatter>();
+                                         .Construct<ValueFormatter>();
             Replier = DependencyFactory.WithInstance(TextResource)
                                        .WithInstance(Formatter)
                                        .Construct<IReplier>();

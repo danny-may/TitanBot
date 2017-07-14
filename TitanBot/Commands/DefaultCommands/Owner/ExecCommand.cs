@@ -11,7 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot.Downloader;
-using TitanBot.Formatter;
+using TitanBot.Formatting;
 using TitanBot.Logging;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
@@ -195,7 +195,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             public IScheduler Scheduler { get; }
             public IReplier Replier { get; }
             public IDownloader Downloader { get; }
-            public OutputFormatter Formatter { get; }
+            public ValueFormatter Formatter { get; }
 
             public ExecGlobals(ExecCommand parent)
             {

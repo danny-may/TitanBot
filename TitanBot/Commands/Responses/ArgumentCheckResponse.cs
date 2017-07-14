@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using TitanBot.TextResource;
+using TitanBot.Formatting;
+using TitanBot.TypeReaders;
 
 namespace TitanBot.Commands.Responses
 {
@@ -22,8 +23,8 @@ namespace TitanBot.Commands.Responses
 
         public static ArgumentCheckResponse FromSuccess(object[] arguments, object[] flags)
             => new ArgumentCheckResponse(ArgumentCheckResult.Successful, arguments, flags, (null, null));
-        public static ArgumentCheckResponse FromError(ArgumentCheckResult result, string message, Func<ITextResourceCollection, object>[] values)
-            => new ArgumentCheckResponse(result, null, null, (message, values));
+        public static ArgumentCheckResponse FromError(TypeReaderResponse response)
+            => new ArgumentCheckResponse(ArgumentCheckResult.ArgumentMismatch, null, null, response.Message);
         public static ArgumentCheckResponse FromError(ArgumentCheckResult result, string message)
             => new ArgumentCheckResponse(result, null, null, (message, new Func<ITextResourceCollection, object>[0]));
     }

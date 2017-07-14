@@ -9,17 +9,16 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using TitanBot.Commands;
-using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.DiscordHandlers;
 using TitanBot.Downloader;
-using TitanBot.Formatter;
+using TitanBot.Formatting;
 using TitanBot.Logging;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
+using TitanBot.Storage;
 using TitanBot.TypeReaders;
 using TitanBot.Util;
-using TitanBot.TextResource;
 
 namespace TitanBot
 {

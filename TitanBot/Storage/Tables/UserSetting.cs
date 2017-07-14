@@ -1,4 +1,4 @@
-﻿using TitanBot.TextResource;
+﻿using TitanBot.Formatting;
 
 namespace TitanBot.Storage
 {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot.TextResource;
+using TitanBot.Formatting;
 using TitanBot.Util;
 
 namespace TitanBot.Commands.DefautlCommands.General

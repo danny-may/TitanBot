@@ -1,9 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using TitanBot.Dependencies;
-using TitanBot.Formatter;
+using TitanBot.Formatting;
 using TitanBot.Settings;
-using TitanBot.TextResource;
 
 namespace TitanBot.Commands
 {
@@ -13,7 +12,7 @@ namespace TitanBot.Commands
         IDependencyFactory DependencyFactory { get; }
         IReplier Replier { get; }
         ITextResourceCollection TextResource { get; }
-        OutputFormatter Formatter { get; }
+        ValueFormatter Formatter { get; }
         IMessageChannel Channel { get; }
         DiscordSocketClient Client { get; }
         IGuild Guild { get; }

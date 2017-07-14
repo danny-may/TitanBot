@@ -1,4 +1,4 @@
-﻿namespace TitanBot.TextResource
+﻿namespace TitanBot.Formatting
 {
     public interface ITextResourceManager
     {

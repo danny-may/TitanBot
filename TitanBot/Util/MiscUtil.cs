@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace TitanBot.Util
@@ -34,5 +36,12 @@ namespace TitanBot.Util
             => TimeExecution<object>(() => { action(); return null; }).Time;
         public static TimeSpan TimeAsyncExecution(Func<Task> action)
             => TimeAsyncExecution<object>(async () => { await action(); return null; }).Time;
+
+        public static MethodInfo GetMethod<T>(Expression<Action<T>> expr)
+        {
+            return ((MethodCallExpression)expr.Body)
+                .Method
+                .GetGenericMethodDefinition();
+        }
     }
 }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TitanBot.Commands;
+﻿using TitanBot.Commands;
 
-namespace TitanBot.TextResource
+namespace TitanBot.Formatting
 {
     public interface ITextResourceCollection
     {

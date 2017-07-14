@@ -3,10 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TitanBot.TextResource
+namespace TitanBot.Formatting
 {
     public class TextResourceManager : ITextResourceManager
     {
@@ -41,7 +39,7 @@ namespace TitanBot.TextResource
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
                 LoadDefaults();
-                File.WriteAllText(file, JsonConvert.SerializeObject(TextMap, Formatting.Indented));
+                File.WriteAllText(file, JsonConvert.SerializeObject(TextMap, Newtonsoft.Json.Formatting.Indented));
             }
             TextMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Locale, string>>>(File.ReadAllText(file));
             TextMap = TextMap.ToDictionary(v => v.Key.ToUpper().Replace(' ', '_'), v => v.Value);

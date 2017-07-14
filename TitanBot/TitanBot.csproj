@@ -226,6 +226,7 @@
     <Compile Include="Commands\Responses\PermissionCheckResponse.cs" />
     <Compile Include="Commands\Responses\ArgumentCheckResponse.cs" />
     <Compile Include="Commands\Models\CallPermission.cs" />
+    <Compile Include="Formatting\ValueFormatter.cs" />
     <Compile Include="Models\Range.cs" />
     <Compile Include="Storage\Tables\Errors.cs" />
     <Compile Include="Storage\Tables\UserSetting.cs" />
@@ -246,7 +247,6 @@
     <Compile Include="Dependencies\InstanceBuilder.cs" />
     <Compile Include="DiscordHandlers\DiscordHandlerBase.cs" />
     <Compile Include="DiscordHandlers\CoreHandler.cs" />
-    <Compile Include="Formatter\OutputFormatter.cs" />
     <Compile Include="Logging\Interfaces\ILoggable.cs" />
     <Compile Include="Logging\Interfaces\ILogger.cs" />
     <Compile Include="Logging\LogEntry.cs" />
@@ -267,11 +267,11 @@
     <Compile Include="Settings\Interfaces\ISettingsManager.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
-    <Compile Include="TextResource\Interfaces\ITextResourceCollection.cs" />
-    <Compile Include="TextResource\Interfaces\ITextResourceManager.cs" />
-    <Compile Include="TextResource\Locale.cs" />
-    <Compile Include="TextResource\TextResourceCollection.cs" />
-    <Compile Include="TextResource\TextResourceManager.cs" />
+    <Compile Include="Formatting\Interfaces\ITextResourceCollection.cs" />
+    <Compile Include="Formatting\Interfaces\ITextResourceManager.cs" />
+    <Compile Include="Formatting\Locale.cs" />
+    <Compile Include="Formatting\TextResourceCollection.cs" />
+    <Compile Include="Formatting\TextResourceManager.cs" />
     <Compile Include="TypeReaders\ITypeReaderCollection.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ChannelTypeReader.cs" />
@@ -306,6 +306,9 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Formatter\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

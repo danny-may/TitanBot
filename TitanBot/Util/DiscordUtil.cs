@@ -35,7 +35,7 @@ namespace TitanBot.Util
             {
                 try
                 {
-                    var serialised = JsonConvert.SerializeObject(embed, Formatting.Indented);
+                    var serialised = JsonConvert.SerializeObject(embed, Newtonsoft.Json.Formatting.Indented);
                     if (text.Length < 2000 &&
                             (embed == null ||
                                 (embed.Fields.Length <= 25 &&

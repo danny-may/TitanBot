@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using TitanBot.TextResource;
+using TitanBot.Formatting;
 
 namespace TitanBot.TypeReaders
 {

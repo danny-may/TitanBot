@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TitanBot.TextResource
+namespace TitanBot.Formatting
 {
     public struct Locale
     {

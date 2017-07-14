@@ -4,14 +4,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.Downloader;
-using TitanBot.Formatter;
+using TitanBot.Formatting;
 using TitanBot.Logging;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
-using TitanBot.TextResource;
+using TitanBot.Storage;
 using TitanBot.Util;
 
 namespace TitanBot.Commands
@@ -47,7 +46,7 @@ namespace TitanBot.Commands
         protected IScheduler Scheduler { get; private set; }
         protected IReplier Replier { get; private set; }
         protected IDownloader Downloader { get; private set; }
-        protected OutputFormatter Formatter { get; private set; }
+        protected ValueFormatter Formatter { get; private set; }
         protected ITextResourceCollection TextResource { get; private set; }
         protected string[] AcceptedPrefixes => new string[] { BotUser.Mention, BotUser.Username, SettingsManager.GlobalSettings.DefaultPrefix, GuildData?.Prefix }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
         protected object GlobalCommandLock => CommandLocks.GetOrAdd(GetType(), new object());
