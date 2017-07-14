@@ -110,6 +110,11 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             var assemblies = GetAssemblies();
             var namespaces = GetNamespaces(assemblies);
 
+            var test = string.Join("\n", assemblies.SelectMany(a => a.GetTypes())
+                                                   .Select(t => t.Name)
+                                                   .Where(t => t.All(c => "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz._".Contains(c)))
+                                                   .OrderBy(x => x));
+
             var codeWithUsings = string.Join("\n", namespaces.Select(n => $"using {n};")) + "\n" + code;
             var globals = GetGlobals(this);
             object result = null;

@@ -35,7 +35,7 @@ namespace TitanBot.TypeReaders
                 if (results.Count > 0)
                     return Task.FromResult(TypeReaderResponse.FromSuccess(results.Values));
             }
-            return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", input, typeof(T), "Role"));
+            return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", input, typeof(T)));
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T role, float score)

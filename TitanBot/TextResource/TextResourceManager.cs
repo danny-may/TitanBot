@@ -131,10 +131,9 @@ namespace TitanBot.TextResource
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOTOWNER", "Only owners can use that command!");
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOPERMISSION", "You do not have permission to use that command!");
             AddResource("COMMAND_DELAY_DEFAULT", "This seems to be taking longer than expected...");
-            AddResource("TYPEREADER_UNABLETOREAD", "`{2}` is not a valid `{3}`");
+            AddResource("TYPEREADER_UNABLETOREAD", "I could not read `{2}` as {3}");
             AddResource("TYPEREADER_NOTYPEREADER", "No reader found for `{3}`");
-            AddResource("TYPEREADER_ENTITY_NOTFOUND", "{4} `{2}` does not exist");
-
+            AddResource("TYPEREADER_ENTITY_NOTFOUND", "{3} `{2}` could not be found");
 
             //Command stuff
 
@@ -217,6 +216,18 @@ namespace TitanBot.TextResource
             AddResource("ERROR", "Error");
             AddResource("OUTPUT", "Output");
 
+            //Types
+            AddResource("TIMESPAN", "a timespan");
+            AddResource("STRING", "some text");
+            AddResource("INT64", "an integer");
+            AddResource("INT32", "an integer");
+            AddResource("INT16", "an integer");
+            AddResource("UINT64", "a positive integer");
+            AddResource("UINT32", "a positive integer");
+            AddResource("UINT16", "a positive integer");
+            AddResource("DOUBLE", "a number");
+            AddResource("FLOAT", "a number");
+            AddResource("DECIMAL", "a number");
         }
     }
 }

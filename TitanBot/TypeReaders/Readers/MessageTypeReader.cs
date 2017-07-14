@@ -17,7 +17,7 @@ namespace TitanBot.TypeReaders
                     return TypeReaderResponse.FromSuccess(msg);
             }
 
-            return TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", value, typeof(T), "Message");
+            return TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", value, typeof(T));
         }
     }
 }

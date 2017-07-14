@@ -10,6 +10,7 @@ namespace LiveBaseTest
         {
             var bot = new BotClient(m => m.Map<ILogger, ConsoleLogger>());
             bot.CommandService.Install(bot.DefaultCommands);
+            bot.CommandService.Install(new Type[] { typeof(TestCommand) });
 
             bot.StartAsync(c =>
             {
