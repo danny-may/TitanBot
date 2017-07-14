@@ -39,15 +39,15 @@ namespace TitanBot.TypeReaders
                 values = new string[] { values[0], values[0] };
 
             if (values.Length != 2)
-                return TypeReaderResponse.FromError($"Unable to read `{value}` as a Range");
+                return TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Range<T>));
 
             var from = await Parser.Read(context, values[0]);
             var to = await Parser.Read(context, values[1]);
 
             if (!from.IsSuccess)
-                return TypeReaderResponse.FromError($"Unable to read `{values[0]}` as {typeof(T)}");
+                return TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", values[0], typeof(T));
             if (!to.IsSuccess)
-                return TypeReaderResponse.FromError($"Unable to read `{values[1]}` as {typeof(T)}");
+                return TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", values[0], typeof(T));
 
             return TypeReaderResponse.FromSuccess(new Range<T>
             {

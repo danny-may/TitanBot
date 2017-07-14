@@ -55,14 +55,14 @@ namespace TitanBot.TypeReaders
                 if (EnumByValue.TryGetValue(baseValue, out enumValue))
                     return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {EnumType.Name}"));
+                    return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
             }
             else
             {
                 if (EnumByName.TryGetValue(input.ToLower(), out enumValue))
                     return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResponse.FromError($"Value is not a {EnumType.Name}"));
+                    return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
             }
         }
     }

@@ -12,6 +12,7 @@ using TitanBot.Logging;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.TextResource;
+using TitanBot.Util;
 
 namespace TitanBot.Commands
 {
@@ -24,7 +25,7 @@ namespace TitanBot.Commands
         IUserMessage AwaitMessage { get; set; }
         ICommandContext Context { get; set; }
 
-        protected virtual string DelayMessage => "This seems to be taking longer than expected...";
+        protected virtual string DelayMessage => "COMMAND_DELAY_DEFAULT";
         protected virtual int DelayMessageMs => 3000;
 
         protected BotClient Bot { get; set; }
@@ -67,28 +68,24 @@ namespace TitanBot.Commands
         internal void Install(ICommandContext context, IDependencyFactory factory)
         {
             Context = context;
+            Replier = Context.Replier;
+            TextResource = Context.TextResource;
+            Formatter = Context.Formatter;
             Logger = factory.Get<ILogger>();
             Database = factory.Get<IDatabase>();
             Bot = factory.Get<BotClient>();
             CommandService = factory.Get<ICommandService>();
             Scheduler = factory.Get<IScheduler>();
-            Replier = factory.GetOrStore<IReplier>();
             SettingsManager = factory.Get<ISettingsManager>();
             Downloader = factory.Get<IDownloader>();
             if (Guild != null)
                 GuildData = SettingsManager.GetGroup<GeneralSettings>(Guild.Id);
-            var userData = Database.AddOrGet(context.Author.Id, () => new UserSetting()).Result;
-            Formatter = factory.WithInstance(userData.AltFormat)
-                               .WithInstance(context)
-                               .Construct<OutputFormatter>();
-            TextResource = factory.GetOrStore<ITextResourceManager>()
-                                  .GetForLanguage(Guild == null ? userData.Language : GuildData.PreferredLanguage);
             Prefix = context.Prefix;
             CommandName = context.CommandText;
-            StartReplyCountdown();
+            StartReplyTimer();
         }
 
-        void StartReplyCountdown()
+        private void StartReplyTimer()
         {
             Task.Run(async () =>
             {
@@ -96,64 +93,49 @@ namespace TitanBot.Commands
                 lock (InstanceCommandLock)
                 {
                     if (!HasReplied)
-                        AwaitMessage = Replier.Reply(Channel, Author, DelayMessage);
+                    {
+                        AwaitMessage = Replier.Reply(Channel, Author)
+                                              .WithMessage(DelayMessage)
+                                              .Send();
+                    }
                 }
-            });
+            }).DontWait();
         }
 
-        void RegisterReply()
+        private Task OnMessageSent(IReplyContext context, IUserMessage message)
         {
             lock (InstanceCommandLock)
             {
+
                 HasReplied = true;
                 if (AwaitMessage != null)
                 {
-                    var temp = AwaitMessage;
+                    AwaitMessage.DeleteAsync().Wait();
                     AwaitMessage = null;
-                    temp.DeleteAsync().Wait();
                 }
+            }
+            return Task.CompletedTask;
+        }
+
+        protected IReplyContext Reply
+        {
+            get
+            {
+                var context = Replier.Reply(Channel, Author);
+                context.OnSend += OnMessageSent;
+                return context;
             }
         }
 
-        protected Task<IUserMessage> ReplyAsync(IMessageChannel channel, string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-        {
-            RegisterReply();
-            return Replier.ReplyAsync(channel, Author, message, replyType, isTTS: isTTS, embed: embed, options: options);
-        }
-        protected IUserMessage Reply(IMessageChannel channel, string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-        {
-            RegisterReply();
-            return Replier.Reply(channel, Author, message, replyType, isTTS: isTTS, embed: embed, options: options);
-        }
-
-        protected Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ReplyAsync(Channel, message, ReplyType.None, isTTS, embed, options);
-        
-        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ReplyAsync(Channel, message, replyType, isTTS, embed, options);
-        
-        protected Task<IUserMessage> ReplyAsync(IMessageChannel channel, string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ReplyAsync(channel, message, ReplyType.None, isTTS, embed, options);
-        
-        protected Task<IUserMessage> ReplyAsync(IUser user, string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ReplyAsync(user.GetOrCreateDMChannelAsync().Result, message, ReplyType.None, isTTS, embed, options);
-        
-        protected Task<IUserMessage> ReplyAsync(IUser user, string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ReplyAsync(user.GetOrCreateDMChannelAsync().Result, message, replyType, isTTS, embed, options);
-
-        protected IUserMessage Reply(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => Reply(Channel, message, ReplyType.None, isTTS, embed, options);
-        
-        protected IUserMessage Reply(string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => Reply(Channel, message, replyType, isTTS, embed, options);
-        
-        protected IUserMessage Reply(IMessageChannel channel, string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => Reply(channel, message, ReplyType.None, isTTS, embed, options);        
-        
-        protected IUserMessage Reply(IUser user, string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => Reply(user.GetOrCreateDMChannelAsync().Result, message, ReplyType.None, isTTS, embed, options);
-        
-        protected IUserMessage Reply(IUser user, string message, ReplyType replyType, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => Reply(user.GetOrCreateDMChannelAsync().Result, message, replyType, isTTS, embed, options);
+        protected Task<IUserMessage> ReplyAsync(string message)
+            => Reply.WithMessage(message).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType)
+            => Reply.WithMessage(message).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, params object[] values)
+            => Reply.WithMessage(message, values).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, params object[] values)
+            => Reply.WithMessage(message, replyType, values).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(Embed embed)
+            => Reply.WithEmbed(embed).SendAsync();
     }
 }

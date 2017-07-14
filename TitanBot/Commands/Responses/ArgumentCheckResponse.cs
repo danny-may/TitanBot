@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using TitanBot.TextResource;
 
 namespace TitanBot.Commands.Responses
 {
@@ -8,27 +10,31 @@ namespace TitanBot.Commands.Responses
         public object[] ParsedArgs { get; }
         public object[] ParsedFlags { get; }
         public object[] CallArguments => ParsedArgs.Concat(ParsedFlags).ToArray();
-        public string ErrorMessage { get; }
+        public (string message, Func<ITextResourceCollection, object>[] values) ErrorMessage { get; }
 
-        private ArgumentCheckResponse(ArgumentCheckResult result, object[] args, object[] flags, string message)
+        private ArgumentCheckResponse(ArgumentCheckResult result, object[] args, object[] flags, (string, Func<ITextResourceCollection, object>[]) message)
         {
             SuccessStatus = result;
             ParsedArgs = args;
             ParsedFlags = flags;
-            ErrorMessage = message ?? "No errors given";
+            ErrorMessage = message;
         }
 
         public static ArgumentCheckResponse FromSuccess(object[] arguments, object[] flags)
-            => new ArgumentCheckResponse(ArgumentCheckResult.Successful, arguments, flags, null);
+            => new ArgumentCheckResponse(ArgumentCheckResult.Successful, arguments, flags, (null, null));
+        public static ArgumentCheckResponse FromError(ArgumentCheckResult result, string message, Func<ITextResourceCollection, object>[] values)
+            => new ArgumentCheckResponse(result, null, null, (message, values));
         public static ArgumentCheckResponse FromError(ArgumentCheckResult result, string message)
-            => new ArgumentCheckResponse(result, null, null, message);
+            => new ArgumentCheckResponse(result, null, null, (message, new Func<ITextResourceCollection, object>[0]));
     }
 
     enum ArgumentCheckResult
     {
         Successful,
-        InvalidArguments,
-        Other,
-        InvalidSubcall
+        ArgumentMismatch,
+        NotEnoughArguments,
+        TooManyArguments,
+        InvalidSubcall,
+        Other
     }
 }

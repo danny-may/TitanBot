@@ -35,13 +35,13 @@ namespace TitanBot.Commands.DefaultCommands.Admin
             
             if (validCalls == null || validCalls.Count() == 0)
             {
-                await ReplyAsync(TextResource.GetResource("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error));
+                await ReplyAsync("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error);
                 return;
             }
 
             PermissionManager.SetPermissions(Context, validCalls.ToArray(), null, roles.Select(r => r.Id).ToArray(), null);
             
-            await ReplyAsync(TextResource.Format("EDITCOMMAND_SUCCESS", ReplyType.Success, "Roles", validCalls.Select(c => c.Parent).Distinct().Count()));
+            await ReplyAsync("EDITCOMMAND_SUCCESS", ReplyType.Success, "Roles", validCalls.Select(c => c.Parent).Distinct().Count());
         }
 
         [Call("SetPerm")]
@@ -52,13 +52,13 @@ namespace TitanBot.Commands.DefaultCommands.Admin
 
             if (validCalls == null || validCalls.Count() == 0)
             {
-                await ReplyAsync(TextResource.GetResource("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error));
+                await ReplyAsync("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error);
                 return;
             }
 
             PermissionManager.SetPermissions(Context, validCalls.ToArray(), permission, null, null);
 
-            await ReplyAsync(TextResource.Format("EDITCOMMAND_SUCCESS", ReplyType.Success, "Permissions", validCalls.Select(c => c.Parent).Distinct().Count()));
+            await ReplyAsync("EDITCOMMAND_SUCCESS", ReplyType.Success, "Permissions", validCalls.Select(c => c.Parent).Distinct().Count());
         }
 
         [Call("Reset")]
@@ -69,13 +69,13 @@ namespace TitanBot.Commands.DefaultCommands.Admin
 
             if (validCalls == null || validCalls.Count() == 0)
             {
-                await ReplyAsync(TextResource.GetResource("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error));
+                await ReplyAsync("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error);
                 return;
             }
 
             PermissionManager.ResetPermissions(Context, validCalls.ToArray());
 
-            await ReplyAsync(TextResource.Format("EDITCOMMAND_SUCCESS", ReplyType.Success, "Permissions", validCalls.Select(c => c.Parent).Distinct().Count()));
+            await ReplyAsync("EDITCOMMAND_SUCCESS", ReplyType.Success, "Permissions", validCalls.Select(c => c.Parent).Distinct().Count());
         }
 
         [Call("Blacklist")]
@@ -86,13 +86,13 @@ namespace TitanBot.Commands.DefaultCommands.Admin
 
             if (validCalls == null || validCalls.Count() == 0)
             {
-                await ReplyAsync(TextResource.GetResource("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error));
+                await ReplyAsync("EDITCOMMAND_FINDCALLS_NORESULTS", ReplyType.Error);
                 return;
             }
 
             PermissionManager.SetPermissions(Context, validCalls.ToArray(), null, null, channels.Select(c => c.Id).ToArray());
 
-            await ReplyAsync(TextResource.Format("EDITCOMMAND_SUCCESS", ReplyType.Success, "Blacklist", validCalls.Select(c => c.Parent).Distinct().Count()));
+            await ReplyAsync("EDITCOMMAND_SUCCESS", ReplyType.Success, "Blacklist", validCalls.Select(c => c.Parent).Distinct().Count());
         }
     }
 }

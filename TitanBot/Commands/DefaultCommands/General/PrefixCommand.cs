@@ -12,9 +12,9 @@ namespace TitanBot.Commands.DefautlCommands.General
         async Task GetPrefixesAsync()
         {
             if (AcceptedPrefixes.Length > 0)
-                await ReplyAsync(TextResource.Format("PREFIX_SHOW_MESSAGE", ReplyType.Info, string.Join(", ", AcceptedPrefixes)));
+                await ReplyAsync("PREFIX_SHOW_MESSAGE", ReplyType.Info, string.Join(", ", AcceptedPrefixes));
             else
-                await ReplyAsync(TextResource.GetResource("PREFIX_SHOW_NOPREFIX", ReplyType.Info));
+                await ReplyAsync("PREFIX_SHOW_NOPREFIX", ReplyType.Info);
         }
 
         [Call]
@@ -25,7 +25,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         {
             GuildData.Prefix = newPrefix.ToLower();
             SettingsManager.SaveGroup(Guild.Id, GuildData);
-            await ReplyAsync(TextResource.Format("PREFIX_SET_MESSAGE", ReplyType.Success, GuildData.Prefix));
+            await ReplyAsync("PREFIX_SET_MESSAGE", ReplyType.Success, GuildData.Prefix);
         }
     }
 }

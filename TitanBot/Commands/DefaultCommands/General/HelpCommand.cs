@@ -60,7 +60,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 builder.AddField(group.Key, string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key)));
             }
             
-            await ReplyAsync("", embed: builder);
+            await ReplyAsync(builder);
         }
 
         async Task HelpCommandAsync(string name)
@@ -68,7 +68,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             var cmd = CommandService.Search(name, out int commandLength);
             if (cmd == null || cmd.Value.Hidden)
             {
-                await ReplyAsync(TextResource.Format("HELP_SINGLE_UNRECOGNISED", ReplyType.Error, name, Prefix));
+                await ReplyAsync("HELP_SINGLE_UNRECOGNISED", ReplyType.Error, name, Prefix);
                 return;
             }
             var command = cmd.Value;
@@ -132,7 +132,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             if (!string.IsNullOrWhiteSpace(notes))
                 builder.AddField(TextResource.GetResource("NOTES"), notes);
             
-            await ReplyAsync("", embed: builder.Build());
+            await ReplyAsync(builder.Build());
         }
     }
 }

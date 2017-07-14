@@ -79,7 +79,7 @@ namespace TitanBot.TypeReaders
 
             if (results.Count > 0)
                 return TypeReaderResponse.FromSuccess(results.Values.ToImmutableArray());
-            return TypeReaderResponse.FromError("User not found.");
+            return TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", input, typeof(T), "User");
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T user, float score)

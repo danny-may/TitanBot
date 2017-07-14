@@ -11,17 +11,13 @@ namespace TitanBot.TypeReaders
 
         public override async Task<TypeReaderResponse> Read(ICommandContext context, string value)
         {
-            ulong id;
-
-            //By Id (1.0)
-            if (ulong.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+            if (ulong.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out ulong id))
             {
-                var msg = await context.Channel.GetMessageAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T;
-                if (msg != null)
+                if (await context.Channel.GetMessageAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) is T msg)
                     return TypeReaderResponse.FromSuccess(msg);
             }
 
-            return TypeReaderResponse.FromError("Message not found.");
+            return TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", value, typeof(T), "Message");
         }
     }
 }

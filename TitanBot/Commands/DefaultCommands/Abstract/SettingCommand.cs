@@ -42,13 +42,13 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                        .WithDescription(string.Join("\n", Settings.Select(g => g.GroupName)));
                 if (string.IsNullOrWhiteSpace(builder.Description))
                     builder.Description = TextResource.GetResource("SETTINGS_DESCRIPTION_NOSETTINGS");
-                await ReplyAsync("", embed: builder.Build());
+                await ReplyAsync(builder.Build());
                 return;
             }
             var groups = Settings.Where(g => g.GroupName.ToLower() == settingGroup.ToLower());
             if (groups.Count() == 0)
             {
-                await ReplyAsync(TextResource.Format("SETTINGS_INVALIDGROUP", ReplyType.Error, settingGroup));
+                await ReplyAsync("SETTINGS_INVALIDGROUP", ReplyType.Error, settingGroup);
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 builder.WithDescription(descriptions);
             if (!string.IsNullOrWhiteSpace(notes))
                 builder.AddField(TextResource.GetResource("NOTES"), notes);
-            await ReplyAsync("", embed: builder.Build());
+            await ReplyAsync(builder.Build());
         }
 
         protected async Task SetSettingAsync(string key, string value = null)
@@ -76,14 +76,14 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             var setting = Settings.SelectMany(g => g.Settings)
                                  .FirstOrDefault(s => s.Name.ToLower() == key.ToLower());
             if (setting == null)
-                await ReplyAsync(TextResource.Format("SETTINGS_KEY_NOTFOUND", ReplyType.Error, key));
+                await ReplyAsync("SETTINGS_KEY_NOTFOUND", ReplyType.Error, key);
             else
             {
                 var readerResult = await Readers.Read(setting.Type, Context, value);
 
                 if (!readerResult.IsSuccess)
                 {
-                    await ReplyAsync(TextResource.Format("SETTINGS_VALUE_INVALID", ReplyType.Error, setting.Name, value));
+                    await ReplyAsync("SETTINGS_VALUE_INVALID", ReplyType.Error, setting.Name, value);
                     return;
                 }
 
@@ -106,7 +106,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                     }.AddField(TextResource.GetResource("SETTING_VALUE_OLD"), string.IsNullOrWhiteSpace(oldValue) ? TextResource.GetResource("SETTINGS_NOTSET") : oldValue)
                      .AddField(TextResource.GetResource("SETTING_VALUE_NEW"), string.IsNullOrWhiteSpace(newValue) ? TextResource.GetResource("SETTINGS_NOTSET") : newValue);
-                    await ReplyAsync("", embed: builder.Build());
+                    await ReplyAsync(builder.Build());
                 }
             }
         }

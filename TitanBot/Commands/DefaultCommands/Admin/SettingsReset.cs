@@ -34,9 +34,9 @@ namespace TitanBot.Commands.DefaultCommands.Admin
             SettingsManager.ResetSettings(Context.Guild.Id);
             var guild = Client.GetGuild(guildId);
             if (guild == null)
-                await ReplyAsync(TextResource.GetResource("SETTINGRESET_GUILD_NOTEXIST", ReplyType.Error));
+                await ReplyAsync("SETTINGRESET_GUILD_NOTEXIST", ReplyType.Error);
             else
-                await ReplyAsync(TextResource.Format("SETTINGRESET_SUCCESS", ReplyType.Success, guild.Name, guild.Id));
+                await ReplyAsync("SETTINGRESET_SUCCESS", ReplyType.Success, guild.Name, guild.Id);
         }
     }
 }

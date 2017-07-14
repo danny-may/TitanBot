@@ -23,7 +23,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             var spoofMessage = new SudoMessage(Message);
             spoofMessage.Author = user;
             spoofMessage.Content = command;
-            await ReplyAsync(TextResource.Format("SUDOCOMMAND_SUCCESS", ReplyType.Success, command, user));
+            await ReplyAsync("SUDOCOMMAND_SUCCESS", ReplyType.Success, command, user);
             await CommandService.ParseAndExecute(spoofMessage);
         }
     }

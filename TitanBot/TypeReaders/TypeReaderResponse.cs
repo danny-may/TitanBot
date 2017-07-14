@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using TitanBot.TextResource;
 
 namespace TitanBot.TypeReaders
 {
@@ -22,11 +24,11 @@ namespace TitanBot.TypeReaders
     {
         public IReadOnlyCollection<TypeReaderValue> Values { get; }
         
-        public string Message { get; }
+        public (string message, Func<ITextResourceCollection, object>[] values) Message { get; }
         public bool IsSuccess { get; }
         public object Best => Values?.OrderByDescending(v => v.Score).Select(v => v.Value).FirstOrDefault();
 
-        private TypeReaderResponse(IReadOnlyCollection<TypeReaderValue> values, bool success, string message)
+        private TypeReaderResponse(IReadOnlyCollection<TypeReaderValue> values, bool success, (string message, Func<ITextResourceCollection, object>[] values) message)
         {
             Values = values;
             Message = message;
@@ -34,14 +36,27 @@ namespace TitanBot.TypeReaders
         }
 
         public static TypeReaderResponse FromSuccess(object value)
-            => new TypeReaderResponse(ImmutableArray.Create(new TypeReaderValue(value, 1.0f)), true, null);
+            => new TypeReaderResponse(ImmutableArray.Create(new TypeReaderValue(value, 1.0f)), true, (null, null));
         public static TypeReaderResponse FromSuccess(TypeReaderValue value)
-            => new TypeReaderResponse(ImmutableArray.Create(value), true, null);
+            => new TypeReaderResponse(ImmutableArray.Create(value), true, (null, null));
         public static TypeReaderResponse FromSuccess(IReadOnlyCollection<TypeReaderValue> values)
-            => new TypeReaderResponse(values, true, null);
-        public static TypeReaderResponse FromError(string message)
-            => new TypeReaderResponse(null, false, message);
+            => new TypeReaderResponse(values, true, (null, null));
+        public static TypeReaderResponse FromError(string message, string value, Type target, params object[] other)
+            => new TypeReaderResponse(null, false, (message, BuildFuncs(value, target, other)));
 
-        public override string ToString() => IsSuccess ? "Success" : Message;
+        private static Func<ITextResourceCollection, object>[] BuildFuncs(string value, Type target, object[] other)
+        {
+            var vals = new List<Func<ITextResourceCollection, object>>
+            {
+                t => value,
+                t => t.GetResource(target.Name)
+            };
+            foreach (var item in other)
+                vals.Add(t => item);
+
+            return vals.ToArray();
+        }
+
+        public override string ToString() => IsSuccess.ToString();
     }
 }

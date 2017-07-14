@@ -10,7 +10,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         [Usage("PING_HELP_USAGE")]
         async Task SendPongAsync()
         {
-            var msg = await ReplyAsync(TextResource.Format("PING_INITIAL", ReplyType.Success, Client.Latency));
+            var msg = await ReplyAsync("PING_INITIAL", ReplyType.Success, Client.Latency);
             await msg.ModifySafeAsync(m => m.Content = TextResource.Format("PING_VERIFY", ReplyType.Success, (msg.Timestamp - Message.Timestamp).TotalMilliseconds));
         }
     }

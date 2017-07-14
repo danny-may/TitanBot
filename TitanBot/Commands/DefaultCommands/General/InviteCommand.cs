@@ -9,7 +9,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         [Usage("INVITE_HELP_USAGE")]
         async Task GetInviteAsync()
         {
-            await ReplyAsync(TextResource.Format("INVITE_MESSAGE", ReplyType.Info, BotUser.Id, GlobalSettings.PreferredPermission));
+            await ReplyAsync("INVITE_MESSAGE", ReplyType.Info, BotUser.Id, GlobalSettings.PreferredPermission);
         }
     }
 }

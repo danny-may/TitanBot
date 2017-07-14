@@ -7,7 +7,7 @@ namespace TitanBot.TypeReaders
     {
         public override Task<TypeReaderResponse> Read(ICommandContext context, string value)
         {
-            return null;
+            return Task.FromResult(TypeReaderResponse.FromError(null, null, null));
         }
     }
 }

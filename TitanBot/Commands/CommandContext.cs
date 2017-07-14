@@ -8,6 +8,7 @@ using TitanBot.Util;
 using TitanBot.TextResource;
 using System.Collections.Generic;
 using System.Linq;
+using TitanBot.Formatter;
 
 namespace TitanBot.Commands
 {
@@ -26,6 +27,9 @@ namespace TitanBot.Commands
         public bool IsCommand => Command != null;
         public bool ExplicitPrefix { get; private set; }
         public CommandInfo? Command { get; set; }
+        public IReplier Replier { get; }
+        public ITextResourceCollection TextResource { get; }
+        public OutputFormatter Formatter { get; }
 
         internal CommandContext(IUserMessage message, IDependencyFactory factory)
         {
@@ -35,8 +39,18 @@ namespace TitanBot.Commands
             Channel = message.Channel;
             Author = message.Author;
             Guild = (message.Channel as IGuildChannel)?.Guild;
+            var database = DependencyFactory.Get<IDatabase>();
+            var userdata = database.AddOrGet(Author.Id, () => new UserSetting()).Result;
             if (Guild != null)
                 GuildData = DependencyFactory.Get<ISettingsManager>().GetGroup<GeneralSettings>(Guild.Id);
+            TextResource = DependencyFactory.Get<ITextResourceManager>()
+                                            .GetForLanguage(GuildData?.PreferredLanguage ?? userdata.Language);
+            Formatter = DependencyFactory.WithInstance(userdata.AltFormat)
+                                         .WithInstance(this)
+                                         .Construct<OutputFormatter>();
+            Replier = DependencyFactory.WithInstance(TextResource)
+                                       .WithInstance(Formatter)
+                                       .Construct<IReplier>();
         }
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)

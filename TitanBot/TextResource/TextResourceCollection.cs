@@ -24,9 +24,11 @@ namespace TitanBot.TextResource
         {
             if (key == null)
                 return null;
-            if (!Values.ContainsKey(key))
+            if (key.Contains(' '))
                 return key;
-            var val = Values[key];
+            if (!Values.ContainsKey(key.ToUpper()))
+                return key;
+            var val = Values[key.ToUpper()];
             return val.langText ?? val.defaultText ?? key;
         }
 

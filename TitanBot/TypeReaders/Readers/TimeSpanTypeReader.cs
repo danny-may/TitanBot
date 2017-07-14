@@ -82,7 +82,7 @@ namespace TitanBot.TypeReaders
             }
             else
             {
-                return Task.FromResult(TypeReaderResponse.FromError("Input could not be parsed as a TimeSpan"));
+                return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(TimeSpan)));
             }
         }
     }

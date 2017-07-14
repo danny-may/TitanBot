@@ -28,12 +28,12 @@ namespace TitanBot.TypeReaders
             else if (input.Length == 6)
                 charsPerVal = 2;
             else
-                return Task.FromResult(TypeReaderResponse.FromError($"`{value}` is not a valid colour"));
+                return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Color)));
 
             if (!int.TryParse(input.Substring(0, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out r) ||
                 !int.TryParse(input.Substring(charsPerVal, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out g) ||
                 !int.TryParse(input.Substring(2 * charsPerVal, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out b))
-                return Task.FromResult(TypeReaderResponse.FromError($"`{value}` is not a valid colour"));
+                return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Color)));
 
             return Task.FromResult(TypeReaderResponse.FromSuccess(Color.FromArgb(r, g, b)));
 

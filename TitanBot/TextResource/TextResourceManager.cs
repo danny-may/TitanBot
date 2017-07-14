@@ -18,6 +18,7 @@ namespace TitanBot.TextResource
             => AddResource(key, Locale.DEFAULT, text);
         public void AddResource(string key, Locale language, string text)
         {
+            key = key.ToUpper().Replace(' ', '_');
             if (!TextMap.ContainsKey(key))
                 TextMap.Add(key, new Dictionary<Locale, string>());
             TextMap[key][language] = text;
@@ -43,6 +44,7 @@ namespace TitanBot.TextResource
                 File.WriteAllText(file, JsonConvert.SerializeObject(TextMap, Formatting.Indented));
             }
             TextMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Locale, string>>>(File.ReadAllText(file));
+            TextMap = TextMap.ToDictionary(v => v.Key.ToUpper().Replace(' ', '_'), v => v.Value);
         }
 
         public ITextResourceCollection GetForLanguage(Locale language)
@@ -121,11 +123,18 @@ namespace TitanBot.TextResource
 
             AddResource("COMMANDEXECUTOR_COMMAND_UNKNOWN", "`{0}{1}` is not a recognised command! Try using `{0}help` for a complete command list.");
             AddResource("COMMANDEXECUTOR_DISALLOWED_CHANNEL", "You cannot use that command here!");
-            AddResource("COMMANDEXECUTOR_SUBCALL_UNKNOW", "That is not a recognised subcommand for `{0}{1}`! Try using `{0}help {1}` for usage info.");
+            AddResource("COMMANDEXECUTOR_SUBCALL_UNKNOWN", "That is not a recognised subcommand for `{0}{1}`! Try using `{0}help {1}` for usage info.");
             AddResource("COMMANDEXECUTOR_SUBCALL_UNSPECIFIED", "You have not specified which sub call you would like to use! Try using `{0}help {1}` for usage info.");
+            AddResource("COMMANDEXECUTOR_ARGUMENTS_TOOMANY", "Too many arguments were supplied. Try using `{0}help {1}` for usage info.");
+            AddResource("COMMANDEXECUTOR_ARGUMENTS_TOOFEW", "Not enough arguments were supplied. Try using `{0}help {1}` for usage info.");
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOTHERE", "You cannot use that command here!");
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOTOWNER", "Only owners can use that command!");
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOPERMISSION", "You do not have permission to use that command!");
+            AddResource("COMMAND_DELAY_DEFAULT", "This seems to be taking longer than expected...");
+            AddResource("TYPEREADER_UNABLETOREAD", "`{2}` is not a valid `{3}`");
+            AddResource("TYPEREADER_NOTYPEREADER", "No reader found for `{3}`");
+            AddResource("TYPEREADER_ENTITY_NOTFOUND", "{4} `{2}` does not exist");
+
 
             //Command stuff
 

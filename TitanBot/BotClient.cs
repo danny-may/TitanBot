@@ -130,7 +130,7 @@ namespace TitanBot
             readyEvent.WaitOne();
             readyEvent.Reset();
 
-            //await Scheduler.StartAsync();
+            await Scheduler.StartAsync();
         }
 
         public async Task StopAsync()

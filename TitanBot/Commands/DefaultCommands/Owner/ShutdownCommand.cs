@@ -13,7 +13,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         async Task ShutdownAsync(TimeSpan delay = default(TimeSpan))
         {
             if (delay > new TimeSpan(0, 0, 0))
-                await ReplyAsync(TextResource.Format("SHUTDOWN_INTIME", ReplyType.Success, delay));
+                await ReplyAsync("SHUTDOWN_INTIME", ReplyType.Success, delay);
             await Task.Delay(delay);
             Bot.StopAsync().DontWait();
         }

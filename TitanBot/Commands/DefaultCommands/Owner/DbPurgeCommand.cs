@@ -12,7 +12,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         {
             await Database.Drop(table);
 
-            await ReplyAsync(TextResource.Format("DBPURGE_SUCCESS", ReplyType.Success, table));
+            await ReplyAsync("DBPURGE_SUCCESS", ReplyType.Success, table);
         }
     }
 }

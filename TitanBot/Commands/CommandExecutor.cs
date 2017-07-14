@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,8 +24,8 @@ namespace TitanBot.Commands
         private ITypeReaderCollection Readers { get; }
         private ICommandContext Context { get; }
         private ITextResourceManager TextManager { get; }
-        private ISettingsManager Settings { get; }
         private ITextResourceCollection TextResource { get; }
+        private ISettingsManager Settings { get; }
         private IReplier Replier { get; }
 
         public CommandExecutor(IDependencyFactory factory, 
@@ -33,7 +34,6 @@ namespace TitanBot.Commands
                                IDatabase database,
                                ILogger logger,
                                ITypeReaderCollection typeReaders,
-                               ITextResourceManager textManager,
                                ISettingsManager settings)
         {
             DependencyFactory = factory;
@@ -42,12 +42,9 @@ namespace TitanBot.Commands
             Database = database;
             Logger = logger;
             Readers = typeReaders;
-            TextManager = textManager;
             Settings = settings;
-
-            Replier = factory.GetOrStore<IReplier>();
-            var lang = Context.GuildData?.PreferredLanguage ?? Database.AddOrGet(context.Author.Id, () => new UserSetting()).Result.Language;
-            TextResource = TextManager.GetForLanguage(lang);
+            Replier = Context.Replier;
+            TextResource = Context.TextResource;
         }
 
         public async Task Run()
@@ -55,7 +52,9 @@ namespace TitanBot.Commands
             if (!Context.IsCommand && !Context.ExplicitPrefix)
                 return;
             else if (!Context.IsCommand)
-                await Replier.ReplyAsync(Context.Channel, Context.Author, TextResource.Format("COMMANDEXECUTOR_COMMAND_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText));
+                await Replier.Reply(Context.Channel, Context.Author)
+                             .WithMessage("COMMANDEXECUTOR_COMMAND_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText)
+                             .SendAsync();
             await TryExecute();
         }
 
@@ -73,13 +72,17 @@ namespace TitanBot.Commands
             var calls = PermissionManager.CheckContext(Context, command.Calls.ToArray());
             if (calls.Count() == 0)
             {
-                await Replier.ReplyAsync(Context.Channel, Context.Author, TextResource.GetResource("COMMANDEXECUTOR_DISALLOWED_CHANNEL", ReplyType.Error));
+                await Replier.Reply(Context.Channel, Context.Author)
+                             .WithMessage("COMMANDEXECUTOR_DISALLOWED_CHANNEL", ReplyType.Error)
+                             .SendAsync();
                 return;
             }
             calls = CheckSubcommands(calls);
             if (calls.Count() == 0)
             {
-                await Replier.ReplyAsync(Context.Channel, Context.Author, TextResource.Format("COMMANDEXECUTOR_SUBCALL_UNKNOW", ReplyType.Error, this.Context.Prefix, this.Context.CommandText));
+                await Replier.Reply(Context.Channel, Context.Author)
+                             .WithMessage("COMMANDEXECUTOR_SUBCALL_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText)
+                             .SendAsync();
                 return;
             }
             foreach (var call in calls)
@@ -91,21 +94,44 @@ namespace TitanBot.Commands
                     if (!permCheck.IsSuccess)
                     {
                         if (permCheck.ErrorMessage != null)
-                            await Replier.ReplyAsync(Context.Channel, Context.Author, TextResource.Format(permCheck.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText));
+                            await Replier.Reply(Context.Channel, Context.Author)
+                                         .WithMessage(permCheck.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText)
+                                         .SendAsync();
                     }
                     else
                     {
-                        instance.Install(Context, DependencyFactory);
-                        LogCommand(call);
-                        using (Context.Channel.EnterTypingState())
+                        try
                         {
-                            await (Task)call.Call.Invoke(instance, response.CallArguments);
+                            instance.Install(Context, DependencyFactory);
+                            LogCommand(call);
+                            using (Context.Channel.EnterTypingState())
+                            {
+                                await (Task)call.Call.Invoke(instance, response.CallArguments);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var record = new Error
+                            {
+                                Channel = Context.Channel.Id,
+                                Message = Context.Message.Id,
+                                User = Context.Author.Id,
+                                Content = JsonConvert.SerializeObject(ex)
+                            };
+                            await Database.Insert(record);
+                            await Replier.Reply(Context.Channel, Context.Author)
+                                         .WithMessage("COMMANDEXECUTOR_EXCEPTION_ALERT", ReplyType.Error, record.Id)
+                                         .SendAsync();
                         }
                     }
                     return;
                 }
             }
-            await Replier.ReplyAsync(Context.Channel, Context.Author, TextResource.Format(response.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText));
+            await Replier.Reply(Context.Channel, Context.Author)
+                         .WithMessage(response.ErrorMessage.message, ReplyType.Error, new object[] { Context.Prefix, Context.CommandText}
+                                                                                            .Concat(response.ErrorMessage.values.Select(v => v(TextResource)))
+                                                                                            .ToArray())
+                         .SendAsync();
         }
 
         private void LogCommand(CallInfo call)
@@ -156,7 +182,7 @@ namespace TitanBot.Commands
                     return readResult;
                 responses.Add(readResult);
             }
-            return responses.Last();
+            return responses.OrderByDescending(r => r.SuccessStatus).Last();
         }
 
         private async Task<ArgumentCheckResponse> ReadArguments(ITypeReaderCollection reader, string[] argStrings, (string Key, string Value)[] flags, ArgumentInfo[] argPattern, CallInfo call)
@@ -166,15 +192,15 @@ namespace TitanBot.Commands
                 if (argStrings.Length == 0)
                     return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, "COMMANDEXECUTOR_SUBCALL_UNSPECIFIED");
                 if (call.SubCall.ToLower() != argStrings[0].ToLower())
-                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, $"The sub call `{argStrings[0]}` is not recognised! Try using `{Context.Prefix}help {Context.CommandText}` for usage info.");
+                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, "COMMANDEXECUTOR_SUBCALL_UNKNOWN");
                 argStrings = argStrings.Skip(1).ToArray();
             }
 
             var acceptedLength = argPattern.Count(a => !a.UseDefault);
             if (argStrings.Length > acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Too many arguments were supplied. Try using `{Context.Prefix}help {Context.CommandText}` for usage info.");
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.TooManyArguments, "COMMANDEXECUTOR_ARGUMENTS_TOOMANY");
             else if (argStrings.Length < acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Try using `{Context.Prefix}help {Context.CommandText}` for usage info.");
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, "COMMANDEXECUTOR_ARGUMENTS_TOOFEW");
 
             var argResults = new object[argPattern.Length];
             var argIterator = argStrings.GetEnumerator();
@@ -187,10 +213,10 @@ namespace TitanBot.Commands
                 else
                 {
                     if (!argIterator.MoveNext())
-                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, $"Not enough arguments were supplied. Try using `{Context.Prefix}help {Context.CommandText}` for usage info.");
+                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, "COMMANDEXECUTOR_ARGUMENTS_TOOFEW");
                     var readRes = await reader.Read(argPattern[i].Type, Context, (string)argIterator.Current);
                     if (!readRes.IsSuccess)
-                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidArguments, readRes.Message);
+                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.ArgumentMismatch, readRes.Message.message, readRes.Message.values);
                     argResults[i] = readRes.Best;
                 }
             }

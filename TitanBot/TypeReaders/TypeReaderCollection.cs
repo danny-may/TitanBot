@@ -128,9 +128,9 @@ namespace TitanBot.TypeReaders
             else if (results.Count() == 1)
                 result = results.First();
             else if (results.Count() > 0)
-                result = TypeReaderResponse.FromError($"Unable to read the value `{text}` as `{type.Name}`");
+                result = TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", text, type);
             else
-                result = TypeReaderResponse.FromError($"No reader found for type `{type.FullName}`");
+                result = TypeReaderResponse.FromError("TYPEREADER_NOTYPEREADER", text, type);
             return ResultsCache.GetOrAdd((context.GetHashCode(), type, text), result);
         }
 

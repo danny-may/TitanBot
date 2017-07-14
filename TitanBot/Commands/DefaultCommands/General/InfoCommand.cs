@@ -49,7 +49,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 builder.AddInlineField(lang.ToString(), TextResource.Format("INFO_LANGUAGE_COVERAGE", Formatter.Beautify(TextManager.GetLanguageCoverage(lang)*100)));
             }
 
-            await ReplyAsync("", embed: builder.Build());
+            await ReplyAsync(builder.Build());
         }
 
         [Call]
@@ -73,7 +73,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 action(builder, this);
             }
 
-            await ReplyAsync("", embed: builder.Build());
+            await ReplyAsync(builder.Build());
         }
     }
 }
