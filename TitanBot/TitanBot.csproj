@@ -186,6 +186,7 @@
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
     <Compile Include="Commands\CommandContext.cs" />
+    <Compile Include="Commands\DefaultCommands\Abstract\SettingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\SettingsCommand.cs" />
     <Compile Include="Commands\CommandExecutor.cs" />

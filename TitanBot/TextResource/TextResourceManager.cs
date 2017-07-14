@@ -101,6 +101,9 @@ namespace TitanBot.TextResource
             AddResource("EXEC_HELP_DESCRIPTION", "Allows for arbitrary code execution");
             AddResource("EXEC_HELP_NOTES", "https://github.com/Titansmasher/TitanBot/blob/rewrite/TitanBotBase/Commands/DefaultCommands/Owner/ExecCommand.cs#L111");
             AddResource("EXEC_HELP_USAGE", "Executes arbitrary code");
+            AddResource("GLOBALSETTINGS_HELP_DESCRIPTION", "Allows the retrieval and changing of existing settings for the server");
+            AddResource("GLOBALSETTINGS_HELP_USAGE_DEFAULT", "Lists all settings available");
+            AddResource("GLOBALSETTINGS_HELP_USAGE_SET", "Sets the given setting to the given value.");
 
             //Settings stuff
 
