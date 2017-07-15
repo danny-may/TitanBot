@@ -12,43 +12,50 @@ namespace TitanBot.Commands
 {
     public class CommandContext : ICommandContext
     {
-        public IMessageChannel Channel { get; }
-        public IDependencyFactory DependencyFactory { get; }
-        public IGuild Guild { get; }
-        public IUserMessage Message { get; }
-        public IUser Author { get; }
         public DiscordSocketClient Client { get; }
-        public GeneralSettings GuildData { get; }
+        public IUserMessage Message { get; }
+        public IMessageChannel Channel { get; }
+        public IUser Author { get; }
+        public IGuild Guild { get; }
+
         public int ArgPos { get; private set; }
         public string Prefix { get; private set; }
         public string CommandText { get; private set; }
         public bool IsCommand => Command != null;
         public bool ExplicitPrefix { get; private set; }
         public CommandInfo? Command { get; set; }
-        public IReplier Replier { get; }
-        public ITextResourceCollection TextResource { get; }
-        public ValueFormatter Formatter { get; }
+
+        public IReplier Replier => _replier.Value;
+        public ITextResourceCollection TextResource => _textResource.Value;
+        public ValueFormatter Formatter => _formatter.Value;
+        public GeneralSettings GuildData => _guildData.Value;
+        public UserSetting UserSetting => _userSetting.Value;
+
+        private Lazy<IReplier> _replier { get; }
+        private Lazy<ITextResourceCollection> _textResource { get; }
+        private Lazy<ValueFormatter> _formatter { get; }
+        private Lazy<GeneralSettings> _guildData { get; }
+        private Lazy<UserSetting> _userSetting { get; }
+
 
         internal CommandContext(IUserMessage message, IDependencyFactory factory)
         {
-            DependencyFactory = factory;
-            Client = DependencyFactory.Get<DiscordSocketClient>();
+            Client = factory.Get<DiscordSocketClient>();
             Message = message;
             Channel = message.Channel;
             Author = message.Author;
             Guild = (message.Channel as IGuildChannel)?.Guild;
-            var database = DependencyFactory.Get<IDatabase>();
-            var userdata = database.AddOrGet(Author.Id, () => new UserSetting()).Result;
-            if (Guild != null)
-                GuildData = DependencyFactory.Get<ISettingsManager>().GetGroup<GeneralSettings>(Guild.Id);
-            Formatter = DependencyFactory.WithInstance(userdata.AltFormat)
-                                         .WithInstance(this)
-                                         .Construct<ValueFormatter>();
-            TextResource = DependencyFactory.Get<ITextResourceManager>()
-                                            .GetForLanguage(GuildData?.PreferredLanguage ?? userdata.Language, Formatter);
-            Replier = DependencyFactory.WithInstance(TextResource)
-                                       .WithInstance(Formatter)
-                                       .Construct<IReplier>();
+
+            _userSetting = new Lazy<UserSetting>(() => factory.Get<IDatabase>()
+                                                              .AddOrGet(Author.Id, () => new UserSetting { Id = Author.Id })
+                                                              .Result);
+            _guildData = new Lazy<GeneralSettings>(() => Guild != null ? factory.Get<ISettingsManager>().GetGroup<GeneralSettings>(Guild.Id) : null);
+            _formatter = new Lazy<ValueFormatter>(() => factory.WithInstance(this)
+                                                               .Construct<ValueFormatter>());
+            _textResource = new Lazy<ITextResourceCollection>(() => factory.Get<ITextResourceManager>()
+                                                                           .GetForLanguage(GuildData?.PreferredLanguage ?? UserSetting.Language, Formatter));
+            _replier = new Lazy<IReplier>(() => factory.WithInstance(this)
+                                                       .Construct<IReplier>());
         }
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)

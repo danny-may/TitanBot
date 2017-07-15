@@ -7,5 +7,6 @@ namespace TitanBot.Storage
         public ulong Id { get; set; }
         public bool AltFormat { get; set; } = true;
         public Locale Language { get; set; } = Locale.DEFAULT;
+        public bool Embeds { get; set; } = true;
     }
 }

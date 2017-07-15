@@ -103,8 +103,9 @@ namespace TitanBot.Util
             }
         }
 
-        public static bool UserHasPermission(this IGuildChannel channel, IGuildUser user, ChannelPermission permission)
-            => user.GetPermissions(channel).Has(permission);
+        public static bool UserHasPermission(this IChannel channel, IUser user, ChannelPermission permission)
+            => (user is IGuildUser guser && channel is IGuildChannel gchannel && guser.GetPermissions(gchannel).Has(permission)) ||
+               !(channel is IGuildChannel);
 
         public static bool HasCharPrefix(this IUserMessage msg, char c, out int argPos)
         {

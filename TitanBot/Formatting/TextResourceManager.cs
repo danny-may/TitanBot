@@ -125,6 +125,7 @@ namespace TitanBot.Formatting
             AddResource("COMMANDEXECUTOR_SUBCALL_UNSPECIFIED", "You have not specified which sub call you would like to use! Try using `{0}help {1}` for usage info.");
             AddResource("COMMANDEXECUTOR_ARGUMENTS_TOOMANY", "Too many arguments were supplied. Try using `{0}help {1}` for usage info.");
             AddResource("COMMANDEXECUTOR_ARGUMENTS_TOOFEW", "Not enough arguments were supplied. Try using `{0}help {1}` for usage info.");
+            AddResource("COMMANDEXECUTOR_EXCEPTION_ALERT", "There was an error when processing your command! ({0}) Please contact Titansmasher asap and give him EXCEPTIONID: {1}");
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOTHERE", "You cannot use that command here!");
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOTOWNER", "Only owners can use that command!");
             AddResource("PERMISSIONMANAGER_DISALLOWED_NOPERMISSION", "You do not have permission to use that command!");
@@ -132,6 +133,9 @@ namespace TitanBot.Formatting
             AddResource("TYPEREADER_UNABLETOREAD", "I could not read `{2}` as {3}");
             AddResource("TYPEREADER_NOTYPEREADER", "No reader found for `{3}`");
             AddResource("TYPEREADER_ENTITY_NOTFOUND", "{3} `{2}` could not be found");
+            AddResource("UNABLE_SEND", "I was unable to send this message in {0} because I did not have permission:\n{1}");
+            AddResource("MESSAGE_TOO_LONG", "I tried to send a message that was too long! Here is that message.");
+            AddResource("MESSAGE_CONTAINED_ATTACHMENT", "This message also contained an attachment, however I was unable to include that here.");
 
             //Command stuff
 
@@ -198,6 +202,11 @@ namespace TitanBot.Formatting
             AddResource("SHUTDOWN_INTIME", "Shutting down in {0}");
             AddResource("SUDOCOMMAND_SUCCESS", "Executing `{0}` as {1}");
             AddResource("RELOAD_COMPLETE", "Reload complete");
+            AddResource("EXCEPTION_NOTFOUND", "Exception {0} has not yet occured!");
+            AddResource("EXCEPTION_MESSAGE", "Message");
+            AddResource("EXCEPTION_CHANNEL", "Channel");
+            AddResource("EXCEPTION_GUILD", "Guild");
+            AddResource("EXCEPTION_FULLMESSAGE", "Here is everything that was logged for exception {0}");
 
             //General stuff
 

@@ -179,7 +179,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 }
             }
 
-            await ReplyAsync(builder.Build());
+            await ReplyAsync(Embedable.FromEmbed(builder));
         }
 
         public class ExecGlobals

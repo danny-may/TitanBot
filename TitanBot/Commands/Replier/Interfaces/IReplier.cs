@@ -6,6 +6,8 @@ namespace TitanBot.Commands
 {
     public interface IReplier
     {
-        IReplyContext Reply(IMessageChannel channel, IUser user);
+        event OnSendEventHandler OnSend;
+
+        IReplyContext Reply(IMessageChannel channel);
     }
 }

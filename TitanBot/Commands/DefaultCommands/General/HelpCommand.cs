@@ -60,7 +60,7 @@ namespace TitanBot.Commands.DefautlCommands.General
                 builder.AddField(group.Key, string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key)));
             }
             
-            await ReplyAsync(builder);
+            await ReplyAsync(Embedable.FromEmbed(builder));
         }
 
         async Task HelpCommandAsync(string name)
@@ -94,11 +94,14 @@ namespace TitanBot.Commands.DefautlCommands.General
                 var flgs = " " + call.GetFlags();
                 usages.Add($"`{pfx + nme + parm.TrimEnd() + flgs.TrimEnd()}` - {TextResource.GetResource(call.Usage)}");
             }
+
+            var notes = TextResource.GetResource(command.Note);
+
             var usage = string.Join("\n", usages);
             if (string.IsNullOrWhiteSpace(usage))
                 usage = TextResource.GetResource("HELP_SINGLE_NOUSAGE");
             else
-                usage += TextResource.GetResource("HELP_SINGLE_USAGE_FOOTER");
+                notes += TextResource.GetResource("HELP_SINGLE_USAGE_FOOTER");
             
             var aliases = command.Alias.Length == 0 ? "" : string.Join(", ", command.Alias.ToList());
             
@@ -107,8 +110,6 @@ namespace TitanBot.Commands.DefautlCommands.General
             var flags = string.Join("\n", permitted.SelectMany(c => c.Flags)
                                                    .GroupBy(f => f.ShortKey)
                                                    .Select(g => g.First()));
-            
-            var notes = TextResource.GetResource(command.Note);
             
             var builder = new EmbedBuilder
             {
@@ -132,7 +133,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             if (!string.IsNullOrWhiteSpace(notes))
                 builder.AddField(TextResource.GetResource("NOTES"), notes);
             
-            await ReplyAsync(builder.Build());
+            await ReplyAsync(Embedable.FromEmbed(builder));
         }
     }
 }

@@ -3,15 +3,16 @@ using Discord.WebSocket;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Settings;
+using TitanBot.Storage;
 
 namespace TitanBot.Commands
 {
     public interface ICommandContext
     {
         IUser Author { get; }
-        IDependencyFactory DependencyFactory { get; }
         IReplier Replier { get; }
         ITextResourceCollection TextResource { get; }
+        UserSetting UserSetting { get; }
         ValueFormatter Formatter { get; }
         IMessageChannel Channel { get; }
         DiscordSocketClient Client { get; }

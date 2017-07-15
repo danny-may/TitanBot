@@ -49,13 +49,36 @@ namespace TitanBot.Commands
 
         public async Task Run()
         {
-            if (!Context.IsCommand && !Context.ExplicitPrefix)
-                return;
-            else if (!Context.IsCommand)
-                await Replier.Reply(Context.Channel, Context.Author)
-                             .WithMessage("COMMANDEXECUTOR_COMMAND_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText)
-                             .SendAsync();
-            await TryExecute();
+            try
+            {
+                if (!Context.IsCommand && !Context.ExplicitPrefix)
+                    return;
+                else if (!Context.IsCommand)
+                    await Replier.Reply(Context.Channel)
+                                 .WithMessage("COMMANDEXECUTOR_COMMAND_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText)
+                                 .SendAsync();
+                await TryExecute();
+            }
+            catch (Exception ex)
+            {
+                var record = new Error
+                {
+                    Channel = Context.Channel.Id,
+                    Message = Context.Message.Id,
+                    User = Context.Author.Id,
+                    Description = $"{ex.GetType()}\n{ex.Message}",
+                    Content = ex.ToString(),
+                    Type = ex.GetType().Name
+                };
+                await Database.Insert(record);
+                try
+                {
+                    await Replier.Reply(Context.Channel)
+                                 .WithMessage("COMMANDEXECUTOR_EXCEPTION_ALERT", ReplyType.Error, ex.GetType().Name, record.Id)
+                                 .SendAsync();
+                }
+                catch { }
+            }
         }
 
         private async Task TryExecute()
@@ -72,7 +95,7 @@ namespace TitanBot.Commands
             var calls = PermissionManager.CheckContext(Context, command.Calls.ToArray());
             if (calls.Count() == 0)
             {
-                await Replier.Reply(Context.Channel, Context.Author)
+                await Replier.Reply(Context.Channel)
                              .WithMessage("COMMANDEXECUTOR_DISALLOWED_CHANNEL", ReplyType.Error)
                              .SendAsync();
                 return;
@@ -80,7 +103,7 @@ namespace TitanBot.Commands
             calls = CheckSubcommands(calls);
             if (calls.Count() == 0)
             {
-                await Replier.Reply(Context.Channel, Context.Author)
+                await Replier.Reply(Context.Channel)
                              .WithMessage("COMMANDEXECUTOR_SUBCALL_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText)
                              .SendAsync();
                 return;
@@ -94,40 +117,23 @@ namespace TitanBot.Commands
                     if (!permCheck.IsSuccess)
                     {
                         if (permCheck.ErrorMessage != null)
-                            await Replier.Reply(Context.Channel, Context.Author)
+                            await Replier.Reply(Context.Channel)
                                          .WithMessage(permCheck.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText)
                                          .SendAsync();
                     }
                     else
                     {
-                        try
+                        instance.Install(Context, DependencyFactory);
+                        LogCommand(call);
+                        using (Context.Channel.EnterTypingState())
                         {
-                            instance.Install(Context, DependencyFactory);
-                            LogCommand(call);
-                            using (Context.Channel.EnterTypingState())
-                            {
-                                await (Task)call.Call.Invoke(instance, response.CallArguments);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            var record = new Error
-                            {
-                                Channel = Context.Channel.Id,
-                                Message = Context.Message.Id,
-                                User = Context.Author.Id,
-                                Content = JsonConvert.SerializeObject(ex)
-                            };
-                            await Database.Insert(record);
-                            await Replier.Reply(Context.Channel, Context.Author)
-                                         .WithMessage("COMMANDEXECUTOR_EXCEPTION_ALERT", ReplyType.Error, record.Id)
-                                         .SendAsync();
+                            await (Task)call.Call.Invoke(instance, response.CallArguments);
                         }
                     }
                     return;
                 }
             }
-            await Replier.Reply(Context.Channel, Context.Author)
+            await Replier.Reply(Context.Channel)
                          .WithMessage(response.ErrorMessage.message, ReplyType.Error, new object[] { Context.Prefix, Context.CommandText}
                                                                                             .Concat(response.ErrorMessage.values.Select(v => v(TextResource)))
                                                                                             .ToArray())

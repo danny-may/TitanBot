@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -42,6 +43,48 @@ namespace TitanBot.Util
             return ((MethodCallExpression)expr.Body)
                 .Method
                 .GetGenericMethodDefinition();
+        }
+
+        public static T InlineAction<T>(T obj, Action<T> action)
+        {
+            action(obj);
+            return obj;
+        }
+
+
+        public static void CheckNull<T>(this T? value, Action<T> hasValue)
+            where T : struct => CheckNull(value, hasValue, () => { });
+        public static void CheckNull<T>(this T? value, Action noValue)
+            where T : struct => CheckNull<T>(value, t => { }, noValue);
+        public static void CheckNull<T>(this T? value, Action<T> hasValue, Action noValue) 
+            where T : struct
+        {
+            if (value.HasValue)
+                hasValue(value.Value);
+            else
+                noValue();
+        }
+        public static void CheckNull<T>(this T value, Action<T> hasValue)
+            where T : class => CheckNull(value, hasValue, () => { });
+        public static void CheckNull<T>(this T value, Action noValue)
+            where T : class => CheckNull(value, t => { }, noValue);
+        public static void CheckNull<T>(this T value, Action<T> hasValue, Action noValue)
+            where T : class
+        {
+            if (value != null)
+                hasValue(value);
+            else
+                noValue();
+        }
+
+        public static Stream ToStream(this string text)
+        {
+            var ms = new MemoryStream();
+            var sw = new StreamWriter(ms);
+            sw.Write(text);
+            sw.Flush();
+            ms.Position = 0;
+            return ms;
         }
     }
 }

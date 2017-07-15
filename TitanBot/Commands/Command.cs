@@ -15,7 +15,7 @@ using TitanBot.Util;
 
 namespace TitanBot.Commands
 {
-    public abstract class Command
+    public abstract partial class Command
     {
         static ConcurrentDictionary<Type, object> CommandLocks { get; } = new ConcurrentDictionary<Type, object>();
         static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> GuildLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
@@ -82,6 +82,8 @@ namespace TitanBot.Commands
             Prefix = context.Prefix;
             CommandName = context.CommandText;
             StartReplyTimer();
+
+            Replier.OnSend += OnMessageSent;
         }
 
         private void StartReplyTimer()
@@ -89,13 +91,14 @@ namespace TitanBot.Commands
             Task.Run(async () =>
             {
                 await Task.Delay(DelayMessageMs);
+                return;
                 lock (InstanceCommandLock)
                 {
                     if (!HasReplied)
                     {
-                        AwaitMessage = Replier.Reply(Channel, Author)
+                        AwaitMessage = Replier.Reply(Channel)
                                               .WithMessage(DelayMessage)
-                                              .Send();
+                                              .Send(true);
                     }
                 }
             }).DontWait();
@@ -116,15 +119,8 @@ namespace TitanBot.Commands
             return Task.CompletedTask;
         }
 
-        protected IReplyContext Reply
-        {
-            get
-            {
-                var context = Replier.Reply(Channel, Author);
-                context.OnSend += OnMessageSent;
-                return context;
-            }
-        }
+        protected IReplyContext Reply 
+            => Replier.Reply(Channel);
 
         protected Task<IUserMessage> ReplyAsync(string message)
             => Reply.WithMessage(message).SendAsync();
@@ -134,7 +130,9 @@ namespace TitanBot.Commands
             => Reply.WithMessage(message, values).SendAsync();
         protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, params object[] values)
             => Reply.WithMessage(message, replyType, values).SendAsync();
-        protected Task<IUserMessage> ReplyAsync(Embed embed)
-            => Reply.WithEmbed(embed).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(IEmbedable embed)
+            => Reply.WithEmbedable(embed).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(EmbedBuilder embed)
+            => ReplyAsync(Embedable.FromEmbed(embed));
     }
 }

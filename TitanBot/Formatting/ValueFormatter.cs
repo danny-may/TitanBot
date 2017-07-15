@@ -18,10 +18,10 @@ namespace TitanBot.Formatting
 
         protected ICommandContext Context;
         protected bool AltFormat;
-        public ValueFormatter(ICommandContext context, bool altFormat)
+        public ValueFormatter(ICommandContext context)
         {
             Context = context;
-            AltFormat = altFormat;
+            AltFormat = Context.UserSetting.AltFormat;
             BeautifyGeneric = MiscUtil.GetMethod<ValueFormatter>(v => v.Beautify<object>(null));
         }
 
