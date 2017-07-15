@@ -37,7 +37,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 text += $"{TextResource.GetResource("EXCEPTION_MESSAGE")}:\n{message.Content}\n\n";
                 text += exception.Content;
 
-                await Reply.WithAttachment(() => text.ToStream(), "error.txt")
+                await Reply.WithAttachment(() => text.ToStream(), $"Exception{exceptionId}.txt")
                            .WithMessage(TextResource.Format("EXCEPTION_FULLMESSAGE", ReplyType.Success, exceptionId))
                            .SendAsync();
             }
@@ -51,7 +51,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                         Name = (user?.Username ?? "UNKNOWNUSER") + "#" + (user?.Discriminator ?? "0000")
                     },
                     Description = exception.Description,
-                    Timestamp = exception.Time
+                    Timestamp = exception.Time,
+                    Color = System.Drawing.Color.Red.ToDiscord()
                 }.AddField(TextResource.GetResource("EXCEPTION_MESSAGE"), message.Content)
                  .AddInlineField(TextResource.GetResource("EXCEPTION_CHANNEL"), $"{channel.Name} ({channel.Id})");
                 if (channel is IGuildChannel guildChannel)
