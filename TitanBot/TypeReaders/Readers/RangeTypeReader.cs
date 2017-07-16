@@ -47,7 +47,7 @@ namespace TitanBot.TypeReaders
             if (!from.IsSuccess)
                 return TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", values[0], typeof(T));
             if (!to.IsSuccess)
-                return TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", values[0], typeof(T));
+                return TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", values[1], typeof(T));
 
             return TypeReaderResponse.FromSuccess(new Range<T>
             {
