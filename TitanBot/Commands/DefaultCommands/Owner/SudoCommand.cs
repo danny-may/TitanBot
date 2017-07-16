@@ -4,7 +4,7 @@ using TitanBot.Commands.Models;
 using TitanBot.Dependencies;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
-{   
+{
     [Description("SUDOCOMMAND_HELP_DESCRIPTION")]
     [RequireOwner]
     public class SudoCommand : Command

@@ -13,12 +13,10 @@ namespace TitanBot.Commands.DefaultCommands.Admin
     public class EditCommandCommand : Command
     {
         IPermissionManager PermissionManager { get; }
-        ICommandContext Context { get; }
 
-        public EditCommandCommand(IPermissionManager permissions, ICommandContext context)
+        public EditCommandCommand(IPermissionManager permissions)
         {
             PermissionManager = permissions;
-            Context = context;
         }
 
         IEnumerable<CallInfo> FindCalls(string[] cmds)

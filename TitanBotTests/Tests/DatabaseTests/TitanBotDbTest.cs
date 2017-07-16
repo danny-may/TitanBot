@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using TitanBot.Storage;
-using TitanBot.Logging;
 using TitanBotBaseTest.Helpers;
 using TitanBotBaseTest.MockModels;
 

@@ -1,17 +1,14 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TitanBot.Commands.Responses;
 using TitanBot.Dependencies;
+using TitanBot.Formatting;
 using TitanBot.Logging;
 using TitanBot.Settings;
 using TitanBot.Storage;
-using TitanBot.Formatting;
 using TitanBot.TypeReaders;
-using TitanBot.Util;
 
 namespace TitanBot.Commands
 {

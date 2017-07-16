@@ -1,9 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Settings;
-using TitanBot.Storage;
 
 namespace TitanBot.Commands
 {

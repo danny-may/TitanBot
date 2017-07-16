@@ -15,6 +15,7 @@ namespace TitanBot.Commands
 
         public static string[] GetFor(Type type)
             => type.GetCustomAttribute<AliasAttribute>()?.Value ?? new string[0];
+
         public static bool ExistsOn(Type type)
             => type.GetCustomAttribute<AliasAttribute>() != null;
 

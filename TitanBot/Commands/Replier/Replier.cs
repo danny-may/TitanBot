@@ -1,6 +1,5 @@
 ﻿using Discord;
 using System.Threading.Tasks;
-using TitanBot.Formatting;
 using TitanBot.Logging;
 using TitanBot.Util;
 

@@ -2,8 +2,8 @@
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using TitanBot.Commands;
-using TitanBot.Storage;
 using TitanBot.Logging;
+using TitanBot.Storage;
 
 namespace TitanBot.DiscordHandlers
 {

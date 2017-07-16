@@ -6,14 +6,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TitanBot.Commands.Responses;
-using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.Logging;
 using TitanBot.Settings;
+using TitanBot.Storage;
 using TitanBot.TypeReaders;
-using TitanBot.Util;
-using TitanBot.Formatting;
 
 namespace TitanBot.Commands
 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TitanBot.Util;
 
 namespace TitanBot.Dependencies
 {

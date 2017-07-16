@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace TitanBot.Formatting
+﻿namespace TitanBot.Formatting
 {
     public struct Locale
     {

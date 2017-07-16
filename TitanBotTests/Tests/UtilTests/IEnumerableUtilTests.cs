@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TitanBot.Util;
 
 namespace TitanBotBaseTest.Tests.UtilTests

@@ -1,13 +1,9 @@
 ﻿using Discord;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using TitanBot.Formatting;
-using TitanBot.Util;
-using System.Drawing;
-using System.IO;
-using System.Collections.Generic;
 using Discord.Net;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using TitanBot.Util;
 
 namespace TitanBot.Commands
 {

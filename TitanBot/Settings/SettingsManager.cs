@@ -4,11 +4,11 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TitanBot.Storage;
+using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
+using TitanBot.Storage;
 using TitanBot.Util;
-using TitanBot.Commands;
 
 namespace TitanBot.Settings
 {

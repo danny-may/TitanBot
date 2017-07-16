@@ -1,12 +1,8 @@
-﻿using Discord;
-using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TitanBot.Commands.DefaultCommands.Abstract;
-using TitanBot.TypeReaders;
-using TitanBot.Util;
-using System.Collections.Generic;
 using TitanBot.Settings;
+using TitanBot.TypeReaders;
 
 namespace TitanBot.Commands.DefaultCommands.Admin
 {
