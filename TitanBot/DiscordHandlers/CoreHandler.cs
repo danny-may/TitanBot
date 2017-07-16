@@ -20,7 +20,7 @@ namespace TitanBot.DiscordHandlers
 
         private Task MessageRecievedAsync(SocketMessage msg)
         {
-            if (msg is IUserMessage message)
+            if (msg is IUserMessage message && !message.Author.IsBot)
                 Task.Run(() => CommandService.ParseAndExecute(message));
             return Task.CompletedTask;
         }
