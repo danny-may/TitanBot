@@ -95,7 +95,7 @@ namespace TitanBot.Commands
         {
             var context = DependencyFactory.WithInstance(message)
                                            .Construct<ICommandContext>();
-            context.CheckCommand(this, SettingsManager.GlobalSettings.DefaultPrefix);
+            context.CheckCommand(this, SettingsManager.GetGlobalGroup<GeneralGlobalSetting>().DefaultPrefix);
             var executor = DependencyFactory.WithInstance(context)
                                             .Construct<CommandExecutor>();
             return executor.Run();

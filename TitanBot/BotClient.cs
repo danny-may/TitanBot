@@ -33,7 +33,7 @@ namespace TitanBot
         public ITypeReaderCollection TypeReaders { get; private set; }
         public ISettingsManager SettingsManager { get; private set; }
         public ITextResourceManager TextResourceManager { get; private set; }
-        public GlobalSetting GlobalSettings => SettingsManager.GlobalSettings;
+        public GeneralGlobalSetting GlobalSettings => SettingsManager.GetGlobalGroup<GeneralGlobalSetting>();
         public IReadOnlyList<ulong> Owners => GlobalSettings.Owners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
                                                                    .ToList().AsReadOnly();
         public Task UntilOffline => Task.Run(async () => { while (DiscordClient.LoginState != LoginState.LoggedOut) { await Task.Delay(10); } });
@@ -111,18 +111,17 @@ namespace TitanBot
         public async Task StartAsync(Func<string, string> tokenInput)
         {
             var token = tokenInput(GlobalSettings.Token) ?? GlobalSettings.Token;
-            token = string.IsNullOrWhiteSpace(token) ? GlobalSettings.Token : token;
-            GlobalSettings.Token = token;
+            SettingsManager.EditGlobalGroup<GeneralGlobalSetting>(s => {if (!string.IsNullOrWhiteSpace(token)) { s.Token = token; } });
             if (DiscordClient.LoginState != LoginState.LoggedOut)
                 return;
             try
             {
-                await DiscordClient.LoginAsync(TokenType.Bot, token);
+                await DiscordClient.LoginAsync(TokenType.Bot, GlobalSettings.Token);
             }
             catch (HttpException ex)
             {
                 if (ex.HttpCode == HttpStatusCode.Unauthorized)
-                    GlobalSettings.Token = null;
+                    SettingsManager.EditGlobalGroup<GeneralGlobalSetting>(s => s.Token = null);
                 throw;
             }
             await DiscordClient.StartAsync();

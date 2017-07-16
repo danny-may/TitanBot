@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using TitanBot.Storage;
 using TitanBot.Dependencies;
+using TitanBot.Formatting;
+using TitanBot.Util;
 
 namespace TitanBot.Settings
 {
@@ -13,83 +15,110 @@ namespace TitanBot.Settings
     {
         private IDatabase Database { get; }
         private IDependencyFactory DependencyFactory { get; }
-
-        public GlobalSetting GlobalSettings { get; }
+        private ITextResourceManager TextResourceManager { get; }
         
-        public IReadOnlyList<IEditableSettingGroup> EditableSettingGroups => Groups.Select(g => g.Value).ToList().AsReadOnly();
-        private Dictionary<Type, IEditableSettingGroup> Groups { get; } = new Dictionary<Type, IEditableSettingGroup>();
+        public IReadOnlyList<IEditableSettingGroup> GuildSettingGroups => GuildGroups.Select(g => g.Value).ToList().AsReadOnly();
+        private Dictionary<Type, IEditableSettingGroup> GuildGroups { get; } = new Dictionary<Type, IEditableSettingGroup>();
 
-        public IReadOnlyList<IEditableSettingGroup> EditableGlobalSettingsGroups => GlobalGroups.Select(g => g.Value).ToList().AsReadOnly();
+        public IReadOnlyList<IEditableSettingGroup> GlobalSettingGroups => GlobalGroups.Select(g => g.Value).ToList().AsReadOnly();
         private Dictionary<Type, IEditableSettingGroup> GlobalGroups { get; } = new Dictionary<Type, IEditableSettingGroup>();
 
-        public T GetCustomGlobal<T>()
-            => GlobalSettings.GetCustom<T>();
-        public void SaveCustomGlobal<T>(T setting)
-            => GlobalSettings.SaveCustom(setting);
+        public IReadOnlyList<IEditableSettingGroup> UserSettingGroups => UserGroups.Select(g => g.Value).ToList().AsReadOnly();
+        private Dictionary<Type, IEditableSettingGroup> UserGroups { get; } = new Dictionary<Type, IEditableSettingGroup>();
 
-        internal SettingsManager(IDatabase database, IDependencyFactory factory)
+        private Dictionary<(Type, ulong), object> Cached { get; } = new Dictionary<(Type, ulong), object>();
+
+        internal SettingsManager(IDatabase database, ITextResourceManager textManager, IDependencyFactory factory)
         {
             Database = database;
             DependencyFactory = factory;
-            GlobalSettings = new GlobalSetting(this, database);
+            TextResourceManager = textManager;
 
-            Register<GeneralSettings>().WithName("General")
-                                       .WithDescription("SETTINGS_GENERAL_DESCRIPTION")
-                                       .AddSetting(s => s.Prefix)
-                                       .AddSetting(s => s.PermOverride)
-                                       .AddSetting(s => s.RoleOverride, (IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: r => string.Join(", ", r?.Select(id => $"<@&{id}>")))
-                                       .AddSetting(s => s.DateTimeFormat)
-                                       .AddSetting(s => s.PreferredLanguage)
-                                       .WithNotes("SETTINGS_GENERAL_NOTES")
-                                       .Finalise();
+            AddGuildSetting<GeneralGuildSetting>().WithName("General")
+                                                  .WithDescription("SETTINGS_GUILD_GENERAL_DESCRIPTION")
+                                                  .AddSetting(s => s.Prefix)
+                                                  .AddSetting(s => s.PermOverride)
+                                                  .AddSetting(s => s.RoleOverride, (IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: r => string.Join(", ", r?.Select(id => $"<@&{id}>")))
+                                                  .AddSetting(s => s.DateTimeFormat)
+                                                  .AddSetting(s => s.PreferredLanguage, validator: v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
+                                                  .WithNotes("SETTINGS_GUILD_GENERAL_NOTES")
+                                                  .Finalise();
 
-            RegisterGlobal((m, id) => m.GlobalSettings, (m, id, o) => { }).WithName("General")
-                                                                          .WithDescription("SETTINGS_GLOBAL_GENERAL_DESCRIPTION")
-                                                                          .AddSetting(s => s.DefaultPrefix)
-                                                                          .AddSetting(s => s.Owners, (IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: u => string.Join(", ", u.Select(p => $"<@{p}>")))
-                                                                          .Finalise();
+            AddGlobalSetting<GeneralGlobalSetting>().WithName("General")
+                                                    .WithDescription("SETTINGS_GLOBAL_GENERAL_DESCRIPTION")
+                                                    .AddSetting(s => s.DefaultPrefix)
+                                                    .AddSetting(s => s.Owners, (IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: u => string.Join(", ", u.Select(p => $"<@{p}>")))
+                                                    .Finalise();
+
+            AddUserSetting<GeneralUserSetting>().WithName("General")
+                                                .WithDescription("SETTINGS_USER_GENERAL_DESCRIPTION")
+                                                .AddSetting(s => s.Language, validator: v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
+                                                .AddSetting(s => s.FormatType, validator: v => v != FormattingType.UNKNOWN ? null : "FORMATTINGTYPE_UNKNOWN", viewer: v => ((FormattingType)v).Name)
+                                                .AddSetting(s => s.UseEmbeds)
+                                                .Finalise();
         }
 
-        public T GetGroup<T>(ulong guildId)
+        private T GetSetting<T>(ulong id)
         {
+            var record = Database.FindById<Setting>(id).Result ?? new Setting { Serialized = "{}", Id = id };
             var targetType = typeof(T).FullName;
-            var settings = JObject.Parse(Database.FindOne<Setting>(s => s.Id == guildId).Result?.Serialized ?? "{}");
+            var settings = JObject.Parse(record.Serialized);
 
             if (settings.TryGetValue(typeof(T).ToString(), out JToken setting))
                 return setting.ToObject<T>();
             return JsonConvert.DeserializeObject<T>("{}");
         }
 
-        public void SaveGroup<T>(ulong guildId, T settings)
+        private void SaveSetting<T>(ulong id, T setting)
         {
-            var current = Database.FindOne<Setting>(s => s.Id == guildId).Result ?? new Setting { Id = guildId, Serialized = "{}" };
+            var record = Database.FindById<Setting>(id).Result ?? new Setting { Serialized = "{}", Id = id };
+            var targetType = typeof(T).FullName;
+            var settings = JObject.Parse(record.Serialized);
 
-            var settingsObj = JObject.Parse(current.Serialized);
-
-            settingsObj[typeof(T).ToString()] = JObject.FromObject(settings);
-
-            Database.Upsert(new Setting
-            {
-                Id = guildId,
-                Serialized = settingsObj.ToString()
-            }).Wait();
+            settings[targetType] = JObject.FromObject(setting);
+            record.Serialized = JsonConvert.SerializeObject(settings);
+            
+            Database.Upsert(record).Wait();
         }
-
-        public IEditableSettingBuilder<T> Register<T>()
-            => Register((m, id) => m.GetGroup<T>(id), (m, id, o) => m.SaveGroup(id, o));
-
-        public IEditableSettingBuilder<T> RegisterGlobal<T>()
-            => RegisterGlobal((m, id) => m.GetCustomGlobal<T>(), (m, id, o) => m.SaveCustomGlobal(o));
-
-        public IEditableSettingBuilder<T> Register<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver)
-            => DependencyFactory.WithInstance(Groups).WithInstance(retriever).WithInstance(saver).Construct<IEditableSettingBuilder<T>>();
-
-        public IEditableSettingBuilder<T> RegisterGlobal<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver)
-            => DependencyFactory.WithInstance(GlobalGroups).WithInstance(retriever).WithInstance(saver).Construct<IEditableSettingBuilder<T>>();
 
         public async void ResetSettings(ulong guildId)
         {
             await Database.Delete<Setting>(s => s.Id == guildId);
         }
+
+        public T GetGuildGroup<T>(ulong id)
+            => GetSetting<T>(id);
+        public T GetGlobalGroup<T>()
+            => GetSetting<T>(1);
+        public T GetUserGroup<T>(ulong id)
+            => GetSetting<T>(id);
+
+        public void SaveGuildGroup<T>(ulong id, T setting)
+            => SaveSetting(id, setting);
+        public void SaveGlobalGroup<T>(T setting)
+            => SaveSetting(1, setting);
+        public void SaveUserGroup<T>(ulong id, T setting)
+            => SaveSetting(id, setting);
+
+        public void EditGuildGroup<T>(ulong id, Action<T> changes)
+            => SaveGuildGroup(id, MiscUtil.InlineAction(GetGuildGroup<T>(id), changes));
+        public void EditGlobalGroup<T>(Action<T> changes)
+            => SaveGlobalGroup(MiscUtil.InlineAction(GetGlobalGroup<T>(), changes));
+        public void EditUserGroup<T>(ulong id, Action<T> changes)
+            => SaveUserGroup(id, MiscUtil.InlineAction(GetUserGroup<T>(id), changes));
+
+        public IEditableSettingBuilder<T> AddGuildSetting<T>()
+            => AddGuildSetting(GetGuildGroup<T>, SaveGuildGroup);
+        public IEditableSettingBuilder<T> AddGlobalSetting<T>()
+            => AddGlobalSetting(GetGlobalGroup<T>, SaveGlobalGroup);
+        public IEditableSettingBuilder<T> AddUserSetting<T>()
+            => AddUserSetting(GetUserGroup<T>, SaveUserGroup);
+
+        public IEditableSettingBuilder<T> AddGuildSetting<T>(Func<ulong, T> retriever, Action<ulong, T> saver)
+            => new EditableSettingBuilder<T>(GuildGroups, DependencyFactory, retriever, saver);
+        public IEditableSettingBuilder<T> AddGlobalSetting<T>(Func<T> retriever, Action<T> saver)
+            => new EditableSettingBuilder<T>(GlobalGroups, DependencyFactory, i => retriever(), (i, v) => saver(v));
+        public IEditableSettingBuilder<T> AddUserSetting<T>(Func<ulong, T> retriever, Action<ulong, T> saver)
+            => new EditableSettingBuilder<T>(UserGroups, DependencyFactory, retriever, saver);
     }
 }

@@ -17,11 +17,11 @@ namespace TitanBot.Formatting
         protected delegate string BeautifyDelegate<T>(T value);
 
         protected ICommandContext Context;
-        protected bool AltFormat;
+        protected FormattingType AltFormat;
         public ValueFormatter(ICommandContext context)
         {
             Context = context;
-            AltFormat = Context.UserSetting.AltFormat;
+            AltFormat = Context.UserSetting.FormatType;
             BeautifyGeneric = MiscUtil.GetMethod<ValueFormatter>(v => v.Beautify<object>(null));
         }
 

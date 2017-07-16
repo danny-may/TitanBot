@@ -110,12 +110,18 @@ namespace TitanBot.Formatting
             AddResource("SUDOCOMMAND_HELP_USAGE", "Will execute any command as the given user");
             AddResource("RELOAD_HELP_DESCRIPTION", "Reloads the various configurations for titanbot");
             AddResource("RELOAD_HELP_USAGE", "Performs the reload");
+            AddResource("PREFERENCES_HELP_DESCRIPTION", "Allows you to set some options for how the bot will interact with you.");
+            AddResource("PREFERENCES_HELP_USAGE_DEFAULT", "Lists all preferences that are available");
+            AddResource("PREFERENCES_HELP_USAGE_SET", "Sets the given preference to the given value");
 
             //Settings stuff
 
-            AddResource("SETTINGS_GENERAL_DESCRIPTION", "General settings for the bot");
-            AddResource("SETTINGS_GENERAL_NOTES", "For DateTimeFormat, you can use [this link](https://www.codeproject.com/Articles/19677/Formats-for-DateTime-ToString) to help determine what is and is not valid!");
+            AddResource("SETTINGS_GUILD_GENERAL_DESCRIPTION", "General guild settings");
+            AddResource("SETTINGS_GUILD_GENERAL_NOTES", "For DateTimeFormat, you can use [this link](https://www.codeproject.com/Articles/19677/Formats-for-DateTime-ToString) to help determine what is and is not valid!");
             AddResource("SETTINGS_GLOBAL_GENERAL_DESCRIPTION", "General global settings");
+            AddResource("SETTINGS_USER_GENERAL_DESCRIPTION", "General user settings");
+            AddResource("LOCALE_UNKNOWN", "The locale `{0}` does not yet exist.");
+            AddResource("FORMATTINGTYPE_UNKNOWN", "The formatting type `{0}` does not exist.");
 
             //Bot stuff
 

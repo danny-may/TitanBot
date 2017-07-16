@@ -41,18 +41,18 @@ namespace TitanBot.Commands
         protected IMessageChannel Channel => Context?.Channel;
         protected SocketSelfUser BotUser => Client?.CurrentUser;
         protected IGuild Guild => Context?.Guild;
-        protected GeneralSettings GuildData => Context?.GuildData;
-        protected UserSetting UserData => Context?.UserSetting;
+        protected GeneralGuildSetting GuildData => Context?.GuildData;
+        protected GeneralUserSetting UserData => Context?.UserSetting;
         protected ValueFormatter Formatter => Context?.Formatter;
         protected IReplier Replier => Context?.Replier;
         protected ITextResourceCollection TextResource => Context?.TextResource;
         protected string Prefix => Context.Prefix;
         protected string CommandName => Context.CommandText;
-        protected GlobalSetting GlobalSettings => SettingsManager?.GlobalSettings;
+        protected GeneralGlobalSetting GlobalSettings => SettingsManager.GetGlobalGroup<GeneralGlobalSetting>();
         protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
         protected IGuildUser GuildAuthor => Author as IGuildUser;
         protected IGuildChannel GuildChannel => Channel as IGuildChannel;
-        protected string[] AcceptedPrefixes => new string[] { BotUser?.Mention, BotUser?.Username, SettingsManager?.GlobalSettings.DefaultPrefix, GuildData?.Prefix }
+        protected string[] AcceptedPrefixes => new string[] { BotUser?.Mention, BotUser?.Username, GlobalSettings.DefaultPrefix, GuildData?.Prefix }
                                                     .Where(p => !string.IsNullOrWhiteSpace(p))
                                                     .ToArray();
 

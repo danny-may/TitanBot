@@ -15,10 +15,10 @@ namespace TitanBot.Settings
         bool hasFinalised = false;
         Dictionary<Type, IEditableSettingGroup> Groups { get; }
         IDependencyFactory DependencyFactory { get; }
-        Func<ISettingsManager, ulong, TGroup> Retriever { get; }
-        Action<ISettingsManager, ulong, TGroup> Saver { get; }
+        Func<ulong, TGroup> Retriever { get; }
+        Action<ulong, TGroup> Saver { get; }
 
-        internal EditableSettingBuilder(Dictionary<Type, IEditableSettingGroup> groups, IDependencyFactory factory, Func<ISettingsManager, ulong, TGroup> retriever, Action<ISettingsManager, ulong, TGroup> saver)
+        internal EditableSettingBuilder(Dictionary<Type, IEditableSettingGroup> groups, IDependencyFactory factory, Func<ulong, TGroup> retriever, Action<ulong, TGroup> saver)
         {
             Groups = groups;
             DependencyFactory = factory;

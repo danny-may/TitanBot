@@ -24,7 +24,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         async Task SetPrefixAsync(string newPrefix)
         {
             GuildData.Prefix = newPrefix.ToLower();
-            SettingsManager.SaveGroup(Guild.Id, GuildData);
+            SettingsManager.SaveGuildGroup(Guild.Id, GuildData);
             await ReplyAsync("PREFIX_SET_MESSAGE", ReplyType.Success, GuildData.Prefix);
         }
     }

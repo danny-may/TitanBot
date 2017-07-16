@@ -8,11 +8,11 @@ namespace TitanBot.Settings
     {
         public string Name { get; protected set; }
         public abstract Type Type { get; }
-        public abstract bool TrySave(ISettingsManager manager, ulong guildId, object value, out string errors);
-        public abstract string Display(ISettingsManager manager, ulong guildId);
+        public abstract bool TrySave(ulong guildId, object value, out string errors);
+        public abstract string Display(ulong guildId);
 
-        public static EditableSetting Create<TGroup, TStore, TAccept>(Func<ISettingsManager, ulong, TGroup> retriever,
-                                                                Action<ISettingsManager, ulong, TGroup> saver,
+        public static EditableSetting Create<TGroup, TStore, TAccept>(Func<ulong, TGroup> retriever,
+                                                                Action<ulong, TGroup> saver,
                                                                 string name,
                                                                 Expression<Func<TGroup, TStore>> property,
                                                                 Func<TAccept, TStore> converter,
@@ -22,8 +22,8 @@ namespace TitanBot.Settings
 
         private class TypedSetting<TGroup, TStore, TAccept> : EditableSetting
         {
-            Func<ISettingsManager, ulong, TGroup> Retriever { get; }
-            Action<ISettingsManager, ulong, TGroup> Saver { get; }
+            Func<ulong, TGroup> Retriever { get; }
+            Action<ulong, TGroup> Saver { get; }
             Func<TAccept, TStore> Converter { get; }
             Func<TStore, string> Viewer { get; }
             Func<TAccept, string> Validator { get; }
@@ -32,8 +32,8 @@ namespace TitanBot.Settings
 
             public override Type Type => typeof(TAccept);
 
-            internal TypedSetting(Func<ISettingsManager, ulong, TGroup> retriever,
-                                  Action<ISettingsManager, ulong, TGroup> saver,
+            internal TypedSetting(Func<ulong, TGroup> retriever,
+                                  Action<ulong, TGroup> saver,
                                   string name,
                                   Expression<Func<TGroup, TStore>> property,
                                   Func<TAccept, TStore> converter,
@@ -50,10 +50,10 @@ namespace TitanBot.Settings
                 Saver = saver;
             }
 
-            public override string Display(ISettingsManager manager, ulong guildId)
-                => Viewer(Getter(Retriever(manager, guildId)));
+            public override string Display(ulong guildId)
+                => Viewer(Getter(Retriever(guildId)));
 
-            public override bool TrySave(ISettingsManager manager, ulong guildId, object value, out string errors)
+            public override bool TrySave(ulong guildId, object value, out string errors)
             {
                 if (!(value is TAccept))
                     errors = $"`{value.GetType()}` is not a valid {typeof(TAccept)}";
@@ -63,9 +63,9 @@ namespace TitanBot.Settings
                 if (errors != null)
                     return false;
 
-                var group = Retriever(manager, guildId);
+                var group = Retriever(guildId);
                 Setter(group, Converter((TAccept)value));
-                Saver(manager, guildId, group);
+                Saver(guildId, group);
                 return true;
             }
 

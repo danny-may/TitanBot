@@ -16,6 +16,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
         protected ICommandContext Context { get; }
 
         protected abstract IReadOnlyList<IEditableSettingGroup> Settings { get; }
+        protected abstract ulong SettingId { get; }
 
         public SettingCommand(ITypeReaderCollection readers, ICommandContext context)
         {
@@ -55,7 +56,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             builder.WithTitle(TextResource.Format("SETTINGS_TITLE_GROUP", groups.First().GroupName));
             foreach (var setting in groups.SelectMany(g => g.Settings))
             {
-                var value = setting.Display(SettingsManager, Guild.Id);
+                var value = setting.Display(SettingId);
                 if (string.IsNullOrWhiteSpace(value))
                     value = TextResource.GetResource("SETTINGS_NOTSET");
                 builder.AddInlineField(setting.Name, value);
@@ -87,13 +88,13 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     return;
                 }
 
-                var oldValue = setting.Display(SettingsManager, Guild.Id);
+                var oldValue = setting.Display(SettingId);
 
-                if (!setting.TrySave(SettingsManager, Guild.Id, readerResult.Best, out string errors))
-                    await ReplyAsync(errors, ReplyType.Error); //TODO: Fix this bit to use the TextResource
+                if (!setting.TrySave(SettingId, readerResult.Best, out string errors))
+                    await ReplyAsync(errors, ReplyType.Error, value);
                 else
                 {
-                    var newValue = setting.Display(SettingsManager, Guild.Id);
+                    var newValue = setting.Display(SettingId);
                     var builder = new EmbedBuilder
                     {
                         Title = TextResource.Format("SETTINGS_VALUE_CHANGED_TITLE", setting.Name),

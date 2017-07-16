@@ -51,7 +51,7 @@ namespace TitanBot.Commands
             if (context.Channel is IDMChannel || context.Channel is IGroupChannel || context.Guild.OwnerId == context.Author.Id)
                 return PermissionCheckResponse.FromSuccess(permitted);
 
-            var settings = Settings.GetGroup<GeneralSettings>(context.Guild.Id);
+            var settings = Settings.GetGuildGroup<GeneralGuildSetting>(context.Guild.Id);
             if (DoesOverride(context, settings))
                 return PermissionCheckResponse.FromSuccess(calls);
 
@@ -67,7 +67,7 @@ namespace TitanBot.Commands
 
         }
 
-        private bool DoesOverride(ICommandContext context, GeneralSettings settings)
+        private bool DoesOverride(ICommandContext context, GeneralGuildSetting settings)
         {
             if (settings.RoleOverride != null && ((context.Author as IGuildUser)?.RoleIds.Any(r => settings.RoleOverride.Contains(r)) ?? false))
                 return true;

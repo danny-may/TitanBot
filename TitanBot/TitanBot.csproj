@@ -196,6 +196,7 @@
     <Compile Include="Commands\DefaultCommands\General\InfoCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\InviteCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PingCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\General\PreferencesCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PrefixCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\DbPurgeCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\ExceptionCommand.cs" />
@@ -229,10 +230,12 @@
     <Compile Include="Commands\Responses\PermissionCheckResponse.cs" />
     <Compile Include="Commands\Responses\ArgumentCheckResponse.cs" />
     <Compile Include="Commands\Models\CallPermission.cs" />
+    <Compile Include="Formatting\Models\FormattingType.cs" />
     <Compile Include="Formatting\ValueFormatter.cs" />
     <Compile Include="Models\Range.cs" />
+    <Compile Include="Settings\Default\GeneralGlobalSetting.cs" />
+    <Compile Include="Settings\Default\GeneralUserSetting.cs" />
     <Compile Include="Storage\Tables\Errors.cs" />
-    <Compile Include="Storage\Tables\UserSetting.cs" />
     <Compile Include="Storage\Database.cs" />
     <Compile Include="Storage\DbTable.cs" />
     <Compile Include="Storage\DbTransaction.cs" />
@@ -243,7 +246,7 @@
     <Compile Include="Downloader\CachedDownloader.cs" />
     <Compile Include="Downloader\IDownloader.cs" />
     <Compile Include="Scheduling\Interfaces\ISchedulerRecord.cs" />
-    <Compile Include="Settings\Default\GeneralSettings.cs" />
+    <Compile Include="Settings\Default\GeneralGuildSetting.cs" />
     <Compile Include="Dependencies\DependencyFactory.cs" />
     <Compile Include="Dependencies\Interfaces\IDependencyFactory.cs" />
     <Compile Include="Dependencies\Interfaces\IInstanceBuilder.cs" />
@@ -264,7 +267,6 @@
     <Compile Include="Settings\Models\EditableSetting.cs" />
     <Compile Include="Settings\Models\EditableSettingBuilder.cs" />
     <Compile Include="Settings\Models\EditableSettingGroup.cs" />
-    <Compile Include="Settings\GlobalSetting.cs" />
     <Compile Include="Settings\Interfaces\IEditableSettingGroup.cs" />
     <Compile Include="Settings\Interfaces\IEditableSettingBuilder.cs" />
     <Compile Include="Settings\Interfaces\ISettingsManager.cs" />
@@ -272,7 +274,7 @@
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Formatting\Interfaces\ITextResourceCollection.cs" />
     <Compile Include="Formatting\Interfaces\ITextResourceManager.cs" />
-    <Compile Include="Formatting\Locale.cs" />
+    <Compile Include="Formatting\Models\Locale.cs" />
     <Compile Include="Formatting\TextResourceCollection.cs" />
     <Compile Include="Formatting\TextResourceManager.cs" />
     <Compile Include="TypeReaders\ITypeReaderCollection.cs" />

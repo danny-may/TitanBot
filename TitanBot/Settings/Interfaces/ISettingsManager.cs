@@ -5,17 +5,24 @@ namespace TitanBot.Settings
 {
     public interface ISettingsManager
     {
-        GlobalSetting GlobalSettings { get; }
-        T GetGroup<T>(ulong id);
-        void SaveGroup<T>(ulong id, T settings);
-        T GetCustomGlobal<T>();
-        void SaveCustomGlobal<T>(T setting);
-        IEditableSettingBuilder<T> Register<T>();
-        IEditableSettingBuilder<T> RegisterGlobal<T>();
-        IEditableSettingBuilder<T> Register<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver);
-        IEditableSettingBuilder<T> RegisterGlobal<T>(Func<ISettingsManager, ulong, T> retriever, Action<ISettingsManager, ulong, T> saver);
-        IReadOnlyList<IEditableSettingGroup> EditableSettingGroups { get; }
-        IReadOnlyList<IEditableSettingGroup> EditableGlobalSettingsGroups { get; }
+        T GetGuildGroup<T>(ulong id);
+        T GetGlobalGroup<T>();
+        T GetUserGroup<T>(ulong id);
+        void SaveGuildGroup<T>(ulong id, T setting);
+        void SaveGlobalGroup<T>(T setting);
+        void SaveUserGroup<T>(ulong id, T setting);
+        void EditGuildGroup<T>(ulong id, Action<T> changes);
+        void EditGlobalGroup<T>(Action<T> changes);
+        void EditUserGroup<T>(ulong id, Action<T> changes);
+        IEditableSettingBuilder<T> AddGuildSetting<T>();
+        IEditableSettingBuilder<T> AddGlobalSetting<T>();
+        IEditableSettingBuilder<T> AddUserSetting<T>();
+        IEditableSettingBuilder<T> AddGuildSetting<T>(Func<ulong, T> retriever, Action<ulong, T> saver);
+        IEditableSettingBuilder<T> AddGlobalSetting<T>(Func<T> retriever, Action<T> saver);
+        IEditableSettingBuilder<T> AddUserSetting<T>(Func<ulong, T> retriever, Action<ulong, T> saver);
+        IReadOnlyList<IEditableSettingGroup> GuildSettingGroups { get; }
+        IReadOnlyList<IEditableSettingGroup> GlobalSettingGroups { get; }
+        IReadOnlyList<IEditableSettingGroup> UserSettingGroups { get; }
         void ResetSettings(ulong id);
     }
 }

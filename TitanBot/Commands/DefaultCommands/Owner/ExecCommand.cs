@@ -190,7 +190,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             public ILogger Logger { get; }
             public ICommandService CommandService { get; }
             public ISettingsManager SettingsManager { get; }
-            public GeneralSettings GuildData { get; }
+            public GeneralGuildSetting GuildData { get; }
             public IDatabase Database { get; }
             public IScheduler Scheduler { get; }
             public IReplier Replier { get; }

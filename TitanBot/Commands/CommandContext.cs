@@ -28,14 +28,14 @@ namespace TitanBot.Commands
         public IReplier Replier => _replier.Value;
         public ITextResourceCollection TextResource => _textResource.Value;
         public ValueFormatter Formatter => _formatter.Value;
-        public GeneralSettings GuildData => _guildData.Value;
-        public UserSetting UserSetting => _userSetting.Value;
+        public GeneralGuildSetting GuildData => _guildData.Value;
+        public GeneralUserSetting UserSetting => _userSetting.Value;
 
         private Lazy<IReplier> _replier { get; }
         private Lazy<ITextResourceCollection> _textResource { get; }
         private Lazy<ValueFormatter> _formatter { get; }
-        private Lazy<GeneralSettings> _guildData { get; }
-        private Lazy<UserSetting> _userSetting { get; }
+        private Lazy<GeneralGuildSetting> _guildData { get; }
+        private Lazy<GeneralUserSetting> _userSetting { get; }
 
 
         internal CommandContext(IUserMessage message, IDependencyFactory factory)
@@ -46,10 +46,8 @@ namespace TitanBot.Commands
             Author = message.Author;
             Guild = (message.Channel as IGuildChannel)?.Guild;
 
-            _userSetting = new Lazy<UserSetting>(() => factory.Get<IDatabase>()
-                                                              .AddOrGet(Author.Id, () => new UserSetting { Id = Author.Id })
-                                                              .Result);
-            _guildData = new Lazy<GeneralSettings>(() => Guild != null ? factory.Get<ISettingsManager>().GetGroup<GeneralSettings>(Guild.Id) : null);
+            _userSetting = new Lazy<GeneralUserSetting>(() => factory.Get<ISettingsManager>().GetUserGroup<GeneralUserSetting>(Author.Id));
+            _guildData = new Lazy<GeneralGuildSetting>(() => Guild != null ? factory.Get<ISettingsManager>().GetGuildGroup<GeneralGuildSetting>(Guild.Id) : null);
             _formatter = new Lazy<ValueFormatter>(() => factory.WithInstance(this)
                                                                .Construct<ValueFormatter>());
             _textResource = new Lazy<ITextResourceCollection>(() => factory.Get<ITextResourceManager>()

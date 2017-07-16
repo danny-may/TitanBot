@@ -16,7 +16,8 @@ namespace TitanBot.Commands.DefaultCommands.Admin
     [RequireContext(ContextType.Guild)]
     public class SettingsCommand : SettingCommand
     {
-        protected override IReadOnlyList<IEditableSettingGroup> Settings => SettingsManager.EditableSettingGroups;
+        protected override IReadOnlyList<IEditableSettingGroup> Settings => SettingsManager.GuildSettingGroups;
+        protected override ulong SettingId => Guild.Id;
 
         public SettingsCommand(ITypeReaderCollection readers, ICommandContext context)
             : base(readers, context) { }

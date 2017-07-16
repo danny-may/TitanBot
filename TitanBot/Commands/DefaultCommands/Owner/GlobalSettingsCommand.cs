@@ -15,7 +15,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     [RequireOwner]
     public class GlobalSettingsCommand : SettingCommand
     {
-        protected override IReadOnlyList<IEditableSettingGroup> Settings => SettingsManager.EditableGlobalSettingsGroups;
+        protected override IReadOnlyList<IEditableSettingGroup> Settings => SettingsManager.GlobalSettingGroups;
+        protected override ulong SettingId => 1;
 
         public GlobalSettingsCommand(ITypeReaderCollection readers, ICommandContext context)
             : base(readers, context) { }

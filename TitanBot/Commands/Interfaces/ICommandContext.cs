@@ -12,12 +12,12 @@ namespace TitanBot.Commands
         IUser Author { get; }
         IReplier Replier { get; }
         ITextResourceCollection TextResource { get; }
-        UserSetting UserSetting { get; }
+        GeneralUserSetting UserSetting { get; }
         ValueFormatter Formatter { get; }
         IMessageChannel Channel { get; }
         DiscordSocketClient Client { get; }
         IGuild Guild { get; }
-        GeneralSettings GuildData { get; }
+        GeneralGuildSetting GuildData { get; }
         IUserMessage Message { get; }
         int ArgPos { get; }
         string Prefix { get; }
