@@ -71,23 +71,49 @@ namespace TitanBot.Scheduling
             var pollTime = DateTime.MinValue;
             while (!ShouldStop)
             {
-                var msSincePrev = (int)(DateTime.Now - pollTime).TotalMilliseconds;
-                if (pollTime != DateTime.MinValue && msSincePrev > PollingPeriod)
-                    Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {msSincePrev - PollingPeriod}ms", "MainLoop");
-                await Task.Delay((PollingPeriod - msSincePrev).Clamp(0, int.MaxValue));
-                pollTime = DateTime.Now;
-                var actives = await FindActives(pollTime);
-                var completed = actives.Where(r => r.EndTime < pollTime).ToList();
-                var ongoing = actives.Where(r => r.EndTime > pollTime).ToList();
-                Complete(completed, false);
-                foreach (var record in ongoing)
+                await LogErrors(async () =>
                 {
-                    var intervalDelta = (pollTime - record.StartTime).Ticks % record.Interval.Ticks;
-                    if (intervalDelta/10000 > PollingPeriod || !TryGetHandler(record.Callback, out ISchedulerCallback callback))
-                        continue;
-                    Task.Run(() => callback.Handle(record, pollTime.AddTicks(-intervalDelta)))
-                        .DontWait();
-                }
+                    var msSincePrev = (int)(DateTime.Now - pollTime).TotalMilliseconds;
+                    if (pollTime != DateTime.MinValue && msSincePrev > PollingPeriod)
+                        Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {msSincePrev - PollingPeriod}ms", "MainLoop");
+                    await Task.Delay((PollingPeriod - msSincePrev).Clamp(0, int.MaxValue));
+                    pollTime = DateTime.Now;
+                    var actives = await FindActives(pollTime);
+                    var completed = actives.Where(r => r.EndTime < pollTime).ToList();
+                    var ongoing = actives.Where(r => r.EndTime > pollTime).ToList();
+                    Complete(completed, false);
+                    foreach (var record in ongoing)
+                    {
+                        var intervalDelta = (pollTime - record.StartTime).Ticks % record.Interval.Ticks;
+                        if (intervalDelta / 10000 > PollingPeriod || !TryGetHandler(record.Callback, out ISchedulerCallback callback))
+                            continue;
+                        Task.Run(() => LogErrors(() => callback.Handle(record, pollTime.AddTicks(-intervalDelta))))
+                            .DontWait();
+                    }
+                });
+            }
+        }
+
+        private async void LogErrors(Action action)
+            => await LogErrors(() => { action(); return Task.CompletedTask; });
+
+        private async Task LogErrors(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception ex)
+            {
+                await Database.Upsert(new Error
+                {
+                    Channel = null,
+                    Content = ex.ToString(),
+                    Description = ex.Message,
+                    Message = null,
+                    Type = ex.GetType().Name,
+                    User = null
+                });
             }
         }
 

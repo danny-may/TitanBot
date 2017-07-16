@@ -72,7 +72,8 @@ namespace TitanBot.Settings
 
             if (settings.TryGetValue(typeof(T).ToString(), out JToken setting))
                 obj = setting.ToObject<T>();
-            obj = JsonConvert.DeserializeObject<T>("{}");
+            else
+                obj = JsonConvert.DeserializeObject<T>("{}");
 
             Cached[(typeof(T), id)] = obj;
             return obj;

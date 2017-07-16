@@ -62,7 +62,7 @@ namespace TitanBot.Formatting
             return covered / totalString;
         }
 
-        private void LoadDefaults()
+        public virtual void LoadDefaults()
         {
             TextMap = new Dictionary<string, Dictionary<Locale, string>>();
 
@@ -230,6 +230,7 @@ namespace TitanBot.Formatting
             AddResource("OUTPUT", "Output");
 
             //Types
+
             AddResource("TIMESPAN", "a timespan");
             AddResource("STRING", "some text");
             AddResource("INT64", "an integer");
@@ -241,6 +242,8 @@ namespace TitanBot.Formatting
             AddResource("DOUBLE", "a number");
             AddResource("FLOAT", "a number");
             AddResource("DECIMAL", "a number");
+            AddResource("BOOLEAN", "true/false");
+            AddResource("DATETIME", "a date/time");
         }
     }
 }

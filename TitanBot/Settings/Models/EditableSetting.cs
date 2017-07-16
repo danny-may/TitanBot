@@ -56,10 +56,7 @@ namespace TitanBot.Settings
 
             public override bool TrySave(ICommandContext context, ulong guildId, object value, out string errors)
             {
-                if (!(value is TAccept))
-                    errors = $"`{value.GetType()}` is not a valid {typeof(TAccept)}";
-                else
-                    errors = Validator(context, (TAccept)value);
+                errors = Validator(context, (TAccept)value);
 
                 if (errors != null)
                     return false;
