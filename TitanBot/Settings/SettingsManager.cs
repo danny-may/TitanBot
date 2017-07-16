@@ -61,13 +61,21 @@ namespace TitanBot.Settings
 
         private T GetSetting<T>(ulong id)
         {
+            if (Cached.TryGetValue((typeof(T), id), out object cached))
+                return (T)cached;
+
             var record = Database.FindById<Setting>(id).Result ?? new Setting { Serialized = "{}", Id = id };
             var targetType = typeof(T).FullName;
             var settings = JObject.Parse(record.Serialized);
 
+            T obj;
+
             if (settings.TryGetValue(typeof(T).ToString(), out JToken setting))
-                return setting.ToObject<T>();
-            return JsonConvert.DeserializeObject<T>("{}");
+                obj = setting.ToObject<T>();
+            obj = JsonConvert.DeserializeObject<T>("{}");
+
+            Cached[(typeof(T), id)] = obj;
+            return obj;
         }
 
         private void SaveSetting<T>(ulong id, T setting)
@@ -80,6 +88,7 @@ namespace TitanBot.Settings
             record.Serialized = JsonConvert.SerializeObject(settings);
             
             Database.Upsert(record).Wait();
+            Cached[(typeof(T), id)] = setting;
         }
 
         public async void ResetSettings(ulong guildId)
