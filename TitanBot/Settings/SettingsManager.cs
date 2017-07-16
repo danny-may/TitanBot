@@ -8,6 +8,7 @@ using TitanBot.Storage;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Util;
+using TitanBot.Commands;
 
 namespace TitanBot.Settings
 {
@@ -38,22 +39,22 @@ namespace TitanBot.Settings
                                                   .WithDescription("SETTINGS_GUILD_GENERAL_DESCRIPTION")
                                                   .AddSetting(s => s.Prefix)
                                                   .AddSetting(s => s.PermOverride)
-                                                  .AddSetting(s => s.RoleOverride, (IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: r => string.Join(", ", r?.Select(id => $"<@&{id}>")))
+                                                  .AddSetting(s => s.RoleOverride, (ICommandContext c, IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: (c, r) => string.Join(", ", r?.Select(id => $"<@&{id}>")))
                                                   .AddSetting(s => s.DateTimeFormat)
-                                                  .AddSetting(s => s.PreferredLanguage, validator: v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
+                                                  .AddSetting(s => s.PreferredLanguage, validator: (c, v) => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
                                                   .WithNotes("SETTINGS_GUILD_GENERAL_NOTES")
                                                   .Finalise();
 
             AddGlobalSetting<GeneralGlobalSetting>().WithName("General")
                                                     .WithDescription("SETTINGS_GLOBAL_GENERAL_DESCRIPTION")
                                                     .AddSetting(s => s.DefaultPrefix)
-                                                    .AddSetting(s => s.Owners, (IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: u => string.Join(", ", u.Select(p => $"<@{p}>")))
+                                                    .AddSetting(s => s.Owners, (ICommandContext c, IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: (c, u) => string.Join(", ", u.Select(p => $"<@{p}>")))
                                                     .Finalise();
 
             AddUserSetting<GeneralUserSetting>().WithName("General")
                                                 .WithDescription("SETTINGS_USER_GENERAL_DESCRIPTION")
-                                                .AddSetting(s => s.Language, validator: v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
-                                                .AddSetting(s => s.FormatType, validator: v => v != FormattingType.UNKNOWN ? null : "FORMATTINGTYPE_UNKNOWN", viewer: v => ((FormattingType)v).Name)
+                                                .AddSetting(s => s.Language, validator: (c, v) => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
+                                                .AddSetting(s => s.FormatType, validator: (c, v) => v == FormattingType.DEFAULT || c.Formatter.AcceptedFormats.Contains(v) ? null : "FORMATTINGTYPE_UNKNOWN", viewer: (c, f) => c.Formatter.GetName(f))
                                                 .AddSetting(s => s.UseEmbeds)
                                                 .Finalise();
         }

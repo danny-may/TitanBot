@@ -19,8 +19,8 @@ namespace TitanBot.Commands.DefaultCommands.Admin
         protected override IReadOnlyList<IEditableSettingGroup> Settings => SettingsManager.GuildSettingGroups;
         protected override ulong SettingId => Guild.Id;
 
-        public SettingsCommand(ITypeReaderCollection readers, ICommandContext context)
-            : base(readers, context) { }
+        public SettingsCommand(ITypeReaderCollection readers)
+            : base(readers) { }
 
         [Call]
         [Usage("SETTINGS_HELP_USAGE_DEFAULT")]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using TitanBot.Commands;
 using TitanBot.Dependencies;
 
 namespace TitanBot.Settings
@@ -66,16 +67,16 @@ namespace TitanBot.Settings
         private string GetName<TStore>(Expression<Func<TGroup, TStore>> property)
             => ((property.Body as MemberExpression)?.Member as PropertyInfo)?.Name ?? "UNKOWN_PROPERTYNAME";
 
-        public IEditableSettingBuilder<TGroup> AddSetting<TStore, TAccept>(string name, Expression<Func<TGroup, TStore>> property, Func<TAccept, TStore> converter, Func<TStore, string> viewer = null, Func<TAccept, string> validator = null)
+        public IEditableSettingBuilder<TGroup> AddSetting<TStore, TAccept>(string name, Expression<Func<TGroup, TStore>> property, Func<ICommandContext, TAccept, TStore> converter, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TAccept, string> validator = null)
         {
             Settings.Add(EditableSetting.Create(Retriever, Saver, name, property, converter, viewer, validator));
             return this;
         }
-        public IEditableSettingBuilder<TGroup> AddSetting<TAccept, TStore>(Expression<Func<TGroup, TStore>> property, Func<TAccept, TStore> converter, Func<TStore, string> viewer = null, Func<TAccept, string> validator = null)
+        public IEditableSettingBuilder<TGroup> AddSetting<TAccept, TStore>(Expression<Func<TGroup, TStore>> property, Func<ICommandContext, TAccept, TStore> converter, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TAccept, string> validator = null)
             => AddSetting(GetName(property), property, converter, viewer, validator);
-        public IEditableSettingBuilder<TGroup> AddSetting<TStore>(Expression<Func<TGroup, TStore>> property, Func<TStore, string> viewer = null, Func<TStore, string> validator = null)
+        public IEditableSettingBuilder<TGroup> AddSetting<TStore>(Expression<Func<TGroup, TStore>> property, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TStore, string> validator = null)
             => AddSetting(GetName(property), property, viewer, validator);
-        public IEditableSettingBuilder<TGroup> AddSetting<TStore>(string name, Expression<Func<TGroup, TStore>> property, Func<TStore, string> viewer = null, Func<TStore, string> validator = null)
-            => AddSetting(name, property, v => v, viewer, validator);
+        public IEditableSettingBuilder<TGroup> AddSetting<TStore>(string name, Expression<Func<TGroup, TStore>> property, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TStore, string> validator = null)
+            => AddSetting(name, property, (c, v) => v, viewer, validator);
     }
 }

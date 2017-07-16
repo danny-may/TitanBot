@@ -12,12 +12,17 @@ namespace TitanBot.Formatting
         private Dictionary<Type, Delegate> BeautifyDelegates { get; } = new Dictionary<Type, Delegate>();
         private MethodInfo BeautifyGeneric { get; }
 
+        protected Dictionary<FormattingType, string> Names { get; } = new Dictionary<FormattingType, string> { { FormattingType.DEFAULT, "Default" } };
+
         protected IEnumerable<Type> KnownTypes => BeautifyDelegates.Keys;
-
-        protected delegate string BeautifyDelegate<T>(T value);
-
+        protected delegate string BeautifyDelegate<T>(T value);        
         protected ICommandContext Context;
         protected FormattingType AltFormat;
+        public virtual FormattingType[] AcceptedFormats { get; } = new FormattingType[0];
+
+        public virtual string GetName(FormattingType format)
+            => Names.TryGetValue(format, out string name) ? name : "UNKNOWN";
+
         public ValueFormatter(ICommandContext context)
         {
             Context = context;

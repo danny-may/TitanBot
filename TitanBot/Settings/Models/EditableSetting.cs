@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using TitanBot.Commands;
 
 namespace TitanBot.Settings
 {
@@ -8,25 +9,25 @@ namespace TitanBot.Settings
     {
         public string Name { get; protected set; }
         public abstract Type Type { get; }
-        public abstract bool TrySave(ulong guildId, object value, out string errors);
-        public abstract string Display(ulong guildId);
+        public abstract bool TrySave(ICommandContext context, ulong guildId, object value, out string errors);
+        public abstract string Display(ICommandContext context, ulong guildId);
 
         public static EditableSetting Create<TGroup, TStore, TAccept>(Func<ulong, TGroup> retriever,
                                                                 Action<ulong, TGroup> saver,
                                                                 string name,
                                                                 Expression<Func<TGroup, TStore>> property,
-                                                                Func<TAccept, TStore> converter,
-                                                                Func<TStore, string> viewer,
-                                                                Func<TAccept, string> validator)
+                                                                Func<ICommandContext, TAccept, TStore> converter,
+                                                                Func<ICommandContext, TStore, string> viewer,
+                                                                Func<ICommandContext, TAccept, string> validator)
             => new TypedSetting<TGroup, TStore, TAccept>(retriever, saver, name, property, converter, viewer, validator);
 
         private class TypedSetting<TGroup, TStore, TAccept> : EditableSetting
         {
             Func<ulong, TGroup> Retriever { get; }
             Action<ulong, TGroup> Saver { get; }
-            Func<TAccept, TStore> Converter { get; }
-            Func<TStore, string> Viewer { get; }
-            Func<TAccept, string> Validator { get; }
+            Func<ICommandContext, TAccept, TStore> Converter { get; }
+            Func<ICommandContext, TStore, string> Viewer { get; }
+            Func<ICommandContext, TAccept, string> Validator { get; }
             Action<TGroup, TStore> Setter { get; }
             Func<TGroup, TStore> Getter { get; }
 
@@ -36,35 +37,35 @@ namespace TitanBot.Settings
                                   Action<ulong, TGroup> saver,
                                   string name,
                                   Expression<Func<TGroup, TStore>> property,
-                                  Func<TAccept, TStore> converter,
-                                  Func<TStore, string> viewer,
-                                  Func<TAccept, string> validator)
+                                  Func<ICommandContext, TAccept, TStore> converter,
+                                  Func<ICommandContext, TStore, string> viewer,
+                                  Func<ICommandContext, TAccept, string> validator)
             {
                 Name = name;
                 Retriever = retriever;
                 Setter = CreateSetter(property);
                 Getter = property.Compile();
                 Converter = converter;
-                Viewer = viewer ?? (s => s?.ToString());
-                Validator = validator ?? (s => null);
+                Viewer = viewer ?? ((c, s) => s?.ToString());
+                Validator = validator ?? ((c, s) => null);
                 Saver = saver;
             }
 
-            public override string Display(ulong guildId)
-                => Viewer(Getter(Retriever(guildId)));
+            public override string Display(ICommandContext context, ulong guildId)
+                => Viewer(context, Getter(Retriever(guildId)));
 
-            public override bool TrySave(ulong guildId, object value, out string errors)
+            public override bool TrySave(ICommandContext context, ulong guildId, object value, out string errors)
             {
                 if (!(value is TAccept))
                     errors = $"`{value.GetType()}` is not a valid {typeof(TAccept)}";
                 else
-                    errors = Validator((TAccept)value);
+                    errors = Validator(context, (TAccept)value);
 
                 if (errors != null)
                     return false;
 
                 var group = Retriever(guildId);
-                Setter(group, Converter((TAccept)value));
+                Setter(group, Converter(context, (TAccept)value));
                 Saver(guildId, group);
                 return true;
             }

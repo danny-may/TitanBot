@@ -18,8 +18,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         protected override IReadOnlyList<IEditableSettingGroup> Settings => SettingsManager.GlobalSettingGroups;
         protected override ulong SettingId => 1;
 
-        public GlobalSettingsCommand(ITypeReaderCollection readers, ICommandContext context)
-            : base(readers, context) { }
+        public GlobalSettingsCommand(ITypeReaderCollection readers)
+            : base(readers) { }
 
         [Call]
         [Usage("GLOBALSETTINGS_HELP_USAGE_DEFAULT")]

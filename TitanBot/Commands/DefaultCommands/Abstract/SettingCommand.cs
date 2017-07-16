@@ -13,15 +13,13 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
     public abstract class SettingCommand : Command
     {
         protected ITypeReaderCollection Readers { get; }
-        protected ICommandContext Context { get; }
 
         protected abstract IReadOnlyList<IEditableSettingGroup> Settings { get; }
         protected abstract ulong SettingId { get; }
 
-        public SettingCommand(ITypeReaderCollection readers, ICommandContext context)
+        public SettingCommand(ITypeReaderCollection readers)
         {
             Readers = readers;
-            Context = context;
         }
 
         protected async Task ListSettingsAsync(string settingGroup = null)
@@ -56,7 +54,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             builder.WithTitle(TextResource.Format("SETTINGS_TITLE_GROUP", groups.First().GroupName));
             foreach (var setting in groups.SelectMany(g => g.Settings))
             {
-                var value = setting.Display(SettingId);
+                var value = setting.Display(Context, SettingId);
                 if (string.IsNullOrWhiteSpace(value))
                     value = TextResource.GetResource("SETTINGS_NOTSET");
                 builder.AddInlineField(setting.Name, value);
@@ -88,13 +86,13 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     return;
                 }
 
-                var oldValue = setting.Display(SettingId);
+                var oldValue = setting.Display(Context, SettingId);
 
-                if (!setting.TrySave(SettingId, readerResult.Best, out string errors))
+                if (!setting.TrySave(Context, SettingId, readerResult.Best, out string errors))
                     await ReplyAsync(errors, ReplyType.Error, value);
                 else
                 {
-                    var newValue = setting.Display(SettingId);
+                    var newValue = setting.Display(Context, SettingId);
                     var builder = new EmbedBuilder
                     {
                         Title = TextResource.Format("SETTINGS_VALUE_CHANGED_TITLE", setting.Name),

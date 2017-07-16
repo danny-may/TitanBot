@@ -12,12 +12,10 @@ namespace TitanBot.Commands.DefautlCommands.General
     public class HelpCommand : Command
     {
         private IPermissionManager PermissionManager { get; }
-        private ICommandContext Context { get; }
 
-        public HelpCommand(IPermissionManager checker, ICommandContext context)
+        public HelpCommand(IPermissionManager checker)
         {
             PermissionManager = checker;
-            Context = context;
         }
 
         [Call]

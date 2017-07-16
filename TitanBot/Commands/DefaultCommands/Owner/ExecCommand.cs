@@ -28,12 +28,6 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     {
         protected override int DelayMessageMs => 10000;
 
-        ICommandContext Context { get; }
-        public ExecCommand(ICommandContext context)
-        {
-            Context = context;
-        }
-
         public static Func<ExecCommand, ExecGlobals> GetGlobals = c => new ExecGlobals(c);
 
         public Assembly[] GetAssemblies()

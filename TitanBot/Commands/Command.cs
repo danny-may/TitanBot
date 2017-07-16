@@ -30,7 +30,6 @@ namespace TitanBot.Commands
 
         private bool HasReplied { get; set; }
         private IUserMessage AwaitMessage { get; set; }
-        private ICommandContext Context { get; set; }
 
         protected virtual string DelayMessage => "COMMAND_DELAY_DEFAULT";
         protected virtual int DelayMessageMs => 3000;
@@ -56,6 +55,7 @@ namespace TitanBot.Commands
                                                     .Where(p => !string.IsNullOrWhiteSpace(p))
                                                     .ToArray();
 
+        protected ICommandContext Context { get; set; }
         protected BotClient Bot { get; set; }
         protected ILogger Logger { get; private set; }
         protected ICommandService CommandService { get; private set; }

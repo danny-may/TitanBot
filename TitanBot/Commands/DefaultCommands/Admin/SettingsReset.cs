@@ -7,12 +7,10 @@ namespace TitanBot.Commands.DefaultCommands.Admin
     public class SettingsReset : Command
     {
         IPermissionManager PermissionManager { get; }
-        ICommandContext Context { get; }
 
-        public SettingsReset(IPermissionManager permissionManager, ICommandContext context)
+        public SettingsReset(IPermissionManager permissionManager)
         {
             PermissionManager = permissionManager;
-            Context = context;
         }
 
         [DefaultPermission(8)]

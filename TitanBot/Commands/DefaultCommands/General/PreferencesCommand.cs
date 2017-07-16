@@ -16,7 +16,7 @@ namespace TitanBot.Commands.DefaultCommands.General
         protected override IReadOnlyList<IEditableSettingGroup> Settings => SettingsManager.UserSettingGroups;
         protected override ulong SettingId => Author.Id;
 
-        public PreferencesCommand(ITypeReaderCollection readers, ICommandContext context) : base(readers, context) { }
+        public PreferencesCommand(ITypeReaderCollection readers) : base(readers) { }
 
         [Call]
         [Usage("PREFERENCES_HELP_USAGE_DEFAULT")]
