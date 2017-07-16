@@ -17,47 +17,52 @@ namespace TitanBot.Commands
 {
     public abstract partial class Command
     {
+        //locks
         static ConcurrentDictionary<Type, object> CommandLocks { get; } = new ConcurrentDictionary<Type, object>();
         static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> GuildLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
         static ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>> ChannelLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>>();
-        bool HasReplied { get; set; }
-        IUserMessage AwaitMessage { get; set; }
-        ICommandContext Context { get; set; }
+        protected object GlobalCommandLock => CommandLocks.GetOrAdd(GetType(), new object());
+        protected object GuildCommandLock => GuildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
+        protected object ChannelCommandLock => ChannelLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong, object>()).GetOrAdd(Context.Channel.Id, new object());
+        protected object InstanceCommandLock { get; } = new object();
+
+        public static int TotalCommands { get; private set; } = 0;
+
+        private bool HasReplied { get; set; }
+        private IUserMessage AwaitMessage { get; set; }
+        private ICommandContext Context { get; set; }
 
         protected virtual string DelayMessage => "COMMAND_DELAY_DEFAULT";
         protected virtual int DelayMessageMs => 3000;
 
-        protected BotClient Bot { get; set; }
-        protected ILogger Logger { get; private set; }
-        protected ICommandService CommandService { get; private set; }
         protected IUserMessage Message => Context?.Message;
         protected DiscordSocketClient Client => Context?.Client;
         protected IUser Author => Context?.Author;
         protected IMessageChannel Channel => Context?.Channel;
         protected SocketSelfUser BotUser => Client?.CurrentUser;
         protected IGuild Guild => Context?.Guild;
+        protected GeneralSettings GuildData => Context?.GuildData;
+        protected UserSetting UserData => Context?.UserSetting;
+        protected ValueFormatter Formatter => Context?.Formatter;
+        protected IReplier Replier => Context?.Replier;
+        protected ITextResourceCollection TextResource => Context?.TextResource;
+        protected string Prefix => Context.Prefix;
+        protected string CommandName => Context.CommandText;
+        protected GlobalSetting GlobalSettings => SettingsManager?.GlobalSettings;
+        protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
         protected IGuildUser GuildAuthor => Author as IGuildUser;
         protected IGuildChannel GuildChannel => Channel as IGuildChannel;
-        protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
+        protected string[] AcceptedPrefixes => new string[] { BotUser?.Mention, BotUser?.Username, SettingsManager?.GlobalSettings.DefaultPrefix, GuildData?.Prefix }
+                                                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                                                    .ToArray();
+
+        protected BotClient Bot { get; set; }
+        protected ILogger Logger { get; private set; }
+        protected ICommandService CommandService { get; private set; }
         protected ISettingsManager SettingsManager { get; private set; }
-        protected GlobalSetting GlobalSettings => SettingsManager?.GlobalSettings;
-        protected GeneralSettings GuildData { get; private set; }
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
-        protected IReplier Replier { get; private set; }
         protected IDownloader Downloader { get; private set; }
-        protected ValueFormatter Formatter { get; private set; }
-        protected ITextResourceCollection TextResource { get; private set; }
-        protected string[] AcceptedPrefixes => new string[] { BotUser.Mention, BotUser.Username, SettingsManager.GlobalSettings.DefaultPrefix, GuildData?.Prefix }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
-        protected object GlobalCommandLock => CommandLocks.GetOrAdd(GetType(), new object());
-        protected object GuildCommandLock => GuildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
-        protected object ChannelCommandLock => ChannelLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong, object>()).GetOrAdd(Context.Channel.Id, new object());
-        protected object InstanceCommandLock { get; } = new object();
-
-        protected string Prefix { get; private set; }
-        protected string CommandName { get; private set; }
-
-        public static int TotalCommands { get; private set; } = 0;
 
         public Command()
         {
@@ -67,9 +72,7 @@ namespace TitanBot.Commands
         internal void Install(ICommandContext context, IDependencyFactory factory)
         {
             Context = context;
-            Replier = Context.Replier;
-            TextResource = Context.TextResource;
-            Formatter = Context.Formatter;
+
             Logger = factory.Get<ILogger>();
             Database = factory.Get<IDatabase>();
             Bot = factory.Get<BotClient>();
@@ -77,10 +80,7 @@ namespace TitanBot.Commands
             Scheduler = factory.Get<IScheduler>();
             SettingsManager = factory.Get<ISettingsManager>();
             Downloader = factory.Get<IDownloader>();
-            if (Guild != null)
-                GuildData = SettingsManager.GetGroup<GeneralSettings>(Guild.Id);
-            Prefix = context.Prefix;
-            CommandName = context.CommandText;
+
             StartReplyTimer();
 
             Replier.OnSend += OnMessageSent;
@@ -91,7 +91,6 @@ namespace TitanBot.Commands
             Task.Run(async () =>
             {
                 await Task.Delay(DelayMessageMs);
-                return;
                 lock (InstanceCommandLock)
                 {
                     if (!HasReplied)
