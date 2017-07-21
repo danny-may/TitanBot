@@ -15,7 +15,6 @@ namespace TitanBot.Commands
         public string PermissionKey { get; }
         public ContextType RequiredContexts { get; }
         public bool RequireOwner { get; }
-        //public FlagInfo[] Flags { get; }
         public string SubCall { get; }
         public ArgumentInfo[] Parameters { get; }
         public CommandInfo Parent { get; }

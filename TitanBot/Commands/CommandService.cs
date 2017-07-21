@@ -22,7 +22,7 @@ namespace TitanBot.Commands
         private ILogger Logger { get; }
         private ITypeReaderCollection Readers { get; }
         private IDatabase Database { get; }
-        private ISettingsManager SettingsManager { get; }
+        private ISettingManager SettingsManager { get; }
         private BotClient Client { get; }
         private DiscordSocketClient DiscordClient { get; }
         private IPermissionManager PermissionManager { get; }
@@ -33,7 +33,7 @@ namespace TitanBot.Commands
                               BotClient botClient,
                               ITypeReaderCollection readers,
                               IDatabase database,
-                              ISettingsManager settings,
+                              ISettingManager settings,
                               IPermissionManager permissionManager)
         {
             DependencyFactory = factory;
@@ -92,7 +92,7 @@ namespace TitanBot.Commands
         {
             var context = DependencyFactory.WithInstance(message)
                                            .Construct<ICommandContext>();
-            context.CheckCommand(this, SettingsManager.GetGlobalGroup<GeneralGlobalSetting>().DefaultPrefix);
+            context.CheckCommand(this, SettingsManager.GetContext(SettingsManager.Global).Get<GeneralGlobalSetting>().DefaultPrefix);
             var executor = DependencyFactory.WithInstance(context)
                                             .Construct<CommandExecutor>();
             return executor.Run();

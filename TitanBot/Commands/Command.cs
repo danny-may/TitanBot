@@ -15,7 +15,7 @@ using TitanBot.Util;
 
 namespace TitanBot.Commands
 {
-    public abstract partial class Command
+    public abstract class Command
     {
         //locks
         static ConcurrentDictionary<Type, object> CommandLocks { get; } = new ConcurrentDictionary<Type, object>();
@@ -40,18 +40,23 @@ namespace TitanBot.Commands
         protected IMessageChannel Channel => Context?.Channel;
         protected SocketSelfUser BotUser => Client?.CurrentUser;
         protected IGuild Guild => Context?.Guild;
-        protected GeneralGuildSetting GuildData => Context?.GuildData;
-        protected GeneralUserSetting UserData => Context?.UserSetting;
+        
         protected ValueFormatter Formatter => Context?.Formatter;
         protected IReplier Replier => Context?.Replier;
         protected ITextResourceCollection TextResource => Context?.TextResource;
         protected string Prefix => Context.Prefix;
         protected string CommandName => Context.CommandText;
-        protected GeneralGlobalSetting GlobalSettings => SettingsManager.GetGlobalGroup<GeneralGlobalSetting>();
+        protected ISettingContext GlobalSettings => SettingsManager.GetContext(SettingsManager.Global);
+        protected ISettingContext GuildSettings => Guild == null ? null : SettingsManager.GetContext(Guild);
+        protected ISettingContext UserSettings => SettingsManager.GetContext(Author);
+        protected ISettingContext ChannelSettings => SettingsManager.GetContext(Channel);
+        protected GeneralGlobalSetting GeneralGlobalSetting => GlobalSettings.Get<GeneralGlobalSetting>();
+        protected GeneralGuildSetting GeneralGuildSetting => GuildSettings.Get<GeneralGuildSetting>();
+        protected GeneralUserSetting GeneralUserSetting => UserSettings.Get<GeneralUserSetting>();
         protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
         protected IGuildUser GuildAuthor => Author as IGuildUser;
         protected IGuildChannel GuildChannel => Channel as IGuildChannel;
-        protected string[] AcceptedPrefixes => new string[] { BotUser?.Mention, BotUser?.Username, GlobalSettings.DefaultPrefix, GuildData?.Prefix }
+        protected string[] AcceptedPrefixes => new string[] { BotUser?.Mention, BotUser?.Username, GeneralGlobalSetting.DefaultPrefix, GeneralGuildSetting?.Prefix }
                                                     .Where(p => !string.IsNullOrWhiteSpace(p))
                                                     .ToArray();
 
@@ -59,7 +64,7 @@ namespace TitanBot.Commands
         protected BotClient Bot { get; set; }
         protected ILogger Logger { get; private set; }
         protected ICommandService CommandService { get; private set; }
-        protected ISettingsManager SettingsManager { get; private set; }
+        protected ISettingManager SettingsManager { get; private set; }
         protected IDatabase Database { get; private set; }
         protected IScheduler Scheduler { get; private set; }
         protected IDownloader Downloader { get; private set; }
@@ -78,7 +83,7 @@ namespace TitanBot.Commands
             Bot = factory.Get<BotClient>();
             CommandService = factory.Get<ICommandService>();
             Scheduler = factory.Get<IScheduler>();
-            SettingsManager = factory.Get<ISettingsManager>();
+            SettingsManager = factory.Get<ISettingManager>();
             Downloader = factory.Get<IDownloader>();
 
             StartReplyTimer();

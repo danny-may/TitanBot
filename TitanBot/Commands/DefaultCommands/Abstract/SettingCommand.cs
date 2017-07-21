@@ -13,8 +13,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
     {
         protected ITypeReaderCollection Readers { get; }
 
-        protected abstract IReadOnlyList<IEditableSettingGroup> Settings { get; }
-        protected abstract ulong SettingId { get; }
+        protected abstract IReadOnlyList<ISettingEditorCollection> Settings { get; }
+        protected abstract IEntity<ulong> SettingContext { get; }
 
         public SettingCommand(ITypeReaderCollection readers)
         {
@@ -33,27 +33,27 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Settings")
                 }
             };
-
+            
             if (settingGroup == null)
             {
                 builder.WithTitle(TextResource.GetResource("SETTINGS_TITLE_NOGROUP"))
-                       .WithDescription(string.Join("\n", Settings.Select(g => g.GroupName)));
+                       .WithDescription(string.Join("\n", Settings.Select(g => g.Name)));
                 if (string.IsNullOrWhiteSpace(builder.Description))
                     builder.Description = TextResource.GetResource("SETTINGS_DESCRIPTION_NOSETTINGS");
                 await ReplyAsync(Embedable.FromEmbed(builder));
                 return;
             }
-            var groups = Settings.Where(g => g.GroupName.ToLower() == settingGroup.ToLower());
+            var groups = Settings.Where(g => g.Name.ToLower() == settingGroup.ToLower());
             if (groups.Count() == 0)
             {
                 await ReplyAsync("SETTINGS_INVALIDGROUP", ReplyType.Error, settingGroup);
                 return;
             }
-
-            builder.WithTitle(TextResource.Format("SETTINGS_TITLE_GROUP", groups.First().GroupName));
-            foreach (var setting in groups.SelectMany(g => g.Settings))
+            
+            builder.WithTitle(TextResource.Format("SETTINGS_TITLE_GROUP", groups.First().Name));
+            foreach (var setting in groups.SelectMany(s => s))
             {
-                var value = setting.Display(Context, SettingId);
+                var value = setting.Display(Context, SettingContext);
                 if (string.IsNullOrWhiteSpace(value))
                     value = TextResource.GetResource("SETTINGS_NOTSET");
                 builder.AddInlineField(setting.Name, value);
@@ -71,27 +71,27 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
 
         protected async Task SetSettingAsync(string key, string value = null)
         {
-            var setting = Settings.SelectMany(g => g.Settings)
+            var setting = Settings.SelectMany(g => g)
                                  .FirstOrDefault(s => s.Name.ToLower() == key.ToLower());
             if (setting == null)
                 await ReplyAsync("SETTINGS_KEY_NOTFOUND", ReplyType.Error, key);
             else
             {
                 var readerResult = await Readers.Read(setting.Type, Context, value);
-
+            
                 if (!readerResult.IsSuccess)
                 {
                     await ReplyAsync("SETTINGS_VALUE_INVALID", ReplyType.Error, setting.Name, value);
                     return;
                 }
-
-                var oldValue = setting.Display(Context, SettingId);
-
-                if (!setting.TrySave(Context, SettingId, readerResult.Best, out string errors))
+            
+                var oldValue = setting.Display(Context, SettingContext);
+            
+                if (!setting.TrySet(Context, SettingContext, readerResult.Best, out string errors))
                     await ReplyAsync(errors, ReplyType.Error, value);
                 else
                 {
-                    var newValue = setting.Display(Context, SettingId);
+                    var newValue = setting.Display(Context, SettingContext);
                     var builder = new EmbedBuilder
                     {
                         Title = TextResource.Format("SETTINGS_VALUE_CHANGED_TITLE", setting.Name),

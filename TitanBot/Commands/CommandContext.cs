@@ -27,14 +27,24 @@ namespace TitanBot.Commands
         public IReplier Replier => _replier.Value;
         public ITextResourceCollection TextResource => _textResource.Value;
         public ValueFormatter Formatter => _formatter.Value;
-        public GeneralGuildSetting GuildData => _guildData.Value;
-        public GeneralUserSetting UserSetting => _userSetting.Value;
+
+        public GeneralGlobalSetting GeneralGlobalSetting => GlobalSettings.Get<GeneralGlobalSetting>();
+        public GeneralGuildSetting GeneralGuildSetting => GuildSettings.Get<GeneralGuildSetting>();
+        public GeneralUserSetting GeneralUserSetting => UserSettings.Get<GeneralUserSetting>();
+
+        private ISettingContext GlobalSettings => _globalSettings.Value;
+        private ISettingContext ChannelSettings => _channelSettings.Value;
+        private ISettingContext UserSettings => _userSettings.Value;
+        private ISettingContext GuildSettings => _guildSettings.Value;
+
 
         private Lazy<IReplier> _replier { get; }
         private Lazy<ITextResourceCollection> _textResource { get; }
         private Lazy<ValueFormatter> _formatter { get; }
-        private Lazy<GeneralGuildSetting> _guildData { get; }
-        private Lazy<GeneralUserSetting> _userSetting { get; }
+        private Lazy<ISettingContext> _globalSettings { get; }
+        private Lazy<ISettingContext> _channelSettings { get; }
+        private Lazy<ISettingContext> _userSettings { get; }
+        private Lazy<ISettingContext> _guildSettings { get; }
 
 
         internal CommandContext(IUserMessage message, IDependencyFactory factory)
@@ -45,19 +55,23 @@ namespace TitanBot.Commands
             Author = message.Author;
             Guild = (message.Channel as IGuildChannel)?.Guild;
 
-            _userSetting = new Lazy<GeneralUserSetting>(() => factory.Get<ISettingsManager>().GetUserGroup<GeneralUserSetting>(Author.Id));
-            _guildData = new Lazy<GeneralGuildSetting>(() => Guild != null ? factory.Get<ISettingsManager>().GetGuildGroup<GeneralGuildSetting>(Guild.Id) : null);
+            var settingManager = factory.GetOrStore<ISettingManager>();
+
+            _globalSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(settingManager.Global));
+            _channelSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(Channel));
+            _guildSettings = new Lazy<ISettingContext>(() => Guild == null ? null : settingManager.GetContext(Guild));
+            _userSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(Author));
             _formatter = new Lazy<ValueFormatter>(() => factory.WithInstance(this)
                                                                .Construct<ValueFormatter>());
             _textResource = new Lazy<ITextResourceCollection>(() => factory.Get<ITextResourceManager>()
-                                                                           .GetForLanguage(GuildData?.PreferredLanguage ?? UserSetting.Language, Formatter));
+                                                                           .GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, Formatter));
             _replier = new Lazy<IReplier>(() => factory.WithInstance(this)
                                                        .Construct<IReplier>());
         }
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)
         {
-            if ((GuildData?.Prefix != null && Message.HasStringPrefix(GuildData.Prefix, out int prefixLength, StringComparison.InvariantCultureIgnoreCase)) || 
+            if ((GeneralGuildSetting?.Prefix != null && Message.HasStringPrefix(GeneralGuildSetting.Prefix, out int prefixLength, StringComparison.InvariantCultureIgnoreCase)) || 
                 Message.HasStringPrefix(defaultPrefix, out prefixLength, StringComparison.InvariantCultureIgnoreCase))
                 ExplicitPrefix = true;
             else if (Message.HasStringPrefix(Client.CurrentUser.Username + " ", out prefixLength, StringComparison.InvariantCultureIgnoreCase) ||

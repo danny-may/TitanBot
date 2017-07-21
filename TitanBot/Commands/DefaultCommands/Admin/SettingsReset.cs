@@ -29,7 +29,7 @@ namespace TitanBot.Commands.DefaultCommands.Admin
         {
             var calls = CommandService.CommandList.SelectMany(c => c.Calls).ToArray();
             PermissionManager.ResetPermissions(Context, calls);
-            SettingsManager.ResetSettings(Context.Guild.Id);
+            //SettingsManager.ResetSettings(Context.Guild.Id);
             var guild = Client.GetGuild(guildId);
             if (guild == null)
                 await ReplyAsync("SETTINGRESET_GUILD_NOTEXIST", ReplyType.Error);

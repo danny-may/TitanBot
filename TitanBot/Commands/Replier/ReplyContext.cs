@@ -44,7 +44,7 @@ namespace TitanBot.Commands
                 me = Context.Guild?.GetUserAsync(me.Id).Result ?? me;
                 IsTTS = IsTTS && Channel.UserHasPermission(me, ChannelPermission.SendTTSMessages);
                 if (Attachment == null)
-                    if (Context.UserSetting.UseEmbeds && Channel.UserHasPermission(me, ChannelPermission.EmbedLinks))
+                    if (Context.GeneralUserSetting.UseEmbeds && Channel.UserHasPermission(me, ChannelPermission.EmbedLinks))
                         msg = await Channel.SendMessageAsync(Message, IsTTS, Embedable?.GetEmbed(), Options);
                     else
                         msg = await Channel.SendMessageAsync(Message + "\n" + Embedable?.GetString(), IsTTS, null, Options);

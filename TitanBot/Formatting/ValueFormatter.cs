@@ -26,7 +26,7 @@ namespace TitanBot.Formatting
         public ValueFormatter(ICommandContext context)
         {
             Context = context;
-            AltFormat = Context.UserSetting.FormatType;
+            AltFormat = Context.GeneralUserSetting.FormatType;
             BeautifyGeneric = MiscUtil.GetMethod<ValueFormatter>(v => v.Beautify<object>(null));
         }
 

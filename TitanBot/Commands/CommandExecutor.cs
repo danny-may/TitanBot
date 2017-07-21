@@ -22,7 +22,7 @@ namespace TitanBot.Commands
         private ICommandContext Context { get; }
         private ITextResourceManager TextManager { get; }
         private ITextResourceCollection TextResource { get; }
-        private ISettingsManager Settings { get; }
+        private ISettingManager Settings { get; }
         private IReplier Replier { get; }
 
         public CommandExecutor(IDependencyFactory factory, 
@@ -31,7 +31,7 @@ namespace TitanBot.Commands
                                IDatabase database,
                                ILogger logger,
                                ITypeReaderCollection typeReaders,
-                               ISettingsManager settings)
+                               ISettingManager settings)
         {
             DependencyFactory = factory;
             PermissionManager = permissionManager;

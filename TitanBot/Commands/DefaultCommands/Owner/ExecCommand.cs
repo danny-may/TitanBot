@@ -183,8 +183,14 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             public DiscordSocketClient Client { get; }
             public ILogger Logger { get; }
             public ICommandService CommandService { get; }
-            public ISettingsManager SettingsManager { get; }
-            public GeneralGuildSetting GuildData { get; }
+            public ISettingManager SettingsManager { get; }
+            public GeneralGuildSetting GeneralGuildSetting => GuildSettings.Get<GeneralGuildSetting>();
+            public GeneralUserSetting GeneralUserSetting => UserSettings.Get<GeneralUserSetting>();
+            public GeneralGlobalSetting GeneralGlobalSetting => GlobalSettings.Get<GeneralGlobalSetting>();
+            public ISettingContext GlobalSettings { get; }
+            public ISettingContext ChannelSettings { get; }
+            public ISettingContext UserSettings { get; }
+            public ISettingContext GuildSettings { get; }
             public IDatabase Database { get; }
             public IScheduler Scheduler { get; }
             public IReplier Replier { get; }
@@ -199,7 +205,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 Logger = parent.Logger;
                 CommandService = parent.CommandService;
                 SettingsManager = parent.SettingsManager;
-                GuildData = parent.GuildData;
+
                 Database = parent.Database;
                 Scheduler = parent.Scheduler;
                 Replier = parent.Replier;

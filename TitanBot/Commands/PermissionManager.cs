@@ -14,10 +14,10 @@ namespace TitanBot.Commands
     {
         private IDatabase Database { get; }
         private BotClient BotClient { get; }
-        private ISettingsManager Settings { get; }
+        private ISettingManager Settings { get; }
         private List<CallPermission> CachedPermissions { get; set; }
 
-        public PermissionManager(IDatabase database, BotClient botClient, ISettingsManager settings)
+        public PermissionManager(IDatabase database, BotClient botClient, ISettingManager settings)
         {
             Database = database;
             BotClient = botClient;
@@ -50,7 +50,7 @@ namespace TitanBot.Commands
             if (context.Channel is IDMChannel || context.Channel is IGroupChannel || context.Guild.OwnerId == context.Author.Id)
                 return PermissionCheckResponse.FromSuccess(permitted);
 
-            var settings = Settings.GetGuildGroup<GeneralGuildSetting>(context.Guild.Id);
+            var settings = Settings.GetContext(context.Guild).Get<GeneralGuildSetting>();
             if (DoesOverride(context, settings))
                 return PermissionCheckResponse.FromSuccess(calls);
 
@@ -121,11 +121,11 @@ namespace TitanBot.Commands
         {
             var guildUser = context.Author as IGuildUser;
 
-            if (guildUser.HasAll(context.GuildData.PermOverride))
+            if (guildUser.HasAll(context.GeneralGuildSetting.PermOverride))
                 return calls;
 
-            if ((context.GuildData.BlackListed?.Length ?? 0) != 0)
-                if (context.GuildData.BlackListed.Contains(context.Channel.Id))
+            if ((context.GeneralGuildSetting.BlackListed?.Length ?? 0) != 0)
+                if (context.GeneralGuildSetting.BlackListed.Contains(context.Channel.Id))
                     return new CallInfo[0];
 
             return calls.Where(c => {

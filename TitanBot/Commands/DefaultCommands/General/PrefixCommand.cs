@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using TitanBot.Settings;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
@@ -23,9 +24,8 @@ namespace TitanBot.Commands.DefautlCommands.General
         [Usage("PREFIX_HELP_USAGE_SET")]
         async Task SetPrefixAsync(string newPrefix)
         {
-            GuildData.Prefix = newPrefix.ToLower();
-            SettingsManager.SaveGuildGroup(Guild.Id, GuildData);
-            await ReplyAsync("PREFIX_SET_MESSAGE", ReplyType.Success, GuildData.Prefix);
+            GuildSettings.Edit<GeneralGuildSetting>(s => s.Prefix = newPrefix.ToLower());
+            await ReplyAsync("PREFIX_SET_MESSAGE", ReplyType.Success, newPrefix.ToLower());
         }
     }
 }

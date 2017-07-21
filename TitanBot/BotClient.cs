@@ -31,10 +31,12 @@ namespace TitanBot
         public IScheduler Scheduler { get; private set; }
         public ICommandService CommandService { get; private set; }
         public ITypeReaderCollection TypeReaders { get; private set; }
-        public ISettingsManager SettingsManager { get; private set; }
+        public ISettingManager SettingsManager { get; private set; }
         public ITextResourceManager TextResourceManager { get; private set; }
-        public GeneralGlobalSetting GlobalSettings => SettingsManager.GetGlobalGroup<GeneralGlobalSetting>();
-        public IReadOnlyList<ulong> Owners => GlobalSettings.Owners.Concat(new ulong[] { DiscordClient.GetApplicationInfoAsync().Result.Owner.Id })
+        private ISettingContext GlobalSettings => SettingsManager.GetContext(SettingsManager.Global);
+        private GeneralGlobalSetting GeneralGlobalSettings => GlobalSettings.Get<GeneralGlobalSetting>();
+        private Lazy<IUser> Owner { get; }
+        public IReadOnlyList<ulong> Owners => GeneralGlobalSettings.Owners.Concat(new ulong[] { Owner.Value.Id })
                                                                    .ToList().AsReadOnly();
         public Task UntilOffline => Task.Run(async () => { while (DiscordClient.LoginState != LoginState.LoggedOut) { await Task.Delay(10); } });
         private List<DiscordHandlerBase> Handlers { get; } = new List<DiscordHandlerBase>();
@@ -47,7 +49,8 @@ namespace TitanBot
         public BotClient(Action<IDependencyFactory> mapper) : this(null, mapper) { }
 
         public BotClient(IDependencyFactory factory, Action<IDependencyFactory> mapper)
-        { 
+        {
+            Owner = new Lazy<IUser>(() => DiscordClient.GetApplicationInfoAsync().Result.Owner);
             mapper = mapper ?? (f => { });
             DependencyFactory = factory ?? new DependencyFactory();
             
@@ -58,18 +61,43 @@ namespace TitanBot
             DiscordClient = DependencyFactory.GetOrStore<DiscordSocketClient>();
             TypeReaders = DependencyFactory.GetOrStore<ITypeReaderCollection>();
             Database = DependencyFactory.GetOrStore<IDatabase>();
-            SettingsManager = DependencyFactory.GetOrStore<ISettingsManager>();
+            SettingsManager = DependencyFactory.GetOrStore<ISettingManager>();
             Scheduler = DependencyFactory.GetOrStore<IScheduler>();
             CommandService = DependencyFactory.GetOrStore<ICommandService>();
             DependencyFactory.GetOrStore<IDownloader>();
             TextResourceManager = DependencyFactory.GetOrStore<ITextResourceManager>();
 
+            InstallSettingEditors();
             SubscribeEvents();
 
             InstallHandlers(Assembly.GetExecutingAssembly());
         }
 
-        public void MapDefaults()
+        private void InstallSettingEditors()
+        {
+            SettingsManager.GetEditorCollection<GeneralGlobalSetting>(SettingScope.Global)
+                           .WithName("General")
+                           .WithDescription("SETTINGS_GLOBAL_GENERAL_DESCRIPTION")
+                           .AddSetting(s => s.DefaultPrefix)
+                           .AddSetting(s => s.Owners, (ICommandContext c, IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: (c, u) => string.Join(", ", u.Select(p => $"<@{p}>")));
+            SettingsManager.GetEditorCollection<GeneralGuildSetting>(SettingScope.Guild)
+                           .WithName("General")
+                           .WithDescription("SETTINGS_GUILD_GENERAL_DESCRIPTION")
+                           .AddSetting(s => s.Prefix)
+                           .AddSetting(s => s.PermOverride)
+                           .AddSetting(s => s.RoleOverride, (ICommandContext c, IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: (c, r) => string.Join(", ", r?.Select(id => $"<@&{id}>")))
+                           .AddSetting(s => s.DateTimeFormat)
+                           .AddSetting(s => s.PreferredLanguage, validator: (c, v) => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
+                           .WithNotes("SETTINGS_GUILD_GENERAL_NOTES");
+            SettingsManager.GetEditorCollection<GeneralUserSetting>(SettingScope.User)
+                           .WithName("General")
+                           .WithDescription("SETTINGS_USER_GENERAL_DESCRIPTION")
+                           .AddSetting(s => s.Language, validator: (c, v) => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
+                           .AddSetting(s => s.FormatType, validator: (c, v) => v == FormattingType.DEFAULT || c.Formatter.AcceptedFormats.Contains(v) ? null : "FORMATTINGTYPE_UNKNOWN", viewer: (c, f) => c.Formatter.GetName(f))
+                           .AddSetting(s => s.UseEmbeds);
+        }
+
+        private void MapDefaults()
         {
             DependencyFactory.Store(this);
             DependencyFactory.TryMap<ILogger, Logger>();
@@ -80,10 +108,9 @@ namespace TitanBot
             DependencyFactory.TryMap<ICommandContext, CommandContext>();
             DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
             DependencyFactory.TryMap<IPermissionManager, PermissionManager>();
-            DependencyFactory.TryMap<ISettingsManager, SettingsManager>();
+            DependencyFactory.TryMap<ISettingManager, SettingManager>();
+            DependencyFactory.TryMap(typeof(ISettingEditorCollection<>), typeof(SettingEditorCollection<>));
             DependencyFactory.TryMap<IDownloader, CachedDownloader>();
-            DependencyFactory.TryMap<IEditableSettingGroup, EditableSettingGroup>();
-            DependencyFactory.TryMap(typeof(IEditableSettingBuilder<>), typeof(EditableSettingBuilder<>));
             DependencyFactory.TryMap<ITextResourceManager, TextResourceManager>();
         }
 
@@ -105,23 +132,23 @@ namespace TitanBot
         }
 
         public Task StartAsync()
-            => StartAsync(x => GlobalSettings.Token);
+            => StartAsync(x => GeneralGlobalSettings.Token);
         public Task StartAsync(string token)
             => StartAsync(x => token);
         public async Task StartAsync(Func<string, string> tokenInput)
         {
-            var token = tokenInput(GlobalSettings.Token) ?? GlobalSettings.Token;
-            SettingsManager.EditGlobalGroup<GeneralGlobalSetting>(s => {if (!string.IsNullOrWhiteSpace(token)) { s.Token = token; } });
+            var token = tokenInput(GeneralGlobalSettings.Token) ?? GeneralGlobalSettings.Token;
+            GlobalSettings.Edit<GeneralGlobalSetting>(s => {if (!string.IsNullOrWhiteSpace(token)) { s.Token = token; } });
             if (DiscordClient.LoginState != LoginState.LoggedOut)
                 return;
             try
             {
-                await DiscordClient.LoginAsync(TokenType.Bot, GlobalSettings.Token);
+                await DiscordClient.LoginAsync(TokenType.Bot, GeneralGlobalSettings.Token);
             }
             catch (HttpException ex)
             {
                 if (ex.HttpCode == HttpStatusCode.Unauthorized)
-                    SettingsManager.EditGlobalGroup<GeneralGlobalSetting>(s => s.Token = null);
+                    GlobalSettings.Edit<GeneralGlobalSetting>(s => s.Token = null);
                 throw;
             }
             await DiscordClient.StartAsync();
