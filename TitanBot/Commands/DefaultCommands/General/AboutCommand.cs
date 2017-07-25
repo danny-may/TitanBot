@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using TitanBot.Commands;
 
-namespace TitanBot2.Commands.General
+namespace TitanBot.Commands.General
 {
     [Description("ABOUT_HELP_DESCRIPTION")]
     public class AboutCommand : Command

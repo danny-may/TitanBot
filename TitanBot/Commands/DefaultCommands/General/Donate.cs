@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
-using TitanBot.Commands;
 
-namespace TitanBot2.Commands.General
+namespace TitanBot.Commands.General
 {
     [Description("DONATE_HELP_DESCRIPTION")]
     public class Donate : Command

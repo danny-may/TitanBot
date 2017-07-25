@@ -134,6 +134,22 @@ namespace TitanBot.Commands
             => Reply.WithMessage(message, values).SendAsync();
         protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, params object[] values)
             => Reply.WithMessage(message, replyType, values).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed)
+            => Reply.WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, EmbedBuilder embed)
+            => Reply.WithMessage(message, replyType).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, IEmbedable embed)
+            => Reply.WithMessage(message).WithEmbedable(embed).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, EmbedBuilder embed)
+            => Reply.WithMessage(message).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed, params object[] values)
+            => Reply.WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, ReplyType replyType, EmbedBuilder embed, params object[] values)
+            => Reply.WithMessage(message, replyType, values).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, IEmbedable embed, params object[] values)
+            => Reply.WithMessage(message, values).WithEmbedable(embed).SendAsync();
+        protected Task<IUserMessage> ReplyAsync(string message, EmbedBuilder embed, params object[] values)
+            => Reply.WithMessage(message, values).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
         protected Task<IUserMessage> ReplyAsync(IEmbedable embed)
             => Reply.WithEmbedable(embed).SendAsync();
         protected Task<IUserMessage> ReplyAsync(EmbedBuilder embed)
