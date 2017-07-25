@@ -233,9 +233,11 @@
     <Compile Include="Formatting\Models\FormattingType.cs" />
     <Compile Include="Formatting\ValueFormatter.cs" />
     <Compile Include="Models\Range.cs" />
+    <Compile Include="Settings\SettingEditorBuilder.cs" />
     <Compile Include="Settings\Default\GeneralGlobalSetting.cs" />
     <Compile Include="Settings\Default\GeneralGuildSetting.cs" />
     <Compile Include="Settings\Default\GeneralUserSetting.cs" />
+    <Compile Include="Settings\Interfaces\ISettingEditorBuilder.cs" />
     <Compile Include="Settings\SettingScope.cs" />
     <Compile Include="Settings\Interfaces\ISettingContext.cs" />
     <Compile Include="Settings\Interfaces\ISettingManager.cs" />

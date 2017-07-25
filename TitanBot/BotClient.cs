@@ -79,21 +79,22 @@ namespace TitanBot
                            .WithName("General")
                            .WithDescription("SETTINGS_GLOBAL_GENERAL_DESCRIPTION")
                            .AddSetting(s => s.DefaultPrefix)
-                           .AddSetting(s => s.Owners, (ICommandContext c, IUser[] u) => u.Select(p => p.Id).ToArray(), viewer: (c, u) => string.Join(", ", u.Select(p => $"<@{p}>")));
+                           .AddSetting<IUser>(s => s.Owners);
             SettingsManager.GetEditorCollection<GeneralGuildSetting>(SettingScope.Guild)
                            .WithName("General")
                            .WithDescription("SETTINGS_GUILD_GENERAL_DESCRIPTION")
                            .AddSetting(s => s.Prefix)
                            .AddSetting(s => s.PermOverride)
-                           .AddSetting(s => s.RoleOverride, (ICommandContext c, IRole[] roles) => roles.Select(r => r.Id).ToArray(), viewer: (c, r) => string.Join(", ", r?.Select(id => $"<@&{id}>")))
+                           .AddSetting<IRole>(s => s.RoleOverride)
                            .AddSetting(s => s.DateTimeFormat)
-                           .AddSetting(s => s.PreferredLanguage, validator: (c, v) => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
+                           .AddSetting(s => s.PreferredLanguage, b => b.SetValidator(v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN"))
                            .WithNotes("SETTINGS_GUILD_GENERAL_NOTES");
             SettingsManager.GetEditorCollection<GeneralUserSetting>(SettingScope.User)
                            .WithName("General")
                            .WithDescription("SETTINGS_USER_GENERAL_DESCRIPTION")
-                           .AddSetting(s => s.Language, validator: (c, v) => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN")
-                           .AddSetting(s => s.FormatType, validator: (c, v) => v == FormattingType.DEFAULT || c.Formatter.AcceptedFormats.Contains(v) ? null : "FORMATTINGTYPE_UNKNOWN", viewer: (c, f) => c.Formatter.GetName(f))
+                           .AddSetting(s => s.Language, b => b.SetValidator(v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN"))
+                           .AddSetting(s => s.FormatType, b => b.SetValidator((c, v) => v == FormattingType.DEFAULT || c.Formatter.AcceptedFormats.Contains(v) ? null : "FORMATTINGTYPE_UNKNOWN")
+                                                                .SetViewer((c, f) => c.Formatter.GetName(f)))
                            .AddSetting(s => s.UseEmbeds);
         }
 

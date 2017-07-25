@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using TitanBot.Commands;
@@ -16,15 +17,20 @@ namespace TitanBot.Settings
         ISettingEditorCollection WithDescription(string description);
         ISettingEditorCollection WithNotes(string notes);
     }
+
     public interface ISettingEditorCollection<TSetting> : ISettingEditorCollection
     {
-        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(string name, Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TAccept, TStore> converter, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TAccept, string> validator = null);
-        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TAccept, TStore> converter, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TAccept, string> validator = null);
-        ISettingEditorCollection<TSetting> AddSetting<TStore>(string name, Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TStore, string> validator = null);
-        ISettingEditorCollection<TSetting> AddSetting<TStore>(Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TStore, string> viewer = null, Func<ICommandContext, TStore, string> validator = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore>(Expression<Func<TSetting, TStore>> property, Action<ISettingEditorBuilder<TStore, TStore>> builder = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<ICommandContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore>(Expression<Func<TSetting, TStore[]>> property, Action<ISettingEditorBuilder<TStore, TStore>> builder = null);
 
-        //ISettingEditorCollection<TSetting> AddEntitySetting<TEntity>(string name, Expression<Func<TSetting, ulong?>> property, )
-
+        //Entity Stuff
+        ISettingEditorCollection<TSetting> AddSetting<TAccept>(Expression<Func<TSetting, ulong>> property, Action<ISettingEditorBuilder<ulong, TAccept>> builder = null) where TAccept : IEntity<ulong>;
+        ISettingEditorCollection<TSetting> AddSetting<TAccept>(Expression<Func<TSetting, ulong?>> property, Action<ISettingEditorBuilder<ulong?, TAccept>> builder = null) where TAccept : IEntity<ulong>;
+        ISettingEditorCollection<TSetting> AddSetting<TAccept>(Expression<Func<TSetting, ulong[]>> property, Action<ISettingEditorBuilder<ulong, TAccept>> builder = null) where TAccept : IEntity<ulong>;
 
         new ISettingEditorCollection<TSetting> WithName(string name);
         new ISettingEditorCollection<TSetting> WithDescription(string description);
