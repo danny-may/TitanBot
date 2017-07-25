@@ -8,6 +8,7 @@ namespace TitanBot.Settings
         IEntity<ulong> Global { get; }
         
         ISettingContext GetContext(IEntity<ulong> entity);
+        ISettingContext GetContext(ulong entity);
 
         IReadOnlyList<ISettingEditorCollection> GetEditors(SettingScope scope);
         ISettingEditorCollection<T> GetEditorCollection<T>(SettingScope scope);

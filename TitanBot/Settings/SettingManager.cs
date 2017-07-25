@@ -31,8 +31,11 @@ namespace TitanBot.Settings
         {
             if (entity == null)
                 return null;
-            return new SettingContext(Database, entity.Id);
+            return GetContext(entity.Id);
         }
+
+        public ISettingContext GetContext(ulong entity)
+            => new SettingContext(Database, entity);
 
         public ISettingEditorCollection<T> GetEditorCollection<T>(SettingScope scope)
         {
