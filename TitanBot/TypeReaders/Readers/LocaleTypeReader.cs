@@ -10,16 +10,9 @@ namespace TitanBot.TypeReaders
 {
     class LocaleTypeReader : TypeReader
     {
-        private ITextResourceManager TextManager { get; }
-
-        public LocaleTypeReader(ITextResourceManager textManager)
-        {
-            TextManager = textManager;
-        }
-
         public override Task<TypeReaderResponse> Read(ICommandContext context, string value)
         {
-            if (TextManager.GetLanguageCoverage(value) > 0)
+            if (context.TextManager.GetLanguageCoverage(value) > 0)
                 return Task.FromResult(TypeReaderResponse.FromSuccess((Locale)value));
             return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Locale)));
         }

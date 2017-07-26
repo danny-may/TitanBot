@@ -87,14 +87,13 @@ namespace TitanBot
                            .AddSetting(s => s.PermOverride)
                            .AddSetting<IRole>(s => s.RoleOverride)
                            .AddSetting(s => s.DateTimeFormat)
-                           .AddSetting(s => s.PreferredLanguage, b => b.SetValidator(v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN"))
+                           .AddSetting(s => s.PreferredLanguage, (Locale a) => (string)a)
                            .WithNotes("SETTINGS_GUILD_GENERAL_NOTES");
             SettingsManager.GetEditorCollection<GeneralUserSetting>(SettingScope.User)
                            .WithName("General")
                            .WithDescription("SETTINGS_USER_GENERAL_DESCRIPTION")
-                           .AddSetting(s => s.Language, b => b.SetValidator(v => TextResourceManager.GetLanguageCoverage(v) > 0 ? null : "LOCALE_UNKNOWN"))
-                           .AddSetting(s => s.FormatType, b => b.SetValidator((c, v) => v == FormattingType.DEFAULT || c.Formatter.AcceptedFormats.Contains(v) ? null : "FORMATTINGTYPE_UNKNOWN")
-                                                                .SetViewer((c, f) => c.Formatter.GetName(f)))
+                           .AddSetting(s => s.Language, (Locale a) => (string)a)
+                           .AddSetting(s => s.FormatType, (FormattingType a) => (uint)a, b => b.SetViewer((c, f) => c.Formatter.GetName(f)))
                            .AddSetting(s => s.UseEmbeds);
         }
 

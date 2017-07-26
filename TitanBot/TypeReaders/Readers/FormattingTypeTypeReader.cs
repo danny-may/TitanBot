@@ -10,16 +10,9 @@ namespace TitanBot.TypeReaders
 {
     class FormatingTypeTypeReader : TypeReader
     {
-        ValueFormatter Formatter { get; }
-
-        public FormatingTypeTypeReader(ValueFormatter formatter)
-        {
-            Formatter = formatter;
-        }
-
         public override Task<TypeReaderResponse> Read(ICommandContext context, string value)
         {
-            foreach (var format in Formatter.FormatNames)
+            foreach (var format in context.Formatter.FormatNames)
                 if (format.Name.ToUpper() == value.ToUpper())
                     return Task.FromResult(TypeReaderResponse.FromSuccess(format.Format));
 

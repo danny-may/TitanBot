@@ -26,6 +26,7 @@ namespace TitanBot.Commands
 
         public IReplier Replier => _replier.Value;
         public ITextResourceCollection TextResource => _textResource.Value;
+        public ITextResourceManager TextManager => _textManager.Value;
         public ValueFormatter Formatter => _formatter.Value;
 
         public GeneralGlobalSetting GeneralGlobalSetting => GlobalSettings.Get<GeneralGlobalSetting>();
@@ -40,6 +41,7 @@ namespace TitanBot.Commands
 
         private Lazy<IReplier> _replier { get; }
         private Lazy<ITextResourceCollection> _textResource { get; }
+        private Lazy<ITextResourceManager> _textManager { get; }
         private Lazy<ValueFormatter> _formatter { get; }
         private Lazy<ISettingContext> _globalSettings { get; }
         private Lazy<ISettingContext> _channelSettings { get; }
@@ -63,8 +65,8 @@ namespace TitanBot.Commands
             _userSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(Author));
             _formatter = new Lazy<ValueFormatter>(() => factory.WithInstance(this)
                                                                .Construct<ValueFormatter>());
-            _textResource = new Lazy<ITextResourceCollection>(() => factory.Get<ITextResourceManager>()
-                                                                           .GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, Formatter));
+            _textManager = new Lazy<ITextResourceManager>(() => factory.GetOrStore<ITextResourceManager>());
+            _textResource = new Lazy<ITextResourceCollection>(() => TextManager.GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, Formatter));
             _replier = new Lazy<IReplier>(() => factory.WithInstance(this)
                                                        .Construct<IReplier>());
         }

@@ -10,6 +10,7 @@ namespace TitanBot.Commands
         IUser Author { get; }
         IReplier Replier { get; }
         ITextResourceCollection TextResource { get; }
+        ITextResourceManager TextManager { get; }
         ValueFormatter Formatter { get; }
         IMessageChannel Channel { get; }
         DiscordSocketClient Client { get; }
