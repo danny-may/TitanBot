@@ -40,7 +40,7 @@ namespace TitanBot.Formatting
             if (!Directory.Exists(DirectoryPath))
                 Directory.CreateDirectory(DirectoryPath);
             EnsureKeys();
-            File.WriteAllText(FileName, JsonConvert.SerializeObject(TextMap, Newtonsoft.Json.Formatting.Indented));
+            File.WriteAllText(FileName, JsonConvert.SerializeObject(TextMap.OrderBy(k => k.Key).ToDictionary(k => k.Key, k => k.Value), Newtonsoft.Json.Formatting.Indented));
         }
 
         public void Refresh()
