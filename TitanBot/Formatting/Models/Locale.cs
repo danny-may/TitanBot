@@ -2,7 +2,7 @@
 {
     public struct Locale
     {
-        public static Locale DEFAULT { get; } = new Locale("Default");
+        public const string DEFAULT = "Default";
         
         private string _id { get; set; }
 
@@ -28,7 +28,7 @@
             => locale1._id.ToUpper() != locale2._id.ToUpper();
 
         public override bool Equals(object obj)
-            => base.Equals(obj);
+            => (obj is Locale l && this == l) || (obj is string s && this == s);
 
         public override int GetHashCode()
             => base.GetHashCode();

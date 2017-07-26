@@ -12,22 +12,27 @@ namespace TitanBot.Formatting
         private Dictionary<Type, Delegate> BeautifyDelegates { get; } = new Dictionary<Type, Delegate>();
         private MethodInfo BeautifyGeneric { get; }
 
-        protected Dictionary<FormattingType, string> Names { get; } = new Dictionary<FormattingType, string> { { FormattingType.DEFAULT, "Default" } };
+        protected HashSet<(FormattingType Format, string Name)> Names { get; } = new HashSet<(FormattingType Format, string Name)> { (FormattingType.DEFAULT, "Default") };
+        public IReadOnlyCollection<(FormattingType Format, string Name)> FormatNames => Names.ToList().AsReadOnly();
 
         protected IEnumerable<Type> KnownTypes => BeautifyDelegates.Keys;
         protected delegate string BeautifyDelegate<T>(T value);        
         protected ICommandContext Context;
-        protected FormattingType AltFormat;
-        public virtual FormattingType[] AcceptedFormats { get; } = new FormattingType[0];
+        protected FormattingType AltFormat = FormattingType.DEFAULT;
+        public FormattingType[] AcceptedFormats => Names.Select(n => n.Format).ToArray();
 
         public virtual string GetName(FormattingType format)
-            => Names.TryGetValue(format, out string name) ? name : "UNKNOWN";
+            => Names.FirstOrDefault(n => n.Format == format).Name ?? "UNKNOWN";
 
-        public ValueFormatter(ICommandContext context)
+        public ValueFormatter()
+        {
+            BeautifyGeneric = MiscUtil.GetMethod<ValueFormatter>(v => v.Beautify<object>(null));
+        }
+
+        public ValueFormatter(ICommandContext context) : this()
         {
             Context = context;
             AltFormat = Context.GeneralUserSetting.FormatType;
-            BeautifyGeneric = MiscUtil.GetMethod<ValueFormatter>(v => v.Beautify<object>(null));
         }
 
         public string Beautify<T>(T value)

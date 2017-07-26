@@ -286,6 +286,8 @@
     <Compile Include="TypeReaders\Readers\ChannelTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ColourTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\EnumTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\FormattingTypeTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\LocaleTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\MessageTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PermissionTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PrimitiveReader.cs" />

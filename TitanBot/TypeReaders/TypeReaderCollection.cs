@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot.Commands;
+using TitanBot.Dependencies;
+using TitanBot.Formatting;
 using TitanBot.Models;
 
 namespace TitanBot.TypeReaders
@@ -16,6 +18,7 @@ namespace TitanBot.TypeReaders
         private readonly ConcurrentDictionary<Type, ConcurrentBag<TypeReader>> TypeReaders;
         private readonly ImmutableList<(Type Entity, Type Reader)> EntityReaders;
         private ConcurrentDictionary<(int, Type, string), TypeReaderResponse> ResultsCache = new ConcurrentDictionary<(int, Type, string), TypeReaderResponse>();
+        protected IDependencyFactory Factory { get; }
 
         private object _lock = new object();
 
@@ -26,8 +29,9 @@ namespace TitanBot.TypeReaders
             EntityReaders = parent.EntityReaders;
         }
 
-        public TypeReaderCollection()
+        public TypeReaderCollection(IDependencyFactory factory)
         {
+            Factory = factory;
             TypeReaders = new ConcurrentDictionary<Type, ConcurrentBag<TypeReader>>();
             var entityTypeReaders = ImmutableList.CreateBuilder<(Type, Type)>();
             entityTypeReaders.Add((typeof(IMessage), typeof(MessageTypeReader<>)));
@@ -40,6 +44,8 @@ namespace TitanBot.TypeReaders
                 AddTypeReader(type, PrimitiveTypeReader.Create(type));
 
             AddTypeReader<TimeSpan>(new TimeSpanTypeReader());
+            AddTypeReader<FormattingType>(new FormatingTypeTypeReader(factory.Construct<ValueFormatter>()));
+            AddTypeReader<Locale>(new LocaleTypeReader(factory.GetOrStore<ITextResourceManager>()));
             AddTypeReader<System.Drawing.Color>(new ColourTypeReader());
         }
 

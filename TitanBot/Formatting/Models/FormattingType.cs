@@ -2,7 +2,7 @@
 {
     public struct FormattingType
     {
-        public static FormattingType DEFAULT { get; } = 0;
+        public const uint DEFAULT = 0;
 
         private uint _id { get; }
 

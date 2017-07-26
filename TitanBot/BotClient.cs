@@ -107,12 +107,13 @@ namespace TitanBot
             DependencyFactory.TryMap<ICommandService, CommandService>();
             DependencyFactory.TryMap<IReplier, Replier>();
             DependencyFactory.TryMap<ICommandContext, CommandContext>();
-            DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
             DependencyFactory.TryMap<IPermissionManager, PermissionManager>();
             DependencyFactory.TryMap<ISettingManager, SettingManager>();
             DependencyFactory.TryMap(typeof(ISettingEditorCollection<>), typeof(SettingEditorCollection<>));
             DependencyFactory.TryMap<IDownloader, CachedDownloader>();
             DependencyFactory.TryMap<ITextResourceManager, TextResourceManager>();
+            DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
+
         }
 
         public void InstallHandlers(Assembly assembly)
