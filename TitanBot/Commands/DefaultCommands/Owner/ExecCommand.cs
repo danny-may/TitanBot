@@ -28,7 +28,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     {
         protected override int DelayMessageMs => 10000;
 
-        public static Func<ExecCommand, ExecGlobals> GetGlobals = c => new ExecGlobals(c);
+        public static Func<ExecCommand, object> GetGlobals = c => new ExecGlobals(c);
 
         public Assembly[] GetAssemblies()
         {
@@ -195,6 +195,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             public IScheduler Scheduler { get; }
             public IReplier Replier { get; }
             public IDownloader Downloader { get; }
+            public ITextResourceManager TextManager { get; }
             public ValueFormatter Formatter { get; }
 
             public ExecGlobals(ExecCommand parent)
@@ -205,6 +206,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 Logger = parent.Logger;
                 CommandService = parent.CommandService;
                 SettingsManager = parent.SettingsManager;
+                TextManager = Bot.DependencyFactory.GetOrStore<ITextResourceManager>();
 
                 Database = parent.Database;
                 Scheduler = parent.Scheduler;

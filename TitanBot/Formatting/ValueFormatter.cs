@@ -41,8 +41,12 @@ namespace TitanBot.Formatting
         }
 
         public string Beautify(object value)
-            => (string)BeautifyGeneric.MakeGenericMethod(value.GetType())
+        {
+            if (value == null)
+                return null;
+            return (string)BeautifyGeneric.MakeGenericMethod(value.GetType())
                                       .Invoke(this, new object[] { value });
+        }
 
         protected void Add<T>(BeautifyDelegate<T> beautify)
             => BeautifyDelegates[typeof(T)] = beautify;
