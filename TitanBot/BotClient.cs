@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using TitanBot.Commands;
+using TitanBot.Commands.DefaultCommands.Owner;
 using TitanBot.Dependencies;
 using TitanBot.DiscordHandlers;
 using TitanBot.Downloader;
@@ -67,10 +68,16 @@ namespace TitanBot
             DependencyFactory.GetOrStore<IDownloader>();
             TextResourceManager = DependencyFactory.GetOrStore<ITextResourceManager>();
 
+            SetupFeatures();
             InstallSettingEditors();
             SubscribeEvents();
 
             InstallHandlers(Assembly.GetExecutingAssembly());
+        }
+
+        private void SetupFeatures()
+        {
+            ReloadCommand.ReloadActions.Add("TextResources", TextResourceManager.Refresh);
         }
 
         private void InstallSettingEditors()

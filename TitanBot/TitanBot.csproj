@@ -203,6 +203,7 @@
     <Compile Include="Commands\DefaultCommands\Owner\ExecCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\GlobalSettingsCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\SettingsReset.cs" />
+    <Compile Include="Commands\DefaultCommands\Owner\ReloadCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\ShutdownCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\SudoCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\TestCommand.cs" />

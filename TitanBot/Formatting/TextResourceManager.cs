@@ -141,11 +141,12 @@ namespace TitanBot.Formatting
                 {"SHUTDOWN_HELP_USAGE", "Shuts me down now, or in the time provided"},
                 {"SUDOCOMMAND_HELP_DESCRIPTION", "Executes any command on behalf of another user. Requires a prefix in the message"},
                 {"SUDOCOMMAND_HELP_USAGE", "Will execute any command as the given user"},
-                {"RELOAD_HELP_DESCRIPTION", "Reloads the various configurations for titanbot"},
-                {"RELOAD_HELP_USAGE", "Performs the reload"},
                 {"PREFERENCES_HELP_DESCRIPTION", "Allows you to set some options for how the bot will interact with you."},
                 {"PREFERENCES_HELP_USAGE_DEFAULT", "Lists all preferences that are available"},
                 {"PREFERENCES_HELP_USAGE_SET", "Sets the given preference to the given value"},
+                {"RELOAD_HELP_DESCRIPTION", "Reloads a given area of the bot"},
+                {"RELOAD_HELP_USAGE", "Reloads the supplied area" },
+                {"RELOAD_HELP_USAGE_LIST", "Lists all available areas to reload" },
 
                 //Settings stuff
 
@@ -240,12 +241,14 @@ namespace TitanBot.Formatting
                 {"EXEC_TITLE_SUCCESS", ":white_check_mark: Execution Result"},
                 {"SHUTDOWN_INTIME", "Shutting down in {0}"},
                 {"SUDOCOMMAND_SUCCESS", "Executing `{0}` as {1}"},
-                {"RELOAD_COMPLETE", "Reload complete"},
                 {"EXCEPTION_NOTFOUND", "Exception {0} has not yet occured!"},
                 {"EXCEPTION_MESSAGE", "Message"},
                 {"EXCEPTION_CHANNEL", "Channel"},
                 {"EXCEPTION_GUILD", "Guild"},
                 {"EXCEPTION_FULLMESSAGE", "Here is everything that was logged for exception {0}"},
+                {"RELOAD_AREA_NOTFOUND", "The area `{0}` does not exist" },
+                {"RELOAD_SUCCESS", "Reloading {0}"},
+                {"RELOAD_LIST", "Here are all the areas that can be reloaded:\n{0}" },
 
                 //General stuff
 
