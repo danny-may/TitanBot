@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace TitanBot.Util
+﻿namespace System.Diagnostics
 {
     public static class PerformanceUtil
     {

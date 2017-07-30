@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
@@ -10,7 +9,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     [Description("RELOAD_HELP_DESCRIPTION")]
     class ReloadCommand : Command
     {
-        public static Dictionary<string, Action> ReloadActions { get; } = new Dictionary<string, Action>();
+        public Dictionary<string, Action> ReloadActions { get; } = new Dictionary<string, Action>();
 
         [Call]
         [Usage("RELOAD_HELP_USAGE")]

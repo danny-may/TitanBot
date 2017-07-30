@@ -28,7 +28,7 @@ namespace TitanBot.TypeReaders
             Parser = parser;
         }
 
-        public override async Task<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override async ValueTask<TypeReaderResponse> Read(ICommandContext context, string value)
         {
             var values = new List<T>();
 
@@ -40,7 +40,7 @@ namespace TitanBot.TypeReaders
 
             foreach (var item in value.Split(','))
             {
-                var response = await Parser?.Read(context, item.Trim());
+                var response = await Parser.Read(context, item.Trim());
                 if (response.IsSuccess)
                     values.Add((T)response.Best);
                 else

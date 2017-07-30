@@ -11,7 +11,7 @@ namespace TitanBot.TypeReaders
     class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
-        public override Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
         {
             ulong id;
 
@@ -33,9 +33,9 @@ namespace TitanBot.TypeReaders
                     AddResult(results, role as T, role.Name == input ? 0.80f : 0.70f);
 
                 if (results.Count > 0)
-                    return Task.FromResult(TypeReaderResponse.FromSuccess(results.Values));
+                    return ValueTask.FromResult(TypeReaderResponse.FromSuccess(results.Values));
             }
-            return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", input, typeof(T)));
+            return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_ENTITY_NOTFOUND", input, typeof(T)));
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T role, float score)

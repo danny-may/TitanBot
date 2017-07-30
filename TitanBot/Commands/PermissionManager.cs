@@ -6,7 +6,6 @@ using TitanBot.Commands.Models;
 using TitanBot.Commands.Responses;
 using TitanBot.Settings;
 using TitanBot.Storage;
-using TitanBot.Util;
 
 namespace TitanBot.Commands
 {

@@ -121,6 +121,7 @@ namespace TitanBot.Formatting
                 {"DONATE_HELP_USAGE", "Gives you the link you awesome person :heart:"},
                 {"HELP_HELP_DESCRIPTION", "Displays help for any command"},
                 {"HELP_HELP_USAGE", "Displays a list of all commands, or help for a single command"},
+                {"HELP_HELP_USAGE_TUTORIAL", "Displays information about a given tutorial" },
                 {"INFO_HELP_DESCRIPTION", "Displays some technical information about me"},
                 {"INFO_HELP_USAGE_LANGUAGE", "Displays info about what languages are supported"},
                 {"INFO_HELP_USAGE_TECHNICAL", "Displays technical info for me"},

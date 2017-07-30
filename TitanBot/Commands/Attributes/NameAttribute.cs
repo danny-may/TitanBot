@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using TitanBot.Util;
 
 namespace TitanBot.Commands
 {

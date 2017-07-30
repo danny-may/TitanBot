@@ -24,11 +24,11 @@ namespace TitanBot.TypeReaders
             _tryParse = PrimitiveParsers.Get<T>();
         }
 
-        public override Task<TypeReaderResponse> Read(ICommandContext context, string text)
+        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string text)
         {
             if (_tryParse(text, out T value))
-                return Task.FromResult(TypeReaderResponse.FromSuccess(value));
-            return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", text, typeof(T)));
+                return ValueTask.FromResult(TypeReaderResponse.FromSuccess(value));
+            return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", text, typeof(T)));
         }
     }
 

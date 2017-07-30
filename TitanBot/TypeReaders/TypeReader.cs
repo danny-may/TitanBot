@@ -5,6 +5,6 @@ namespace TitanBot.TypeReaders
 {
     public abstract class TypeReader
     {
-        public abstract Task<TypeReaderResponse> Read(ICommandContext context, string value);
+        public abstract ValueTask<TypeReaderResponse> Read(ICommandContext context, string value);
     }
 }

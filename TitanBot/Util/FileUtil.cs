@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 
-namespace TitanBot.Util
+namespace System.IO
 {
     public static class FileUtil
     {

@@ -5,7 +5,6 @@ using System.Linq;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Settings;
-using TitanBot.Util;
 
 namespace TitanBot.Commands
 {

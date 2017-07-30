@@ -29,7 +29,7 @@ namespace TitanBot.TypeReaders
             Parser = parser;
         }
 
-        public override async Task<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override async ValueTask<TypeReaderResponse> Read(ICommandContext context, string value)
         {
             if (value == null)
                 return TypeReaderResponse.FromSuccess(null);

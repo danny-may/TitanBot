@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TitanBot.Util;
 
-namespace TitanBot.Util
+namespace System
 {
     public static class StringUtils
     {
@@ -196,36 +196,6 @@ namespace TitanBot.Util
             }
 
             return builder.ToString();
-        }
-
-        public static T[][] Rotate<T>(this T[][] data)
-        {
-            var ret = new T[data.Max(r => r.Length)][];
-            for (int y = 0; y < data.Length; y++)
-            {
-                for (int x = 0; x < data[y].Length; x++)
-                {
-                    ret[x] = ret[x] ?? new T[data.Length];
-                    ret[x][y] = data[y][x];
-                }
-            }
-            return ret;
-        }
-
-        public static T[][] ForceColumns<T>(this T[][] data)
-        {
-            var columns = data.Max(r => r.Length);
-            var ret = data.Select(r => new T[columns]).ToArray();
-            for (int y = 0; y < data.Length; y++)
-            {
-                ret[y] = new T[columns];
-                for (int x = 0; x < data[y].Length; x++)
-                {
-                    ret[y][x] = data[y][x];
-                }
-            }
-
-            return ret;
         }
     }
 }

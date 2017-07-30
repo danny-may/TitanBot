@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace TitanBot.Util
+namespace System
 {
     public static class NumericUtil
     {

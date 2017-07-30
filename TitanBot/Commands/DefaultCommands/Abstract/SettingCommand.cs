@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Settings;
 using TitanBot.TypeReaders;
-using TitanBot.Util;
 
 namespace TitanBot.Commands.DefaultCommands.Abstract
 {

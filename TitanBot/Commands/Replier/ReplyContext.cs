@@ -18,7 +18,7 @@ namespace TitanBot.Commands
         private Func<Stream> Attachment { get; set; }
         private string AttachmentName { get; set; }
 
-        private event MessageErrorHandler Handler;
+        private event MessageSendErrorHandler Handler;
         public event OnSendEventHandler OnSend;
         
         public ReplyContext(IMessageChannel channel, ICommandContext context)
@@ -28,10 +28,10 @@ namespace TitanBot.Commands
             OnSend += (s, m) => Task.CompletedTask;
         }
 
-        public IUserMessage Send(bool stealthy = false)
-            => SendAsync(stealthy).Result;
+        public void Send(bool stealthy = false)
+            => SendAsync(stealthy).DontWait();
 
-        public async Task<IUserMessage> SendAsync(bool stealthy = false)
+        public async ValueTask<IUserMessage> SendAsync(bool stealthy = false)
         {
             if (string.IsNullOrWhiteSpace(Message) && Embedable == null)
                 throw new InvalidOperationException("Unable to send a message without an embed or message");
@@ -80,7 +80,7 @@ namespace TitanBot.Commands
             return msg;
         }
 
-        public IReplyContext WithErrorHandler(MessageErrorHandler handler)
+        public IReplyContext WithErrorHandler(MessageSendErrorHandler handler)
             => MiscUtil.InlineAction(this, v => v.Handler += handler);
 
         public IReplyContext WithMessage(string message)

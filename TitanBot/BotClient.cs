@@ -19,7 +19,6 @@ using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Storage;
 using TitanBot.TypeReaders;
-using TitanBot.Util;
 
 namespace TitanBot
 {
@@ -77,7 +76,7 @@ namespace TitanBot
 
         private void SetupFeatures()
         {
-            ReloadCommand.ReloadActions.Add("TextResources", TextResourceManager.Refresh);
+            CommandService.AddBuildEvent<ReloadCommand>(c => c.ReloadActions.Add("TextResources", TextResourceManager.Refresh));
         }
 
         private void InstallSettingEditors()

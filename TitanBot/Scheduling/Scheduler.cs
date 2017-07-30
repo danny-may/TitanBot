@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using TitanBot.Dependencies;
 using TitanBot.Logging;
 using TitanBot.Storage;
-using TitanBot.Util;
 
 namespace TitanBot.Scheduling
 {
@@ -131,7 +130,7 @@ namespace TitanBot.Scheduling
             return true;
         }
 
-        private Task<IEnumerable<SchedulerRecord>> FindActives(DateTime pollTime)
+        private ValueTask<IEnumerable<SchedulerRecord>> FindActives(DateTime pollTime)
             => Database.Find((SchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
 
         public ISchedulerRecord[] Complete(IEnumerable<ulong> ids, bool wasCancelled = true)

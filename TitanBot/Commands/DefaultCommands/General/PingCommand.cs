@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using TitanBot.Util;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
@@ -11,7 +10,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         async Task SendPongAsync()
         {
             var msg = await ReplyAsync("PING_INITIAL", ReplyType.Success, Client.Latency);
-            await msg.ModifySafeAsync(m => m.Content = TextResource.Format("PING_VERIFY", ReplyType.Success, (msg.Timestamp - Message.Timestamp).TotalMilliseconds));
+            Modify(msg).ChangeMessage("PING_VERIFY", ReplyType.Success, (msg.Timestamp - Message.Timestamp).TotalMilliseconds).Modify();
         }
     }
 }

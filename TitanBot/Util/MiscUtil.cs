@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace TitanBot.Util
             return (result, DateTime.Now - start);
         }
 
-        public static (T Result, TimeSpan Time) TimeAsyncExecution<T>(Func<Task<T>> action)
+        public static (T Result, TimeSpan Time) TimeAsyncExecution<T>(Func<ValueTask<T>> action)
         {
             var start = DateTime.Now;
             var result = action().Result;
@@ -51,32 +52,6 @@ namespace TitanBot.Util
             return obj;
         }
 
-
-        public static void CheckNull<T>(this T? value, Action<T> hasValue)
-            where T : struct => CheckNull(value, hasValue, () => { });
-        public static void CheckNull<T>(this T? value, Action noValue)
-            where T : struct => CheckNull<T>(value, t => { }, noValue);
-        public static void CheckNull<T>(this T? value, Action<T> hasValue, Action noValue) 
-            where T : struct
-        {
-            if (value.HasValue)
-                hasValue(value.Value);
-            else
-                noValue();
-        }
-        public static void CheckNull<T>(this T value, Action<T> hasValue)
-            where T : class => CheckNull(value, hasValue, () => { });
-        public static void CheckNull<T>(this T value, Action noValue)
-            where T : class => CheckNull(value, t => { }, noValue);
-        public static void CheckNull<T>(this T value, Action<T> hasValue, Action noValue)
-            where T : class
-        {
-            if (value != null)
-                hasValue(value);
-            else
-                noValue();
-        }
-
         public static Stream ToStream(this string text)
         {
             var ms = new MemoryStream();
@@ -85,6 +60,36 @@ namespace TitanBot.Util
             sw.Flush();
             ms.Position = 0;
             return ms;
+        }
+
+        public static T[][] Rotate<T>(this T[][] data)
+        {
+            var ret = new T[data.Max(r => r.Length)][];
+            for (int y = 0; y < data.Length; y++)
+            {
+                for (int x = 0; x < data[y].Length; x++)
+                {
+                    ret[x] = ret[x] ?? new T[data.Length];
+                    ret[x][y] = data[y][x];
+                }
+            }
+            return ret;
+        }
+
+        public static T[][] ForceColumns<T>(this T[][] data)
+        {
+            var columns = data.Max(r => r.Length);
+            var ret = data.Select(r => new T[columns]).ToArray();
+            for (int y = 0; y < data.Length; y++)
+            {
+                ret[y] = new T[columns];
+                for (int x = 0; x < data[y].Length; x++)
+                {
+                    ret[y][x] = data[y][x];
+                }
+            }
+
+            return ret;
         }
     }
 }

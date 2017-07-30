@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace TitanBot.Util
+﻿namespace System.Drawing
 {
     public static class ImageUtil
     {

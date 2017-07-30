@@ -7,11 +7,11 @@ namespace TitanBot.TypeReaders
 {
     class ColourTypeReader : TypeReader
     {
-        public override Task<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string value)
         {
             var colour = Color.FromName(value);
             if (colour.IsKnownColor)
-                return Task.FromResult(TypeReaderResponse.FromSuccess(colour));
+                return ValueTask.FromResult(TypeReaderResponse.FromSuccess(colour));
 
             var input = (string)value.Clone();
             if (value.StartsWith("#"))
@@ -28,14 +28,14 @@ namespace TitanBot.TypeReaders
             else if (input.Length == 6)
                 charsPerVal = 2;
             else
-                return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Color)));
+                return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Color)));
 
             if (!int.TryParse(input.Substring(0, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out r) ||
                 !int.TryParse(input.Substring(charsPerVal, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out g) ||
                 !int.TryParse(input.Substring(2 * charsPerVal, charsPerVal), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out b))
-                return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Color)));
+                return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(Color)));
 
-            return Task.FromResult(TypeReaderResponse.FromSuccess(Color.FromArgb(r, g, b)));
+            return ValueTask.FromResult(TypeReaderResponse.FromSuccess(Color.FromArgb(r, g, b)));
 
         }
     }

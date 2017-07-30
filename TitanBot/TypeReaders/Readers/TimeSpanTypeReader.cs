@@ -7,7 +7,7 @@ namespace TitanBot.TypeReaders
 {
     class TimeSpanTypeReader : TypeReader
     {
-        public override Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
         {
             var days = 0;
             var hours = 0;
@@ -78,11 +78,11 @@ namespace TitanBot.TypeReaders
 
             if (match)
             {
-                return Task.FromResult(TypeReaderResponse.FromSuccess(new TimeSpan(days, hours, minutes, seconds)));
+                return ValueTask.FromResult(TypeReaderResponse.FromSuccess(new TimeSpan(days, hours, minutes, seconds)));
             }
             else
             {
-                return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(TimeSpan)));
+                return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(TimeSpan)));
             }
         }
     }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Commands.Responses;
-using TitanBot.Util;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
@@ -12,6 +11,7 @@ namespace TitanBot.Commands.DefautlCommands.General
     public class HelpCommand : Command
     {
         private IPermissionManager PermissionManager { get; }
+        public Dictionary<string, TutorialModel> Tutorials { get; } = new Dictionary<string, TutorialModel>();
 
         public HelpCommand(IPermissionManager checker)
         {
@@ -26,6 +26,13 @@ namespace TitanBot.Commands.DefautlCommands.General
                 await AllHelpAsync();
             else
                 await HelpCommandAsync(command);
+        }
+
+        [Call("Tutorial")]
+        [Usage("HELP_HELP_USAGE_TUTORIAL")]
+        async Task TutorialAsync(string tutorialArea)
+        {
+            await Task.Delay(0);
         }
 
 

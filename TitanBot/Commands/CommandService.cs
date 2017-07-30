@@ -26,9 +26,10 @@ namespace TitanBot.Commands
         private BotClient Client { get; }
         private DiscordSocketClient DiscordClient { get; }
         private IPermissionManager PermissionManager { get; }
+        private Dictionary<Type, List<(MethodInfo Method, object Parent)>> CommandBuildActions { get; } = new Dictionary<Type, List<(MethodInfo, object)>>();
 
         public CommandService(IDependencyFactory factory,
-                              ILogger logger, 
+                              ILogger logger,
                               DiscordSocketClient discordClient,
                               BotClient botClient,
                               ITypeReaderCollection readers,
@@ -94,8 +95,29 @@ namespace TitanBot.Commands
                                            .Construct<ICommandContext>();
             context.CheckCommand(this, SettingsManager.GetContext(SettingsManager.Global).Get<GeneralGlobalSetting>().DefaultPrefix);
             var executor = DependencyFactory.WithInstance(context)
+                                            .WithInstance(this)
                                             .Construct<CommandExecutor>();
             return executor.Run();
         }
+
+        public void AddBuildEvent<T>(Action<T> handler) where T : Command
+        {
+            if (!CommandBuildActions.ContainsKey(typeof(T)))
+                CommandBuildActions[typeof(T)] = new List<(MethodInfo, object)>();
+
+            CommandBuildActions[typeof(T)].Add((handler.Method, handler.Target));
+        }
+
+        public List<Action<Command>> GetBuildEvents(Type commandType)
+            => CommandBuildActions.Where(k => commandType.IsAssignableFrom(k.Key))
+                                  .SelectMany(k => k.Value)
+                                  .Select(h => BuildCommandAction(h.Method, h.Parent))
+                                  .ToList();
+
+        private Action<Command> BuildCommandAction(MethodInfo method, object target)
+            => c => method.Invoke(target, new object[] { c });
+
+        public List<Action<T>> GetBuildEvents<T>() where T : Command
+            => GetBuildEvents(typeof(T)).Select(e => (Action<T>)e).ToList();
     }
 }

@@ -9,7 +9,7 @@ namespace TitanBot.TypeReaders
         where T : class, IMessage
     {
 
-        public override async Task<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override async ValueTask<TypeReaderResponse> Read(ICommandContext context, string value)
         {
             if (ulong.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out ulong id))
             {

@@ -15,6 +15,7 @@ namespace TitanBot.Commands
     class CommandExecutor
     {
         private IDependencyFactory DependencyFactory { get; }
+        private ICommandService Owner { get; }
         private IPermissionManager PermissionManager { get; }
         private IDatabase Database { get; }
         private ILogger Logger { get; }
@@ -25,7 +26,8 @@ namespace TitanBot.Commands
         private ISettingManager Settings { get; }
         private IReplier Replier { get; }
 
-        public CommandExecutor(IDependencyFactory factory, 
+        public CommandExecutor(IDependencyFactory factory,
+                               ICommandService owner,
                                ICommandContext context, 
                                IPermissionManager permissionManager,
                                IDatabase database,
@@ -34,6 +36,7 @@ namespace TitanBot.Commands
                                ISettingManager settings)
         {
             DependencyFactory = factory;
+            Owner = owner;
             PermissionManager = permissionManager;
             Context = context;
             Database = database;
@@ -121,6 +124,8 @@ namespace TitanBot.Commands
                     else
                     {
                         instance.Install(Context, DependencyFactory);
+                        foreach (var buildEvent in Owner.GetBuildEvents(instance.GetType()))
+                            buildEvent.Invoke(instance);
                         LogCommand(call);
                         using (Context.Channel.EnterTypingState())
                         {
@@ -169,7 +174,7 @@ namespace TitanBot.Commands
             return noSubcalls.ToArray();
         }
 
-        private async Task<ArgumentCheckResponse> MatchArguments(CallInfo call)
+        private async ValueTask<ArgumentCheckResponse> MatchArguments(CallInfo call)
         {
             var reader = Readers.NewCache();
             var responses = new List<ArgumentCheckResponse>();
@@ -188,7 +193,7 @@ namespace TitanBot.Commands
             return responses.OrderByDescending(r => r.SuccessStatus).Last();
         }
 
-        private async Task<ArgumentCheckResponse> ReadArguments(ITypeReaderCollection reader, string[] argStrings, (string Key, string Value)[] flags, ArgumentInfo[] argPattern, CallInfo call)
+        private async ValueTask<ArgumentCheckResponse> ReadArguments(ITypeReaderCollection reader, string[] argStrings, (string Key, string Value)[] flags, ArgumentInfo[] argPattern, CallInfo call)
         {
             if (call.SubCall != null)
             {

@@ -29,7 +29,7 @@ namespace TitanBot.Downloader
                 CacheStore.TryRemove(url, out CacheObject removed);
         }
 
-        public async Task<string> GetString(Uri url, Encoding encoding = null, int freshness = 3600, int timeout = 5000)
+        public async ValueTask<string> GetString(Uri url, Encoding encoding = null, int freshness = 3600, int timeout = 5000)
         {
             var data = await GetBytes(url, freshness, timeout);
 
@@ -38,7 +38,7 @@ namespace TitanBot.Downloader
             return (encoding ?? Encoding.Default).GetString(data);
         }
 
-        public async Task<Bitmap> GetImage(Uri url, int freshness = 86400, int timeout = 5000)
+        public async ValueTask<Bitmap> GetImage(Uri url, int freshness = 86400, int timeout = 5000)
         {
             var data = await GetBytes(url, freshness, timeout);
 
@@ -47,7 +47,7 @@ namespace TitanBot.Downloader
             return new Bitmap(new MemoryStream(data));
         }
         
-        public async Task<byte[]> GetBytes(Uri url, int freshness = 3600, int timeout = 5000)
+        public async ValueTask<byte[]> GetBytes(Uri url, int freshness = 3600, int timeout = 5000)
         {
             if (!url.IsWellFormedOriginalString())
                 throw new UriFormatException($"{url} is not a well formatted URI");
@@ -77,7 +77,7 @@ namespace TitanBot.Downloader
                 Logger = logger;
             }
 
-            public async Task<byte[]> Get(int freshness, int timeout)
+            public async ValueTask<byte[]> Get(int freshness, int timeout)
             {
                 bool queryOwner = false;
                 try

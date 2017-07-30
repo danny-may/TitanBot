@@ -12,7 +12,7 @@ namespace TitanBot.TypeReaders
     class UserTypeReader<T> : TypeReader
         where T : class, IUser
     {
-        public override async Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override async ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
             IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?

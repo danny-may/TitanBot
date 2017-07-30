@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Formatting;
-using TitanBot.Util;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
@@ -52,7 +51,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             await ReplyAsync(Embedable.FromEmbed(builder));
         }
 
-        [Call]
+        [Call("Technical")]
         [Usage("INFO_HELP_USAGE_TECHNICAL")]
         async Task ShowInfoAsync()
         {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TitanBot.Util;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {

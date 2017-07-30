@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot.Commands;
-using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Models;
 
@@ -111,7 +110,7 @@ namespace TitanBot.TypeReaders
             return GetReaders(type);
         }
 
-        public async Task<TypeReaderResponse> Read(Type type, ICommandContext context, string text)
+        public async ValueTask<TypeReaderResponse> Read(Type type, ICommandContext context, string text)
         {
             if (ResultsCache.TryGetValue((context.GetHashCode(), type, text), out TypeReaderResponse result))
                 return result;
@@ -122,7 +121,7 @@ namespace TitanBot.TypeReaders
 
             var resultTasks = readers.Select(r => r.Read(context, text)).ToArray();
 
-            var results = await Task.WhenAll(resultTasks);
+            var results = await ValueTask.WhenAll(resultTasks);
 
             var success = results.Where(r => r.IsSuccess).OrderByDescending(r => r.Values.Max(v => v.Score));
 

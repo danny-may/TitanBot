@@ -45,24 +45,21 @@ namespace TitanBot.TypeReaders
             EnumByValue = byValueBuilder.ToImmutable();
         }
 
-        public override Task<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
         {
-            T baseValue;
-            object enumValue;
-
-            if (TryParse(input, out baseValue))
+            if (TryParse(input, out T baseValue))
             {
-                if (EnumByValue.TryGetValue(baseValue, out enumValue))
-                    return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
+                if (EnumByValue.TryGetValue(baseValue, out object enumValue))
+                    return ValueTask.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
+                    return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
             }
             else
             {
-                if (EnumByName.TryGetValue(input.ToLower(), out enumValue))
-                    return Task.FromResult(TypeReaderResponse.FromSuccess(enumValue));
+                if (EnumByName.TryGetValue(input.ToLower(), out object enumValue))
+                    return ValueTask.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
+                    return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
             }
         }
     }
