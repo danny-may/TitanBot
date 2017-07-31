@@ -152,7 +152,7 @@ namespace TitanBot.Commands
         protected ValueTask<IUserMessage> ReplyAsync(IEmbedable embed)
             => Reply.WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(Embedable embed)
-            => ReplyAsync(embed);
+            => Reply.WithEmbedable(embed).SendAsync();
 
         protected IModifyContext Modify(IUserMessage message)
             => Replier.Modify(message);

@@ -72,6 +72,8 @@ namespace TitanBot.Commands
                 builder.AddField(TextResource.GetResource("FLAGS"), Flags);
             if (!string.IsNullOrWhiteSpace(Notes))
                 builder.AddField(TextResource.GetResource("NOTES"), Notes + (Usages.Count > 0 ? NotesFooter : ""));
+            else if (Usages.Count > 0)
+                builder.AddField(TextResource.GetResource("NOTES"), NotesFooter);
 
             return builder;
         }

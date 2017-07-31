@@ -10,7 +10,7 @@ namespace TitanBot.Commands
         public EmbedBuilder Builder { get; }
         private Func<Embed, string> StringFormatter { get; }
 
-        private Embedable(EmbedBuilder value, Func<IEmbed, string> stringFormat)
+        private Embedable(EmbedBuilder value, Func<Embed, string> stringFormat)
         {
             Builder = value;
             StringFormatter = stringFormat;
@@ -23,21 +23,20 @@ namespace TitanBot.Commands
             => StringFormatter(Builder);
 
         public static implicit operator Embedable(Embed embed)
-            => FromEmbed(embed);
+            => FromEmbed(GetBuilder(embed), GetString);
         public static implicit operator Embedable(EmbedBuilder embed)
-            => FromEmbed(embed);
+            => FromEmbed(embed, GetString);
 
-        public static Embedable FromEmbed(EmbedBuilder builder)
-            => FromEmbed(builder, GetString);
         public static Embedable FromEmbed(Embed embed)
-            => FromEmbed(GetBuilder(embed));
+            => FromEmbed(GetBuilder(embed), GetString);
+        public static Embedable FromEmbed(EmbedBuilder embed)
+            => FromEmbed(embed, GetString);
         public static Embedable FromEmbed(Embed embed, Func<Embed, string> stringFormat)
             => FromEmbed(GetBuilder(embed), stringFormat);
+        public static Embedable FromEmbed(EmbedBuilder embed, Func<Embed, string> stringFormat)
+            => embed == null ? null : new Embedable(embed, stringFormat);
 
-        public static Embedable FromEmbed(EmbedBuilder builder, Func<IEmbed, string> stringFormat)
-            => builder == null ? null : new Embedable(builder, stringFormat);
-
-        private static EmbedBuilder GetBuilder(IEmbed embed)
+        private static EmbedBuilder GetBuilder(Embed embed)
         {
             if (embed == null)
                 return null;

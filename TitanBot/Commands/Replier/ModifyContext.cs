@@ -57,6 +57,14 @@ namespace TitanBot.Commands
                 throw new InvalidOperationException($"Unable to modify the message of another person.\n{Message.Id}");
             try
             {
+                IUser me = Context.Client.CurrentUser;
+                me = Context.Guild?.GetUserAsync(me.Id).Result ?? me;
+                if (!(Context.GeneralUserSetting.UseEmbeds && Message.Channel.UserHasPermission(me, ChannelPermission.EmbedLinks)))
+                {
+                    Text = Text + "\n" + Embedable?.GetString();
+                    Embedable = null;
+                }
+
                 await Message.ModifyAsync(m =>
                 {
                     m.Content = Text;
