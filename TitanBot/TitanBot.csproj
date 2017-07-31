@@ -201,6 +201,8 @@
     <Compile Include="Commands\DefaultCommands\General\PingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PreferencesCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\PrefixCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\Models\Help\HelpCommandEmbeddable.cs" />
+    <Compile Include="Commands\DefaultCommands\Models\Help\HelpGeneralEmbedable.cs" />
     <Compile Include="Commands\DefaultCommands\Models\TutorialModel.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\DbPurgeCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\ExceptionCommand.cs" />

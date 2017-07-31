@@ -64,6 +64,7 @@ namespace TitanBot.Commands
         {
             var blocks = new List<string>();
             if (embed.Author != null) blocks.Add($"{embed.Author?.Name}\n{embed.Author?.Url}".Trim());
+            if (embed.Title != null) blocks.Add($"**{embed.Title}**".Trim());
             if (embed.Description != null) blocks.Add(embed.Description.Trim());
             if (embed.Thumbnail != null) blocks.Add($"Thumbnail: {embed.Thumbnail?.Url}".Trim());
             foreach (var field in embed.Fields)

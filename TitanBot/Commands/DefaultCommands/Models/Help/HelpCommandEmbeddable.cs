@@ -1,0 +1,97 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Discord;
+using TitanBot.Formatting;
+using System.Text.RegularExpressions;
+
+namespace TitanBot.Commands
+{
+    class HelpCommandEmbeddable : IEmbedable
+    {
+        private string Name { get; }
+        private CommandInfo Command { get; }
+        private ICommandContext Context { get; }
+        private IEnumerable<CallInfo> Permitted { get; }
+
+        private ITextResourceCollection TextResource => Context.TextResource;
+        private string Prefix => Context.Prefix;
+        private IUser BotUser => Context.Client.CurrentUser;
+
+        private List<string> Usages { get; } = new List<string>();
+        private string Usage { get; }
+        private string Notes { get; }
+        private string Aliases { get; }
+        private string Group { get; }
+        private string Flags { get; }
+        private string NotesFooter { get; }
+
+        public HelpCommandEmbeddable(CommandInfo subject, IEnumerable<CallInfo> permitted, string name, ICommandContext context)
+        {
+            Name = name;
+            Command = subject;
+            Permitted = permitted;
+            Context = context;
+
+            foreach (var call in Permitted)
+                Usages.Add($"`{Context.Prefix}{Name} {call.SubCall} {string.Join(" ", call.GetParameters())} {call.GetFlags()}` - {TextResource.GetResource(call.Usage)}".RegexReplace(" +", " "));
+            Usage = string.Join("\n", Usages);
+            if (string.IsNullOrWhiteSpace(Usage))
+                Usage = TextResource.GetResource("HELP_SINGLE_NOUSAGE");
+            Notes = TextResource.GetResource(Command.Note);
+            NotesFooter = TextResource.GetResource("HELP_SINGLE_USAGE_FOOTER");
+            Aliases = Command.Alias.Length == 0 ? "" : string.Join(", ", Command.Alias.ToList());
+            Group = Command.Group ?? TextResource.GetResource("HELP_SINGLE_NOGROUP");
+            Flags = string.Join("\n", Permitted.SelectMany(c => c.Flags)
+                                               .GroupBy(f => f.ShortKey)
+                                               .Select(g => g.First()));
+        }
+
+        public Embed GetEmbed()
+        { 
+            var builder = new EmbedBuilder
+            {
+                Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
+                Title = TextResource.Format("HELP_SINGLE_TITLE", ReplyType.Info, Command.Name),
+                Description = TextResource.GetResource(Command.Description ?? "HELP_SINGLE_NODESCRIPTION"),
+                Timestamp = DateTime.Now,
+                Footer = new EmbedFooterBuilder
+                {
+                    IconUrl = BotUser.GetAvatarUrl(),
+                    Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Help")
+                }
+            };
+
+            builder.AddInlineField(TextResource.GetResource("GROUP"), Group);
+            if (!string.IsNullOrWhiteSpace(Aliases))
+                builder.AddInlineField(TextResource.GetResource("ALIASES"), Format.Sanitize(Aliases));
+            builder.AddField(TextResource.GetResource("USAGE"), Usage);
+            if (!string.IsNullOrWhiteSpace(Flags))
+                builder.AddField(TextResource.GetResource("FLAGS"), Flags);
+            if (!string.IsNullOrWhiteSpace(Notes))
+                builder.AddField(TextResource.GetResource("NOTES"), Notes + (Usages.Count > 0 ? NotesFooter : ""));
+
+            return builder;
+        }
+
+        public string GetString()
+        {
+            var msg = TextResource.Format("HELP_SINGLE_TITLE", ReplyType.Info, Command.Name) + "\n" +
+                      TextResource.GetResource(Command.Description ?? "HELP_SINGLE_NODESCRIPTION") + "\n" + 
+                      $"**{TextResource.GetResource("GROUP")}**: {Group}\n";
+            if (!string.IsNullOrWhiteSpace(Aliases))
+                msg += $"**{TextResource.GetResource("ALIASES")}**: {Format.Sanitize(Aliases)}\n";
+            msg += $"**{TextResource.GetResource("USAGE")}**:\n{Usage}\n";
+            if (!string.IsNullOrWhiteSpace(Flags))
+                msg += $"**{TextResource.GetResource("FLAGS")}**:\n{Flags}\n";
+            if (!string.IsNullOrWhiteSpace(Notes))
+                msg += $"**{TextResource.GetResource("NOTES")}**:\n{Notes}";
+            if (Usages.Count != 0)
+                msg += NotesFooter;
+
+            return msg.Trim();
+        }
+    }
+}

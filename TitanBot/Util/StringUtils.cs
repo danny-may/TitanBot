@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using TitanBot.Util;
 
 namespace System
@@ -13,6 +15,22 @@ namespace System
                 return s.Substring(0, s.Length - remove.Length);
             return s;
         }
+
+        public static string ToTitleCase(this string text)
+            => new CultureInfo("en-GB", false).TextInfo.ToTitleCase(text);
+
+        public static string RegexReplace(this string text, string pattern, MatchEvaluator evaluator)
+            => Regex.Replace(text, pattern, evaluator);
+        public static string RegexReplace(this string text, string pattern, string replacement)
+            => Regex.Replace(text, pattern, replacement);
+        public static string RegexReplace(this string text, string pattern, MatchEvaluator evaluator, RegexOptions options)
+            => Regex.Replace(text, pattern, evaluator, options);
+        public static string RegexReplace(this string text, string pattern, string replacement, RegexOptions options)
+            => Regex.Replace(text, pattern, replacement, options);
+        public static string RegexReplace(this string text, string pattern, string replacement, RegexOptions options, TimeSpan matchTimeout)
+            => Regex.Replace(text, pattern, replacement, options, matchTimeout);
+        public static string RegexReplace(this string text, string pattern, MatchEvaluator evaluator, RegexOptions options, TimeSpan matchTimeout)
+            => Regex.Replace(text, pattern, evaluator, options, matchTimeout);
 
         private static IEnumerable<(int From, int To)> GetBlockRanges(this string text)
         {

@@ -205,7 +205,7 @@ namespace TitanBot.Formatting
                 {"DONATE_MESSAGE_ADDITIONAL", ""},
                 {"HELP_LIST_TITLE", "These are the commands you can use"},
                 {"HELP_LIST_DESCRIPTION", "To use a command, type `<prefix><command>`\n  e.g. `{0}help`\n" +
-                                                     "To pass arguments, add a list of values after the command separated by space\n  e.g. `{0}command a, b, c, d`\n" +
+                                                     "To pass arguments, add a list of values after the command separated by space\n  e.g. `{0}command a b c, d`\n" +
                                                      "You can use any of these prefixes: \"{1}\""},
                 {"HELP_SINGLE_UNRECOGNISED", "`{0}` is not a recognised command. Use `{1}help` for a list of all available commands"},
                 {"HELP_SINGLE_NOUSAGE", "No usage available!"},
