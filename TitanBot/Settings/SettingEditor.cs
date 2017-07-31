@@ -8,39 +8,45 @@ namespace TitanBot.Settings
 {
     class SettingEditor<TSetting, TStore, TAccept> : ISettingEditor
     {
-        Func<IEntity<ulong>, TSetting> Getter { get; }
+        Func<IEntity<ulong>, TSetting> SettingGetter { get; }
         Action<IEntity<ulong>, Action<TSetting>> Editor { get; }
         Func<ICommandContext, TAccept, TStore> Converter { get; }
         Func<ICommandContext, TStore, string> Viewer { get; }
         Func<ICommandContext, TAccept, string> Validator { get; }
 
         Action<TSetting, TStore> Setter { get; }
-        Func<TSetting, TStore> Value { get; }
+        Func<TSetting, TStore> Getter { get; }
 
         public string Name { get; }
+        public string[] Aliases { get; }
         public Type Type => typeof(TAccept);
 
         public SettingEditor(Func<IEntity<ulong>, TSetting> getter, 
                              Action<IEntity<ulong>, Action<TSetting>> editor, 
                              string name,
+                             string[] aliases,
                              Expression<Func<TSetting, TStore>> property,
                              Func<ICommandContext, TAccept, TStore> converter,
                              Func<ICommandContext, TStore, string> viewer,
                              Func<ICommandContext, TAccept, string> validator)
         {
             Name = name;
-            Getter = getter;
+            Aliases = aliases;
+            SettingGetter = getter;
             Editor = editor;
             Converter = converter;
             Viewer = viewer ?? ((c, s) => s?.ToString());
             Validator = validator ?? ((c, s) => null);
 
             Setter = CreateSetter(property);
-            Value = property.Compile();
+            Getter = property.Compile();
         }
 
+        public object Get(IEntity<ulong> entity)
+            => Getter(SettingGetter(entity));
+
         public string Display(ICommandContext context, IEntity<ulong> entity)
-            => Viewer(context, Value(Getter(entity)));
+            => Viewer(context, (TStore)Get(entity));
 
         public bool TrySet(ICommandContext context, IEntity<ulong> entity, object value, out string error)
             => TrySet(context, entity, (TAccept)value, out error);

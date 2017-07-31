@@ -12,16 +12,21 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     [RequireOwner]
     public class GlobalSettingsCommand : SettingCommand
     {
-        public GlobalSettingsCommand(ITypeReaderCollection readers)
-            : base(readers) { }
-
         protected override IReadOnlyList<ISettingEditorCollection> Settings => SettingsManager.GetEditors(SettingScope.Global);
         protected override IEntity<ulong> SettingContext => SettingsManager.Global;
+
+        public GlobalSettingsCommand(ITypeReaderCollection readers)
+            : base(readers) { }
 
         [Call]
         [Usage("GLOBALSETTINGS_HELP_USAGE_DEFAULT")]
         new Task ListSettingsAsync([Dense]string settingGroup = null)
             => base.ListSettingsAsync(settingGroup);
+
+        [Call("Toggle")]
+        [Usage("GLOBALSETTINGS_HELP_USAGE_TOGGLE")]
+        new Task ToggleSettingAsync(string key)
+            => base.ToggleSettingAsync(key);
 
         [Call("Set")]
         [Usage("GLOBALSETTINGS_HELP_USAGE_SET")]

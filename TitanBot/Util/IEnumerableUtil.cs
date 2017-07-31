@@ -1,6 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
 
-namespace System.Collections.Generic
+namespace System.Linq
 {
     public static class IEnumerableUtil
     {
@@ -29,6 +30,15 @@ namespace System.Collections.Generic
                 index++;
             }
         }
+
+        public static IEnumerable<string> ToLower(this IEnumerable<string> values)
+            => values.Select(v => v.ToLower());
+        public static IEnumerable<string> ToUpper(this IEnumerable<string> values)
+            => values.Select(v => v.ToUpper());
+        public static string[] ToLower(this string[] values)
+            => values.Select(v => v.ToLower()).ToArray();
+        public static string[] ToUpper(this string[] values)
+            => values.Select(v => v.ToUpper()).ToArray();
 
         public static IEnumerable<bool[]> BooleanMask(int optionCount)
         {

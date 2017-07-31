@@ -24,6 +24,11 @@ namespace TitanBot.Commands.DefaultCommands.Admin
         new Task ListSettingsAsync([Dense]string settingGroup = null)
             => base.ListSettingsAsync(settingGroup);
 
+        [Call("Toggle")]
+        [Usage("SETTINGS_HELP_USAGE_TOGGLE")]
+        new Task ToggleSettingAsync(string key)
+            => base.ToggleSettingAsync(key);
+
         [Call("Set")]
         [Usage("SETTINGS_HELP_USAGE_SET")]
         new Task SetSettingAsync(string key, [Dense]string value = null)

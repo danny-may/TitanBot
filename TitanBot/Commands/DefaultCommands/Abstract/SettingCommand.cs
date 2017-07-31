@@ -20,6 +20,16 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             Readers = readers;
         }
 
+        protected ISettingEditor Find(string key)
+        {
+            var editors = Settings.SelectMany(s => s);
+            var editor = editors.FirstOrDefault(e => e.Name.ToLower() == key.ToLower());
+            if (editor != null)
+                return editor;
+            editor = editors.FirstOrDefault(e => e.Aliases?.ToLower().Contains(key.ToLower()) ?? false);
+            return editor;
+        }
+
         protected async Task ListSettingsAsync(string settingGroup = null)
         {
             var builder = new EmbedBuilder
@@ -32,7 +42,10 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Settings")
                 }
             };
-            
+
+            if (Settings.Count == 1)
+                settingGroup = Settings.First().Name;
+
             if (settingGroup == null)
             {
                 builder.WithTitle(TextResource.GetResource("SETTINGS_TITLE_NOGROUP"))
@@ -68,10 +81,42 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             await ReplyAsync(builder);
         }
 
+        protected async Task ToggleSettingAsync(string key)
+        {
+            var setting = Find(key);
+            if (setting == null)
+                await ReplyAsync("SETTINGS_KEY_NOTFOUND", ReplyType.Error, key);
+            else if (setting.Type != typeof(bool))
+                await ReplyAsync("SETTINGS_UNABLE_TOGGLE", ReplyType.Error, key);
+            else
+            {
+                var oldValue = (bool)setting.Get(SettingContext);
+                var oldDisplay = setting.Display(Context, SettingContext);
+                if (!setting.TrySet(Context, SettingContext, !oldValue, out string errors))
+                    await ReplyAsync(errors, ReplyType.Error, !oldValue);
+                else
+                {
+                    var newDisplay = setting.Display(Context, SettingContext);
+                    var builder = new EmbedBuilder
+                    {
+                        Title = TextResource.Format("SETTINGS_VALUE_CHANGED_TITLE", setting.Name),
+                        Footer = new EmbedFooterBuilder
+                        {
+                            IconUrl = BotUser.GetAvatarUrl(),
+                            Text = BotUser.Username,
+                        },
+                        Timestamp = DateTime.Now,
+                        Color = System.Drawing.Color.SkyBlue.ToDiscord(),
+                    }.AddField(TextResource.GetResource("SETTING_VALUE_OLD"), string.IsNullOrWhiteSpace(oldDisplay) ? TextResource.GetResource("SETTINGS_NOTSET") : oldDisplay)
+                     .AddField(TextResource.GetResource("SETTING_VALUE_NEW"), string.IsNullOrWhiteSpace(newDisplay) ? TextResource.GetResource("SETTINGS_NOTSET") : newDisplay);
+                    await ReplyAsync(builder);
+                }
+            }
+        }
+
         protected async Task SetSettingAsync(string key, string value = null)
         {
-            var setting = Settings.SelectMany(g => g)
-                                 .FirstOrDefault(s => s.Name.ToLower() == key.ToLower());
+            var setting = Find(key);
             if (setting == null)
                 await ReplyAsync("SETTINGS_KEY_NOTFOUND", ReplyType.Error, key);
             else
