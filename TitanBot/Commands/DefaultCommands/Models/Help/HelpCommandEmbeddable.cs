@@ -43,7 +43,7 @@ namespace TitanBot.Commands
             Group = Command.Group ?? TextResource.GetResource("HELP_SINGLE_NOGROUP");
             Flags = string.Join("\n", Permitted.SelectMany(c => c.Flags)
                                                .GroupBy(f => f.ShortKey)
-                                               .Select(g => g.First()));
+                                               .Select(g => g.First().ToString(TextResource)));
         }
 
         public Embed GetEmbed()

@@ -151,6 +151,9 @@ namespace TitanBot.Formatting
                 {"RELOAD_HELP_DESCRIPTION", "Reloads a given area of the bot"},
                 {"RELOAD_HELP_USAGE", "Reloads the supplied area" },
                 {"RELOAD_HELP_USAGE_LIST", "Lists all available areas to reload" },
+                {"EXCEPTION_HELP_DESCRIPTION", "Shows details about exceptions that have occured within the bot" },
+                {"EXCEPTION_HELP_USAGE", "Shows details about the given exception" },
+                {"EXCEPTION_HELP_FLAG_F", "Returns the full exception in a file" },
 
                 //Settings stuff
 

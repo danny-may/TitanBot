@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using TitanBot.Formatting;
 
 namespace TitanBot.Commands
 {
@@ -25,12 +26,12 @@ namespace TitanBot.Commands
                              (bool)param.DefaultValue == false);
         }
 
-        public override string ToString()
+        public string ToString(ITextResourceCollection textResource)
         {
             if (LongKey != null)
-                return $"`-{ShortKey}` / `--{LongKey}` = {Description}";
+                return $"`-{ShortKey}` / `--{LongKey}` = {textResource.GetResource(Description)}";
             else
-                return $"`-{ShortKey}` = {Description}";
+                return $"`-{ShortKey}` = {textResource.GetResource(Description)}";
         }
     }
 }

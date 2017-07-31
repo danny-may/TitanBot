@@ -11,7 +11,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     {
         [Call]
         [Usage("EXCEPTION_HELP_USAGE")]
-        async Task ShowException(ulong exceptionId, [CallFlag('f', "full", "Returns the full exception in a file")]bool full = false)
+        async Task ShowException(ulong exceptionId, [CallFlag('f', "full", "EXCEPTION_HELP_FLAG_F")]bool full = false)
         {
             var exception = await Database.FindById<Error>(exceptionId);
             if (exception == null)
