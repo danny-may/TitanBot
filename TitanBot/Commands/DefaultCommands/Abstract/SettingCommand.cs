@@ -39,7 +39,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                        .WithDescription(string.Join("\n", Settings.Select(g => g.Name)));
                 if (string.IsNullOrWhiteSpace(builder.Description))
                     builder.Description = TextResource.GetResource("SETTINGS_DESCRIPTION_NOSETTINGS");
-                await ReplyAsync(Embedable.FromEmbed(builder));
+                await ReplyAsync(builder);
                 return;
             }
             var groups = Settings.Where(g => g.Name.ToLower() == settingGroup.ToLower());
@@ -65,7 +65,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 builder.WithDescription(descriptions);
             if (!string.IsNullOrWhiteSpace(notes))
                 builder.AddField(TextResource.GetResource("NOTES"), notes);
-            await ReplyAsync(Embedable.FromEmbed(builder));
+            await ReplyAsync(builder);
         }
 
         protected async Task SetSettingAsync(string key, string value = null)
@@ -103,7 +103,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                     }.AddField(TextResource.GetResource("SETTING_VALUE_OLD"), string.IsNullOrWhiteSpace(oldValue) ? TextResource.GetResource("SETTINGS_NOTSET") : oldValue)
                      .AddField(TextResource.GetResource("SETTING_VALUE_NEW"), string.IsNullOrWhiteSpace(newValue) ? TextResource.GetResource("SETTINGS_NOTSET") : newValue);
-                    await ReplyAsync(Embedable.FromEmbed(builder));
+                    await ReplyAsync(builder);
                 }
             }
         }

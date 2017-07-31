@@ -54,7 +54,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 if (channel is IGuildChannel guildChannel)
                     builder.AddInlineField(TextResource.GetResource("EXCEPTION_GUILD"), $"{guildChannel.Guild.Name} ({guildChannel.Guild.Id})");
 
-                await ReplyAsync(Embedable.FromEmbed(builder));
+                await ReplyAsync(builder);
             }
         }
     }

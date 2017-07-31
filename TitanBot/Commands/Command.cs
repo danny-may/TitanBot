@@ -135,24 +135,24 @@ namespace TitanBot.Commands
             => Reply.WithMessage(message, replyType, values).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed)
             => Reply.WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, EmbedBuilder embed)
-            => Reply.WithMessage(message, replyType).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed)
+            => Reply.WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed)
             => Reply.WithMessage(message).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, EmbedBuilder embed)
-            => Reply.WithMessage(message).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed)
+            => Reply.WithMessage(message).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed, params object[] values)
             => Reply.WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, EmbedBuilder embed, params object[] values)
-            => Reply.WithMessage(message, replyType, values).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed, params object[] values)
+            => Reply.WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed, params object[] values)
             => Reply.WithMessage(message, values).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, EmbedBuilder embed, params object[] values)
-            => Reply.WithMessage(message, values).WithEmbedable(Embedable.FromEmbed(embed)).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed, params object[] values)
+            => Reply.WithMessage(message, values).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(IEmbedable embed)
             => Reply.WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(EmbedBuilder embed)
-            => ReplyAsync(Embedable.FromEmbed(embed));
+        protected ValueTask<IUserMessage> ReplyAsync(Embedable embed)
+            => ReplyAsync(embed);
 
         protected IModifyContext Modify(IUserMessage message)
             => Replier.Modify(message);
