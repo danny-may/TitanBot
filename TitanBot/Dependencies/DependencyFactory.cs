@@ -7,8 +7,9 @@ namespace TitanBot.Dependencies
     public class DependencyFactory : IDependencyFactory
     {
         private readonly Dictionary<Type, object> Stored = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, Func<object>> Builders = new Dictionary<Type, Func<object>>();
         private readonly Dictionary<Type, Type> TypeMap = new Dictionary<Type, Type>();
-        private Type[] KnownTypes => Stored.Keys.Cast<Type>().ToArray();
+        private Type[] KnownTypes => Stored.Keys.Cast<Type>().Concat(Builders.Keys).Distinct().ToArray();
 
         public DependencyFactory()
         {
@@ -24,6 +25,10 @@ namespace TitanBot.Dependencies
             => Store(typeof(T), value);
         public void Store(Type type, object value)
             => Stored.Add(type, value);
+        public void StoreBuilder<T>(Func<T> builder)
+            => StoreBuilder(typeof(T), () => builder());
+        public void StoreBuilder(Type type, Func<object> builder)
+            => Builders.Add(type, builder);
 
         public void Map<From, To>() where To : From
             => Map(typeof(From), typeof(To));
@@ -50,19 +55,42 @@ namespace TitanBot.Dependencies
             return res;
         }
         public bool TryGet(Type type, out object result)
-            => Stored.TryGetValue(type, out result);
+        {
+            if (Stored.TryGetValue(type, out result))
+                return true;
+            foreach (var key in Stored.Keys)
+                if (type.IsAssignableFrom(key) || type.IsInterface && key.GetInterfaces().Contains(type))
+                    return Stored.TryGetValue(key, out result);
+            if (Builders.TryGetValue(type, out var builder))
+            {
+                result = builder();
+                return true;
+            }
+            foreach (var key in Builders.Keys)
+                if (type.IsAssignableFrom(key) || type.IsInterface && key.GetInterfaces().Contains(type))
+                {
+                    Builders.TryGetValue(key, out builder);
+                    result = builder();
+                    return true;
+                }
+            return false;
+        }
         public T Get<T>()
             => (T)Get(typeof(T));
         public object Get(Type type)
-            => Stored[type];
+            => TryGet(type, out var result) ? result : throw new KeyNotFoundException($"Could not locate a stored object of type {type}");
 
         IInstanceBuilder GetBuilder()
-            => new InstanceBuilder(Stored, TypeMap);
+            => new InstanceBuilder(Stored, Builders, TypeMap);
 
         public IInstanceBuilder WithInstance<T>(T value)
             => GetBuilder().WithInstance(value);
         public IInstanceBuilder WithInstance(Type type, object value)
             => GetBuilder().WithInstance(type, value);
+        public IInstanceBuilder WithInstanceBuilder<T>(Func<T> builder)
+            => GetBuilder().WithInstanceBuilder(builder);
+        public IInstanceBuilder WithInstanceBuilder(Type type, Func<object> builder)
+            => GetBuilder().WithInstanceBuilder(type, builder);
 
         public bool TryConstruct<T>(out T obj)
             => GetBuilder().TryConstruct(out obj);

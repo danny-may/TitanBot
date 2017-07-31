@@ -7,7 +7,7 @@ namespace TitanBot.Scheduling
     public interface IScheduler
     {
         bool IsRunning { get; }
-        ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = null, DateTime? to = null, string data = null)
+        ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = null, DateTime? to = null, ulong? message = null, ulong? channel = null, string data = null)
             where T : ISchedulerCallback;
         ISchedulerRecord[] Complete<T>(ulong? guildId, ulong? userId, bool wasCancelled = true)
             where T : ISchedulerCallback;

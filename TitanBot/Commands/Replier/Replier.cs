@@ -8,12 +8,12 @@ namespace TitanBot.Commands
     class Replier : IReplier
     {
         private ILogger Logger { get; }
-        private ICommandContext Context { get; }
+        private IMessageContext Context { get; }
 
         public event OnSendEventHandler OnSend;
         public event OnModifyEventHandler OnModify;
 
-        public Replier(ICommandContext context, ILogger logger)
+        public Replier(IMessageContext context, ILogger logger)
         {
             Logger = logger;
             Context = context;

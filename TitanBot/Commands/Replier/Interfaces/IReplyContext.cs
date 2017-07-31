@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TitanBot.Commands
 {
     public delegate Task OnSendEventHandler(IReplyContext context, IUserMessage message);
-    public delegate Task MessageSendErrorHandler(Exception ex, IMessageChannel channel, ICommandContext context, string text, IEmbedable embed);
+    public delegate Task MessageSendErrorHandler(Exception ex, IMessageChannel channel, IMessageContext context, string text, IEmbedable embed);
 
     public interface IReplyContext
     {

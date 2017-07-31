@@ -4,7 +4,7 @@ namespace TitanBot.Scheduling
 {
     public interface ISchedulerCallback
     {
-        void Handle(ISchedulerRecord record, DateTime eventTime);
-        void Complete(ISchedulerRecord record, bool wasCancelled);
+        void Handle(ISchedulerContext context, DateTime eventTime);
+        void Complete(ISchedulerContext context, bool wasCancelled);
     }
 }

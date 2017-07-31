@@ -12,5 +12,7 @@ namespace TitanBot.Scheduling
         TimeSpan Interval { get; set; }
         DateTime StartTime { get; set; }
         ulong UserId { get; set; }
+        ulong? MessageId { get; set; }
+        ulong? ChannelId { get; set; }
     }
 }

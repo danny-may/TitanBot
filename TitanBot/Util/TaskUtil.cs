@@ -12,6 +12,8 @@ namespace System.Threading.Tasks
         }
         public static void DontWait<T>(this ValueTask<T> task)
             => task.AsTask().DontWait();
+        public static void Wait<T>(this ValueTask<T> task)
+            => task.AsTask().Wait();
     }
 
     public static class ValueTask

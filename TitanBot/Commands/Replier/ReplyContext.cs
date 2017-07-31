@@ -9,7 +9,7 @@ namespace TitanBot.Commands
 {
     class ReplyContext : IReplyContext
     {
-        private ICommandContext Context { get; }
+        private IMessageContext Context { get; }
         private IMessageChannel Channel { get; set; }
         private string Message { get; set; } = "";
         private bool IsTTS { get; set; }
@@ -21,7 +21,7 @@ namespace TitanBot.Commands
         private event MessageSendErrorHandler Handler;
         public event OnSendEventHandler OnSend;
         
-        public ReplyContext(IMessageChannel channel, ICommandContext context)
+        public ReplyContext(IMessageChannel channel, IMessageContext context)
         {
             Context = context;
             Channel = channel;

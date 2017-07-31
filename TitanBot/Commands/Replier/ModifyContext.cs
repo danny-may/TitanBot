@@ -8,7 +8,7 @@ namespace TitanBot.Commands
 {
     class ModifyContext : IModifyContext
     {
-        private ICommandContext Context { get; }
+        private IMessageContext Context { get; }
         private IUserMessage Message { get; }
 
         private string Text { get; set; }
@@ -18,7 +18,7 @@ namespace TitanBot.Commands
         private event MessageModifyErrorHandler Handler;
         public event OnModifyEventHandler OnModify;
 
-        public ModifyContext(ICommandContext context, IUserMessage message)
+        public ModifyContext(IMessageContext context, IUserMessage message)
         {
             Message = message;
             Context = context;

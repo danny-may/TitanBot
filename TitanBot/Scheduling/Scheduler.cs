@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.WebSocket;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Logging;
 using TitanBot.Storage;
@@ -14,7 +16,7 @@ namespace TitanBot.Scheduling
         private readonly IDatabase Database;
         private readonly IDependencyFactory DependencyManager;
         private readonly ILogger Logger;
-        private readonly Dictionary<Type, object> CachedHandlers = new Dictionary<Type, object>();
+        private readonly DiscordSocketClient Client;
         private Task LoopTask;
         private bool ShouldStop;
         public int PollingPeriod = 1000;
@@ -23,8 +25,9 @@ namespace TitanBot.Scheduling
                                 !LoopTask.IsCanceled &&
                                 !LoopTask.IsFaulted;
 
-        public Scheduler(IDependencyFactory manager, IDatabase database, ILogger logger)
+        public Scheduler(DiscordSocketClient client, IDependencyFactory manager, IDatabase database, ILogger logger)
         {
+            Client = client;
             DependencyManager = manager;
             Database = database;
             Logger = logger;
@@ -32,7 +35,7 @@ namespace TitanBot.Scheduling
 
 
 
-        public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), string data = null) where T : ISchedulerCallback
+        public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), ulong? message = null, ulong? channel = null, string data = null) where T : ISchedulerCallback
         {
             var record = new SchedulerRecord
             {
@@ -42,6 +45,8 @@ namespace TitanBot.Scheduling
                 EndTime = to ?? DateTime.MaxValue,
                 StartTime = from,
                 Interval = period ?? TimeSpan.MaxValue,
+                MessageId = message,
+                ChannelId = channel,
                 Data = data
             };
             Database.Insert(record).Wait();
@@ -86,7 +91,7 @@ namespace TitanBot.Scheduling
                         var intervalDelta = (pollTime - record.StartTime).Ticks % record.Interval.Ticks;
                         if (intervalDelta / 10000 > PollingPeriod || !TryGetHandler(record.Callback, out ISchedulerCallback callback))
                             continue;
-                        Task.Run(() => LogErrors(() => callback.Handle(record, pollTime.AddTicks(-intervalDelta))))
+                        Task.Run(() => LogErrors(() => callback.Handle(new SchedulerContext(record, Client, DependencyManager), pollTime.AddTicks(-intervalDelta))))
                             .DontWait();
                     }
                 });
@@ -118,15 +123,11 @@ namespace TitanBot.Scheduling
 
         private bool TryGetHandler(string serialisedType, out ISchedulerCallback callback)
         {
-            callback = null;
             var type = JsonConvert.DeserializeObject<Type>(serialisedType);
-            if (!CachedHandlers.ContainsKey(type))
-            {
-                if (!DependencyManager.TryConstruct(type, out object constructed))
-                    return false;
-                CachedHandlers.Add(type, constructed);
-            }
-            callback = (ISchedulerCallback)CachedHandlers[type];
+            callback = null;
+            if (!DependencyManager.TryConstruct(type, out object constructed))
+                return false;
+            callback = (ISchedulerCallback)constructed;
             return true;
         }
 
@@ -141,7 +142,7 @@ namespace TitanBot.Scheduling
             foreach (var record in records)
             {
                 if (TryGetHandler(record.Callback, out ISchedulerCallback callback))
-                    Task.Run(() => callback.Complete(record, wasCancelled)).DontWait();
+                    Task.Run(() => callback.Complete(new SchedulerContext(record, Client, DependencyManager), wasCancelled)).DontWait();
                 record.Complete = true;
                 record.EndTime = DateTime.Now;
             }

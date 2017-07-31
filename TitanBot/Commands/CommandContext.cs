@@ -8,7 +8,7 @@ using TitanBot.Settings;
 
 namespace TitanBot.Commands
 {
-    public class CommandContext : ICommandContext
+    class CommandContext : ICommandContext
     {
         public DiscordSocketClient Client { get; }
         public IUserMessage Message { get; }
@@ -28,14 +28,14 @@ namespace TitanBot.Commands
         public ITextResourceManager TextManager => _textManager.Value;
         public ValueFormatter Formatter => _formatter.Value;
 
-        public GeneralGlobalSetting GeneralGlobalSetting => GlobalSettings.Get<GeneralGlobalSetting>();
-        public GeneralGuildSetting GeneralGuildSetting => GuildSettings.Get<GeneralGuildSetting>();
-        public GeneralUserSetting GeneralUserSetting => UserSettings.Get<GeneralUserSetting>();
+        public GeneralGlobalSetting GeneralGlobalSetting => GlobalSettings?.Get<GeneralGlobalSetting>();
+        public GeneralGuildSetting GeneralGuildSetting => GuildSettings?.Get<GeneralGuildSetting>();
+        public GeneralUserSetting GeneralUserSetting => UserSettings?.Get<GeneralUserSetting>();
 
-        private ISettingContext GlobalSettings => _globalSettings.Value;
-        private ISettingContext ChannelSettings => _channelSettings.Value;
-        private ISettingContext UserSettings => _userSettings.Value;
-        private ISettingContext GuildSettings => _guildSettings.Value;
+        public ISettingContext GlobalSettings => _globalSettings.Value;
+        public ISettingContext ChannelSettings => _channelSettings.Value;
+        public ISettingContext UserSettings => _userSettings.Value;
+        public ISettingContext GuildSettings => _guildSettings.Value;
 
 
         private Lazy<IReplier> _replier { get; }

@@ -6,6 +6,8 @@ namespace TitanBot.Dependencies
     {
         void Store<T>(T value);
         void Store(Type type, object value);
+        void StoreBuilder<T>(Func<T> builder);
+        void StoreBuilder(Type type, Func<object> builder);
 
         void Map<From, To>()
             where To : From;

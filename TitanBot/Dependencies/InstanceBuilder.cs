@@ -2,23 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using TitanBot.Util;
 
 namespace TitanBot.Dependencies
 {
     public class InstanceBuilder : IInstanceBuilder
     {
         private readonly Dictionary<Type, object> Store;
+        private readonly Dictionary<Type, Func<object>> Builders;
         private readonly Dictionary<Type, Type> TypeMap;
-        private Type[] KnownTypes => Store.Keys.Cast<Type>().ToArray();
+        private Type[] KnownTypes => Store.Keys.Cast<Type>().Concat(Builders.Keys).Distinct().ToArray();
 
         private Dictionary<Type, object> ParentStore;
+        private Dictionary<Type, Func<object>> ParentBuilders;
 
         private static readonly BindingFlags CtorFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
 
-        public InstanceBuilder(Dictionary<Type, object> parentStore, Dictionary<Type, Type> parentMap)
+        public InstanceBuilder(Dictionary<Type, object> parentStore, Dictionary<Type, Func<object>> parentBuilders, Dictionary<Type, Type> parentMap)
         {
             Store = parentStore.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             ParentStore = parentStore;
+            Builders = parentBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            ParentBuilders = parentBuilders;
             TypeMap = parentMap;
         }
 
@@ -37,11 +42,21 @@ namespace TitanBot.Dependencies
         {
             if (Store.TryGetValue(type, out result))
                 return true;
-            foreach (var key in KnownTypes)
-            {
-                if (type.IsAssignableFrom(key))
+            foreach (var key in Store.Keys)
+                if (type.IsAssignableFrom(key) || type.IsInterface && key.GetInterfaces().Contains(type))
                     return Store.TryGetValue(key, out result);
+            if (Builders.TryGetValue(type, out var builder))
+            {
+                result = builder();
+                return true;
             }
+            foreach (var key in Builders.Keys)
+                if (type.IsAssignableFrom(key) || type.IsInterface && key.GetInterfaces().Contains(type))
+                {
+                    Builders.TryGetValue(key, out builder);
+                    result = builder();
+                    return true;
+                }
             return false;
         }
 
@@ -210,9 +225,12 @@ namespace TitanBot.Dependencies
             => WithInstance(typeof(T), value);
 
         public IInstanceBuilder WithInstance(Type type, object value)
-        {
-            Store[type] = value;
-            return this;
-        }
+            => MiscUtil.InlineAction(this, o => o.Store[type] = value);
+
+        public IInstanceBuilder WithInstanceBuilder<T>(Func<T> builder)
+            => WithInstanceBuilder(typeof(T), () => builder());
+
+        public IInstanceBuilder WithInstanceBuilder(Type type, Func<object> builder)
+            => MiscUtil.InlineAction(this, o => o.Builders[type] = builder);
     }
 }

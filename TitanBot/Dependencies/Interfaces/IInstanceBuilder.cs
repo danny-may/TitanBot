@@ -6,6 +6,8 @@ namespace TitanBot.Dependencies
     {
         IInstanceBuilder WithInstance<T>(T value);
         IInstanceBuilder WithInstance(Type type, object value);
+        IInstanceBuilder WithInstanceBuilder<T>(Func<T> builder);
+        IInstanceBuilder WithInstanceBuilder(Type type, Func<object> builder);
 
         bool TryConstruct<T>(out T obj);
         bool TryConstruct(Type type, out object obj);
