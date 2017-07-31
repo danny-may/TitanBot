@@ -1,9 +1,4 @@
-﻿using Discord;
-using Discord.WebSocket;
-using TitanBot.Formatting;
-using TitanBot.Settings;
-
-namespace TitanBot.Commands
+﻿namespace TitanBot.Commands
 {
     public interface ICommandContext : IMessageContext
     {
