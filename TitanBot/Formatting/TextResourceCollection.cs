@@ -45,11 +45,11 @@ namespace TitanBot.Formatting
             switch (replyType)
             {
                 case ReplyType.Success:
-                    return GetResource("REPLYTYPE_SUCCESS");
+                    return GetResource(TitanBotResource.REPLYTYPE_SUCCESS);
                 case ReplyType.Error:
-                    return GetResource("REPLYTYPE_ERROR");
+                    return GetResource(TitanBotResource.REPLYTYPE_ERROR);
                 case ReplyType.Info:
-                    return GetResource("REPLYTYPE_INFO");
+                    return GetResource(TitanBotResource.REPLYTYPE_INFO);
                 default:
                     return "";
             }

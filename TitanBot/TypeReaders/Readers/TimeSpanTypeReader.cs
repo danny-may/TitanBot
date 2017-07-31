@@ -82,7 +82,7 @@ namespace TitanBot.TypeReaders
             }
             else
             {
-                return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(TimeSpan)));
+                return ValueTask.FromResult(TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, input, typeof(TimeSpan)));
             }
         }
     }

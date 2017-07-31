@@ -240,6 +240,7 @@
     <Compile Include="Commands\Responses\PermissionCheckResponse.cs" />
     <Compile Include="Commands\Responses\ArgumentCheckResponse.cs" />
     <Compile Include="Commands\Models\CallPermission.cs" />
+    <Compile Include="TitanBotResource.cs" />
     <Compile Include="Formatting\Models\FormattingType.cs" />
     <Compile Include="Formatting\ValueFormatter.cs" />
     <Compile Include="Models\Range.cs" />

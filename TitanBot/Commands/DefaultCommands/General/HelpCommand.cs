@@ -5,7 +5,7 @@ using TitanBot.Commands.Responses;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
-    [Description("HELP_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.HELP_HELP_DESCRIPTION)]
     public class HelpCommand : Command
     {
         private IPermissionManager PermissionManager { get; }
@@ -17,7 +17,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         }
 
         [Call]
-        [Usage("HELP_HELP_USAGE")]
+        [Usage(TitanBotResource.HELP_HELP_USAGE)]
         async Task HelpAsync(string command = null)
         {
             if (command == null)
@@ -27,7 +27,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         }
 
         [Call("Tutorial")]
-        [Usage("HELP_HELP_USAGE_TUTORIAL")]
+        [Usage(TitanBotResource.HELP_HELP_USAGE_TUTORIAL)]
         async Task TutorialAsync(string tutorialArea)
         {
             await Task.Delay(0);
@@ -45,7 +45,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             var cmd = CommandService.Search(name, out int commandLength);
             if (cmd == null || cmd.Value.Hidden)
             {
-                await ReplyAsync("HELP_SINGLE_UNRECOGNISED", ReplyType.Error, name, Prefix);
+                await ReplyAsync(TitanBotResource.HELP_SINGLE_UNRECOGNISED, ReplyType.Error, name, Prefix);
                 return;
             }
 

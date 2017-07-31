@@ -28,13 +28,13 @@ namespace TitanBot.Commands
             var builder = new EmbedBuilder()
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = TextResource.GetResource("HELP_LIST_TITLE", ReplyType.Info),
-                Description = TextResource.Format("HELP_LIST_DESCRIPTION", Prefix, string.Join("\", \"", AcceptedPrefixes)),
+                Title = TextResource.GetResource(TitanBotResource.HELP_LIST_TITLE, ReplyType.Info),
+                Description = TextResource.Format(TitanBotResource.HELP_LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
                     IconUrl = BotUser.GetAvatarUrl(),
-                    Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Help")
+                    Text = TextResource.Format(TitanBotResource.EMBED_FOOTER, BotUser.Username, "Help")
                 }
             };
 
@@ -47,12 +47,12 @@ namespace TitanBot.Commands
 
         public string GetString()
         {
-            var msg =  TextResource.GetResource("HELP_LIST_TITLE", ReplyType.Info) + "\n" +
-                       TextResource.Format("HELP_LIST_DESCRIPTION", Prefix, string.Join("\", \"", AcceptedPrefixes)) + "\n" +
+            var msg =  TextResource.GetResource(TitanBotResource.HELP_LIST_TITLE, ReplyType.Info) + "\n" +
+                       TextResource.Format(TitanBotResource.HELP_LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)) + "\n" +
                        "```prolog\n";
             var groups = Commands.GroupBy(c => c.Group);
             foreach (var group in groups)
-                msg += $"{group.Key.ToTitleCase()} Commands:\n   {string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))}\n";
+                msg += TextResource.Format(TitanBotResource.HELP_LIST_COMMAND, group.Key.ToTitleCase(), string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))) + "\n";
 
             return msg.Trim() + "```";
         }

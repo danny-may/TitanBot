@@ -53,7 +53,7 @@ namespace TitanBot.Commands
             }
             catch (HttpException ex) when (ex.DiscordCode == 50013)
             {
-                Message = Context.TextResource.Format("UNABLE_SEND", ReplyType.Error, Channel, Message);
+                Message = Context.TextResource.Format(TitanBotResource.UNABLE_SEND, ReplyType.Error, Channel, Message);
                 Channel = await Context.Author.GetOrCreateDMChannelAsync();
                 return await SendAsync(stealthy);
             }
@@ -61,10 +61,10 @@ namespace TitanBot.Commands
             {
                 var message = (Message + "\n" + Embedable?.GetString()).Trim();
                 if (Attachment != null)
-                    message += "\n\n" + Context.TextResource.Format("MESSAGE_CONTAINED_ATTACHMENT", AttachmentName);
+                    message += "\n\n" + Context.TextResource.Format(TitanBotResource.MESSAGE_CONTAINED_ATTACHMENT, AttachmentName);
                 Attachment = () => message.ToStream();
                 AttachmentName = "Output.txt";
-                Message = Context.TextResource.GetResource("MESSAGE_TOO_LONG", ReplyType.Error);
+                Message = Context.TextResource.GetResource(TitanBotResource.MESSAGE_TOO_LONG, ReplyType.Error);
                 Embedable = null;
 
                 return await SendAsync(stealthy);

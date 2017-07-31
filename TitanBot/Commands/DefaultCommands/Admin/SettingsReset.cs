@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace TitanBot.Commands.DefaultCommands.Admin
 {
-    [Description("SETTINGSRESET_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.SETTINGSRESET_HELP_DESCRIPTION)]
     public class SettingsReset : Command
     {
         IPermissionManager PermissionManager { get; }
@@ -16,14 +16,14 @@ namespace TitanBot.Commands.DefaultCommands.Admin
         [DefaultPermission(8)]
         [Call]
         [RequireContext(ContextType.Guild)]
-        [Usage("SETTINGSRESET_HELP_USAGE_THISGUILD")]
+        [Usage(TitanBotResource.SETTINGSRESET_HELP_USAGE_THISGUILD)]
         async Task ResetGuild()
         {
             await ResetGuild(Guild.Id);
         }
 
         [Call]
-        [Usage("SETTINGSRESET_HELP_USAGE_GIVENGUILD")]
+        [Usage(TitanBotResource.SETTINGSRESET_HELP_USAGE_GIVENGUILD)]
         [RequireOwner]
         async Task ResetGuild(ulong guildId)
         {
@@ -32,9 +32,9 @@ namespace TitanBot.Commands.DefaultCommands.Admin
             //SettingsManager.ResetSettings(Context.Guild.Id);
             var guild = Client.GetGuild(guildId);
             if (guild == null)
-                await ReplyAsync("SETTINGRESET_GUILD_NOTEXIST", ReplyType.Error);
+                await ReplyAsync(TitanBotResource.SETTINGRESET_GUILD_NOTEXIST, ReplyType.Error);
             else
-                await ReplyAsync("SETTINGRESET_SUCCESS", ReplyType.Success, guild.Name, guild.Id);
+                await ReplyAsync(TitanBotResource.SETTINGRESET_SUCCESS, ReplyType.Success, guild.Name, guild.Id);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace TitanBot.TypeReaders
             var values = new List<T>();
 
             if (Parser == null)
-                return TypeReaderResponse.FromError("TYPEREADER_NOTYPEREADER", value, typeof(T));
+                return TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_NOTYPEREADER, value, typeof(T));
 
             if (value == null)
                 return TypeReaderResponse.FromSuccess(new T[0]);
@@ -44,7 +44,7 @@ namespace TitanBot.TypeReaders
                 if (response.IsSuccess)
                     values.Add((T)response.Best);
                 else
-                    return TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", item.Trim(), typeof(T));
+                    return TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, item.Trim(), typeof(T));
             }
 
             return TypeReaderResponse.FromSuccess(values.ToArray());

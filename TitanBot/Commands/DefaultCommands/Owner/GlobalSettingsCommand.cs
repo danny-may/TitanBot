@@ -7,7 +7,7 @@ using TitanBot.TypeReaders;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description("GLOBALSETTINGS_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.GLOBALSETTINGS_HELP_DESCRIPTION)]
     [Alias("GSettings", "GSetting")]
     [RequireOwner]
     public class GlobalSettingsCommand : SettingCommand
@@ -19,17 +19,17 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             : base(readers) { }
 
         [Call]
-        [Usage("GLOBALSETTINGS_HELP_USAGE_DEFAULT")]
+        [Usage(TitanBotResource.GLOBALSETTINGS_HELP_USAGE_DEFAULT)]
         new Task ListSettingsAsync([Dense]string settingGroup = null)
             => base.ListSettingsAsync(settingGroup);
 
         [Call("Toggle")]
-        [Usage("GLOBALSETTINGS_HELP_USAGE_TOGGLE")]
+        [Usage(TitanBotResource.GLOBALSETTINGS_HELP_USAGE_TOGGLE)]
         new Task ToggleSettingAsync(string key)
             => base.ToggleSettingAsync(key);
 
         [Call("Set")]
-        [Usage("GLOBALSETTINGS_HELP_USAGE_SET")]
+        [Usage(TitanBotResource.GLOBALSETTINGS_HELP_USAGE_SET)]
         new Task SetSettingAsync(string key, [Dense]string value = null)
             => base.SetSettingAsync(key, value);
     }

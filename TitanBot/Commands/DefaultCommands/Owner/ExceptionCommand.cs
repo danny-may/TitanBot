@@ -5,18 +5,18 @@ using TitanBot.Util;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description("EXCEPTION_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.EXCEPTION_HELP_DESCRIPTION)]
     [RequireOwner]
     class ExceptionCommand : Command
     {
         [Call]
-        [Usage("EXCEPTION_HELP_USAGE")]
-        async Task ShowException(ulong exceptionId, [CallFlag('f', "full", "EXCEPTION_HELP_FLAG_F")]bool full = false)
+        [Usage(TitanBotResource.EXCEPTION_HELP_USAGE)]
+        async Task ShowException(ulong exceptionId, [CallFlag('f', "full", TitanBotResource.EXCEPTION_HELP_FLAG_F)]bool full = false)
         {
             var exception = await Database.FindById<Error>(exceptionId);
             if (exception == null)
             {
-                await ReplyAsync("EXCEPTION_NOTFOUND", ReplyType.Error, exceptionId);
+                await ReplyAsync(TitanBotResource.EXCEPTION_NOTFOUND, ReplyType.Error, exceptionId);
                 return;
             }
 
@@ -26,15 +26,15 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
             if (full)
             {
-                var text = $"USER:\n{(user?.Username ?? "UNKNOWNUSER") + "#" + (user?.Discriminator ?? "0000")}\n" +
-                           $"{TextResource.GetResource("EXCEPTION_CHANNEL")}:\n{channel.Name} ({channel.Id})\n";
+                var text = TextResource.Format(TitanBotResource.EXCEPTION_USER, (user?.Username ?? TitanBotResource.UNKNOWNUSER) + "#" + (user?.Discriminator ?? "0000")) + "\n" +
+                           TextResource.Format(TitanBotResource.EXCEPTION_CHANNEL, channel.Name, channel.Id) + "\n";
                 if (channel is IGuildChannel guildChannel)
-                    text += $"{TextResource.GetResource("EXCEPTION_GUILD")}:\n{guildChannel.Guild.Name} ({guildChannel.Guild.Id})\n";
-                text += $"{TextResource.GetResource("EXCEPTION_MESSAGE")}:\n{message.Content}\n\n";
+                    text += $"{TextResource.GetResource(TitanBotResource.EXCEPTION_GUILD)}:\n{guildChannel.Guild.Name} ({guildChannel.Guild.Id})\n";
+                text += $"{TextResource.GetResource(TitanBotResource.EXCEPTION_MESSAGE)}:\n{message.Content}\n\n";
                 text += exception.Content;
 
                 await Reply.WithAttachment(() => text.ToStream(), $"Exception{exceptionId}.txt")
-                           .WithMessage(TextResource.Format("EXCEPTION_FULLMESSAGE", ReplyType.Success, exceptionId))
+                           .WithMessage(TextResource.Format(TitanBotResource.EXCEPTION_FULLMESSAGE, ReplyType.Success, exceptionId))
                            .SendAsync();
             }
             else
@@ -44,15 +44,15 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                     Author = new EmbedAuthorBuilder
                     {
                         IconUrl = user?.GetAvatarUrl(),
-                        Name = (user?.Username ?? "UNKNOWNUSER") + "#" + (user?.Discriminator ?? "0000")
+                        Name = (user?.Username ?? TitanBotResource.UNKNOWNUSER) + "#" + (user?.Discriminator ?? "0000")
                     },
                     Description = exception.Description,
                     Timestamp = exception.Time,
                     Color = System.Drawing.Color.Red.ToDiscord()
-                }.AddField(TextResource.GetResource("EXCEPTION_MESSAGE"), message.Content)
-                 .AddInlineField(TextResource.GetResource("EXCEPTION_CHANNEL"), $"{channel.Name} ({channel.Id})");
+                }.AddField(TextResource.GetResource(TitanBotResource.EXCEPTION_MESSAGE), message.Content)
+                 .AddInlineField(TextResource.GetResource(TitanBotResource.EXCEPTION_CHANNEL), $"{channel.Name} ({channel.Id})");
                 if (channel is IGuildChannel guildChannel)
-                    builder.AddInlineField(TextResource.GetResource("EXCEPTION_GUILD"), $"{guildChannel.Guild.Name} ({guildChannel.Guild.Id})");
+                    builder.AddInlineField(TextResource.GetResource(TitanBotResource.EXCEPTION_GUILD), $"{guildChannel.Guild.Name} ({guildChannel.Guild.Id})");
 
                 await ReplyAsync(builder);
             }

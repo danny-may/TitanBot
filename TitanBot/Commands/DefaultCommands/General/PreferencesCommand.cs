@@ -7,7 +7,7 @@ using TitanBot.TypeReaders;
 
 namespace TitanBot.Commands.DefaultCommands.General
 {
-    [Description("PREFERENCES_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.PREFERENCES_HELP_DESCRIPTION)]
     [Alias("Pref", "Preference")]
     class PreferencesCommand : SettingCommand
     {
@@ -18,17 +18,17 @@ namespace TitanBot.Commands.DefaultCommands.General
             : base(readers) { }
 
         [Call]
-        [Usage("PREFERENCES_HELP_USAGE_DEFAULT")]
+        [Usage(TitanBotResource.PREFERENCES_HELP_USAGE_DEFAULT)]
         new Task ListSettingsAsync([Dense]string settingGroup = null)
             => base.ListSettingsAsync(settingGroup);
 
         [Call("Toggle")]
-        [Usage("PREFERENCES_HELP_USAGE_TOGGLE")]
+        [Usage(TitanBotResource.PREFERENCES_HELP_USAGE_TOGGLE)]
         new Task ToggleSettingAsync(string key)
             => base.ToggleSettingAsync(key);
 
         [Call("Set")]
-        [Usage("PREFERENCES_HELP_USAGE_SET")]
+        [Usage(TitanBotResource.PREFERENCES_HELP_USAGE_SET)]
         new Task SetSettingAsync(string key, [Dense]string value = null)
             => base.SetSettingAsync(key, value);
     }

@@ -83,21 +83,21 @@ namespace TitanBot
         {
             SettingsManager.GetEditorCollection<GeneralGlobalSetting>(SettingScope.Global)
                            .WithName("General")
-                           .WithDescription("SETTINGS_GLOBAL_GENERAL_DESCRIPTION")
+                           .WithDescription(TitanBotResource.SETTINGS_GLOBAL_GENERAL_DESCRIPTION)
                            .AddSetting(s => s.DefaultPrefix, s => s.SetAlias("Prefix", "Pfx"))
                            .AddSetting<IUser>(s => s.Owners);
             SettingsManager.GetEditorCollection<GeneralGuildSetting>(SettingScope.Guild)
                            .WithName("General")
-                           .WithDescription("SETTINGS_GUILD_GENERAL_DESCRIPTION")
+                           .WithDescription(TitanBotResource.SETTINGS_GUILD_GENERAL_DESCRIPTION)
                            .AddSetting(s => s.Prefix, s => s.SetAlias("Prefix", "Pfx"))
                            .AddSetting(s => s.PermOverride)
                            .AddSetting<IRole>(s => s.RoleOverride)
                            .AddSetting(s => s.DateTimeFormat)
                            .AddSetting(s => s.PreferredLanguage, (Locale a) => (string)a, s => s.SetAlias("Lang", "Locale"))
-                           .WithNotes("SETTINGS_GUILD_GENERAL_NOTES");
+                           .WithNotes(TitanBotResource.SETTINGS_GUILD_GENERAL_NOTES);
             SettingsManager.GetEditorCollection<GeneralUserSetting>(SettingScope.User)
                            .WithName("General")
-                           .WithDescription("SETTINGS_USER_GENERAL_DESCRIPTION")
+                           .WithDescription(TitanBotResource.SETTINGS_USER_GENERAL_DESCRIPTION)
                            .AddSetting(s => s.Language, (Locale a) => (string)a)
                            .AddSetting(s => s.FormatType, (FormattingType a) => (uint)a, b => b.SetViewer((c, f) => c.Formatter.GetName(f)))
                            .AddSetting(s => s.UseEmbeds, s => s.SetAlias("Embed", "Embeds", "UseEmbed"));

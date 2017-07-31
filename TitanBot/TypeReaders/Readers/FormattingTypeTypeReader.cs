@@ -12,7 +12,7 @@ namespace TitanBot.TypeReaders
                 if (format.Name.ToUpper() == value.ToUpper())
                     return ValueTask.FromResult(TypeReaderResponse.FromSuccess(format.Format));
 
-            return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", value, typeof(FormattingType)));
+            return ValueTask.FromResult(TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, value, typeof(FormattingType)));
         }
     }
 }

@@ -5,7 +5,7 @@ using TitanBot.Dependencies;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description("SUDOCOMMAND_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.SUDOCOMMAND_HELP_DESCRIPTION)]
     [RequireOwner]
     public class SudoCommand : Command
     {
@@ -17,13 +17,13 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         }
 
         [Call]
-        [Usage("SUDOCOMMAND_HELP_USAGE")]
+        [Usage(TitanBotResource.SUDOCOMMAND_HELP_USAGE)]
         async Task SudoAsync(IUser user, [Dense]string command)
         {
             var spoofMessage = new SudoMessage(Message);
             spoofMessage.Author = user;
             spoofMessage.Content = command;
-            await ReplyAsync("SUDOCOMMAND_SUCCESS", ReplyType.Success, command, user);
+            await ReplyAsync(TitanBotResource.SUDOCOMMAND_SUCCESS, ReplyType.Success, command, user);
             await CommandService.ParseAndExecute(spoofMessage);
         }
     }

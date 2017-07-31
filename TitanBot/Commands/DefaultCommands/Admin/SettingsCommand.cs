@@ -7,7 +7,7 @@ using TitanBot.TypeReaders;
 
 namespace TitanBot.Commands.DefaultCommands.Admin
 {
-    [Description("SETTINGS_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.SETTINGS_HELP_DESCRIPTION)]
     [DefaultPermission(8)]
     [Alias("Setting")]
     [RequireContext(ContextType.Guild)]
@@ -20,17 +20,17 @@ namespace TitanBot.Commands.DefaultCommands.Admin
             : base(readers) { }
 
         [Call]
-        [Usage("SETTINGS_HELP_USAGE_DEFAULT")]
+        [Usage(TitanBotResource.SETTINGS_HELP_USAGE_DEFAULT)]
         new Task ListSettingsAsync([Dense]string settingGroup = null)
             => base.ListSettingsAsync(settingGroup);
 
         [Call("Toggle")]
-        [Usage("SETTINGS_HELP_USAGE_TOGGLE")]
+        [Usage(TitanBotResource.SETTINGS_HELP_USAGE_TOGGLE)]
         new Task ToggleSettingAsync(string key)
             => base.ToggleSettingAsync(key);
 
         [Call("Set")]
-        [Usage("SETTINGS_HELP_USAGE_SET")]
+        [Usage(TitanBotResource.SETTINGS_HELP_USAGE_SET)]
         new Task SetSettingAsync(string key, [Dense]string value = null)
             => base.SetSettingAsync(key, value);
     }

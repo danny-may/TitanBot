@@ -39,7 +39,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 Footer = new EmbedFooterBuilder
                 {
                     IconUrl = BotUser.GetAvatarUrl(),
-                    Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Settings")
+                    Text = TextResource.Format(TitanBotResource.EMBED_FOOTER, BotUser.Username, "Settings")
                 }
             };
 
@@ -48,26 +48,26 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
 
             if (settingGroup == null)
             {
-                builder.WithTitle(TextResource.GetResource("SETTINGS_TITLE_NOGROUP"))
+                builder.WithTitle(TextResource.GetResource(TitanBotResource.SETTINGS_TITLE_NOGROUP))
                        .WithDescription(string.Join("\n", Settings.Select(g => g.Name)));
                 if (string.IsNullOrWhiteSpace(builder.Description))
-                    builder.Description = TextResource.GetResource("SETTINGS_DESCRIPTION_NOSETTINGS");
+                    builder.Description = TextResource.GetResource(TitanBotResource.SETTINGS_DESCRIPTION_NOSETTINGS);
                 await ReplyAsync(builder);
                 return;
             }
             var groups = Settings.Where(g => g.Name.ToLower() == settingGroup.ToLower());
             if (groups.Count() == 0)
             {
-                await ReplyAsync("SETTINGS_INVALIDGROUP", ReplyType.Error, settingGroup);
+                await ReplyAsync(TitanBotResource.SETTINGS_INVALIDGROUP, ReplyType.Error, settingGroup);
                 return;
             }
             
-            builder.WithTitle(TextResource.Format("SETTINGS_TITLE_GROUP", groups.First().Name));
+            builder.WithTitle(TextResource.Format(TitanBotResource.SETTINGS_TITLE_GROUP, groups.First().Name));
             foreach (var setting in groups.SelectMany(s => s))
             {
                 var value = setting.Display(Context, SettingContext);
                 if (string.IsNullOrWhiteSpace(value))
-                    value = TextResource.GetResource("SETTINGS_NOTSET");
+                    value = TextResource.GetResource(TitanBotResource.SETTINGS_NOTSET);
                 builder.AddInlineField(setting.Name, value);
             }
             var descriptions = string.Join("\n", groups.Where(g => !string.IsNullOrWhiteSpace(g.Description))
@@ -77,7 +77,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             if (!string.IsNullOrWhiteSpace(descriptions))
                 builder.WithDescription(descriptions);
             if (!string.IsNullOrWhiteSpace(notes))
-                builder.AddField(TextResource.GetResource("NOTES"), notes);
+                builder.AddField(TextResource.GetResource(TitanBotResource.NOTES), notes);
             await ReplyAsync(builder);
         }
 
@@ -85,9 +85,9 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
         {
             var setting = Find(key);
             if (setting == null)
-                await ReplyAsync("SETTINGS_KEY_NOTFOUND", ReplyType.Error, key);
+                await ReplyAsync(TitanBotResource.SETTINGS_KEY_NOTFOUND, ReplyType.Error, key);
             else if (setting.Type != typeof(bool))
-                await ReplyAsync("SETTINGS_UNABLE_TOGGLE", ReplyType.Error, key);
+                await ReplyAsync(TitanBotResource.SETTINGS_UNABLE_TOGGLE, ReplyType.Error, key);
             else
             {
                 var oldValue = (bool)setting.Get(SettingContext);
@@ -99,7 +99,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     var newDisplay = setting.Display(Context, SettingContext);
                     var builder = new EmbedBuilder
                     {
-                        Title = TextResource.Format("SETTINGS_VALUE_CHANGED_TITLE", setting.Name),
+                        Title = TextResource.Format(TitanBotResource.SETTINGS_VALUE_CHANGED_TITLE, setting.Name),
                         Footer = new EmbedFooterBuilder
                         {
                             IconUrl = BotUser.GetAvatarUrl(),
@@ -107,8 +107,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         },
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(TextResource.GetResource("SETTING_VALUE_OLD"), string.IsNullOrWhiteSpace(oldDisplay) ? TextResource.GetResource("SETTINGS_NOTSET") : oldDisplay)
-                     .AddField(TextResource.GetResource("SETTING_VALUE_NEW"), string.IsNullOrWhiteSpace(newDisplay) ? TextResource.GetResource("SETTINGS_NOTSET") : newDisplay);
+                    }.AddField(TextResource.GetResource(TitanBotResource.SETTING_VALUE_OLD), string.IsNullOrWhiteSpace(oldDisplay) ? TextResource.GetResource(TitanBotResource.SETTINGS_NOTSET) : oldDisplay)
+                     .AddField(TextResource.GetResource(TitanBotResource.SETTING_VALUE_NEW), string.IsNullOrWhiteSpace(newDisplay) ? TextResource.GetResource(TitanBotResource.SETTINGS_NOTSET) : newDisplay);
                     await ReplyAsync(builder);
                 }
             }
@@ -118,14 +118,14 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
         {
             var setting = Find(key);
             if (setting == null)
-                await ReplyAsync("SETTINGS_KEY_NOTFOUND", ReplyType.Error, key);
+                await ReplyAsync(TitanBotResource.SETTINGS_KEY_NOTFOUND, ReplyType.Error, key);
             else
             {
                 var readerResult = await Readers.Read(setting.Type, Context, value);
             
                 if (!readerResult.IsSuccess)
                 {
-                    await ReplyAsync("SETTINGS_VALUE_INVALID", ReplyType.Error, setting.Name, value);
+                    await ReplyAsync(TitanBotResource.SETTINGS_VALUE_INVALID, ReplyType.Error, setting.Name, value);
                     return;
                 }
             
@@ -138,7 +138,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     var newValue = setting.Display(Context, SettingContext);
                     var builder = new EmbedBuilder
                     {
-                        Title = TextResource.Format("SETTINGS_VALUE_CHANGED_TITLE", setting.Name),
+                        Title = TextResource.Format(TitanBotResource.SETTINGS_VALUE_CHANGED_TITLE, setting.Name),
                         Footer = new EmbedFooterBuilder
                         {
                             IconUrl = BotUser.GetAvatarUrl(),
@@ -146,8 +146,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         },
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(TextResource.GetResource("SETTING_VALUE_OLD"), string.IsNullOrWhiteSpace(oldValue) ? TextResource.GetResource("SETTINGS_NOTSET") : oldValue)
-                     .AddField(TextResource.GetResource("SETTING_VALUE_NEW"), string.IsNullOrWhiteSpace(newValue) ? TextResource.GetResource("SETTINGS_NOTSET") : newValue);
+                    }.AddField(TextResource.GetResource(TitanBotResource.SETTING_VALUE_OLD), string.IsNullOrWhiteSpace(oldValue) ? TextResource.GetResource(TitanBotResource.SETTINGS_NOTSET) : oldValue)
+                     .AddField(TextResource.GetResource(TitanBotResource.SETTING_VALUE_NEW), string.IsNullOrWhiteSpace(newValue) ? TextResource.GetResource(TitanBotResource.SETTINGS_NOTSET) : newValue);
                     await ReplyAsync(builder);
                 }
             }

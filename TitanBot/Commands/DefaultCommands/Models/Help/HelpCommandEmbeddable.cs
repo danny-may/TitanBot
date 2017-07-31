@@ -36,11 +36,11 @@ namespace TitanBot.Commands
                 Usages.Add($"`{Context.Prefix}{Name} {call.SubCall} {string.Join(" ", call.GetParameters())} {call.GetFlags()}` - {TextResource.GetResource(call.Usage)}".RegexReplace(" +", " "));
             Usage = string.Join("\n", Usages);
             if (string.IsNullOrWhiteSpace(Usage))
-                Usage = TextResource.GetResource("HELP_SINGLE_NOUSAGE");
+                Usage = TextResource.GetResource(TitanBotResource.HELP_SINGLE_NOUSAGE);
             Notes = TextResource.GetResource(Command.Note);
-            NotesFooter = TextResource.GetResource("HELP_SINGLE_USAGE_FOOTER");
+            NotesFooter = TextResource.GetResource(TitanBotResource.HELP_SINGLE_USAGE_FOOTER);
             Aliases = Command.Alias.Length == 0 ? "" : string.Join(", ", Command.Alias.ToList());
-            Group = Command.Group ?? TextResource.GetResource("HELP_SINGLE_NOGROUP");
+            Group = Command.Group ?? TextResource.GetResource(TitanBotResource.HELP_SINGLE_NOGROUP);
             Flags = string.Join("\n", Permitted.SelectMany(c => c.Flags)
                                                .GroupBy(f => f.ShortKey)
                                                .Select(g => g.First().ToString(TextResource)));
@@ -51,42 +51,42 @@ namespace TitanBot.Commands
             var builder = new EmbedBuilder
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = TextResource.Format("HELP_SINGLE_TITLE", ReplyType.Info, Command.Name),
-                Description = TextResource.GetResource(Command.Description ?? "HELP_SINGLE_NODESCRIPTION"),
+                Title = TextResource.Format(TitanBotResource.HELP_SINGLE_TITLE, ReplyType.Info, Command.Name),
+                Description = TextResource.GetResource(Command.Description ?? TitanBotResource.HELP_SINGLE_NODESCRIPTION),
                 Timestamp = DateTime.Now,
                 Footer = new EmbedFooterBuilder
                 {
                     IconUrl = BotUser.GetAvatarUrl(),
-                    Text = TextResource.Format("EMBED_FOOTER", BotUser.Username, "Help")
+                    Text = TextResource.Format(TitanBotResource.EMBED_FOOTER, BotUser.Username, "Help")
                 }
             };
 
-            builder.AddInlineField(TextResource.GetResource("GROUP"), Group);
+            builder.AddInlineField(TextResource.GetResource(TitanBotResource.GROUP), Group);
             if (!string.IsNullOrWhiteSpace(Aliases))
-                builder.AddInlineField(TextResource.GetResource("ALIASES"), Format.Sanitize(Aliases));
-            builder.AddField(TextResource.GetResource("USAGE"), Usage);
+                builder.AddInlineField(TextResource.GetResource(TitanBotResource.ALIASES), Format.Sanitize(Aliases));
+            builder.AddField(TextResource.GetResource(TitanBotResource.USAGE), Usage);
             if (!string.IsNullOrWhiteSpace(Flags))
-                builder.AddField(TextResource.GetResource("FLAGS"), Flags);
+                builder.AddField(TextResource.GetResource(TitanBotResource.FLAGS), Flags);
             if (!string.IsNullOrWhiteSpace(Notes))
-                builder.AddField(TextResource.GetResource("NOTES"), Notes + (Usages.Count > 0 ? NotesFooter : ""));
+                builder.AddField(TextResource.GetResource(TitanBotResource.NOTES), Notes + (Usages.Count > 0 ? NotesFooter : ""));
             else if (Usages.Count > 0)
-                builder.AddField(TextResource.GetResource("NOTES"), NotesFooter);
+                builder.AddField(TextResource.GetResource(TitanBotResource.NOTES), NotesFooter);
 
             return builder;
         }
 
         public string GetString()
         {
-            var msg = TextResource.Format("HELP_SINGLE_TITLE", ReplyType.Info, Command.Name) + "\n" +
-                      TextResource.GetResource(Command.Description ?? "HELP_SINGLE_NODESCRIPTION") + "\n" + 
-                      $"**{TextResource.GetResource("GROUP")}**: {Group}\n";
+            var msg = TextResource.Format(TitanBotResource.HELP_SINGLE_TITLE, ReplyType.Info, Command.Name) + "\n" +
+                      TextResource.GetResource(Command.Description ?? TitanBotResource.HELP_SINGLE_NODESCRIPTION) + "\n" + 
+                      $"**{TextResource.GetResource(TitanBotResource.GROUP)}**: {Group}\n";
             if (!string.IsNullOrWhiteSpace(Aliases))
-                msg += $"**{TextResource.GetResource("ALIASES")}**: {Format.Sanitize(Aliases)}\n";
-            msg += $"**{TextResource.GetResource("USAGE")}**:\n{Usage}\n";
+                msg += $"**{TextResource.GetResource(TitanBotResource.ALIASES)}**: {Format.Sanitize(Aliases)}\n";
+            msg += $"**{TextResource.GetResource(TitanBotResource.USAGE)}**:\n{Usage}\n";
             if (!string.IsNullOrWhiteSpace(Flags))
-                msg += $"**{TextResource.GetResource("FLAGS")}**:\n{Flags}\n";
+                msg += $"**{TextResource.GetResource(TitanBotResource.FLAGS)}**:\n{Flags}\n";
             if (!string.IsNullOrWhiteSpace(Notes))
-                msg += $"**{TextResource.GetResource("NOTES")}**:\n{Notes}";
+                msg += $"**{TextResource.GetResource(TitanBotResource.NOTES)}**:\n{Notes}";
             if (Usages.Count != 0)
                 msg += NotesFooter;
 

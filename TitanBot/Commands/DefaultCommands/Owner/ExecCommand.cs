@@ -20,10 +20,10 @@ using TitanBot.Util;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description("EXEC_HELP_DESCRIPTION")]
+    [Description(TitanBotResource.EXEC_HELP_DESCRIPTION)]
     [Alias("Eval", "Run")]
     [RequireOwner]
-    [Notes("EXEC_HELP_NOTES")]
+    [Notes(TitanBotResource.EXEC_HELP_NOTES)]
     public class ExecCommand : Command
     {
         protected override int DelayMessageMs => 10000;
@@ -98,7 +98,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         }
 
         [Call]
-        [Usage("EXEC_HELP_USAGE")]
+        [Usage(TitanBotResource.EXEC_HELP_USAGE)]
         protected virtual async Task ExecAsync([Dense, RawArguments]string code)
         {
             var assemblies = GetAssemblies();
@@ -118,20 +118,20 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             if (!TryConstruct(codeWithUsings, assemblies.ToArray(), globals.GetType(), out var constructTime, out var constructRes))
             {
                 result = constructRes;
-                footerText = TextResource.Format("EXEC_FOOTER_CONSTRUCTFAILED", constructTime);
+                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_CONSTRUCTFAILED, constructTime);
             }
             else if (!TryCompile(constructRes as Script<object>, out var compileTime, out var compileRes))
             {
                 result = compileRes;
-                footerText = TextResource.Format("EXEC_FOOTER_COMPILEFAILED", constructTime, compileTime);
+                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_COMPILEFAILED, constructTime, compileTime);
             }
             else if (!TryExecute(constructRes as Script<object>, globals, out var execTime, out result))
             {
-                footerText = TextResource.Format("EXEC_FOOTER_EXECUTEFAILED", constructTime, compileTime, execTime);
+                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_EXECUTEFAILED, constructTime, compileTime, execTime);
             }
             else
             {
-                footerText = TextResource.Format("EXEC_FOOTER_SUCCESS", constructTime, compileTime, execTime);
+                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_SUCCESS, constructTime, compileTime, execTime);
             }
 
             var builder = new EmbedBuilder
@@ -140,11 +140,11 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 {
                     Text = footerText
                 }
-            }.AddField(TextResource.GetResource("INPUT"), TextResource.Format("EXEC_INPUT_FORMAT", code));
+            }.AddField(TextResource.GetResource(TitanBotResource.INPUT), TextResource.Format(TitanBotResource.EXEC_INPUT_FORMAT, code));
 
             if (result is Exception exception)
             {
-                builder.WithTitle(TextResource.GetResource("EXEC_TITLE_EXCEPTION"));
+                builder.WithTitle(TextResource.GetResource(TitanBotResource.EXEC_TITLE_EXCEPTION));
                 builder.WithColor(System.Drawing.Color.Red.ToDiscord());
                 var exceptions = new List<Exception>();
                 if (exception is AggregateException aggex)
@@ -153,15 +153,15 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                     exceptions.Add(exception);
                 foreach (var ex in exceptions)
                 {
-                    builder.AddField(TextResource.GetResource("ERROR"), TextResource.Format("EXEC_OUTPUT_FORMAT", Format.Sanitize(ex.GetType().ToString()), Format.Sanitize(ex.Message)));
+                    builder.AddField(TextResource.GetResource(TitanBotResource.ERROR), TextResource.Format(TitanBotResource.EXEC_OUTPUT_FORMAT, Format.Sanitize(ex.GetType().ToString()), Format.Sanitize(ex.Message)));
                 }
             }
             else
             {
-                builder.WithTitle(TextResource.GetResource("EXEC_TITLE_SUCCESS"));
+                builder.WithTitle(TextResource.GetResource(TitanBotResource.EXEC_TITLE_SUCCESS));
                 builder.WithColor(System.Drawing.Color.LimeGreen.ToDiscord());
                 if (result == null)
-                    builder.AddField(TextResource.GetResource("OUTPUT"), TextResource.Format("EXEC_OUTPUT_NULL", null, null));
+                    builder.AddField(TextResource.GetResource(TitanBotResource.OUTPUT), TextResource.Format(TitanBotResource.EXEC_OUTPUT_NULL, null, null));
                 else
                 {
                     var resString = "";
@@ -169,7 +169,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                         resString = "[" + string.Join(", ", (result as IEnumerable<object>) ?? new List<string>()) + "]";
                     else
                         resString = result?.ToString();
-                    builder.AddField(TextResource.GetResource("OUTPUT"), TextResource.Format("EXEC_OUTPUT_FORMAT", Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
+                    builder.AddField(TextResource.GetResource(TitanBotResource.OUTPUT), TextResource.Format(TitanBotResource.EXEC_OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
                 }
             }
 

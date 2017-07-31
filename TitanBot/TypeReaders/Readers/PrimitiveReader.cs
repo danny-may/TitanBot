@@ -28,7 +28,7 @@ namespace TitanBot.TypeReaders
         {
             if (_tryParse(text, out T value))
                 return ValueTask.FromResult(TypeReaderResponse.FromSuccess(value));
-            return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", text, typeof(T)));
+            return ValueTask.FromResult(TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, text, typeof(T)));
         }
     }
 

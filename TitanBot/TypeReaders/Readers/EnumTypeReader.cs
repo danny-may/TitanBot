@@ -52,14 +52,14 @@ namespace TitanBot.TypeReaders
                 if (EnumByValue.TryGetValue(baseValue, out object enumValue))
                     return ValueTask.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
+                    return ValueTask.FromResult(TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, input, typeof(T)));
             }
             else
             {
                 if (EnumByName.TryGetValue(input.ToLower(), out object enumValue))
                     return ValueTask.FromResult(TypeReaderResponse.FromSuccess(enumValue));
                 else
-                    return ValueTask.FromResult(TypeReaderResponse.FromError("TYPEREADER_UNABLETOREAD", input, typeof(T)));
+                    return ValueTask.FromResult(TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, input, typeof(T)));
             }
         }
     }

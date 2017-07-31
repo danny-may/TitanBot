@@ -200,7 +200,7 @@ namespace System
         {
             var builder = new StringBuilder();
             data = data.ForceColumns();
-            var maxWidth = data.Rotate().Select(c => c.Max(v => v.ToString().Length)).ToList();
+            var maxWidth = data.Rotate().Select(c => c.Max(v => v?.ToString()?.Length ?? 0)).ToList();
             for (int row = 0; row < data.Length; row++)
             {
                 for (int col = 0; col < data[row].Length; col++)
@@ -208,7 +208,7 @@ namespace System
                     if (row == 0 && headerFormat != null)
                         builder.Append(string.Format(headerFormat, data[row][col].ToString().PadRight(maxWidth[col])));
                     else
-                        builder.Append(string.Format(cellFormat, data[row][col].ToString().PadRight(maxWidth[col])));
+                        builder.Append(string.Format(cellFormat, (data[row][col]?.ToString() ?? "").PadRight(maxWidth[col])));
                 }
                 builder.Append("\n");
             }

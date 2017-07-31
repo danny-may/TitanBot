@@ -12,6 +12,6 @@ namespace TitanBot.Formatting
         Locale[] SupportedLanguages { get; }
         void Refresh();
 
-        void RequireKeys(Dictionary<string, string> values);
+        void RequireKeys(IReadOnlyDictionary<string, string> values);
     }
 }

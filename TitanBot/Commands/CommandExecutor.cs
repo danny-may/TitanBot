@@ -55,7 +55,7 @@ namespace TitanBot.Commands
                     return;
                 else if (!Context.IsCommand)
                     await Replier.Reply(Context.Channel)
-                                 .WithMessage("COMMANDEXECUTOR_COMMAND_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText)
+                                 .WithMessage(TitanBotResource.COMMANDEXECUTOR_COMMAND_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText)
                                  .SendAsync();
                 await TryExecute();
             }
@@ -74,7 +74,7 @@ namespace TitanBot.Commands
                 try
                 {
                     await Replier.Reply(Context.Channel)
-                                 .WithMessage("COMMANDEXECUTOR_EXCEPTION_ALERT", ReplyType.Error, ex.GetType().Name, record.Id)
+                                 .WithMessage(TitanBotResource.COMMANDEXECUTOR_EXCEPTION_ALERT, ReplyType.Error, ex.GetType().Name, record.Id)
                                  .SendAsync();
                 }
                 catch { }
@@ -96,7 +96,7 @@ namespace TitanBot.Commands
             if (calls.Count() == 0)
             {
                 await Replier.Reply(Context.Channel)
-                             .WithMessage("COMMANDEXECUTOR_DISALLOWED_CHANNEL", ReplyType.Error)
+                             .WithMessage(TitanBotResource.COMMANDEXECUTOR_DISALLOWED_CHANNEL, ReplyType.Error)
                              .SendAsync();
                 return;
             }
@@ -104,7 +104,7 @@ namespace TitanBot.Commands
             if (calls.Count() == 0)
             {
                 await Replier.Reply(Context.Channel)
-                             .WithMessage("COMMANDEXECUTOR_SUBCALL_UNKNOWN", ReplyType.Error, Context.Prefix, Context.CommandText)
+                             .WithMessage(TitanBotResource.COMMANDEXECUTOR_SUBCALL_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText)
                              .SendAsync();
                 return;
             }
@@ -198,17 +198,17 @@ namespace TitanBot.Commands
             if (call.SubCall != null)
             {
                 if (argStrings.Length == 0)
-                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, "COMMANDEXECUTOR_SUBCALL_UNSPECIFIED");
+                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, TitanBotResource.COMMANDEXECUTOR_SUBCALL_UNSPECIFIED);
                 if (call.SubCall.ToLower() != argStrings[0].ToLower())
-                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, "COMMANDEXECUTOR_SUBCALL_UNKNOWN");
+                    return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, TitanBotResource.COMMANDEXECUTOR_SUBCALL_UNKNOWN);
                 argStrings = argStrings.Skip(1).ToArray();
             }
 
             var acceptedLength = argPattern.Count(a => !a.UseDefault);
             if (argStrings.Length > acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.TooManyArguments, "COMMANDEXECUTOR_ARGUMENTS_TOOMANY");
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.TooManyArguments, TitanBotResource.COMMANDEXECUTOR_ARGUMENTS_TOOMANY);
             else if (argStrings.Length < acceptedLength)
-                return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, "COMMANDEXECUTOR_ARGUMENTS_TOOFEW");
+                return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, TitanBotResource.COMMANDEXECUTOR_ARGUMENTS_TOOFEW);
 
             var argResults = new object[argPattern.Length];
             var argIterator = argStrings.GetEnumerator();
@@ -221,7 +221,7 @@ namespace TitanBot.Commands
                 else
                 {
                     if (!argIterator.MoveNext())
-                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, "COMMANDEXECUTOR_ARGUMENTS_TOOFEW");
+                        return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, TitanBotResource.COMMANDEXECUTOR_ARGUMENTS_TOOFEW);
                     var readRes = await reader.Read(argPattern[i].Type, Context, (string)argIterator.Current);
                     if (!readRes.IsSuccess)
                         return ArgumentCheckResponse.FromError(readRes);
