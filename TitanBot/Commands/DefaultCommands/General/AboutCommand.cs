@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using TitanBot.Replying;
 
 namespace TitanBot.Commands.General
 {

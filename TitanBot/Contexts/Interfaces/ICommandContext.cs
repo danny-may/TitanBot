@@ -1,4 +1,6 @@
-﻿namespace TitanBot.Commands
+﻿using TitanBot.Commands;
+
+namespace TitanBot.Contexts
 {
     public interface ICommandContext : IMessageContext
     {

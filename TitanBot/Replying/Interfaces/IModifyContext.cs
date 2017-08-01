@@ -2,11 +2,11 @@
 using System;
 using System.Threading.Tasks;
 
-namespace TitanBot.Commands
+namespace TitanBot.Replying
 {
 
     public delegate Task OnModifyEventHandler(IModifyContext context, IUserMessage message);
-    public delegate Task MessageModifyErrorHandler(Exception ex, IUserMessage message, IMessageContext context, string text, IEmbedable embed);
+    public delegate Task MessageModifyErrorHandler(Exception ex, IUserMessage message, string text, IEmbedable embed);
 
     public interface IModifyContext
     {

@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Commands.Responses;
+using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Logging;
+using TitanBot.Replying;
 using TitanBot.Settings;
 using TitanBot.Storage;
 using TitanBot.TypeReaders;
@@ -22,9 +25,9 @@ namespace TitanBot.Commands
         private ITypeReaderCollection Readers { get; }
         private ICommandContext Context { get; }
         private ITextResourceManager TextManager { get; }
-        private ITextResourceCollection TextResource { get; }
+        private ITextResourceCollection TextResource => Context.TextResource;
         private ISettingManager Settings { get; }
-        private IReplier Replier { get; }
+        private IReplier Replier => Context.Replier;
 
         public CommandExecutor(IDependencyFactory factory,
                                ICommandService owner,
@@ -43,9 +46,16 @@ namespace TitanBot.Commands
             Logger = logger;
             Readers = typeReaders;
             Settings = settings;
-            Replier = Context.Replier;
-            TextResource = Context.TextResource;
         }
+
+        private ValueTask<IUserMessage> ReplyAsync(string text)
+            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text).SendAsync();
+        private ValueTask<IUserMessage> ReplyAsync(string text, ReplyType replyType)
+            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text, replyType).SendAsync();
+        private ValueTask<IUserMessage> ReplyAsync(string text, params object[] values)
+            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text, values).SendAsync();
+        private ValueTask<IUserMessage> ReplyAsync(string text, ReplyType replyType, params object[] values)
+            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text, replyType, values).SendAsync();
 
         public async Task Run()
         {
@@ -54,9 +64,7 @@ namespace TitanBot.Commands
                 if (!Context.IsCommand && !Context.ExplicitPrefix)
                     return;
                 else if (!Context.IsCommand)
-                    await Replier.Reply(Context.Channel)
-                                 .WithMessage(TitanBotResource.COMMANDEXECUTOR_COMMAND_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText)
-                                 .SendAsync();
+                    await ReplyAsync(TitanBotResource.COMMANDEXECUTOR_COMMAND_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText);
                 await TryExecute();
             }
             catch (Exception ex)
@@ -73,9 +81,7 @@ namespace TitanBot.Commands
                 await Database.Insert(record);
                 try
                 {
-                    await Replier.Reply(Context.Channel)
-                                 .WithMessage(TitanBotResource.COMMANDEXECUTOR_EXCEPTION_ALERT, ReplyType.Error, ex.GetType().Name, record.Id)
-                                 .SendAsync();
+                    await ReplyAsync(TitanBotResource.COMMANDEXECUTOR_EXCEPTION_ALERT, ReplyType.Error, ex.GetType().Name, record.Id);
                 }
                 catch { }
             }
@@ -95,17 +101,13 @@ namespace TitanBot.Commands
             var calls = PermissionManager.CheckContext(Context, command.Calls.ToArray());
             if (calls.Count() == 0)
             {
-                await Replier.Reply(Context.Channel)
-                             .WithMessage(TitanBotResource.COMMANDEXECUTOR_DISALLOWED_CHANNEL, ReplyType.Error)
-                             .SendAsync();
+                await ReplyAsync(TitanBotResource.COMMANDEXECUTOR_DISALLOWED_CHANNEL, ReplyType.Error);
                 return;
             }
             calls = CheckSubcommands(calls);
             if (calls.Count() == 0)
             {
-                await Replier.Reply(Context.Channel)
-                             .WithMessage(TitanBotResource.COMMANDEXECUTOR_SUBCALL_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText)
-                             .SendAsync();
+                await ReplyAsync(TitanBotResource.COMMANDEXECUTOR_SUBCALL_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText);
                 return;
             }
             foreach (var call in calls)
@@ -117,9 +119,7 @@ namespace TitanBot.Commands
                     if (!permCheck.IsSuccess)
                     {
                         if (permCheck.ErrorMessage != null)
-                            await Replier.Reply(Context.Channel)
-                                         .WithMessage(permCheck.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText)
-                                         .SendAsync();
+                            await ReplyAsync(permCheck.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText);
                     }
                     else
                     {
@@ -135,11 +135,9 @@ namespace TitanBot.Commands
                     return;
                 }
             }
-            await Replier.Reply(Context.Channel)
-                         .WithMessage(response.ErrorMessage.message, ReplyType.Error, new object[] { Context.Prefix, Context.CommandText}
+            await ReplyAsync(response.ErrorMessage.message, ReplyType.Error, new object[] { Context.Prefix, Context.CommandText }
                                                                                             .Concat(response.ErrorMessage.values.Select(v => v(TextResource)))
-                                                                                            .ToArray())
-                         .SendAsync();
+                                                                                            .ToArray());
         }
 
         private void LogCommand(CallInfo call)
@@ -158,7 +156,7 @@ namespace TitanBot.Commands
                 Prefix = Context.Prefix,
                 CommandName = Context.Command?.Name
             };
-            Logger.LogAsync(LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
+            Logger.LogAsync(Logging.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
             Database.Insert(record);
         }
 

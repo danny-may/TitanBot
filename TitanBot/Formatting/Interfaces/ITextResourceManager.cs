@@ -7,7 +7,7 @@ namespace TitanBot.Formatting
         void AddResource(string key, string text);
         void AddResource(string key, Locale language, string text);
         void SaveChanges();
-        ITextResourceCollection GetForLanguage(Locale language, ValueFormatter valueFormatter);
+        ITextResourceCollection GetForLanguage(Locale language, FormattingType format);
         double GetLanguageCoverage(Locale language);
         Locale[] SupportedLanguages { get; }
         void Refresh();

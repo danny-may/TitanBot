@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using TitanBot.Commands;
+using TitanBot.Replying;
 
 namespace TitanBot.Formatting
 {
@@ -8,15 +8,17 @@ namespace TitanBot.Formatting
     {
         private Dictionary<string, (string defaultText, string langText)> Values { get; }
         private ValueFormatter Formatter { get; }
+        private FormattingType FormatType { get; }
         public double Coverage { get; }
 
         public string this[string key] => GetResource(key);
 
-        public TextResourceCollection(double coverage, ValueFormatter valueFormatter, Dictionary<string, (string defaultText, string langText)> values)
+        public TextResourceCollection(double coverage, ValueFormatter formatter, FormattingType format, Dictionary<string, (string defaultText, string langText)> values)
         {
             Coverage = coverage;
             Values = values;
-            Formatter = valueFormatter;
+            Formatter = formatter;
+            FormatType = format;
         }
 
         public string GetResource(string key)
@@ -32,7 +34,7 @@ namespace TitanBot.Formatting
         }
 
         public string Format(string key, params object[] items)
-            => string.Format(GetResource(key), items.Select(i => Formatter.Beautify(i)).ToArray());
+            => string.Format(GetResource(key), items.Select(i => Formatter.Beautify(FormatType, i)).ToArray());
 
         public string Format(string key, ReplyType replyType, params object[] items)
             => GetReplyType(replyType) + Format(key, items);

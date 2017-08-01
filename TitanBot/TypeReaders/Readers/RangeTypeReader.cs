@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 using TitanBot.Models;
 
 namespace TitanBot.TypeReaders
@@ -29,7 +29,7 @@ namespace TitanBot.TypeReaders
             Parser = parser;
         }
 
-        public override async ValueTask<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override async ValueTask<TypeReaderResponse> Read(IMessageContext context, string value)
         {
             if (value == null)
                 return TypeReaderResponse.FromSuccess(null);

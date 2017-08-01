@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 using TitanBot.Util;
 
 namespace TitanBot.Settings
@@ -10,14 +10,14 @@ namespace TitanBot.Settings
     {
         public string Name { get; private set; }
         public string[] Aliases { get; private set; }
-        public Func<ICommandContext, TAccept, TStore> Converter { get; }
-        public Func<ICommandContext, TAccept, string> Validator { get; private set; }
-        public Func<ICommandContext, TStore, string> Viewer { get; private set; }
+        public Func<IMessageContext, TAccept, TStore> Converter { get; }
+        public Func<IMessageContext, TAccept, string> Validator { get; private set; }
+        public Func<IMessageContext, TStore, string> Viewer { get; private set; }
         private Expression<Func<TSetting, TStore>> Property { get; }
         private ISettingManager Parent { get; }
 
 
-        public SettingEditorBuilder(ISettingManager parent, Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TAccept, TStore> converter)
+        public SettingEditorBuilder(ISettingManager parent, Expression<Func<TSetting, TStore>> property, Func<IMessageContext, TAccept, TStore> converter)
         {
             Parent = parent;
             Property = property;
@@ -35,12 +35,12 @@ namespace TitanBot.Settings
         public ISettingEditorBuilder<TStore, TAccept> SetName(string name)
             => MiscUtil.InlineAction(this, o => o.Name = name);
 
-        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<ICommandContext, TAccept, string> validator)
+        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<IMessageContext, TAccept, string> validator)
             => MiscUtil.InlineAction(this, o => o.Validator = validator);
         public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<TAccept, string> validator)
             => MiscUtil.InlineAction(this, o => o.Validator = (c, a) => validator(a));
 
-        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<ICommandContext, TStore, string> viewer)
+        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<IMessageContext, TStore, string> viewer)
             => MiscUtil.InlineAction(this, o => o.Viewer = viewer);
         public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<TStore, string> viewer)
             => MiscUtil.InlineAction(this, o => o.Viewer = (c, a) => viewer(a));

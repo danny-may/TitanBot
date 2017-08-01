@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TitanBot.Dependencies
 {
     public interface IDependencyFactory : IDisposable, IInstanceBuilder
     {
+        List<Type> History { get; }
+
         void Store<T>(T value);
         void Store(Type type, object value);
         void StoreBuilder<T>(Func<T> builder);

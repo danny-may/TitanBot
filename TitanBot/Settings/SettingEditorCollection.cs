@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 using TitanBot.Util;
 
 namespace TitanBot.Settings
@@ -34,10 +34,10 @@ namespace TitanBot.Settings
         }
 
         //Delegates
-        private Func<ICommandContext, TAccept[], TStore[]> MakeArrayConverter<TStore, TAccept>(Func<ICommandContext, TAccept, TStore> converter)
+        private Func<IMessageContext, TAccept[], TStore[]> MakeArrayConverter<TStore, TAccept>(Func<IMessageContext, TAccept, TStore> converter)
             => (c, a) => a.Select(v => converter(c, v)).ToArray();
 
-        private Func<ICommandContext, TAccept, TStore> WrapConverter<TStore, TAccept>(Func<TAccept, TStore> converter)
+        private Func<IMessageContext, TAccept, TStore> WrapConverter<TStore, TAccept>(Func<TAccept, TStore> converter)
             => (c, a) => converter(a);
 
         private Action<ISettingEditorBuilder<TStore[], TAccept[]>> MakeArrayEditor<TStore, TAccept>(Action<ISettingEditorBuilder<TStore, TAccept>> templateEditor = null)
@@ -50,9 +50,9 @@ namespace TitanBot.Settings
                 b.SetViewer((c, s) => string.Join(", ", s.Select(v => temp.Viewer(c, v))));
             };
 
-        private string EntityViewer<TAccept>(ICommandContext context, ulong id)
+        private string EntityViewer<TAccept>(IMessageContext context, ulong id)
             => EntityViewer<TAccept>(context, (ulong?)id);
-        private string EntityViewer<TAccept>(ICommandContext context, ulong? id)
+        private string EntityViewer<TAccept>(IMessageContext context, ulong? id)
         {
             if (id == null)
                 return null;
@@ -70,20 +70,20 @@ namespace TitanBot.Settings
             return id.ToString();
         }
 
-        private ISettingEditorBuilder<TStore, TAccept> MakeBuilder<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TAccept, TStore> converter)
+        private ISettingEditorBuilder<TStore, TAccept> MakeBuilder<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<IMessageContext, TAccept, TStore> converter)
             => new SettingEditorBuilder<TSetting, TStore, TAccept>(Parent, property, converter);
 
         private Action<ISettingEditorBuilder<TStore, TAccept>> ChainEditors<TStore, TAccept>(params Action<ISettingEditorBuilder<TStore, TAccept>>[] editors)
             => b => editors.ForEach(e => e?.Invoke(b));
 
 
-        public ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> editor = null)
+        public ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<IMessageContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> editor = null)
             => AddSetting(MakeBuilder(property, converter), editor);
         public ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> editor = null)
             => AddSetting(property, WrapConverter(converter), editor);
         public ISettingEditorCollection<TSetting> AddSetting<TStore>(Expression<Func<TSetting, TStore>> property, Action<ISettingEditorBuilder<TStore, TStore>> editor = null)
             => AddSetting(property, a => a, editor);
-        public ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<ICommandContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> editor = null)
+        public ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<IMessageContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> editor = null)
             => AddSetting(property, MakeArrayConverter(converter), MakeArrayEditor(editor));
         public ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> editor = null)
             => AddSetting(property, WrapConverter(converter), editor);

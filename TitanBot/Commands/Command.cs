@@ -4,13 +4,16 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.Downloader;
 using TitanBot.Formatting;
 using TitanBot.Logging;
+using TitanBot.Replying;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Storage;
+using TitanBot.Util;
 
 namespace TitanBot.Commands
 {
@@ -41,7 +44,7 @@ namespace TitanBot.Commands
         protected IGuild Guild => Context?.Guild;
         
         protected ValueFormatter Formatter => Context?.Formatter;
-        protected IReplier Replier => Context?.Replier;
+        private IReplier Replier => Context?.Replier;
         protected ITextResourceCollection TextResource => Context?.TextResource;
         protected string Prefix => Context.Prefix;
         protected string CommandName => Context.CommandText;
@@ -86,8 +89,6 @@ namespace TitanBot.Commands
             Downloader = factory.Get<IDownloader>();
 
             StartReplyTimer();
-
-            Replier.OnSend += OnMessageSent;
         }
 
         private void StartReplyTimer()
@@ -99,7 +100,7 @@ namespace TitanBot.Commands
                 {
                     if (!HasReplied)
                     {
-                        AwaitMessage = Replier.Reply(Channel)
+                        AwaitMessage = Replier.Reply(Channel, Author)
                                               .WithMessage(DelayMessage)
                                               .SendAsync(true).Result;
                     }
@@ -122,39 +123,48 @@ namespace TitanBot.Commands
             return Task.CompletedTask;
         }
 
-        protected IReplyContext Reply 
-            => Replier.Reply(Channel);
-
-        protected ValueTask<IUserMessage> ReplyAsync(string message)
-            => Reply.WithMessage(message).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType)
-            => Reply.WithMessage(message).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, params object[] values)
-            => Reply.WithMessage(message, values).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, params object[] values)
-            => Reply.WithMessage(message, replyType, values).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed)
-            => Reply.WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed)
-            => Reply.WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed)
-            => Reply.WithMessage(message).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed)
-            => Reply.WithMessage(message).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed, params object[] values)
-            => Reply.WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed, params object[] values)
-            => Reply.WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed, params object[] values)
-            => Reply.WithMessage(message, values).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed, params object[] values)
-            => Reply.WithMessage(message, values).WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(IEmbedable embed)
-            => Reply.WithEmbedable(embed).SendAsync();
-        protected ValueTask<IUserMessage> ReplyAsync(Embedable embed)
-            => Reply.WithEmbedable(embed).SendAsync();
+        protected IReplyContext Reply()
+            => Reply(Channel, Author);
+        protected IReplyContext Reply(IMessageChannel channel)
+            => Reply(channel, Author);
+        protected IReplyContext Reply(IUser user)
+            => Reply(Channel, user);
+        protected IReplyContext Reply(IMessageChannel channel, IUser user)
+            => MiscUtil.InlineAction(Replier.Reply(channel, user), r => r.OnSend += OnMessageSent);
 
         protected IModifyContext Modify(IUserMessage message)
-            => Replier.Modify(message);
+            => Modify(message, Author);
+        protected IModifyContext Modify(IUserMessage message, IUser user)
+            => Replier.Modify(message, user);
+
+
+        protected ValueTask<IUserMessage> ReplyAsync(string message)
+            => Reply().WithMessage(message).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType)
+            => Reply().WithMessage(message).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, params object[] values)
+            => Reply().WithMessage(message, values).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, params object[] values)
+            => Reply().WithMessage(message, replyType, values).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed)
+            => Reply().WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed)
+            => Reply().WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed)
+            => Reply().WithMessage(message).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed)
+            => Reply().WithMessage(message).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed, params object[] values)
+            => Reply().WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed, params object[] values)
+            => Reply().WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed, params object[] values)
+            => Reply().WithMessage(message, values).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed, params object[] values)
+            => Reply().WithMessage(message, values).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(IEmbedable embed)
+            => Reply().WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(Embedable embed)
+            => Reply().WithEmbedable(embed).SendAsync();
     }
 }

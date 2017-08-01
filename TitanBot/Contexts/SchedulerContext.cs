@@ -1,12 +1,13 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
-using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
+using TitanBot.Replying;
+using TitanBot.Scheduling;
 using TitanBot.Settings;
 
-namespace TitanBot.Scheduling
+namespace TitanBot.Contexts
 {
     class SchedulerContext : ISchedulerContext
     {
@@ -64,12 +65,10 @@ namespace TitanBot.Scheduling
             _channelSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(Channel));
             _guildSettings = new Lazy<ISettingContext>(() => Guild == null ? null : settingManager.GetContext(Guild));
             _userSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(Author));
-            _formatter = new Lazy<ValueFormatter>(() => factory.WithInstance(this)
-                                                               .Construct<ValueFormatter>());
+            _formatter = new Lazy<ValueFormatter>(() => factory.GetOrStore<ValueFormatter>());
             _textManager = new Lazy<ITextResourceManager>(() => factory.GetOrStore<ITextResourceManager>());
-            _textResource = new Lazy<ITextResourceCollection>(() => TextManager.GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, Formatter));
-            _replier = new Lazy<IReplier>(() => factory.WithInstance(this)
-                                                       .Construct<IReplier>());
+            _textResource = new Lazy<ITextResourceCollection>(() => TextManager.GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, GeneralUserSetting.FormatType));
+            _replier = new Lazy<IReplier>(() => factory.GetOrStore<IReplier>());
         }
     }
 }

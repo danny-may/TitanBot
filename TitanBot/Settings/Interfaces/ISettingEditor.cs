@@ -1,6 +1,6 @@
 ﻿using Discord;
 using System;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.Settings
 {

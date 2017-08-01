@@ -11,13 +11,15 @@ namespace TitanBot.Formatting
         private Dictionary<string, Dictionary<Locale, string>> TextMap { get; set; }
         static readonly string FileName = Path.Combine(AppContext.BaseDirectory, "Localisation.json");
         static readonly string DirectoryPath = Path.GetDirectoryName(FileName);
+        private ValueFormatter ValueFormatter { get; }
 
         private Dictionary<string, Dictionary<Locale, string>> Defaults { get; } = new Dictionary<string, Dictionary<Locale, string>>();
 
         public Locale[] SupportedLanguages => TextMap.SelectMany(t => t.Value.Keys).Distinct().ToArray();
 
-        public TextResourceManager()
+        public TextResourceManager(ValueFormatter valueFormatter)
         {
+            ValueFormatter = valueFormatter;
             RequireKeys(TitanBotResource.GetDefaults());
             Refresh();
         }
@@ -52,9 +54,9 @@ namespace TitanBot.Formatting
             SaveChanges();
         }
 
-        public ITextResourceCollection GetForLanguage(Locale language, ValueFormatter valueFormatter)
+        public ITextResourceCollection GetForLanguage(Locale language, FormattingType format)
         {
-            return new TextResourceCollection( GetLanguageCoverage(language), valueFormatter,
+            return new TextResourceCollection( GetLanguageCoverage(language), ValueFormatter, format,
                 TextMap.SelectMany(k => k.Value.Select(v => (key: k.Key, language: v.Key, text: v.Value)))
                        .Where(v => v.language == language || v.language == Locale.DEFAULT)
                        .GroupBy(v => v.key)

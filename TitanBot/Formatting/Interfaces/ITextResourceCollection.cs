@@ -1,4 +1,4 @@
-﻿using TitanBot.Commands;
+﻿using TitanBot.Replying;
 
 namespace TitanBot.Formatting
 {

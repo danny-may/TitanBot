@@ -1,13 +1,13 @@
 ﻿using System.Drawing;
 using System.Globalization;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
     class ColourTypeReader : TypeReader
     {
-        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override ValueTask<TypeReaderResponse> Read(IMessageContext context, string value)
         {
             var colour = Color.FromName(value);
             if (colour.IsKnownColor)

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.Logging;
 using TitanBot.Settings;
@@ -94,10 +95,7 @@ namespace TitanBot.Commands
             var context = DependencyFactory.WithInstance(message)
                                            .Construct<ICommandContext>();
             context.CheckCommand(this, SettingsManager.GetContext(SettingsManager.Global).Get<GeneralGlobalSetting>().DefaultPrefix);
-            var executor = DependencyFactory.WithInstance(context)
-                                            .WithInstance(this)
-                                            .Construct<CommandExecutor>();
-            return executor.Run();
+            return new CommandExecutor(DependencyFactory, this, context, PermissionManager, Database, Logger, Readers, SettingsManager).Run();
         }
 
         public void AddBuildEvent<T>(Action<T> handler) where T : Command

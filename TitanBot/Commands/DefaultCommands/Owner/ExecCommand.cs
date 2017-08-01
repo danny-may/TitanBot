@@ -10,9 +10,11 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using TitanBot.Contexts;
 using TitanBot.Downloader;
 using TitanBot.Formatting;
 using TitanBot.Logging;
+using TitanBot.Replying;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Storage;
@@ -178,7 +180,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
         public class ExecGlobals
         {
-            public ICommandContext Context { get; }
+            public IMessageContext Context { get; }
             public BotClient Bot { get; }
             public DiscordSocketClient Client { get; }
             public ILogger Logger { get; }
@@ -193,10 +195,24 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             public ISettingContext GuildSettings { get; }
             public IDatabase Database { get; }
             public IScheduler Scheduler { get; }
-            public IReplier Replier { get; }
             public IDownloader Downloader { get; }
             public ITextResourceManager TextManager { get; }
             public ValueFormatter Formatter { get; }
+
+            private Func<IReplyContext> ReplyBase { get; }
+            private Func<IUser, IReplyContext> ReplyUser { get; }
+            private Func<IMessageChannel, IReplyContext> ReplyChannel { get; }
+            private Func<IMessageChannel, IUser, IReplyContext> ReplyBoth { get; }
+            private Func<IUserMessage, IModifyContext> ModifyBase { get; }
+            private Func<IUserMessage, IUser, IModifyContext> ModifyUser { get; }
+
+            public IReplyContext Reply() => ReplyBase();
+            public IReplyContext Reply(IMessageChannel channel) => ReplyChannel(channel);
+            public IReplyContext Reply(IUser user) => ReplyUser(user);
+            public IReplyContext Reply(IMessageChannel channel, IUser user)  => ReplyBoth(channel, user);
+
+            public IModifyContext Modify(IUserMessage message) => ModifyBase(message);
+            public IModifyContext Modify(IUserMessage message, IUser user) => ModifyUser(message, user);
 
             public ExecGlobals(ExecCommand parent)
             {
@@ -210,9 +226,15 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
                 Database = parent.Database;
                 Scheduler = parent.Scheduler;
-                Replier = parent.Replier;
                 Downloader = parent.Downloader;
                 Formatter = parent.Formatter;
+
+                ReplyBase = parent.Reply;
+                ReplyChannel = parent.Reply;
+                ReplyUser = parent.Reply;
+                ReplyBoth = parent.Reply;
+                ModifyBase = parent.Modify;
+                ModifyUser = parent.Modify;
             }
         }
     }

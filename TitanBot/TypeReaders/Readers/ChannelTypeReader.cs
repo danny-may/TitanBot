@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
     class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
-        public override async ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override async ValueTask<TypeReaderResponse> Read(IMessageContext context, string input)
         {
             if (context.Guild != null)
             {

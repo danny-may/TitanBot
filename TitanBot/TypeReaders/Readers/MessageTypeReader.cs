@@ -1,7 +1,7 @@
 ﻿using Discord;
 using System.Globalization;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
@@ -9,7 +9,7 @@ namespace TitanBot.TypeReaders
         where T : class, IMessage
     {
 
-        public override async ValueTask<TypeReaderResponse> Read(ICommandContext context, string value)
+        public override async ValueTask<TypeReaderResponse> Read(IMessageContext context, string value)
         {
             if (ulong.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out ulong id))
             {

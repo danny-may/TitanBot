@@ -10,11 +10,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using TitanBot.Commands;
 using TitanBot.Commands.DefaultCommands.Owner;
+using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.DiscordHandlers;
 using TitanBot.Downloader;
 using TitanBot.Formatting;
 using TitanBot.Logging;
+using TitanBot.Replying;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Storage;
@@ -65,6 +67,8 @@ namespace TitanBot
             Scheduler = DependencyFactory.GetOrStore<IScheduler>();
             CommandService = DependencyFactory.GetOrStore<ICommandService>();
             DependencyFactory.GetOrStore<IDownloader>();
+            DependencyFactory.GetOrStore<ValueFormatter>();
+            DependencyFactory.GetOrStore<IReplier>();
             TextResourceManager = DependencyFactory.GetOrStore<ITextResourceManager>();
 
             SetupFeatures();
@@ -111,14 +115,14 @@ namespace TitanBot
             DependencyFactory.TryMap<IScheduler, Scheduler>();
             DependencyFactory.TryMap<ICommandService, CommandService>();
             DependencyFactory.TryMap<IReplier, Replier>();
-            DependencyFactory.TryMap<ICommandContext, CommandContext>();
+            DependencyFactory.TryMap<Contexts.ICommandContext, CommandContext>();
             DependencyFactory.TryMap<IPermissionManager, PermissionManager>();
             DependencyFactory.TryMap<ISettingManager, SettingManager>();
             DependencyFactory.TryMap(typeof(ISettingEditorCollection<>), typeof(SettingEditorCollection<>));
             DependencyFactory.TryMap<IDownloader, CachedDownloader>();
+            DependencyFactory.TryMap<ValueFormatter, ValueFormatter>();
             DependencyFactory.TryMap<ITextResourceManager, TextResourceManager>();
             DependencyFactory.TryMap<ITypeReaderCollection, TypeReaderCollection>();
-
         }
 
         public void InstallHandlers(Assembly assembly)

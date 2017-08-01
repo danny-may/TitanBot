@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.Settings
 {
@@ -20,10 +20,10 @@ namespace TitanBot.Settings
 
     public interface ISettingEditorCollection<TSetting> : ISettingEditorCollection
     {
-        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<ICommandContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<IMessageContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
         ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
         ISettingEditorCollection<TSetting> AddSetting<TStore>(Expression<Func<TSetting, TStore>> property, Action<ISettingEditorBuilder<TStore, TStore>> builder = null);
-        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<ICommandContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
+        ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<IMessageContext, TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
         ISettingEditorCollection<TSetting> AddSetting<TStore, TAccept>(Expression<Func<TSetting, TStore[]>> property, Func<TAccept, TStore> converter, Action<ISettingEditorBuilder<TStore, TAccept>> builder = null);
         ISettingEditorCollection<TSetting> AddSetting<TStore>(Expression<Func<TSetting, TStore[]>> property, Action<ISettingEditorBuilder<TStore, TStore>> builder = null);
 

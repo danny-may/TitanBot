@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
@@ -24,7 +24,7 @@ namespace TitanBot.TypeReaders
             _tryParse = PrimitiveParsers.Get<T>();
         }
 
-        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string text)
+        public override ValueTask<TypeReaderResponse> Read(IMessageContext context, string text)
         {
             if (_tryParse(text, out T value))
                 return ValueTask.FromResult(TypeReaderResponse.FromSuccess(value));

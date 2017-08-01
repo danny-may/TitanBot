@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
     class TimeSpanTypeReader : TypeReader
     {
-        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override ValueTask<TypeReaderResponse> Read(IMessageContext context, string input)
         {
             var days = 0;
             var hours = 0;

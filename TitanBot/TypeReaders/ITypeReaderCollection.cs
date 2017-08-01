@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
@@ -9,6 +9,6 @@ namespace TitanBot.TypeReaders
         void AddTypeReader(Type type, TypeReader reader);
         void AddTypeReader<T>(TypeReader reader);
         ITypeReaderCollection NewCache();
-        ValueTask<TypeReaderResponse> Read(Type type, ICommandContext context, string text);
+        ValueTask<TypeReaderResponse> Read(Type type, IMessageContext context, string text);
     }
 }

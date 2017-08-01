@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace TitanBot
 {
@@ -124,6 +120,7 @@ namespace TitanBot
         public const string INFO_FIELD_CALLS = "INFO_FIELD_CALLS";
         public const string INFO_FIELD_COMMANDS_USED = "INFO_FIELD_COMMANDS_USED";
         public const string INFO_FIELD_DATABASE_QUERIES = "INFO_FIELD_DATABASE_QUERIES";
+        public const string INFO_FIELD_FACTORY_BUILT = "INFO_FIELD_FACTORY_BUILT";
         public const string INFO_FIELD_RAM = "INFO_FIELD_RAM";
         public const string INFO_FIELD_CPU = "INFO_FIELD_CPU";
         public const string INFO_FIELD_TIMERS = "INFO_FIELD_TIMERS";
@@ -314,6 +311,7 @@ namespace TitanBot
                 { INFO_FIELD_CALLS, "Loaded calls" },
                 { INFO_FIELD_COMMANDS_USED, "Commands used this session" },
                 { INFO_FIELD_DATABASE_QUERIES, "Database queries" },
+                { INFO_FIELD_FACTORY_BUILT, "Factory Objects produced" },
                 { INFO_FIELD_RAM, "RAM" },
                 { INFO_FIELD_CPU, "CPU" },
                 { INFO_FIELD_TIMERS, "Active Timers" },

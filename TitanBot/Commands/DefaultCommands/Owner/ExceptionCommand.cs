@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System.Threading.Tasks;
+using TitanBot.Replying;
 using TitanBot.Storage;
 using TitanBot.Util;
 
@@ -33,9 +34,9 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 text += $"{TextResource.GetResource(TitanBotResource.EXCEPTION_MESSAGE)}:\n{message.Content}\n\n";
                 text += exception.Content;
 
-                await Reply.WithAttachment(() => text.ToStream(), $"Exception{exceptionId}.txt")
-                           .WithMessage(TextResource.Format(TitanBotResource.EXCEPTION_FULLMESSAGE, ReplyType.Success, exceptionId))
-                           .SendAsync();
+                await Reply().WithAttachment(() => text.ToStream(), $"Exception{exceptionId}.txt")
+                             .WithMessage(TextResource.Format(TitanBotResource.EXCEPTION_FULLMESSAGE, ReplyType.Success, exceptionId))
+                             .SendAsync();
             }
             else
             {

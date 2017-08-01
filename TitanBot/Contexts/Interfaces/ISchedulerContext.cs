@@ -1,6 +1,6 @@
-﻿using TitanBot.Commands;
+﻿using TitanBot.Scheduling;
 
-namespace TitanBot.Scheduling
+namespace TitanBot.Contexts
 {
     public interface ISchedulerContext : IMessageContext
     {

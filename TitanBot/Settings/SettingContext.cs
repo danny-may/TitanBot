@@ -30,7 +30,7 @@ namespace TitanBot.Settings
         public T Get<T>()
         {
             if (Record.Settings.TryGetValue(typeof(T).Name, out object obj) && obj != null)
-                return (T)obj;
+                return  (T)obj;
             return JsonConvert.DeserializeObject<T>("{}");
         }
     }

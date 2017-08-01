@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.Settings
 {
@@ -10,9 +10,9 @@ namespace TitanBot.Settings
     {
         Func<IEntity<ulong>, TSetting> SettingGetter { get; }
         Action<IEntity<ulong>, Action<TSetting>> Editor { get; }
-        Func<ICommandContext, TAccept, TStore> Converter { get; }
-        Func<ICommandContext, TStore, string> Viewer { get; }
-        Func<ICommandContext, TAccept, string> Validator { get; }
+        Func<IMessageContext, TAccept, TStore> Converter { get; }
+        Func<IMessageContext, TStore, string> Viewer { get; }
+        Func<IMessageContext, TAccept, string> Validator { get; }
 
         Action<TSetting, TStore> Setter { get; }
         Func<TSetting, TStore> Getter { get; }
@@ -26,9 +26,9 @@ namespace TitanBot.Settings
                              string name,
                              string[] aliases,
                              Expression<Func<TSetting, TStore>> property,
-                             Func<ICommandContext, TAccept, TStore> converter,
-                             Func<ICommandContext, TStore, string> viewer,
-                             Func<ICommandContext, TAccept, string> validator)
+                             Func<IMessageContext, TAccept, TStore> converter,
+                             Func<IMessageContext, TStore, string> viewer,
+                             Func<IMessageContext, TAccept, string> validator)
         {
             Name = name;
             Aliases = aliases;

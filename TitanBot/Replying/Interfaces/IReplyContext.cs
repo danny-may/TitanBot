@@ -3,10 +3,10 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace TitanBot.Commands
+namespace TitanBot.Replying
 {
     public delegate Task OnSendEventHandler(IReplyContext context, IUserMessage message);
-    public delegate Task MessageSendErrorHandler(Exception ex, IMessageChannel channel, IMessageContext context, string text, IEmbedable embed);
+    public delegate Task MessageSendErrorHandler(Exception ex, IMessageChannel channel, string text, IEmbedable embed);
 
     public interface IReplyContext
     {

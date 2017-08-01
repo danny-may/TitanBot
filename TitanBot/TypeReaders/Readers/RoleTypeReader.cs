@@ -4,16 +4,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
     class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
-        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override ValueTask<TypeReaderResponse> Read(IMessageContext context, string input)
         {
-            ulong id;
 
             if (context.Guild != null)
             {
@@ -21,7 +20,7 @@ namespace TitanBot.TypeReaders
                 var roles = context.Guild.Roles;
 
                 //By Mention (1.0)
-                if (MentionUtils.TryParseRole(input, out id))
+                if (MentionUtils.TryParseRole(input, out ulong id))
                     AddResult(results, context.Guild.GetRole(id) as T, 1.00f);
 
                 //By Id (0.9)

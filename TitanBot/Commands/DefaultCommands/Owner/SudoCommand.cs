@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TitanBot.Commands.Models;
 using TitanBot.Dependencies;
+using TitanBot.Replying;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {

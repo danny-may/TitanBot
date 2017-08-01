@@ -19,6 +19,7 @@ namespace TitanBot.Settings
         private IDatabase Database { get; }
         private IDependencyFactory Factory { get; }
         private Dictionary<SettingScope, Dictionary<Type, ISettingEditorCollection>> _settingEditors { get; } = new Dictionary<SettingScope, Dictionary<Type, ISettingEditorCollection>>();
+        private Dictionary<ulong, ISettingContext> Cached { get; } = new Dictionary<ulong, ISettingContext>();
 
         public SettingManager(IDatabase database, IDependencyFactory factory)
         {
@@ -35,7 +36,11 @@ namespace TitanBot.Settings
         }
 
         public ISettingContext GetContext(ulong entity)
-            => new SettingContext(Database, entity);
+        {
+            if (!Cached.ContainsKey(entity))
+                Cached[entity] = new SettingContext(Database, entity);
+            return Cached[entity];
+        }
 
         public ISettingEditorCollection<T> GetEditorCollection<T>(SettingScope scope)
         {

@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TitanBot.Contexts;
 using TitanBot.Formatting;
+using TitanBot.Replying;
 
 namespace TitanBot.Commands
 {

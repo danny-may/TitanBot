@@ -188,7 +188,7 @@
     <Compile Include="Commands\Attributes\RequireGuildAttribute.cs" />
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
-    <Compile Include="Commands\CommandContext.cs" />
+    <Compile Include="Contexts\CommandContext.cs" />
     <Compile Include="Commands\DefaultCommands\Abstract\SettingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\SettingsCommand.cs" />
@@ -215,13 +215,14 @@
     <Compile Include="Commands\DefaultCommands\Owner\TestCommand.cs" />
     <Compile Include="Commands\Embedable.cs" />
     <Compile Include="Commands\FlagDefinition.cs" />
-    <Compile Include="Commands\Interfaces\IEmbeddable.cs" />
-    <Compile Include="Commands\Interfaces\ICommandContext.cs" />
-    <Compile Include="Commands\Interfaces\IMessageContext.cs" />
-    <Compile Include="Commands\Replier\Interfaces\IModifyContext.cs" />
-    <Compile Include="Commands\Replier\Interfaces\IReplier.cs" />
+    <Compile Include="Debugging\Timer.cs" />
+    <Compile Include="Replying\Interfaces\IEmbeddable.cs" />
+    <Compile Include="Contexts\Interfaces\ICommandContext.cs" />
+    <Compile Include="Contexts\Interfaces\IMessageContext.cs" />
+    <Compile Include="Replying\Interfaces\IModifyContext.cs" />
+    <Compile Include="Replying\Interfaces\IReplier.cs" />
     <Compile Include="Commands\Interfaces\IPermissionManager.cs" />
-    <Compile Include="Commands\Replier\Interfaces\IReplyContext.cs" />
+    <Compile Include="Replying\Interfaces\IReplyContext.cs" />
     <Compile Include="Commands\Models\ArgumentInfo.cs" />
     <Compile Include="Commands\Models\CallInfo.cs" />
     <Compile Include="Commands\Command.cs" />
@@ -232,10 +233,10 @@
     <Compile Include="Commands\Models\ContextType.cs" />
     <Compile Include="Commands\Models\SudoMessage.cs" />
     <Compile Include="Commands\PermissionManager.cs" />
-    <Compile Include="Commands\Replier\ModifyContext.cs" />
-    <Compile Include="Commands\Replier\Replier.cs" />
-    <Compile Include="Commands\Replier\ReplyContext.cs" />
-    <Compile Include="Commands\ReplyType.cs" />
+    <Compile Include="Replying\ModifyContext.cs" />
+    <Compile Include="Replying\Replier.cs" />
+    <Compile Include="Replying\ReplyContext.cs" />
+    <Compile Include="Replying\ReplyType.cs" />
     <Compile Include="Commands\Responses\CallCheckResponse.cs" />
     <Compile Include="Commands\Responses\PermissionCheckResponse.cs" />
     <Compile Include="Commands\Responses\ArgumentCheckResponse.cs" />
@@ -244,8 +245,8 @@
     <Compile Include="Formatting\Models\FormattingType.cs" />
     <Compile Include="Formatting\ValueFormatter.cs" />
     <Compile Include="Models\Range.cs" />
-    <Compile Include="Scheduling\Interfaces\ISchedulerContext.cs" />
-    <Compile Include="Scheduling\Model\SchedulerContext.cs" />
+    <Compile Include="Contexts\Interfaces\ISchedulerContext.cs" />
+    <Compile Include="Contexts\SchedulerContext.cs" />
     <Compile Include="Settings\SettingEditorBuilder.cs" />
     <Compile Include="Settings\Default\GeneralGlobalSetting.cs" />
     <Compile Include="Settings\Default\GeneralGuildSetting.cs" />
@@ -333,6 +334,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Discord\Logging\" />
+    <Folder Include="Scheduling\Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

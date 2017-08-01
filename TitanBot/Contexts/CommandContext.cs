@@ -2,11 +2,13 @@
 using Discord.WebSocket;
 using System;
 using System.Linq;
+using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
+using TitanBot.Replying;
 using TitanBot.Settings;
 
-namespace TitanBot.Commands
+namespace TitanBot.Contexts
 {
     class CommandContext : ICommandContext
     {
@@ -62,12 +64,10 @@ namespace TitanBot.Commands
             _channelSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(Channel));
             _guildSettings = new Lazy<ISettingContext>(() => Guild == null ? null : settingManager.GetContext(Guild));
             _userSettings = new Lazy<ISettingContext>(() => settingManager.GetContext(Author));
-            _formatter = new Lazy<ValueFormatter>(() => factory.WithInstance(this)
-                                                               .Construct<ValueFormatter>());
             _textManager = new Lazy<ITextResourceManager>(() => factory.GetOrStore<ITextResourceManager>());
-            _textResource = new Lazy<ITextResourceCollection>(() => TextManager.GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, Formatter));
-            _replier = new Lazy<IReplier>(() => factory.WithInstance(this)
-                                                       .Construct<IReplier>());
+            _formatter = new Lazy<ValueFormatter>(() => factory.GetOrStore<ValueFormatter>());
+            _textResource = new Lazy<ITextResourceCollection>(() => TextManager.GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, GeneralUserSetting.FormatType));
+            _replier = new Lazy<IReplier>(() => factory.GetOrStore<IReplier>());
         }
 
         public void CheckCommand(ICommandService commandService, string defaultPrefix)

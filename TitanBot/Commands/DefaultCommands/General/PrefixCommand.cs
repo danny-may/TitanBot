@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using TitanBot.Replying;
 using TitanBot.Settings;
 
 namespace TitanBot.Commands.DefautlCommands.General

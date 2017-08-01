@@ -1,4 +1,4 @@
-﻿namespace TitanBot.Commands
+﻿namespace TitanBot.Replying
 {
     public enum ReplyType : int
     {

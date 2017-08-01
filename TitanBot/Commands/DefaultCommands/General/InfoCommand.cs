@@ -4,35 +4,40 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot.Dependencies;
 using TitanBot.Formatting;
+using TitanBot.Replying;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
     [Description(TitanBotResource.INFO_HELP_DESCRIPTION)]
     public class InfoCommand : Command
     {
-        public static List<Action<EmbedBuilder, InfoCommand>> BuildActions { get; } = new List<Action<EmbedBuilder, InfoCommand>>();
+        public static List<Func<InfoCommand, (string TitleKey, object Value, bool IsInline)>> TechnicalActions { get; } = new List<Func<InfoCommand, (string, object, bool)>>();
         private ITextResourceManager TextManager { get; }
-
+        private IDependencyFactory Factory { get; }
 
         static InfoCommand()
         {
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_GUILDS), c.Formatter.Beautify(c.Client.Guilds.Count)));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_CHANNELS), c.Formatter.Beautify(c.Client.Guilds.Sum(g => g.Channels.Count))));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_USERS), c.Formatter.Beautify(c.Client.Guilds.SelectMany(g => g.Users).Distinct().Count())));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_COMMANDS), c.Formatter.Beautify(c.CommandService.CommandList.Count)));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_CALLS), c.Formatter.Beautify(c.CommandService.CommandList.Sum(m => m.Calls.Count))));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_COMMANDS_USED), c.Formatter.Beautify(TotalCommands)));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_DATABASE_QUERIES), c.Formatter.Beautify(c.Database.TotalCalls)));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_RAM), $"{c.Formatter.Beautify((double)Process.GetCurrentProcess().PrivateMemorySize64 / (1024 * 1024))} / {c.Formatter.Beautify(PerformanceUtil.getAvailableRAM())}"));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_CPU), c.Formatter.Beautify(PerformanceUtil.getCurrentCPUUsage())));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_TIMERS), c.Formatter.Beautify(c.Scheduler.ActiveCount())));
-            BuildActions.Add((b, c) => b.AddInlineField(c.TextResource.GetResource(TitanBotResource.INFO_FIELD_UPTIME), c.Formatter.Beautify(DateTime.Now - Process.GetCurrentProcess().StartTime)));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_GUILDS, c.Client.Guilds.Count, true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_CHANNELS, c.Client.Guilds.Sum(g => g.Channels.Count), true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_USERS, c.Client.Guilds.SelectMany(g => g.Users).Distinct().Count(), true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_COMMANDS, c.CommandService.CommandList.Count, true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_CALLS, c.CommandService.CommandList.Sum(m => m.Calls.Count), true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_COMMANDS_USED, TotalCommands, true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_DATABASE_QUERIES, c.Formatter.Beautify(c.GeneralUserSetting.FormatType, c.Database.TotalCalls), true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_FACTORY_BUILT, c.Factory.History.Count, true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_RAM, c.Formatter.Beautify(c.GeneralUserSetting.FormatType, (double)Process.GetCurrentProcess().PrivateMemorySize64 / (1024 * 1024)) + " / " + 
+                                                                        c.Formatter.Beautify(c.GeneralUserSetting.FormatType, PerformanceUtil.getAvailableRAM()), true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_CPU, PerformanceUtil.getCurrentCPUUsage(), true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_TIMERS, c.Scheduler.ActiveCount(), true));
+            TechnicalActions.Add(c => (TitanBotResource.INFO_FIELD_UPTIME, DateTime.Now - Process.GetCurrentProcess().StartTime, true));
         }
 
-        public InfoCommand(ITextResourceManager textManager)
+        public InfoCommand(ITextResourceManager textManager, IDependencyFactory factory)
         {
             TextManager = textManager;
+            Factory = factory;
         }
 
         [Call("Language")]
@@ -45,7 +50,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             };
             foreach (var lang in TextManager.SupportedLanguages)
             {
-                builder.AddInlineField(lang.ToString(), TextResource.Format(TitanBotResource.INFO_LANGUAGE_COVERAGE, Formatter.Beautify(TextManager.GetLanguageCoverage(lang)*100)));
+                builder.AddInlineField(lang.ToString(), TextResource.Format(TitanBotResource.INFO_LANGUAGE_COVERAGE, Formatter.Beautify(GeneralUserSetting.FormatType, TextManager.GetLanguageCoverage(lang)*100)));
             }
 
             await ReplyAsync(builder);
@@ -67,9 +72,10 @@ namespace TitanBot.Commands.DefautlCommands.General
                 Timestamp = DateTime.Now
             };
 
-            foreach (var action in BuildActions)
+            foreach (var action in TechnicalActions)
             {
-                action(builder, this);
+                var settings = action(this);
+                builder.AddField(TextResource.GetResource(settings.TitleKey), Formatter.Beautify(GeneralUserSetting.FormatType, settings.Value), settings.IsInline);
             }
 
             await ReplyAsync(builder);

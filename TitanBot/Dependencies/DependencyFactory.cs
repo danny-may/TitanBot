@@ -4,12 +4,14 @@ using System.Linq;
 
 namespace TitanBot.Dependencies
 {
-    public class DependencyFactory : IDependencyFactory
+    public partial class DependencyFactory : IDependencyFactory
     {
         private readonly Dictionary<Type, object> Stored = new Dictionary<Type, object>();
         private readonly Dictionary<Type, Func<object>> Builders = new Dictionary<Type, Func<object>>();
         private readonly Dictionary<Type, Type> TypeMap = new Dictionary<Type, Type>();
         private Type[] KnownTypes => Stored.Keys.Cast<Type>().Concat(Builders.Keys).Distinct().ToArray();
+
+        public List<Type> History { get; } = new List<Type>();
 
         public DependencyFactory()
         {
@@ -81,7 +83,7 @@ namespace TitanBot.Dependencies
             => TryGet(type, out var result) ? result : throw new KeyNotFoundException($"Could not locate a stored object of type {type}");
 
         IInstanceBuilder GetBuilder()
-            => new InstanceBuilder(Stored, Builders, TypeMap);
+            => new InstanceBuilder(this);
 
         public IInstanceBuilder WithInstance<T>(T value)
             => GetBuilder().WithInstance(value);

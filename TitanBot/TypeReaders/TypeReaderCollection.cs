@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 using TitanBot.Formatting;
 using TitanBot.Models;
 
@@ -110,7 +110,7 @@ namespace TitanBot.TypeReaders
             return GetReaders(type);
         }
 
-        public async ValueTask<TypeReaderResponse> Read(Type type, ICommandContext context, string text)
+        public async ValueTask<TypeReaderResponse> Read(Type type, IMessageContext context, string text)
         {
             if (ResultsCache.TryGetValue((context.GetHashCode(), type, text), out TypeReaderResponse result))
                 return result;

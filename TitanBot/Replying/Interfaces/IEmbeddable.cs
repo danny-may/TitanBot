@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace TitanBot.Commands
+namespace TitanBot.Replying
 {
     public interface IEmbedable
     {

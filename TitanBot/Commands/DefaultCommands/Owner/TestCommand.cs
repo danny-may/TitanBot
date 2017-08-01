@@ -5,11 +5,10 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     [RequireOwner]
     class TestCommand : Command
     {
-        protected override int DelayMessageMs => 1000000000;
-
         [Call]
         async Task TestAsync()
         {
+            await Task.Delay(5000);
             await ReplyAsync(new string('a', 3000));
         }
     }

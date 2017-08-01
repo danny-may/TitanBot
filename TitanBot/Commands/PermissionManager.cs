@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Commands.Models;
 using TitanBot.Commands.Responses;
+using TitanBot.Contexts;
 using TitanBot.Settings;
 using TitanBot.Storage;
 
@@ -33,7 +34,7 @@ namespace TitanBot.Commands
             }
         }
 
-        public PermissionCheckResponse CheckAllowed(ICommandContext context, CallInfo[] calls)
+        public PermissionCheckResponse CheckAllowed(IMessageContext context, CallInfo[] calls)
         {
             var permitted = CheckContext(context, calls);
             if (permitted.Count() == 0)
@@ -65,7 +66,7 @@ namespace TitanBot.Commands
 
         }
 
-        private bool DoesOverride(ICommandContext context, GeneralGuildSetting settings)
+        private bool DoesOverride(IMessageContext context, GeneralGuildSetting settings)
         {
             if (settings.RoleOverride != null && ((context.Author as IGuildUser)?.RoleIds.Any(r => settings.RoleOverride.Contains(r)) ?? false))
                 return true;
@@ -74,7 +75,7 @@ namespace TitanBot.Commands
             return false;
         }
 
-        public CallInfo[] CheckContext(ICommandContext context, CallInfo[] calls)
+        public CallInfo[] CheckContext(IMessageContext context, CallInfo[] calls)
         {
             return calls.Where(c =>
             {
@@ -91,7 +92,7 @@ namespace TitanBot.Commands
             }).ToArray();
         }
 
-        public CallInfo[] CheckOwner(ICommandContext context, CallInfo[] calls)
+        public CallInfo[] CheckOwner(IMessageContext context, CallInfo[] calls)
         {
             var application = context.Client.GetApplicationInfoAsync().Result;
             return calls.Where(c =>
@@ -116,7 +117,7 @@ namespace TitanBot.Commands
             }).ToArray();
         }
 
-        public CallInfo[] CheckBlacklist(ICommandContext context, CallInfo[] calls)
+        public CallInfo[] CheckBlacklist(IMessageContext context, CallInfo[] calls)
         {
             var guildUser = context.Author as IGuildUser;
 
@@ -137,7 +138,7 @@ namespace TitanBot.Commands
             }).ToArray();
         }
 
-        public CallInfo[] CheckPermissions(ICommandContext context, CallInfo[] calls)
+        public CallInfo[] CheckPermissions(IMessageContext context, CallInfo[] calls)
         {
             var guildUser = context.Author as IGuildUser;
 
@@ -150,7 +151,7 @@ namespace TitanBot.Commands
             }).ToArray();
         }
 
-        public async void SetPermissions(ICommandContext context, CallInfo[] calls, ulong? permission, ulong[] roles, ulong[] blacklist)
+        public async void SetPermissions(IMessageContext context, CallInfo[] calls, ulong? permission, ulong[] roles, ulong[] blacklist)
         {
             foreach (var call in calls)
             {
@@ -174,7 +175,7 @@ namespace TitanBot.Commands
             }
         }
 
-        public async void ResetPermissions(ICommandContext context, CallInfo[] calls)
+        public async void ResetPermissions(IMessageContext context, CallInfo[] calls)
         {
             foreach (var call in calls)
             {

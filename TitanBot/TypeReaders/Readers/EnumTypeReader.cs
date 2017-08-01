@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using TitanBot.Commands;
+using TitanBot.Contexts;
 
 namespace TitanBot.TypeReaders
 {
@@ -45,7 +45,7 @@ namespace TitanBot.TypeReaders
             EnumByValue = byValueBuilder.ToImmutable();
         }
 
-        public override ValueTask<TypeReaderResponse> Read(ICommandContext context, string input)
+        public override ValueTask<TypeReaderResponse> Read(IMessageContext context, string input)
         {
             if (TryParse(input, out T baseValue))
             {

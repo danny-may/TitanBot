@@ -52,5 +52,16 @@ namespace System.Linq
                                     .ToArray();
             }
         }
+
+        public static (T First, T Second)[] Pair<T>(this T[] source)
+        {
+            if (source.Length < 2)
+                return new(T, T)[0];
+
+            var arr = new(T, T)[source.Length - 1];
+            for (int i = 0; i < arr.Length - 1; i++)
+                arr[i] = (source[i], source[i + 1]);
+            return arr;
+        }
     }
 }
