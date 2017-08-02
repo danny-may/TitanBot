@@ -51,25 +51,46 @@ namespace TitanBot.Replying
         }
 
         public IModifyContext WithErrorHandler(MessageModifyErrorHandler handler)
-            => MiscUtil.InlineAction(this, v => v.Handler += handler);
+        {
+            Handler += handler;
+            return this;
+        }
 
         public IModifyContext ChangeMessage(string message)
-            => MiscUtil.InlineAction(this, v => v.Text = TextResource.GetResource(message));
+        {
+            Text = TextResource.GetResource(message);
+            return this;
+        }
 
         public IModifyContext ChangeMessage(string message, ReplyType replyType)
-            => MiscUtil.InlineAction(this, v => v.Text = TextResource.GetResource(message, replyType));
+        {
+            Text = TextResource.GetResource(message, replyType);
+            return this;
+        }
 
         public IModifyContext ChangeMessage(string message, params object[] values)
-            => MiscUtil.InlineAction(this, v => v.Text = TextResource.Format(message, values));
+        {
+            Text = TextResource.Format(message, values);
+            return this;
+        }
 
         public IModifyContext ChangeMessage(string message, ReplyType replyType, params object[] values)
-            => MiscUtil.InlineAction(this, v => v.Text = TextResource.Format(message, replyType, values));
+        {
+            Text = TextResource.Format(message, replyType, values);
+            return this;
+        }
 
         public IModifyContext WithRequestOptions(RequestOptions options)
-            => MiscUtil.InlineAction(this, v => v.Options = options);
+        {
+            Options = options;
+            return this;
+        }
 
         public IModifyContext ChangeEmbedable(IEmbedable embedable)
-            => MiscUtil.InlineAction(this, v => v.Embedable = embedable);
+        {
+            Embedable = embedable;
+            return this;
+        }
 
         public void Modify(bool stealthy = false)
             => ModifyAsync(stealthy).DontWait();

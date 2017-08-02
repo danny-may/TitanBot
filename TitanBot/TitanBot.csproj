@@ -188,6 +188,7 @@
     <Compile Include="Commands\Attributes\RequireGuildAttribute.cs" />
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
+    <Compile Include="Commands\LocalisedEmbedBuilder.cs" />
     <Compile Include="Contexts\CommandContext.cs" />
     <Compile Include="Commands\DefaultCommands\Abstract\SettingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />

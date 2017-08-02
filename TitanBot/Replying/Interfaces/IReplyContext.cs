@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using TitanBot.Commands;
 
 namespace TitanBot.Replying
 {
@@ -18,6 +19,8 @@ namespace TitanBot.Replying
         IReplyContext WithMessage(string message, ReplyType replyType, params object[] values);
         IReplyContext WithAttachment(Func<Stream> attachment, string name);
         IReplyContext WithEmbedable(IEmbedable embedable);
+        IReplyContext WithEmbedable(Embedable embedable);
+        IReplyContext WithEmbedable(LocalisedEmbedBuilder embedable);
         IReplyContext WithErrorHandler(MessageSendErrorHandler handler);
         IReplyContext WithTTS(bool tts);
         IReplyContext WithRequestOptions(RequestOptions options);

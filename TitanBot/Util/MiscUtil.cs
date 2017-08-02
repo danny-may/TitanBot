@@ -46,12 +46,6 @@ namespace TitanBot.Util
                 .GetGenericMethodDefinition();
         }
 
-        public static T InlineAction<T>(T obj, Action<T> action)
-        {
-            action(obj);
-            return obj;
-        }
-
         public static Stream ToStream(this string text)
         {
             var ms = new MemoryStream();

@@ -50,31 +50,31 @@ namespace TitanBot.Commands
 
         public Embed GetEmbed()
         { 
-            var builder = new EmbedBuilder
+            var builder = new LocalisedEmbedBuilder
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = TextResource.Format(TitanBotResource.HELP_SINGLE_TITLE, ReplyType.Info, Command.Name),
-                Description = TextResource.GetResource(Command.Description ?? TitanBotResource.HELP_SINGLE_NODESCRIPTION),
+                Title = (TitanBotResource.HELP_SINGLE_TITLE, ReplyType.Info,Command.Name),
+                Description = Command.Description ?? TitanBotResource.HELP_SINGLE_NODESCRIPTION,
                 Timestamp = DateTime.Now,
-                Footer = new EmbedFooterBuilder
+                Footer = new LocalisedFooterBuilder
                 {
                     IconUrl = BotUser.GetAvatarUrl(),
-                    Text = TextResource.Format(TitanBotResource.EMBED_FOOTER, BotUser.Username, "Help")
+                    Text = (TitanBotResource.EMBED_FOOTER, BotUser.Username, "Help")
                 }
             };
 
-            builder.AddInlineField(TextResource.GetResource(TitanBotResource.GROUP), Group);
+            builder.AddInlineField(TitanBotResource.GROUP, Group);
             if (!string.IsNullOrWhiteSpace(Aliases))
-                builder.AddInlineField(TextResource.GetResource(TitanBotResource.ALIASES), Format.Sanitize(Aliases));
-            builder.AddField(TextResource.GetResource(TitanBotResource.USAGE), Usage);
+                builder.AddInlineField(TitanBotResource.ALIASES, Format.Sanitize(Aliases));
+            builder.AddField(TitanBotResource.USAGE, Usage);
             if (!string.IsNullOrWhiteSpace(Flags))
-                builder.AddField(TextResource.GetResource(TitanBotResource.FLAGS), Flags);
+                builder.AddField(TitanBotResource.FLAGS, Flags);
             if (!string.IsNullOrWhiteSpace(Notes))
-                builder.AddField(TextResource.GetResource(TitanBotResource.NOTES), Notes + (Usages.Count > 0 ? NotesFooter : ""));
+                builder.AddField(TitanBotResource.NOTES, Notes + (Usages.Count > 0 ? NotesFooter : ""));
             else if (Usages.Count > 0)
-                builder.AddField(TextResource.GetResource(TitanBotResource.NOTES), NotesFooter);
+                builder.AddField(TitanBotResource.NOTES, NotesFooter);
 
-            return builder;
+            return builder.Localise(TextResource);
         }
 
         public string GetString()

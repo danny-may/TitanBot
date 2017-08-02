@@ -115,38 +115,38 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             var globals = GetGlobals(this);
             object result = null;
 
-            string footerText = "";
+            LocalisedString footerText = "";
 
             if (!TryConstruct(codeWithUsings, assemblies.ToArray(), globals.GetType(), out var constructTime, out var constructRes))
             {
                 result = constructRes;
-                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_CONSTRUCTFAILED, constructTime);
+                footerText = (TitanBotResource.EXEC_FOOTER_CONSTRUCTFAILED, constructTime);
             }
             else if (!TryCompile(constructRes as Script<object>, out var compileTime, out var compileRes))
             {
                 result = compileRes;
-                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_COMPILEFAILED, constructTime, compileTime);
+                footerText = (TitanBotResource.EXEC_FOOTER_COMPILEFAILED, constructTime, compileTime);
             }
             else if (!TryExecute(constructRes as Script<object>, globals, out var execTime, out result))
             {
-                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_EXECUTEFAILED, constructTime, compileTime, execTime);
+                footerText = (TitanBotResource.EXEC_FOOTER_EXECUTEFAILED, constructTime, compileTime, execTime);
             }
             else
             {
-                footerText = TextResource.Format(TitanBotResource.EXEC_FOOTER_SUCCESS, constructTime, compileTime, execTime);
+                footerText = (TitanBotResource.EXEC_FOOTER_SUCCESS, constructTime, compileTime, execTime);
             }
 
-            var builder = new EmbedBuilder
+            var builder = new LocalisedEmbedBuilder
             {
-                Footer = new EmbedFooterBuilder
+                Footer = new LocalisedFooterBuilder
                 {
                     Text = footerText
                 }
-            }.AddField(TextResource.GetResource(TitanBotResource.INPUT), TextResource.Format(TitanBotResource.EXEC_INPUT_FORMAT, code));
+            }.AddField(TitanBotResource.INPUT, (TitanBotResource.EXEC_INPUT_FORMAT, code));
 
             if (result is Exception exception)
             {
-                builder.WithTitle(TextResource.GetResource(TitanBotResource.EXEC_TITLE_EXCEPTION));
+                builder.WithTitle(TitanBotResource.EXEC_TITLE_EXCEPTION);
                 builder.WithColor(System.Drawing.Color.Red.ToDiscord());
                 var exceptions = new List<Exception>();
                 if (exception is AggregateException aggex)
@@ -155,15 +155,15 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                     exceptions.Add(exception);
                 foreach (var ex in exceptions)
                 {
-                    builder.AddField(TextResource.GetResource(TitanBotResource.ERROR), TextResource.Format(TitanBotResource.EXEC_OUTPUT_FORMAT, Format.Sanitize(ex.GetType().ToString()), Format.Sanitize(ex.Message)));
+                    builder.AddField(TitanBotResource.ERROR, (TitanBotResource.EXEC_OUTPUT_FORMAT, Format.Sanitize(ex.GetType().ToString()), Format.Sanitize(ex.Message)));
                 }
             }
             else
             {
-                builder.WithTitle(TextResource.GetResource(TitanBotResource.EXEC_TITLE_SUCCESS));
+                builder.WithTitle(TitanBotResource.EXEC_TITLE_SUCCESS);
                 builder.WithColor(System.Drawing.Color.LimeGreen.ToDiscord());
                 if (result == null)
-                    builder.AddField(TextResource.GetResource(TitanBotResource.OUTPUT), TextResource.Format(TitanBotResource.EXEC_OUTPUT_NULL, null, null));
+                    builder.AddField(TitanBotResource.OUTPUT, (TitanBotResource.EXEC_OUTPUT_NULL, null, null));
                 else
                 {
                     var resString = "";
@@ -171,7 +171,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                         resString = "[" + string.Join(", ", (result as IEnumerable<object>) ?? new List<string>()) + "]";
                     else
                         resString = result?.ToString();
-                    builder.AddField(TextResource.GetResource(TitanBotResource.OUTPUT), TextResource.Format(TitanBotResource.EXEC_OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
+                    builder.AddField(TitanBotResource.OUTPUT, (TitanBotResource.EXEC_OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
                 }
             }
 
@@ -197,7 +197,6 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             public IScheduler Scheduler { get; }
             public IDownloader Downloader { get; }
             public ITextResourceManager TextManager { get; }
-            public ValueFormatter Formatter { get; }
 
             private Func<IReplyContext> ReplyBase { get; }
             private Func<IUser, IReplyContext> ReplyUser { get; }
@@ -227,7 +226,6 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 Database = parent.Database;
                 Scheduler = parent.Scheduler;
                 Downloader = parent.Downloader;
-                Formatter = parent.Formatter;
 
                 ReplyBase = parent.Reply;
                 ReplyChannel = parent.Reply;

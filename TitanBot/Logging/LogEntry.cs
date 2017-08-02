@@ -27,7 +27,7 @@ namespace TitanBot.Logging
         {
             var core = $"[{LogTime}][{Severity}][{LogType}][{Source}]";
             var padding = "\n".PadRight(core.Length + 1);
-            return $"{core}{Message.Replace("\n", padding)}";
+            return $"{core}{Message?.Replace("\n", padding)}";
         }
     }
 }

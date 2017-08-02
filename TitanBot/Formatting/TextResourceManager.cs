@@ -20,8 +20,7 @@ namespace TitanBot.Formatting
         public TextResourceManager(ValueFormatter valueFormatter)
         {
             ValueFormatter = valueFormatter;
-            RequireKeys(TitanBotResource.GetDefaults());
-            Refresh();
+            Load();
         }
 
         private string SanitiseKey(string key)
@@ -45,7 +44,7 @@ namespace TitanBot.Formatting
             File.WriteAllText(FileName, JsonConvert.SerializeObject(TextMap.OrderBy(k => k.Key).ToDictionary(k => k.Key, k => k.Value), Newtonsoft.Json.Formatting.Indented));
         }
 
-        public void Refresh()
+        public void Load()
         {
             if (!File.Exists(FileName))
                 SaveChanges();
@@ -95,7 +94,7 @@ namespace TitanBot.Formatting
                 Defaults[key][Locale.DEFAULT] = pair.Value;
             }
 
-            EnsureKeys();
+            SaveChanges();
         }
     }
 }

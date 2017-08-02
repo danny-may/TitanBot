@@ -10,7 +10,7 @@ namespace TitanBot.Formatting
         ITextResourceCollection GetForLanguage(Locale language, FormattingType format);
         double GetLanguageCoverage(Locale language);
         Locale[] SupportedLanguages { get; }
-        void Refresh();
+        void Load();
 
         void RequireKeys(IReadOnlyDictionary<string, string> values);
     }

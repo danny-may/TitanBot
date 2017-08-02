@@ -98,18 +98,29 @@ namespace TitanBot.Settings
             => AddSetting(property, (c, a) => a.Id, ChainEditors(b => b.SetViewer(EntityViewer<TAccept>), editor));
 
         public ISettingEditorCollection<TSetting> WithName(string name)
-            => MiscUtil.InlineAction(this, o => o.Name = name);
+        {
+            Name = name;
+            return this;
+        }
+
         public ISettingEditorCollection<TSetting> WithDescription(string description)
-            => MiscUtil.InlineAction(this, o => o.Description = description);
+        {
+            Description = description;
+            return this;
+        }
+
         public ISettingEditorCollection<TSetting> WithNotes(string notes)
-            => MiscUtil.InlineAction(this, o => o.Notes = notes);
+        {
+            Notes = notes;
+            return this;
+        }
 
         ISettingEditorCollection ISettingEditorCollection.WithName(string name)
-            => MiscUtil.InlineAction(this, o => o.Name = name);
+            => WithName(name);
         ISettingEditorCollection ISettingEditorCollection.WithDescription(string description)
-            => MiscUtil.InlineAction(this, o => o.Description = description);
+            => WithDescription(description);
         ISettingEditorCollection ISettingEditorCollection.WithNotes(string notes)
-            => MiscUtil.InlineAction(this, o => o.Notes = notes);
+            => WithNotes(notes);
 
         public IEnumerator<ISettingEditor> GetEnumerator()
             => SettingEditors.GetEnumerator();

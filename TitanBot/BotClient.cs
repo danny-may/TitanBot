@@ -80,7 +80,8 @@ namespace TitanBot
 
         private void SetupFeatures()
         {
-            CommandService.AddBuildEvent<ReloadCommand>(c => c.ReloadActions.Add("TextResources", TextResourceManager.Refresh));
+            TextResourceManager.RequireKeys(TitanBotResource.GetDefaults());
+            CommandService.AddBuildEvent<ReloadCommand>(c => c.ReloadActions.Add("TextResources", TextResourceManager.Load));
         }
 
         private void InstallSettingEditors()

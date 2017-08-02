@@ -41,8 +41,14 @@ namespace TitanBot.Formatting
         {
             if (value == null)
                 return null;
-            return (string)BeautifyGeneric.MakeGenericMethod(value.GetType())
-                                      .Invoke(this, new object[] { format, value });
+            return (string)BeautifyGeneric.MakeGenericMethod(value.GetType()).Invoke(this, new object[] { format, value });
+        }
+
+        public string Beautify(FormattingType format, Type type, object value)
+        {
+            if (value == null || type == null)
+                return null;
+            return (string)BeautifyGeneric.MakeGenericMethod(type).Invoke(this, new object[] { format, value });
         }
 
         protected void Add<T>(BeautifyDelegate<T> beautify, params (FormattingType, BeautifyDelegate<T>)[] others)

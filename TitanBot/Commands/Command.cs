@@ -130,7 +130,11 @@ namespace TitanBot.Commands
         protected IReplyContext Reply(IUser user)
             => Reply(Channel, user);
         protected IReplyContext Reply(IMessageChannel channel, IUser user)
-            => MiscUtil.InlineAction(Replier.Reply(channel, user), r => r.OnSend += OnMessageSent);
+        {
+            var rContext = Replier.Reply(channel, user);
+            rContext.OnSend += OnMessageSent;
+            return rContext;
+        }
 
         protected IModifyContext Modify(IUserMessage message)
             => Modify(message, Author);
@@ -148,23 +152,41 @@ namespace TitanBot.Commands
             => Reply().WithMessage(message, replyType, values).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed)
             => Reply().WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, LocalisedEmbedBuilder embed)
+            => ReplyAsync(message, replyType, embed.Localise(TextResource));
         protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed)
             => Reply().WithMessage(message, replyType).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed)
             => Reply().WithMessage(message).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, LocalisedEmbedBuilder embed)
+            => ReplyAsync(message, embed.Localise(TextResource));
         protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed)
             => Reply().WithMessage(message).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, IEmbedable embed, params object[] values)
             => Reply().WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, LocalisedEmbedBuilder embed, params object[] values)
+            => ReplyAsync(message, replyType, embed.Localise(TextResource), values);
         protected ValueTask<IUserMessage> ReplyAsync(string message, ReplyType replyType, Embedable embed, params object[] values)
             => Reply().WithMessage(message, replyType, values).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(string message, IEmbedable embed, params object[] values)
             => Reply().WithMessage(message, values).WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(string message, LocalisedEmbedBuilder embed, params object[] values)
+            => ReplyAsync(message, embed.Localise(TextResource), values);
         protected ValueTask<IUserMessage> ReplyAsync(string message, Embedable embed, params object[] values)
             => Reply().WithMessage(message, values).WithEmbedable(embed).SendAsync();
         protected ValueTask<IUserMessage> ReplyAsync(IEmbedable embed)
             => Reply().WithEmbedable(embed).SendAsync();
+        protected ValueTask<IUserMessage> ReplyAsync(LocalisedEmbedBuilder embed)
+            => ReplyAsync(embed.Localise(TextResource));
         protected ValueTask<IUserMessage> ReplyAsync(Embedable embed)
             => Reply().WithEmbedable(embed).SendAsync();
+        
+
+        protected string Beautify<T>(T value)
+            => Formatter.Beautify(GeneralUserSetting.FormatType, value);
+        protected string Beautify(object value)
+             => Formatter.Beautify(GeneralUserSetting.FormatType, value);
+        protected string Beautify(Type type, object value)
+             => Formatter.Beautify(GeneralUserSetting.FormatType, type, value);
     }
 }

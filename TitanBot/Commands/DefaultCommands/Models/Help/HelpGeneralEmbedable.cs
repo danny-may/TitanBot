@@ -27,16 +27,16 @@ namespace TitanBot.Commands
 
         public Embed GetEmbed()
         {
-            var builder = new EmbedBuilder()
+            var builder = new LocalisedEmbedBuilder()
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = TextResource.GetResource(TitanBotResource.HELP_LIST_TITLE, ReplyType.Info),
-                Description = TextResource.Format(TitanBotResource.HELP_LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
+                Title = (TitanBotResource.HELP_LIST_TITLE, ReplyType.Info),
+                Description = (TitanBotResource.HELP_LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
                 Timestamp = DateTime.Now,
-                Footer = new EmbedFooterBuilder
+                Footer = new LocalisedFooterBuilder
                 {
                     IconUrl = BotUser.GetAvatarUrl(),
-                    Text = TextResource.Format(TitanBotResource.EMBED_FOOTER, BotUser.Username, "Help")
+                    Text = (TitanBotResource.EMBED_FOOTER, BotUser.Username, "Help")
                 }
             };
 
@@ -44,7 +44,7 @@ namespace TitanBot.Commands
             foreach (var group in groups)
                 builder.AddField(group.Key, string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key)));
 
-            return builder.Build();
+            return builder.Localise(TextResource);
         }
 
         public string GetString()

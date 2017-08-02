@@ -33,22 +33,34 @@ namespace TitanBot.Settings
         }
 
         public ISettingEditorBuilder<TStore, TAccept> SetName(string name)
-            => MiscUtil.InlineAction(this, o => o.Name = name);
+        {
+            Name = name;
+            return this;
+        }
 
-        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<IMessageContext, TAccept, string> validator)
-            => MiscUtil.InlineAction(this, o => o.Validator = validator);
         public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<TAccept, string> validator)
-            => MiscUtil.InlineAction(this, o => o.Validator = (c, a) => validator(a));
+            => SetValidator((c, a) => validator(a));
+        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<IMessageContext, TAccept, string> validator)
+        {
+            Validator = validator;
+            return this;
+        }
 
-        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<IMessageContext, TStore, string> viewer)
-            => MiscUtil.InlineAction(this, o => o.Viewer = viewer);
         public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<TStore, string> viewer)
-            => MiscUtil.InlineAction(this, o => o.Viewer = (c, a) => viewer(a));
+            => SetViewer((c, s) => viewer(s));
+        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<IMessageContext, TStore, string> viewer)
+        {
+            Viewer = viewer;
+            return this;
+        }
 
         private string GetName(Expression<Func<TSetting, TStore>> property)
             => ((property.Body as MemberExpression)?.Member as PropertyInfo)?.Name ?? "UNKOWN_PROPERTYNAME";
 
         public ISettingEditorBuilder<TStore, TAccept> SetAlias(params string[] aliases)
-            => MiscUtil.InlineAction(this, o => o.Aliases = aliases);
+        {
+            Aliases = aliases;
+            return this;
+        }
     }
 }

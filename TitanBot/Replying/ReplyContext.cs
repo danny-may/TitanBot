@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Settings;
@@ -102,30 +103,66 @@ namespace TitanBot.Replying
         }
 
         public IReplyContext WithErrorHandler(MessageSendErrorHandler handler)
-            => MiscUtil.InlineAction(this, v => v.Handler += handler);
+        {
+            Handler += handler;
+            return this;
+        }
 
         public IReplyContext WithMessage(string message)
-            => MiscUtil.InlineAction(this, v => v.Message = TextResource.GetResource(message));
+        {
+            Message = TextResource.GetResource(message);
+            return this;
+        }
 
         public IReplyContext WithMessage(string message, ReplyType replyType)
-            => MiscUtil.InlineAction(this, v => v.Message = TextResource.GetResource(message, replyType));
+        {
+            Message = TextResource.GetResource(message, replyType);
+            return this;
+        }
 
         public IReplyContext WithMessage(string message, params object[] values)
-            => MiscUtil.InlineAction(this, v => v.Message = TextResource.Format(message, values));
+        {
+            Message = TextResource.Format(message, values);
+            return this;
+        }
 
         public IReplyContext WithMessage(string message, ReplyType replyType, params object[] values)
-            => MiscUtil.InlineAction(this, v => v.Message = TextResource.Format(message, replyType, values));
+        {
+            Message = TextResource.Format(message, replyType, values);
+            return this;
+        }
 
         public IReplyContext WithRequestOptions(RequestOptions options)
-            => MiscUtil.InlineAction(this, v => v.Options = options);
+        {
+            Options = options;
+            return this;
+        }
 
         public IReplyContext WithTTS(bool tts)
-            => MiscUtil.InlineAction(this, v => v.IsTTS = tts);
+        {
+            IsTTS = tts;
+            return this;
+        }
 
         public IReplyContext WithAttachment(Func<Stream> attachment, string name)
-            => MiscUtil.InlineAction(this, v => { v.Attachment = attachment; v.AttachmentName = name; });
+        {
+            Attachment = attachment;
+            AttachmentName = name;
+            return this;
+        }
 
         public IReplyContext WithEmbedable(IEmbedable embedable)
-            => MiscUtil.InlineAction(this, v => v.Embedable = embedable);
+        {
+            Embedable = embedable;
+            return this;
+        }
+
+        public IReplyContext WithEmbedable(LocalisedEmbedBuilder embedable)
+            => WithEmbedable(embedable.Localise(TextResource));
+        public IReplyContext WithEmbedable(Embedable embedable)
+        {
+            Embedable = embedable;
+            return this;
+        }
     }
 }

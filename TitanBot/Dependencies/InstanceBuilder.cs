@@ -226,13 +226,19 @@ namespace TitanBot.Dependencies
                 => WithInstance(typeof(T), value);
 
             public IInstanceBuilder WithInstance(Type type, object value)
-                => MiscUtil.InlineAction(this, o => o.Store[type] = value);
+            {
+                Store[type] = value;
+                return this;
+            }
 
             public IInstanceBuilder WithInstanceBuilder<T>(Func<T> builder)
                 => WithInstanceBuilder(typeof(T), () => builder());
 
             public IInstanceBuilder WithInstanceBuilder(Type type, Func<object> builder)
-                => MiscUtil.InlineAction(this, o => o.Builders[type] = builder);
+            {
+                Builders[type] = builder;
+                return this;
+            }
         }
     }
 }

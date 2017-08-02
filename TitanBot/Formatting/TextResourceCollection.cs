@@ -27,6 +27,8 @@ namespace TitanBot.Formatting
                 return null;
             if (key.Contains(' '))
                 return key;
+            if (key.StartsWith("_"))
+                return key.Substring(1);
             if (!Values.ContainsKey(key.ToUpper()))
                 return key;
             var val = Values[key.ToUpper()];
