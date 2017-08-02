@@ -152,6 +152,11 @@ namespace TitanBot.Commands
         }
         public LocalisedEmbedBuilder AddInlineField(LocalisedString title, LocalisedString text)
             => AddField(title, text, true);
+        public LocalisedEmbedBuilder AddField(LocalisedString title, object value, bool inline = false)
+            => AddField(title, new LocalisedString(value), inline);
+        public LocalisedEmbedBuilder AddInlineField(LocalisedString title, object value)
+            => AddField(title, new LocalisedString(value), true);
+
 
         public EmbedBuilder Localise(ITextResourceCollection textResource)
             => new EmbedBuilder
@@ -303,24 +308,6 @@ namespace TitanBot.Commands
 
             return new LocalisedString(text, replyType, values ?? new object[0]);
         }
-
-        //Done like this because I cant implicit convert from object because c# is dumb :(
-        public static implicit operator LocalisedString(int value)
-            => new LocalisedString(value);
-        public static implicit operator LocalisedString(double value)
-            => new LocalisedString(value);
-        public static implicit operator LocalisedString(long value)
-            => new LocalisedString(value);
-        public static implicit operator LocalisedString(uint value)
-            => new LocalisedString(value);
-        public static implicit operator LocalisedString(ulong value)
-            => new LocalisedString(value);
-        public static implicit operator LocalisedString(DateTime value)
-            => new LocalisedString(value);
-        public static implicit operator LocalisedString(TimeSpan value)
-            => new LocalisedString(value);
-        public static implicit operator LocalisedString(bool value)
-            => new LocalisedString(value);
 
         public static implicit operator LocalisedString(string text)
             => Build(text);
