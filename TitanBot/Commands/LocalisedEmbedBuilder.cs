@@ -265,6 +265,14 @@ namespace TitanBot.Commands
             };
     }
 
+    public class RawString : LocalisedString
+    {
+        public RawString(string text) : base("{0}", text) { }
+
+        public static implicit operator RawString(string text)
+            => new RawString(text);
+    }
+
     public class LocalisedString
     {
         public string Key { get; }
@@ -273,7 +281,7 @@ namespace TitanBot.Commands
 
         private List<object> _values { get; } = new List<object>();
 
-        public LocalisedString(object value) : this("_{0}", ReplyType.None, new object[] { value }) { }
+        public LocalisedString(object value) : this("{0}", ReplyType.None, new object[] { value }) { }
         public LocalisedString(string text) : this(text, ReplyType.None, values: null) { }
         public LocalisedString(string key, ReplyType replyType) : this(key, replyType, values: null) { }
         public LocalisedString(string key, params object[] values) : this(key, ReplyType.None, values) { }

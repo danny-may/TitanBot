@@ -108,8 +108,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         },
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(TitanBotResource.SETTING_VALUE_OLD, string.IsNullOrWhiteSpace(oldDisplay) ? TitanBotResource.SETTINGS_NOTSET : $"_{oldDisplay}")
-                     .AddField(TitanBotResource.SETTING_VALUE_NEW, string.IsNullOrWhiteSpace(newDisplay) ? TitanBotResource.SETTINGS_NOTSET : $"_{newDisplay}");
+                    }.AddField(TitanBotResource.SETTING_VALUE_OLD, string.IsNullOrWhiteSpace(oldDisplay) ? TitanBotResource.SETTINGS_NOTSET : (RawString)oldDisplay)
+                     .AddField(TitanBotResource.SETTING_VALUE_NEW, string.IsNullOrWhiteSpace(newDisplay) ? TitanBotResource.SETTINGS_NOTSET : (RawString)newDisplay);
                     await ReplyAsync(builder);
                 }
             }
@@ -147,8 +147,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         },
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(TitanBotResource.SETTING_VALUE_OLD, string.IsNullOrWhiteSpace(oldValue) ? TitanBotResource.SETTINGS_NOTSET : $"_{oldValue}")
-                     .AddField(TitanBotResource.SETTING_VALUE_NEW, string.IsNullOrWhiteSpace(newValue) ? TitanBotResource.SETTINGS_NOTSET : $"_{newValue}");
+                    }.AddField(TitanBotResource.SETTING_VALUE_OLD, string.IsNullOrWhiteSpace(oldValue) ? TitanBotResource.SETTINGS_NOTSET : (RawString)oldValue)
+                     .AddField(TitanBotResource.SETTING_VALUE_NEW, string.IsNullOrWhiteSpace(newValue) ? TitanBotResource.SETTINGS_NOTSET : (RawString)newValue);
                     await ReplyAsync(builder);
                 }
             }
