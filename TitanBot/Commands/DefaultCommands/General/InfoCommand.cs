@@ -73,7 +73,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             foreach (var action in TechnicalActions)
             {
                 var settings = action(this);
-                builder.AddField(settings.TitleKey, settings.Value.ToString(), settings.IsInline);
+                builder.AddField(settings.TitleKey, new LocalisedString(settings.Value), settings.IsInline);
             }
 
             await ReplyAsync(builder);

@@ -151,15 +151,11 @@ namespace TitanBot.Replying
             return this;
         }
 
-        public IReplyContext WithEmbedable(IEmbedable embedable)
-        {
-            Embedable = embedable;
-            return this;
-        }
-
         public IReplyContext WithEmbedable(LocalisedEmbedBuilder embedable)
             => WithEmbedable(embedable.Localise(TextResource));
         public IReplyContext WithEmbedable(Embedable embedable)
+            => WithEmbedable((IEmbedable)embedable);
+        public IReplyContext WithEmbedable(IEmbedable embedable)
         {
             Embedable = embedable;
             return this;

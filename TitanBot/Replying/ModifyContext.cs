@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Settings;
@@ -85,7 +86,10 @@ namespace TitanBot.Replying
             Options = options;
             return this;
         }
-
+        public IModifyContext ChangeEmbedable(LocalisedEmbedBuilder embedable)
+            => ChangeEmbedable(embedable.Localise(TextResource));
+        public IModifyContext ChangeEmbedable(Embedable embedable)
+            => ChangeEmbedable((IEmbedable)embedable);
         public IModifyContext ChangeEmbedable(IEmbedable embedable)
         {
             Embedable = embedable;

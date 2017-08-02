@@ -268,7 +268,7 @@ namespace TitanBot.Commands
 
         private List<object> _values { get; } = new List<object>();
 
-        public LocalisedString(object value) : this("{0}", ReplyType.None, new object[] { value }) { }
+        public LocalisedString(object value) : this("_{0}", ReplyType.None, new object[] { value }) { }
         public LocalisedString(string text) : this(text, ReplyType.None, values: null) { }
         public LocalisedString(string key, ReplyType replyType) : this(key, replyType, values: null) { }
         public LocalisedString(string key, params object[] values) : this(key, ReplyType.None, values) { }
@@ -303,6 +303,24 @@ namespace TitanBot.Commands
 
             return new LocalisedString(text, replyType, values ?? new object[0]);
         }
+
+        //Done like this because I cant implicit convert from object because c# is dumb :(
+        public static implicit operator LocalisedString(int value)
+            => new LocalisedString(value);
+        public static implicit operator LocalisedString(double value)
+            => new LocalisedString(value);
+        public static implicit operator LocalisedString(long value)
+            => new LocalisedString(value);
+        public static implicit operator LocalisedString(uint value)
+            => new LocalisedString(value);
+        public static implicit operator LocalisedString(ulong value)
+            => new LocalisedString(value);
+        public static implicit operator LocalisedString(DateTime value)
+            => new LocalisedString(value);
+        public static implicit operator LocalisedString(TimeSpan value)
+            => new LocalisedString(value);
+        public static implicit operator LocalisedString(bool value)
+            => new LocalisedString(value);
 
         public static implicit operator LocalisedString(string text)
             => Build(text);

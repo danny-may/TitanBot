@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System;
 using System.Threading.Tasks;
+using TitanBot.Commands;
 
 namespace TitanBot.Replying
 {
@@ -17,6 +18,8 @@ namespace TitanBot.Replying
         IModifyContext ChangeMessage(string message, params object[] values);
         IModifyContext ChangeMessage(string message, ReplyType replyType, params object[] values);
         IModifyContext ChangeEmbedable(IEmbedable embedable);
+        IModifyContext ChangeEmbedable(Embedable embedable);
+        IModifyContext ChangeEmbedable(LocalisedEmbedBuilder embedable);
         IModifyContext WithRequestOptions(RequestOptions options);
         IModifyContext WithErrorHandler(MessageModifyErrorHandler handler);
 
