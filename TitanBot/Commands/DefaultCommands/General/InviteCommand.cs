@@ -1,16 +1,18 @@
 ﻿using System.Threading.Tasks;
 using TitanBot.Replying;
+using static TitanBot.TBLocalisation.Help;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
-    [Description(TitanBotResource.INVITE_HELP_DESCRIPTION)]
+    [Description(Desc.INVITE)]
     public class InviteCommand : Command
     {
         [Call]
-        [Usage(TitanBotResource.INVITE_HELP_USAGE)]
+        [Usage(Usage.INVITE)]
         async Task GetInviteAsync()
         {
-            await ReplyAsync(TitanBotResource.INVITE_MESSAGE, ReplyType.Info, BotUser.Id, GeneralGlobalSetting.PreferredPermission);
+            await ReplyAsync(InviteText.MESSAGE, ReplyType.Info, BotUser.Id, GeneralGlobalSetting.PreferredPermission);
         }
     }
 }

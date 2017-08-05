@@ -7,5 +7,6 @@ namespace TitanBot.Settings
         ulong Id { get; }
         T Get<T>();
         void Edit<T>(Action<T> edits);
+        void ResetAll();
     }
 }

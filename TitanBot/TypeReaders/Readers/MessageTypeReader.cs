@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Threading.Tasks;
 using TitanBot.Contexts;
+using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.TypeReaders
 {
@@ -17,7 +18,7 @@ namespace TitanBot.TypeReaders
                     return TypeReaderResponse.FromSuccess(msg);
             }
 
-            return TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_ENTITY_NOTFOUND, value, typeof(T));
+            return TypeReaderResponse.FromError(TYPEREADER_ENTITY_NOTFOUND, value, typeof(T));
         }
     }
 }

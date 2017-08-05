@@ -3,10 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Commands.Responses;
 using TitanBot.Replying;
+using static TitanBot.TBLocalisation.Help;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
-    [Description(TitanBotResource.HELP_HELP_DESCRIPTION)]
+    [Description(Desc.HELP)]
     public class HelpCommand : Command
     {
         private IPermissionManager PermissionManager { get; }
@@ -18,7 +20,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         }
 
         [Call]
-        [Usage(TitanBotResource.HELP_HELP_USAGE)]
+        [Usage(Usage.HELP)]
         async Task HelpAsync(string command = null)
         {
             if (command == null)
@@ -28,7 +30,7 @@ namespace TitanBot.Commands.DefautlCommands.General
         }
 
         [Call("Tutorial")]
-        [Usage(TitanBotResource.HELP_HELP_USAGE_TUTORIAL)]
+        [Usage(Usage.HELP_TUTORIAL)]
         async Task TutorialAsync(string tutorialArea)
         {
             await Task.Delay(0);
@@ -46,7 +48,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             var cmd = CommandService.Search(name, out int commandLength);
             if (cmd == null || cmd.Value.Hidden)
             {
-                await ReplyAsync(TitanBotResource.HELP_SINGLE_UNRECOGNISED, ReplyType.Error, name, Prefix);
+                await ReplyAsync(HelpText.SINGLE_UNRECOGNISED, ReplyType.Error, name, Prefix);
                 return;
             }
 

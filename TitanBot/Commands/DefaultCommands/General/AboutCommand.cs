@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TitanBot.Replying;
+using static TitanBot.TBLocalisation.Help;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.General
 {
-    [Description(TitanBotResource.ABOUT_HELP_DESCRIPTION)]
+    [Description(Desc.ABOUT)]
     public class AboutCommand : Command
     {
-        private readonly Dictionary<ulong, string> _specialThanks = new Dictionary<ulong, string>();
-
         [Call]
-        [Usage(TitanBotResource.ABOUT_HELP_USAGE)]
+        [Usage(Usage.ABOUT)]
         async Task ShowAbout()
         {
-            await ReplyAsync(TitanBotResource.ABOUT_MESSAGE, ReplyType.Info);
+            await ReplyAsync(AboutText.MESSAGE, ReplyType.Info);
         }
     }
 }

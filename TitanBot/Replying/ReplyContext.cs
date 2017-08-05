@@ -9,6 +9,7 @@ using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Settings;
 using TitanBot.Util;
+using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.Replying
 {
@@ -75,7 +76,7 @@ namespace TitanBot.Replying
             }
             catch (HttpException ex) when (ex.DiscordCode == 50013 || ex.DiscordCode == 50001)
             {
-                Message = TextResource.Format(TitanBotResource.UNABLE_SEND, ReplyType.Error, Channel, Message);
+                Message = TextResource.Format(UNABLE_SEND, ReplyType.Error, Channel, Message);
                 Channel = await User.GetOrCreateDMChannelAsync();
                 return await SendAsync(stealthy);
             }
@@ -83,10 +84,10 @@ namespace TitanBot.Replying
             {
                 var message = (Message + "\n" + Embedable?.GetString()).Trim();
                 if (Attachment != null)
-                    message += "\n\n" + TextResource.Format(TitanBotResource.MESSAGE_CONTAINED_ATTACHMENT, AttachmentName);
+                    message += "\n\n" + TextResource.Format(MESSAGE_CONTAINED_ATTACHMENT, AttachmentName);
                 Attachment = () => message.ToStream();
                 AttachmentName = "Output.txt";
-                Message = TextResource.GetResource(TitanBotResource.MESSAGE_TOO_LONG, ReplyType.Error);
+                Message = TextResource.GetResource(MESSAGE_TOO_LONG, ReplyType.Error);
                 Embedable = null;
 
                 return await SendAsync(stealthy);

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Contexts;
+using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.TypeReaders
 {
@@ -35,7 +36,7 @@ namespace TitanBot.TypeReaders
                     return TypeReaderResponse.FromSuccess(results.Values);
             }
 
-            return TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_ENTITY_NOTFOUND, input, typeof(T));
+            return TypeReaderResponse.FromError(TYPEREADER_ENTITY_NOTFOUND, input, typeof(T));
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T channel, float score)

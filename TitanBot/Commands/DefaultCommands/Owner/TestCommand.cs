@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Discord;
+using System.Threading.Tasks;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
@@ -10,6 +11,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         {
             await Task.Delay(5000);
             await ReplyAsync(new string('a', 3000));
+            var x = new EmbedBuilder();
         }
     }
 }

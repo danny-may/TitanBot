@@ -13,7 +13,7 @@ using TitanBot.Replying;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Storage;
-using TitanBot.Util;
+using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.Commands
 {
@@ -33,7 +33,7 @@ namespace TitanBot.Commands
         private bool HasReplied { get; set; }
         private IUserMessage AwaitMessage { get; set; }
 
-        protected virtual string DelayMessage => TitanBotResource.COMMAND_DELAY_DEFAULT;
+        protected virtual string DelayMessage => COMMAND_DELAY_DEFAULT;
         protected virtual int DelayMessageMs => 3000;
 
         protected IUserMessage Message => Context?.Message;

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Formatting;
 using TitanBot.Models;
+using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.TypeReaders
 {
@@ -131,9 +132,9 @@ namespace TitanBot.TypeReaders
             else if (results.Count() == 1)
                 result = results.First();
             else if (results.Count() > 0)
-                result = TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, text, type);
+                result = TypeReaderResponse.FromError(TYPEREADER_UNABLETOREAD, text, type);
             else
-                result = TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_NOTYPEREADER, text, type);
+                result = TypeReaderResponse.FromError(TYPEREADER_NOTYPEREADER, text, type);
             return ResultsCache.GetOrAdd((context.GetHashCode(), type, text), result);
         }
 

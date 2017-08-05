@@ -21,6 +21,7 @@ using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Storage;
 using TitanBot.TypeReaders;
+using static TitanBot.TBLocalisation.Settings;
 
 namespace TitanBot
 {
@@ -55,7 +56,6 @@ namespace TitanBot
             Owner = new Lazy<IUser>(() => DiscordClient.GetApplicationInfoAsync().Result.Owner);
             mapper = mapper ?? (f => { });
             DependencyFactory = factory ?? new DependencyFactory();
-            
             MapDefaults();
             mapper(DependencyFactory);
 
@@ -80,7 +80,7 @@ namespace TitanBot
 
         private void SetupFeatures()
         {
-            TextResourceManager.RequireKeys(TitanBotResource.GetDefaults());
+            TextResourceManager.RequireKeys(TBLocalisation.Defaults);
             CommandService.AddBuildEvent<ReloadCommand>(c => c.ReloadActions.Add("TextResources", TextResourceManager.Load));
         }
 
@@ -88,21 +88,21 @@ namespace TitanBot
         {
             SettingsManager.GetEditorCollection<GeneralGlobalSetting>(SettingScope.Global)
                            .WithName("General")
-                           .WithDescription(TitanBotResource.SETTINGS_GLOBAL_GENERAL_DESCRIPTION)
+                           .WithDescription(Desc.GLOBAL_GENERAL)
                            .AddSetting(s => s.DefaultPrefix, s => s.SetAlias("Prefix", "Pfx"))
                            .AddSetting<IUser>(s => s.Owners);
             SettingsManager.GetEditorCollection<GeneralGuildSetting>(SettingScope.Guild)
                            .WithName("General")
-                           .WithDescription(TitanBotResource.SETTINGS_GUILD_GENERAL_DESCRIPTION)
+                           .WithDescription(Desc.GUILD_GENERAL)
                            .AddSetting(s => s.Prefix, s => s.SetAlias("Prefix", "Pfx"))
                            .AddSetting(s => s.PermOverride)
                            .AddSetting<IRole>(s => s.RoleOverride)
                            .AddSetting(s => s.DateTimeFormat)
                            .AddSetting(s => s.PreferredLanguage, (Locale a) => (string)a, s => s.SetAlias("Lang", "Locale"))
-                           .WithNotes(TitanBotResource.SETTINGS_GUILD_GENERAL_NOTES);
+                           .WithNotes(Notes.GUILD_GENERAL);
             SettingsManager.GetEditorCollection<GeneralUserSetting>(SettingScope.User)
                            .WithName("General")
-                           .WithDescription(TitanBotResource.SETTINGS_USER_GENERAL_DESCRIPTION)
+                           .WithDescription(Desc.USER_GENERAL)
                            .AddSetting(s => s.Language, (Locale a) => (string)a)
                            .AddSetting(s => s.FormatType, (FormattingType a) => (uint)a, b => b.SetViewer((c, f) => c.Formatter.GetName(f)))
                            .AddSetting(s => s.UseEmbeds, s => s.SetAlias("Embed", "Embeds", "UseEmbed"));

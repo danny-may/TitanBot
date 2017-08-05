@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using TitanBot.Storage;
 
 namespace TitanBot.Settings
@@ -32,6 +33,12 @@ namespace TitanBot.Settings
             if (Record.Settings.TryGetValue(typeof(T).Name, out object obj) && obj != null)
                 return  (T)obj;
             return JsonConvert.DeserializeObject<T>("{}");
+        }
+
+        public void ResetAll()
+        {
+            Record.Settings = new Dictionary<string, object>();
+            Database.Upsert(Record).Wait();
         }
     }
 }

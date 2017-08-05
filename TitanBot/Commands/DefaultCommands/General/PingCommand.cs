@@ -1,17 +1,19 @@
 ﻿using System.Threading.Tasks;
 using TitanBot.Replying;
+using static TitanBot.TBLocalisation.Help;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
-    [Description(TitanBotResource.PING_HELP_DESCRIPTION)]
+    [Description(Desc.PING)]
     public class PingCommand : Command
     {
         [Call]
-        [Usage(TitanBotResource.PING_HELP_USAGE)]
+        [Usage(Usage.PING)]
         async Task SendPongAsync()
         {
-            var msg = await ReplyAsync(TitanBotResource.PING_INITIAL, ReplyType.Success, Client.Latency);
-            Modify(msg).ChangeMessage(TitanBotResource.PING_VERIFY, ReplyType.Success, (msg.Timestamp - Message.Timestamp).TotalMilliseconds).Modify();
+            var msg = await ReplyAsync(PingText.INITIAL, ReplyType.Success, Client.Latency);
+            Modify(msg).ChangeMessage(PingText.VERIFY, ReplyType.Success, (msg.Timestamp - Message.Timestamp).TotalMilliseconds).Modify();
         }
     }
 }

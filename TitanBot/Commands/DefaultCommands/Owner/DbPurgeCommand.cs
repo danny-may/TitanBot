@@ -1,19 +1,21 @@
 ﻿using System.Threading.Tasks;
 using TitanBot.Replying;
+using static TitanBot.TBLocalisation.Help;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description(TitanBotResource.DBPURGE_HELP_DESCRIPTION)]
+    [Description(Desc.DBPURGE)]
     [RequireOwner]
     public class DbPurgeCommand : Command
     {
         [Call]
-        [Usage(TitanBotResource.DBPURGE_HELP_USAGE)]
+        [Usage(Usage.DBPURGE)]
         async Task DropAsync(string table)
         {
             await Database.Drop(table);
 
-            await ReplyAsync(TitanBotResource.DBPURGE_SUCCESS, ReplyType.Success, table);
+            await ReplyAsync(DbPurgeText.SUCCESS, ReplyType.Success, table);
         }
     }
 }

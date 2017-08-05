@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Formatting;
+using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.TypeReaders
 {
@@ -10,7 +11,7 @@ namespace TitanBot.TypeReaders
         {
             if (context.TextManager.GetLanguageCoverage(value) > 0)
                 return ValueTask.FromResult(TypeReaderResponse.FromSuccess((Locale)value));
-            return ValueTask.FromResult(TypeReaderResponse.FromError(TitanBotResource.TYPEREADER_UNABLETOREAD, value, typeof(Locale)));
+            return ValueTask.FromResult(TypeReaderResponse.FromError(TYPEREADER_UNABLETOREAD, value, typeof(Locale)));
         }
     }
 }

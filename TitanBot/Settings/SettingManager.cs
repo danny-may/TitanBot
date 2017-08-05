@@ -60,5 +60,14 @@ namespace TitanBot.Settings
 
             return _settingEditors[scope].Values.ToList().AsReadOnly();
         }
+
+        public void ResetSettings(IEntity<ulong> entity)
+        {
+            if (entity != null)
+                ResetSettings(entity.Id);
+        }
+
+        public void ResetSettings(ulong entity)
+            => GetContext(entity).ResetAll();
     }
 }

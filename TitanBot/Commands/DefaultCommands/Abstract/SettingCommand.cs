@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TitanBot.Replying;
 using TitanBot.Settings;
 using TitanBot.TypeReaders;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.DefaultCommands.Abstract
 {
@@ -33,15 +34,12 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
 
         protected async Task ListSettingsAsync(string settingGroup = null)
         {
-            var builder = new EmbedBuilder
+            var builder = new LocalisedEmbedBuilder
             {
                 Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                 Timestamp = DateTime.Now,
-                Footer = new EmbedFooterBuilder
-                {
-                    IconUrl = BotUser.GetAvatarUrl(),
-                    Text = TextResource.Format(TitanBotResource.EMBED_FOOTER, BotUser.Username, "Settings")
-                }
+                Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl())
+                                                     .WithText((SettingText.FOOTERTEXT, BotUser.Username))
             };
 
             if (Settings.Count == 1)
@@ -49,36 +47,39 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
 
             if (settingGroup == null)
             {
-                builder.WithTitle(TextResource.GetResource(TitanBotResource.SETTINGS_TITLE_NOGROUP))
-                       .WithDescription(string.Join("\n", Settings.Select(g => g.Name)));
-                if (string.IsNullOrWhiteSpace(builder.Description))
-                    builder.Description = TextResource.GetResource(TitanBotResource.SETTINGS_DESCRIPTION_NOSETTINGS);
+                builder.WithTitle(SettingText.TITLE_NOGROUP);
+                var desc = string.Join("\n", Settings.Select(g => g.Name));
+                if (string.IsNullOrWhiteSpace(desc))
+                    builder.WithDescription(SettingText.DESCRIPTION_NOSETTINGS);
+                else
+                    builder.WithRawDescription(desc);
                 await ReplyAsync(builder);
                 return;
             }
             var groups = Settings.Where(g => g.Name.ToLower() == settingGroup.ToLower());
             if (groups.Count() == 0)
             {
-                await ReplyAsync(TitanBotResource.SETTINGS_INVALIDGROUP, ReplyType.Error, settingGroup);
+                await ReplyAsync(SettingText.INVALIDGROUP, ReplyType.Error, settingGroup);
                 return;
             }
             
-            builder.WithTitle(TextResource.Format(TitanBotResource.SETTINGS_TITLE_GROUP, groups.First().Name));
+            builder.WithTitle(SettingText.TITLE_GROUP, groups.First().Name);
             foreach (var setting in groups.SelectMany(s => s))
             {
-                var value = setting.Display(Context, SettingContext);
+                string value = setting.Display(Context, SettingContext);
                 if (string.IsNullOrWhiteSpace(value))
-                    value = TextResource.GetResource(TitanBotResource.SETTINGS_NOTSET);
-                builder.AddInlineField(setting.Name, value);
+                    builder.AddInlineField(f => f.WithRawName(setting.Name).WithValue(SettingText.NOTSET));
+                else
+                    builder.AddInlineField(f => f.WithRawName(setting.Name).WithRawValue(value));
             }
             var descriptions = string.Join("\n", groups.Where(g => !string.IsNullOrWhiteSpace(g.Description))
                                                        .Select(g => TextResource.GetResource(g.Description)));
             var notes = string.Join("\n", groups.Where(g => !string.IsNullOrWhiteSpace(g.Notes))
                                                 .Select(g => TextResource.GetResource(g.Notes)));
             if (!string.IsNullOrWhiteSpace(descriptions))
-                builder.WithDescription(descriptions);
+                builder.WithRawDescription(descriptions);
             if (!string.IsNullOrWhiteSpace(notes))
-                builder.AddField(TextResource.GetResource(TitanBotResource.NOTES), notes);
+                builder.AddField(f => f.WithName(TBLocalisation.NOTES).WithRawValue(notes));
             await ReplyAsync(builder);
         }
 
@@ -86,9 +87,9 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
         {
             var setting = Find(key);
             if (setting == null)
-                await ReplyAsync(TitanBotResource.SETTINGS_KEY_NOTFOUND, ReplyType.Error, key);
+                await ReplyAsync(SettingText.KEY_NOTFOUND, ReplyType.Error, key);
             else if (setting.Type != typeof(bool))
-                await ReplyAsync(TitanBotResource.SETTINGS_UNABLE_TOGGLE, ReplyType.Error, key);
+                await ReplyAsync(SettingText.UNABLE_TOGGLE, ReplyType.Error, key);
             else
             {
                 var oldValue = (bool)setting.Get(SettingContext);
@@ -100,16 +101,12 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     var newDisplay = setting.Display(Context, SettingContext);
                     var builder = new LocalisedEmbedBuilder
                     {
-                        Title = (TitanBotResource.SETTINGS_VALUE_CHANGED_TITLE, setting.Name),
-                        Footer = new LocalisedFooterBuilder
-                        {
-                            IconUrl = BotUser.GetAvatarUrl(),
-                            Text = BotUser.Username,
-                        },
+                        Title = (SettingText.VALUE_CHANGED_TITLE, setting.Name),
+                        Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl()).WithText(BotUser.Username),
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(TitanBotResource.SETTING_VALUE_OLD, string.IsNullOrWhiteSpace(oldDisplay) ? TitanBotResource.SETTINGS_NOTSET : (RawString)oldDisplay)
-                     .AddField(TitanBotResource.SETTING_VALUE_NEW, string.IsNullOrWhiteSpace(newDisplay) ? TitanBotResource.SETTINGS_NOTSET : (RawString)newDisplay);
+                    }.AddField(f => f.WithName(SettingText.VALUE_OLD).WithValue(string.IsNullOrWhiteSpace(oldDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)oldDisplay))
+                     .AddField(f => f.WithName(SettingText.VALUE_NEW).WithValue(string.IsNullOrWhiteSpace(newDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)newDisplay));
                     await ReplyAsync(builder);
                 }
             }
@@ -119,14 +116,14 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
         {
             var setting = Find(key);
             if (setting == null)
-                await ReplyAsync(TitanBotResource.SETTINGS_KEY_NOTFOUND, ReplyType.Error, key);
+                await ReplyAsync(SettingText.KEY_NOTFOUND, ReplyType.Error, key);
             else
             {
                 var readerResult = await Readers.Read(setting.Type, Context, value);
             
                 if (!readerResult.IsSuccess)
                 {
-                    await ReplyAsync(TitanBotResource.SETTINGS_VALUE_INVALID, ReplyType.Error, setting.Name, value);
+                    await ReplyAsync(SettingText.VALUE_INVALID, ReplyType.Error, setting.Name, value);
                     return;
                 }
             
@@ -139,16 +136,12 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     var newValue = setting.Display(Context, SettingContext);
                     var builder = new LocalisedEmbedBuilder
                     {
-                        Title = (TitanBotResource.SETTINGS_VALUE_CHANGED_TITLE, setting.Name),
-                        Footer = new LocalisedFooterBuilder
-                        {
-                            IconUrl = BotUser.GetAvatarUrl(),
-                            Text = BotUser.Username,
-                        },
+                        Title = (SettingText.VALUE_CHANGED_TITLE, setting.Name),
+                        Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl()).WithText(BotUser.Username),
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(TitanBotResource.SETTING_VALUE_OLD, string.IsNullOrWhiteSpace(oldValue) ? TitanBotResource.SETTINGS_NOTSET : (RawString)oldValue)
-                     .AddField(TitanBotResource.SETTING_VALUE_NEW, string.IsNullOrWhiteSpace(newValue) ? TitanBotResource.SETTINGS_NOTSET : (RawString)newValue);
+                    }.AddField(f => f.WithName(SettingText.VALUE_OLD).WithValue(string.IsNullOrWhiteSpace(oldValue) ? (LocalisedString)SettingText.NOTSET : (RawString)oldValue))
+                     .AddField(f => f.WithName(SettingText.VALUE_NEW).WithValue(string.IsNullOrWhiteSpace(newValue) ? (LocalisedString)SettingText.NOTSET : (RawString)newValue));
                     await ReplyAsync(builder);
                 }
             }

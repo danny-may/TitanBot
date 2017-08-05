@@ -5,6 +5,7 @@ using System.Linq;
 using TitanBot.Contexts;
 using TitanBot.Formatting;
 using TitanBot.Replying;
+using static TitanBot.TBLocalisation.Commands.HelpText;
 
 namespace TitanBot.Commands
 {
@@ -30,31 +31,27 @@ namespace TitanBot.Commands
             var builder = new LocalisedEmbedBuilder()
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = (TitanBotResource.HELP_LIST_TITLE, ReplyType.Info),
-                Description = (TitanBotResource.HELP_LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
+                Title = (LIST_TITLE, ReplyType.Info),
+                Description = (LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
                 Timestamp = DateTime.Now,
-                Footer = new LocalisedFooterBuilder
-                {
-                    IconUrl = BotUser.GetAvatarUrl(),
-                    Text = (TitanBotResource.EMBED_FOOTER, BotUser.Username, "Help")
-                }
+                Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl()).WithText((SINGLE_FOOTER, BotUser.Username))
             };
 
             var groups = Commands.GroupBy(c => c.Group);
             foreach (var group in groups)
-                builder.AddField(group.Key, string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key)));
+                builder.AddField(f => f.WithRawName(group.Key).WithRawValue(string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key))));
 
             return builder.Localise(TextResource);
         }
 
         public string GetString()
         {
-            var msg =  TextResource.GetResource(TitanBotResource.HELP_LIST_TITLE, ReplyType.Info) + "\n" +
-                       TextResource.Format(TitanBotResource.HELP_LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)) + "\n" +
+            var msg =  TextResource.GetResource(LIST_TITLE, ReplyType.Info) + "\n" +
+                       TextResource.Format(LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)) + "\n" +
                        "```prolog\n";
             var groups = Commands.GroupBy(c => c.Group);
             foreach (var group in groups)
-                msg += TextResource.Format(TitanBotResource.HELP_LIST_COMMAND, group.Key.ToTitleCase(), string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))) + "\n";
+                msg += TextResource.Format(LIST_COMMAND, group.Key.ToTitleCase(), string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))) + "\n";
 
             return msg.Trim() + "```";
         }

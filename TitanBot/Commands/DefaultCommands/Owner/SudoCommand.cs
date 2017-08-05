@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using TitanBot.Commands.Models;
 using TitanBot.Dependencies;
 using TitanBot.Replying;
+using static TitanBot.TBLocalisation.Help;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description(TitanBotResource.SUDOCOMMAND_HELP_DESCRIPTION)]
+    [Description(Desc.SUDOCOMMAND)]
     [RequireOwner]
     public class SudoCommand : Command
     {
@@ -18,13 +20,13 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         }
 
         [Call]
-        [Usage(TitanBotResource.SUDOCOMMAND_HELP_USAGE)]
+        [Usage(Usage.SUDOCOMMAND)]
         async Task SudoAsync(IUser user, [Dense]string command)
         {
             var spoofMessage = new SudoMessage(Message);
             spoofMessage.Author = user;
             spoofMessage.Content = command;
-            await ReplyAsync(TitanBotResource.SUDOCOMMAND_SUCCESS, ReplyType.Success, command, user);
+            await ReplyAsync(SudoText.SUCCESS, ReplyType.Success, command, user);
             await CommandService.ParseAndExecute(spoofMessage);
         }
     }

@@ -88,17 +88,6 @@ namespace TitanBot.Commands
             Author = author;
             return this;
         }
-        public LocalisedEmbedBuilder WithAuthor(LocalisedString name, LocalisedString iconUrl = null, LocalisedString url = null)
-        {
-            var author = new LocalisedAuthorBuilder
-            {
-                Name = name,
-                IconUrl = iconUrl,
-                Url = url
-            };
-            Author = author;
-            return this;
-        }
         public LocalisedEmbedBuilder WithFooter(LocalisedFooterBuilder footer)
         {
             Footer = footer;
@@ -111,17 +100,12 @@ namespace TitanBot.Commands
             Footer = footer;
             return this;
         }
-        public LocalisedEmbedBuilder WithFooter(LocalisedString text, LocalisedString iconUrl = null)
-        {
-            var footer = new LocalisedFooterBuilder
-            {
-                Text = text,
-                IconUrl = iconUrl
-            };
-            Footer = footer;
-            return this;
-        }
 
+
+        public LocalisedEmbedBuilder AddField(LocalisedString name, LocalisedString value, bool inline = false)
+            => AddField(new LocalisedFieldBuilder { Name = name, Value = value, IsInline = inline });
+        public LocalisedEmbedBuilder AddInlineField(LocalisedString name, LocalisedString value)
+            => AddField(name, value, true);
         public LocalisedEmbedBuilder AddField(LocalisedFieldBuilder field)
         {
             if (Fields.Count >= EmbedBuilder.MaxFieldCount)
@@ -136,26 +120,14 @@ namespace TitanBot.Commands
         {
             var field = new LocalisedFieldBuilder();
             action(field);
-            AddField(field);
-            return this;
+            return AddField(field);
         }
-        public LocalisedEmbedBuilder AddField(LocalisedString title, LocalisedString text, bool inline = false)
+        public LocalisedEmbedBuilder AddInlineField(Action<LocalisedFieldBuilder> action)
         {
-            var field = new LocalisedFieldBuilder
-            {
-                Name = title,
-                Value = text,
-                IsInline = inline
-            };
-            _fields.Add(field);
-            return this;
+            var field = new LocalisedFieldBuilder().WithIsInline(true);
+            action(field);
+            return AddField(field);
         }
-        public LocalisedEmbedBuilder AddInlineField(LocalisedString title, LocalisedString text)
-            => AddField(title, text, true);
-        public LocalisedEmbedBuilder AddField(LocalisedString title, object value, bool inline = false)
-            => AddField(title, new LocalisedString(value), inline);
-        public LocalisedEmbedBuilder AddInlineField(LocalisedString title, object value)
-            => AddField(title, new LocalisedString(value), true);
 
 
         public EmbedBuilder Localise(ITextResourceCollection textResource)
@@ -172,6 +144,59 @@ namespace TitanBot.Commands
                 Title = Title?.ToString(textResource),
                 Url = Url?.ToString(textResource)
             };
+
+        #region WithX Overloads
+        public LocalisedEmbedBuilder WithRawTitle(string rawText)
+            => WithTitle(new RawString(rawText));
+        public LocalisedEmbedBuilder WithTitle(string key)
+            => WithTitle(new LocalisedString(key));
+        public LocalisedEmbedBuilder WithTitle(string key, ReplyType replyType)
+            => WithTitle(new LocalisedString(key, replyType));
+        public LocalisedEmbedBuilder WithTitle(string key, params object[] values)
+            => WithTitle(new LocalisedString(key, values));
+        public LocalisedEmbedBuilder WithTitle(string key, ReplyType replyType, params object[] values)
+            => WithTitle(new LocalisedString(key, replyType, values));
+        public LocalisedEmbedBuilder WithRawDescription(string rawText)
+            => WithDescription(new RawString(rawText));
+        public LocalisedEmbedBuilder WithDescription(string key)
+            => WithDescription(new LocalisedString(key));
+        public LocalisedEmbedBuilder WithDescription(string key, ReplyType replyType)
+            => WithDescription(new LocalisedString(key, replyType));
+        public LocalisedEmbedBuilder WithDescription(string key, params object[] values)
+            => WithDescription(new LocalisedString(key, values));
+        public LocalisedEmbedBuilder WithDescription(string key, ReplyType replyType, params object[] values)
+            => WithDescription(new LocalisedString(key, replyType, values));
+        public LocalisedEmbedBuilder WithRawUrl(string rawText)
+            => WithUrl(new RawString(rawText));
+        public LocalisedEmbedBuilder WithUrl(string key)
+            => WithUrl(new LocalisedString(key));
+        public LocalisedEmbedBuilder WithUrl(string key, ReplyType replyType)
+            => WithUrl(new LocalisedString(key, replyType));
+        public LocalisedEmbedBuilder WithUrl(string key, params object[] values)
+            => WithUrl(new LocalisedString(key, values));
+        public LocalisedEmbedBuilder WithUrl(string key, ReplyType replyType, params object[] values)
+            => WithUrl(new LocalisedString(key, replyType, values));
+        public LocalisedEmbedBuilder WithRawThumbnailUrl(string rawText)
+            => WithThumbnailUrl(new RawString(rawText));
+        public LocalisedEmbedBuilder WithThumbnailUrl(string key)
+            => WithThumbnailUrl(new LocalisedString(key));
+        public LocalisedEmbedBuilder WithThumbnailUrl(string key, ReplyType replyType)
+            => WithThumbnailUrl(new LocalisedString(key, replyType));
+        public LocalisedEmbedBuilder WithThumbnailUrl(string key, params object[] values)
+            => WithThumbnailUrl(new LocalisedString(key, values));
+        public LocalisedEmbedBuilder WithThumbnailUrl(string key, ReplyType replyType, params object[] values)
+            => WithThumbnailUrl(new LocalisedString(key, replyType, values));
+        public LocalisedEmbedBuilder WithRawImageUrl(string rawText)
+            => WithImageUrl(new RawString(rawText));
+        public LocalisedEmbedBuilder WithImageUrl(string key)
+            => WithImageUrl(new LocalisedString(key));
+        public LocalisedEmbedBuilder WithImageUrl(string key, ReplyType replyType)
+            => WithImageUrl(new LocalisedString(key, replyType));
+        public LocalisedEmbedBuilder WithImageUrl(string key, params object[] values)
+            => WithImageUrl(new LocalisedString(key, values));
+        public LocalisedEmbedBuilder WithImageUrl(string key, ReplyType replyType, params object[] values)
+            => WithImageUrl(new LocalisedString(key, replyType, values));
+        #endregion
     }
 
     public class LocalisedAuthorBuilder
@@ -179,12 +204,12 @@ namespace TitanBot.Commands
         public LocalisedString Name { get; set; }
         public LocalisedString Url { get; set; }
         public LocalisedString IconUrl { get; set; }
-
+        
         public LocalisedAuthorBuilder WithName(LocalisedString name)
         {
             Name = name;
             return this;
-        }
+        }        
         public LocalisedAuthorBuilder WithUrl(LocalisedString url)
         {
             Url = url;
@@ -203,19 +228,52 @@ namespace TitanBot.Commands
                 Url = Url?.ToString(textResource),
                 IconUrl = IconUrl?.ToString(textResource)
             };
+
+        #region WithX Overloads
+        public LocalisedAuthorBuilder WithRawName(string rawText)
+            => WithName(new RawString(rawText));
+        public LocalisedAuthorBuilder WithName(string key)
+            => WithName(new LocalisedString(key));
+        public LocalisedAuthorBuilder WithName(string key, ReplyType replyType)
+            => WithName(new LocalisedString(key, replyType));
+        public LocalisedAuthorBuilder WithName(string key, params object[] values)
+            => WithName(new LocalisedString(key, values));
+        public LocalisedAuthorBuilder WithName(string key, ReplyType replyType, params object[] values)
+            => WithName(new LocalisedString(key, replyType, values));
+        public LocalisedAuthorBuilder WithRawUrl(string rawText)
+            => WithUrl(new RawString(rawText));
+        public LocalisedAuthorBuilder WithUrl(string key)
+            => WithUrl(new LocalisedString(key));
+        public LocalisedAuthorBuilder WithUrl(string key, ReplyType replyType)
+            => WithUrl(new LocalisedString(key, replyType));
+        public LocalisedAuthorBuilder WithUrl(string key, params object[] values)
+            => WithUrl(new LocalisedString(key, values));
+        public LocalisedAuthorBuilder WithUrl(string key, ReplyType replyType, params object[] values)
+            => WithUrl(new LocalisedString(key, replyType, values));
+        public LocalisedAuthorBuilder WithRawIconUrl(string rawText)
+            => WithIconUrl(new RawString(rawText));
+        public LocalisedAuthorBuilder WithIconUrl(string key)
+            => WithIconUrl(new LocalisedString(key));
+        public LocalisedAuthorBuilder WithIconUrl(string key, ReplyType replyType)
+            => WithIconUrl(new LocalisedString(key, replyType));
+        public LocalisedAuthorBuilder WithIconUrl(string key, params object[] values)
+            => WithIconUrl(new LocalisedString(key, values));
+        public LocalisedAuthorBuilder WithIconUrl(string key, ReplyType replyType, params object[] values)
+            => WithIconUrl(new LocalisedString(key, replyType, values));
+        #endregion
     }
 
     public class LocalisedFooterBuilder
     {
         public LocalisedString Text { get; set; }
         public LocalisedString IconUrl { get; set; }
-        
-        public LocalisedFooterBuilder WithText(string text)
+
+        public LocalisedFooterBuilder WithText(LocalisedString text)
         {
             Text = text;
             return this;
         }
-        public LocalisedFooterBuilder WithIconUrl(string iconUrl)
+        public LocalisedFooterBuilder WithIconUrl(LocalisedString iconUrl)
         {
             IconUrl = iconUrl;
             return this;
@@ -227,6 +285,29 @@ namespace TitanBot.Commands
                 Text = Text?.ToString(textResource),
                 IconUrl = IconUrl?.ToString(textResource)
             };
+
+        #region WithX Overloads
+        public LocalisedFooterBuilder WithRawText(string rawText)
+            => WithText(new RawString(rawText));
+        public LocalisedFooterBuilder WithText(string key)
+            => WithText(new LocalisedString(key));
+        public LocalisedFooterBuilder WithText(string key, ReplyType replyType)
+            => WithText(new LocalisedString(key, replyType));
+        public LocalisedFooterBuilder WithText(string key, params object[] values)
+            => WithText(new LocalisedString(key, values));
+        public LocalisedFooterBuilder WithText(string key, ReplyType replyType, params object[] values)
+            => WithText(new LocalisedString(key, replyType, values));
+        public LocalisedFooterBuilder WithRawIconUrl(string rawText)
+            => WithIconUrl(new RawString(rawText));
+        public LocalisedFooterBuilder WithIconUrl(string key)
+            => WithIconUrl(new LocalisedString(key));
+        public LocalisedFooterBuilder WithIconUrl(string key, ReplyType replyType)
+            => WithIconUrl(new LocalisedString(key, replyType));
+        public LocalisedFooterBuilder WithIconUrl(string key, params object[] values)
+            => WithIconUrl(new LocalisedString(key, values));
+        public LocalisedFooterBuilder WithIconUrl(string key, ReplyType replyType, params object[] values)
+            => WithIconUrl(new LocalisedString(key, replyType, values));
+        #endregion
     }
 
     public class LocalisedFieldBuilder
@@ -239,7 +320,7 @@ namespace TitanBot.Commands
         {
             Name = name;
             return this;
-        }        
+        }
         public LocalisedFieldBuilder WithValue(LocalisedString value)
         {
             Value = value;
@@ -263,6 +344,29 @@ namespace TitanBot.Commands
                 Value = Value?.ToString(textResource),
                 IsInline = IsInline
             };
+
+        #region WithX Overloads
+        public LocalisedFieldBuilder WithRawValue(string rawText)
+            => WithValue(new RawString(rawText));
+        public LocalisedFieldBuilder WithValue(string key)
+            => WithValue(new LocalisedString(key));
+        public LocalisedFieldBuilder WithValue(string key, ReplyType replyType)
+            => WithValue(new LocalisedString(key, replyType));
+        public LocalisedFieldBuilder WithValue(string key, params object[] values)
+            => WithValue(new LocalisedString(key, values));
+        public LocalisedFieldBuilder WithValue(string key, ReplyType replyType, params object[] values)
+            => WithValue(new LocalisedString(key, replyType, values));
+        public LocalisedFieldBuilder WithRawName(string rawText)
+            => WithName(new RawString(rawText));
+        public LocalisedFieldBuilder WithName(string key)
+            => WithName(new LocalisedString(key));
+        public LocalisedFieldBuilder WithName(string key, ReplyType replyType)
+            => WithName(new LocalisedString(key, replyType));
+        public LocalisedFieldBuilder WithName(string key, params object[] values)
+            => WithName(new LocalisedString(key, values));
+        public LocalisedFieldBuilder WithName(string key, ReplyType replyType, params object[] values)
+            => WithName(new LocalisedString(key, replyType, values));
+        #endregion
     }
 
     public class RawString : LocalisedString
@@ -312,12 +416,12 @@ namespace TitanBot.Commands
         
         private static LocalisedString Build(string text, ReplyType replyType = ReplyType.None, object[] values = null)
         {
-            if (text == null) return null;
+            if (text == null) return null;            
 
             return new LocalisedString(text, replyType, values ?? new object[0]);
         }
-
-        public static implicit operator LocalisedString(string text)
+        
+        public static explicit operator LocalisedString(string text)
             => Build(text);
         public static implicit operator LocalisedString((string Text, object Value1) tuple)
             => Build(tuple.Text, values: new object[] { tuple.Value1 });

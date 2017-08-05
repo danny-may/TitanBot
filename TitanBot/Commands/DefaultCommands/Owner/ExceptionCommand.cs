@@ -3,21 +3,23 @@ using System.Threading.Tasks;
 using TitanBot.Replying;
 using TitanBot.Storage;
 using TitanBot.Util;
+using static TitanBot.TBLocalisation.Help;
+using static TitanBot.TBLocalisation.Commands;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
-    [Description(TitanBotResource.EXCEPTION_HELP_DESCRIPTION)]
+    [Description(Desc.EXCEPTION)]
     [RequireOwner]
     class ExceptionCommand : Command
     {
         [Call]
-        [Usage(TitanBotResource.EXCEPTION_HELP_USAGE)]
-        async Task ShowException(ulong exceptionId, [CallFlag('f', "full", TitanBotResource.EXCEPTION_HELP_FLAG_F)]bool full = false)
+        [Usage(Usage.EXCEPTION)]
+        async Task ShowException(ulong exceptionId, [CallFlag('f', "full", Flags.EXCEPTION_F)]bool full = false)
         {
             var exception = await Database.FindById<Error>(exceptionId);
             if (exception == null)
             {
-                await ReplyAsync(TitanBotResource.EXCEPTION_NOTFOUND, ReplyType.Error, exceptionId);
+                await ReplyAsync(ExceptionText.NOTFOUND, ReplyType.Error, exceptionId);
                 return;
             }
 
@@ -27,33 +29,34 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
             if (full)
             {
-                var text = TextResource.Format(TitanBotResource.EXCEPTION_USER, (user?.Username ?? TitanBotResource.UNKNOWNUSER) + "#" + (user?.Discriminator ?? "0000")) + "\n" +
-                           TextResource.Format(TitanBotResource.EXCEPTION_CHANNEL, channel.Name, channel.Id) + "\n";
+                var text = TextResource.Format(ExceptionText.USER, (user?.Username ?? TBLocalisation.UNKNOWNUSER) + "#" + (user?.Discriminator ?? "0000")) + "\n" +
+                           TextResource.Format(ExceptionText.CHANNEL, channel.Name, channel.Id) + "\n";
                 if (channel is IGuildChannel guildChannel)
-                    text += $"{TextResource.GetResource(TitanBotResource.EXCEPTION_GUILD)}:\n{guildChannel.Guild.Name} ({guildChannel.Guild.Id})\n";
-                text += $"{TextResource.GetResource(TitanBotResource.EXCEPTION_MESSAGE)}:\n{message.Content}\n\n";
+                    text += $"{TextResource.GetResource(ExceptionText.GUILD)}:\n{guildChannel.Guild.Name} ({guildChannel.Guild.Id})\n";
+                text += $"{TextResource.GetResource(ExceptionText.MESSAGE)}:\n{message.Content}\n\n";
                 text += exception.Content;
 
                 await Reply().WithAttachment(() => text.ToStream(), $"Exception{exceptionId}.txt")
-                             .WithMessage(TextResource.Format(TitanBotResource.EXCEPTION_FULLMESSAGE, ReplyType.Success, exceptionId))
+                             .WithMessage(TextResource.Format(ExceptionText.FULLMESSAGE, ReplyType.Success, exceptionId))
                              .SendAsync();
             }
             else
             {
-                var builder = new EmbedBuilder
+                var builder = new LocalisedEmbedBuilder
                 {
-                    Author = new EmbedAuthorBuilder
-                    {
-                        IconUrl = user?.GetAvatarUrl(),
-                        Name = (user?.Username ?? TitanBotResource.UNKNOWNUSER) + "#" + (user?.Discriminator ?? "0000")
-                    },
-                    Description = exception.Description,
                     Timestamp = exception.Time,
                     Color = System.Drawing.Color.Red.ToDiscord()
-                }.AddField(TextResource.GetResource(TitanBotResource.EXCEPTION_MESSAGE), message.Content)
-                 .AddInlineField(TextResource.GetResource(TitanBotResource.EXCEPTION_CHANNEL), $"{channel.Name} ({channel.Id})");
+                }.WithRawDescription(exception.Description)
+                 .AddField(f => f.WithName(ExceptionText.MESSAGE).WithRawValue(message.Content))
+                 .AddInlineField(f => f.WithName(ExceptionText.CHANNEL).WithRawValue($"{channel.Name} ({channel.Id})"));
+
+                if (user == null)
+                    builder.WithAuthor(a => a.WithName(TBLocalisation.UNKNOWNUSER));
+                else
+                    builder.WithAuthor(a => a.WithIconUrl(user.GetAvatarUrl()).WithRawName($"{user.Username}#{user.Discriminator}"));
+
                 if (channel is IGuildChannel guildChannel)
-                    builder.AddInlineField(TextResource.GetResource(TitanBotResource.EXCEPTION_GUILD), $"{guildChannel.Guild.Name} ({guildChannel.Guild.Id})");
+                    builder.AddInlineField(f => f.WithName(ExceptionText.GUILD).WithRawValue($"{guildChannel.Guild.Name} ({guildChannel.Guild.Id})"));
 
                 await ReplyAsync(builder);
             }
