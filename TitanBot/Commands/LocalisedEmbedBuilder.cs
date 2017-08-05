@@ -1,4 +1,7 @@
 ﻿using Discord;
+using Discord.WebSocket;
+using Discord.Rest;
+using Discord.Rpc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -229,6 +232,50 @@ namespace TitanBot.Commands
                 IconUrl = IconUrl?.ToString(textResource)
             };
 
+        public static implicit operator LocalisedAuthorBuilder(EmbedAuthorBuilder builder)
+            => new LocalisedAuthorBuilder
+            {
+                IconUrl = (RawString)builder.IconUrl,
+                Name = (RawString)builder.Name,
+                Url = (RawString)builder.Url
+            };
+
+        public static LocalisedAuthorBuilder FromUser(IUser user)
+            => new LocalisedAuthorBuilder
+            {
+                IconUrl = (RawString)user.GetAvatarUrl(),
+                Name = (RawString)$"{user.Username}#{user.Discriminator}"
+            };
+
+        public static implicit operator LocalisedAuthorBuilder(SocketUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(SocketGuildUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(SocketSelfUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(SocketGroupUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(SocketUnknownUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(SocketWebhookUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RestUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RestGuildUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RestSelfUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RestGroupUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RestWebhookUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RpcUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RpcGuildUser user)
+            => FromUser(user);
+        public static implicit operator LocalisedAuthorBuilder(RpcWebhookUser user)
+            => FromUser(user);
+
         #region WithX Overloads
         public LocalisedAuthorBuilder WithRawName(string rawText)
             => WithName(new RawString(rawText));
@@ -284,6 +331,13 @@ namespace TitanBot.Commands
             {
                 Text = Text?.ToString(textResource),
                 IconUrl = IconUrl?.ToString(textResource)
+            };
+
+        public static implicit operator LocalisedFooterBuilder(EmbedFooterBuilder builder)
+            => new LocalisedFooterBuilder
+            {
+                IconUrl = (RawString)builder.IconUrl,
+                Text = (RawString)builder.Text
             };
 
         #region WithX Overloads
@@ -343,6 +397,14 @@ namespace TitanBot.Commands
                 Name = Name?.ToString(textResource),
                 Value = Value?.ToString(textResource),
                 IsInline = IsInline
+            };
+
+        public static implicit operator LocalisedFieldBuilder(EmbedFieldBuilder builder)
+            => new LocalisedFieldBuilder
+            {
+                IsInline = builder.IsInline,
+                Name = (RawString)builder.Name,
+                Value = (RawString)builder.Value
             };
 
         #region WithX Overloads
