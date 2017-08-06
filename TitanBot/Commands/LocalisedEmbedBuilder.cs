@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 using TitanBot.Formatting;
 using TitanBot.Replying;
 using TitanBot.Util;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Commands
 {
-    public class LocalisedEmbedBuilder
+    public class LocalisedEmbedBuilder : ILocalisable<EmbedBuilder>
     {
 
         public LocalisedString Title { get; set; }
@@ -131,21 +132,22 @@ namespace TitanBot.Commands
             action(field);
             return AddField(field);
         }
-
-
+        
+        object ILocalisable.Localise(ITextResourceCollection textResource)
+            => Localise(textResource);
         public EmbedBuilder Localise(ITextResourceCollection textResource)
             => new EmbedBuilder
             {
                 Author = Author?.Localise(textResource),
                 Color = Color,
-                Description = Description?.ToString(textResource),
+                Description = Description?.Localise(textResource),
                 Fields = Fields.Select(f => f?.Localise(textResource)).Where(f => f != null).ToList(),
                 Footer = Footer?.Localise(textResource),
-                ImageUrl = ImageUrl?.ToString(textResource),
-                ThumbnailUrl = ThumbnailUrl?.ToString(textResource),
+                ImageUrl = ImageUrl?.Localise(textResource),
+                ThumbnailUrl = ThumbnailUrl?.Localise(textResource),
                 Timestamp = Timestamp,
-                Title = Title?.ToString(textResource),
-                Url = Url?.ToString(textResource)
+                Title = Title?.Localise(textResource),
+                Url = Url?.Localise(textResource)
             };
 
         #region WithX Overloads
@@ -202,7 +204,7 @@ namespace TitanBot.Commands
         #endregion
     }
 
-    public class LocalisedAuthorBuilder
+    public class LocalisedAuthorBuilder : ILocalisable<EmbedAuthorBuilder>
     {
         public LocalisedString Name { get; set; }
         public LocalisedString Url { get; set; }
@@ -224,12 +226,14 @@ namespace TitanBot.Commands
             return this;
         }
 
+        object ILocalisable.Localise(ITextResourceCollection textResource)
+            => Localise(textResource);
         public EmbedAuthorBuilder Localise(ITextResourceCollection textResource)
             => new EmbedAuthorBuilder
             {
-                Name = Name?.ToString(textResource),
-                Url = Url?.ToString(textResource),
-                IconUrl = IconUrl?.ToString(textResource)
+                Name = Name?.Localise(textResource),
+                Url = Url?.Localise(textResource),
+                IconUrl = IconUrl?.Localise(textResource)
             };
 
         public static implicit operator LocalisedAuthorBuilder(EmbedAuthorBuilder builder)
@@ -310,7 +314,7 @@ namespace TitanBot.Commands
         #endregion
     }
 
-    public class LocalisedFooterBuilder
+    public class LocalisedFooterBuilder : ILocalisable<EmbedFooterBuilder>
     {
         public LocalisedString Text { get; set; }
         public LocalisedString IconUrl { get; set; }
@@ -326,11 +330,13 @@ namespace TitanBot.Commands
             return this;
         }
 
+        object ILocalisable.Localise(ITextResourceCollection textResource)
+            => Localise(textResource);
         public EmbedFooterBuilder Localise(ITextResourceCollection textResource)
             => new EmbedFooterBuilder
             {
-                Text = Text?.ToString(textResource),
-                IconUrl = IconUrl?.ToString(textResource)
+                Text = Text?.Localise(textResource),
+                IconUrl = IconUrl?.Localise(textResource)
             };
 
         public static implicit operator LocalisedFooterBuilder(EmbedFooterBuilder builder)
@@ -364,7 +370,7 @@ namespace TitanBot.Commands
         #endregion
     }
 
-    public class LocalisedFieldBuilder
+    public class LocalisedFieldBuilder : ILocalisable<EmbedFieldBuilder>
     {
         public LocalisedString Name { get; set; }
         public LocalisedString Value { get; set; }
@@ -391,11 +397,13 @@ namespace TitanBot.Commands
             return this;
         }
 
+        object ILocalisable.Localise(ITextResourceCollection textResource)
+            => Localise(textResource);
         public EmbedFieldBuilder Localise(ITextResourceCollection textResource)
             => new EmbedFieldBuilder
             {
-                Name = Name?.ToString(textResource),
-                Value = Value?.ToString(textResource),
+                Name = Name?.Localise(textResource),
+                Value = Value?.Localise(textResource),
                 IsInline = IsInline
             };
 
@@ -439,7 +447,7 @@ namespace TitanBot.Commands
             => new RawString(text);
     }
 
-    public class LocalisedString
+    public class LocalisedString : ILocalisable<string>
     {
         public string Key { get; }
         public ReplyType ReplyType { get; } = ReplyType.None;
@@ -464,17 +472,17 @@ namespace TitanBot.Commands
             return this;
         }
 
-        public string ToString(ITextResourceCollection textResource)
+        object ILocalisable.Localise(ITextResourceCollection textResource)
+            => Localise(textResource);
+        public string Localise(ITextResourceCollection textResource)
         {
             if (Key == null) return null;
-            var prepped = _values.Select(v => v is LocalisedString ls ? ls.ToString(textResource) : v).ToArray();
+            var prepped = _values.Select(v => v is ILocalisable ls ? ls.Localise(textResource) : v).ToArray();
             return textResource.Format(Key, ReplyType, prepped);
         }
 
         public override string ToString()
-        {
-            return Key;
-        }
+            => Key;
         
         private static LocalisedString Build(string text, ReplyType replyType = ReplyType.None, object[] values = null)
         {
@@ -482,7 +490,7 @@ namespace TitanBot.Commands
 
             return new LocalisedString(text, replyType, values ?? new object[0]);
         }
-        
+
         public static explicit operator LocalisedString(string text)
             => Build(text);
         public static implicit operator LocalisedString((string Text, object Value1) tuple)

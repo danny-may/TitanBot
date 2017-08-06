@@ -217,6 +217,7 @@
     <Compile Include="Commands\Embedable.cs" />
     <Compile Include="Commands\FlagDefinition.cs" />
     <Compile Include="Debugging\Timer.cs" />
+    <Compile Include="Formatting\Interfaces\ILocalisable.cs" />
     <Compile Include="Replying\Interfaces\IEmbeddable.cs" />
     <Compile Include="Contexts\Interfaces\ICommandContext.cs" />
     <Compile Include="Contexts\Interfaces\IMessageContext.cs" />
