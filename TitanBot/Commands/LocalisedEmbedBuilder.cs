@@ -386,11 +386,7 @@ namespace TitanBot.Commands
             Value = value;
             return this;
         }
-        public LocalisedFieldBuilder WithValue(object value)
-        {
-            Value = new LocalisedString(value);
-            return this;
-        }
+        
         public LocalisedFieldBuilder WithIsInline(bool isInline)
         {
             IsInline = isInline;
@@ -418,6 +414,8 @@ namespace TitanBot.Commands
         #region WithX Overloads
         public LocalisedFieldBuilder WithRawValue(string rawText)
             => WithValue(new RawString(rawText));
+        public LocalisedFieldBuilder WithValue(object value)
+            => WithValue(new LocalisedString(value));
         public LocalisedFieldBuilder WithValue(string key)
             => WithValue(new LocalisedString(key));
         public LocalisedFieldBuilder WithValue(string key, ReplyType replyType)
@@ -426,6 +424,10 @@ namespace TitanBot.Commands
             => WithValue(new LocalisedString(key, values));
         public LocalisedFieldBuilder WithValue(string key, ReplyType replyType, params object[] values)
             => WithValue(new LocalisedString(key, replyType, values));
+        public LocalisedFieldBuilder WithValues<T>(IEnumerable<T> values, string separator = ", ")
+            => WithValues(values.ToArray(), separator);
+        public LocalisedFieldBuilder WithValues<T>(T[] values, string separator = ", ")
+            => WithValue(string.Join(separator, values.Select((v, i) => $"{{{i}}}")), values);
         public LocalisedFieldBuilder WithRawName(string rawText)
             => WithName(new RawString(rawText));
         public LocalisedFieldBuilder WithName(string key)
