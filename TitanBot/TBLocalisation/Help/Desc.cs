@@ -41,8 +41,6 @@ namespace TitanBot
                         { EDITCOMMAND, "Used to allow people with varying roles or permissions to use different commands." },
                         { SETTINGS, "Allows the retrieval and changing of existing settings for the server" },
                         { SETTINGSRESET, "Resets all settings and command permissions for a guild." },
-                        { SETTINGSRESET, "Resets all settings and command permissions for a guild." },
-                        { SETTINGSRESET, "Resets all settings and command permissions for a guild." },
                         { ABOUT, "A tiny command that just displays some helpful links :)" },
                         { DONATE, "You.. youre thinking of donating? :open_mouth: This command will give you a link to my patreon page" },
                         { HELP, "Displays help for any command" },
