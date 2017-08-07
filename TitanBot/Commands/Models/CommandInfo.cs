@@ -17,7 +17,7 @@ namespace TitanBot.Commands
         public string PermissionKey { get; }
         public string Note { get; }
         public bool RequireOwner { get; }
-        public ulong? RequireGuild { get; }
+        public ulong[] RequireGuild { get; }
         public bool Hidden { get; }
 
         private CommandInfo(Type type)

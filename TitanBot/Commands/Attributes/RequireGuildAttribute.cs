@@ -6,15 +6,15 @@ namespace TitanBot.Commands
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class RequireGuildAttribute : RequireContextAttribute
     {
-        public ulong GuildID { get; }
+        public ulong[] GuildIDs { get; }
 
-        public RequireGuildAttribute(ulong guild) : base(ContextType.Guild)
+        public RequireGuildAttribute(params ulong[] guild) : base(ContextType.Guild)
         {
-            GuildID = guild;
+            GuildIDs = guild;
         }
 
-        new public static ulong? GetFor(Type info)
-            => info.GetCustomAttribute<RequireGuildAttribute>()?.GuildID;
+        new public static ulong[] GetFor(Type info)
+            => info.GetCustomAttribute<RequireGuildAttribute>()?.GuildIDs ?? new ulong[0];
         new public static bool ExistsOn(Type info)
             => info.GetCustomAttribute<RequireGuildAttribute>() != null;
     }
