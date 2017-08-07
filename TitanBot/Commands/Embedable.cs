@@ -29,6 +29,8 @@ namespace TitanBot.Commands
             => FromEmbed(GetBuilder(embed), GetString);
         public static implicit operator Embedable(EmbedBuilder embed)
             => FromEmbed(embed, GetString);
+        public static implicit operator Embedable(LocalisedEmbedBuilder embed)
+            => FromEmbed(embed, GetString);
 
         public static Embedable FromEmbed(Embed embed)
             => FromEmbed(GetBuilder(embed), GetString);
