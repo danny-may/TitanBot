@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using TitanBot.Commands;
+using TitanBot.Formatting;
 
 namespace TitanBot.Replying
 {

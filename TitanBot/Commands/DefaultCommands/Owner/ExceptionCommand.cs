@@ -5,6 +5,7 @@ using TitanBot.Storage;
 using TitanBot.Util;
 using static TitanBot.TBLocalisation.Help;
 using static TitanBot.TBLocalisation.Commands;
+using TitanBot.Formatting;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {

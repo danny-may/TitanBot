@@ -188,7 +188,9 @@
     <Compile Include="Commands\Attributes\RequireGuildAttribute.cs" />
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
-    <Compile Include="Commands\LocalisedEmbedBuilder.cs" />
+    <Compile Include="Formatting\Localisation\DynamicString.cs" />
+    <Compile Include="Formatting\Localisation\LocalisedEmbedBuilder.cs" />
+    <Compile Include="Formatting\Localisation\LocalisedString.cs" />
     <Compile Include="Contexts\CommandContext.cs" />
     <Compile Include="Commands\DefaultCommands\Abstract\SettingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />
@@ -218,6 +220,7 @@
     <Compile Include="Commands\FlagDefinition.cs" />
     <Compile Include="Debugging\Timer.cs" />
     <Compile Include="Formatting\Interfaces\ILocalisable.cs" />
+    <Compile Include="Formatting\Localisation\RawString.cs" />
     <Compile Include="Replying\Interfaces\IEmbeddable.cs" />
     <Compile Include="Contexts\Interfaces\ICommandContext.cs" />
     <Compile Include="Contexts\Interfaces\IMessageContext.cs" />

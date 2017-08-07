@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System.Threading.Tasks;
+using TitanBot.Formatting;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
@@ -10,7 +11,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         async Task TestAsync()
         {
             var builder = new LocalisedEmbedBuilder();
-            builder.AddField(f => f.WithRawName("test").WithValues(", ", new [] { "a", "b", "c" }));
+            builder.AddField(f => f.WithRawName("test").WithValue(tr => tr.ToString()));
             await ReplyAsync(builder);
         }
     }
