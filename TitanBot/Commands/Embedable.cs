@@ -45,7 +45,11 @@ namespace TitanBot.Commands
         {
             if (embed == null)
                 return null;
-            var builder = new LocalisedEmbedBuilder();
+            var builder = new LocalisedEmbedBuilder()
+            {
+                Fields = embed.Fields.Select(f => (LocalisedFieldBuilder)(new EmbedFieldBuilder().WithIsInline(f.Inline).WithName(f.Name).WithValue(f.Value)))
+                                     .ToList()
+            };
             if (embed.Author != null)
                 builder.WithAuthor(new EmbedAuthorBuilder
                 {

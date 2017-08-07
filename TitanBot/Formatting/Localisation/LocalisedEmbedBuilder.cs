@@ -419,7 +419,7 @@ namespace TitanBot.Formatting
             {
                 IsInline = builder.IsInline,
                 Name = (RawString)builder.Name,
-                Value = (RawString)builder.Value
+                Value = (RawString)builder.Value.ToString()
             };
 
         #region WithX Overloads
