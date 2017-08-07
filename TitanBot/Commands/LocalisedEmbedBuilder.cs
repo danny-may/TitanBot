@@ -427,7 +427,7 @@ namespace TitanBot.Commands
         public LocalisedFieldBuilder WithValues<T>(IEnumerable<T> values, string separator = ", ")
             => WithValues(values.ToArray(), separator);
         public LocalisedFieldBuilder WithValues<T>(T[] values, string separator = ", ")
-            => WithValue(string.Join(separator, values.Select((v, i) => $"{{{i}}}")), values);
+            => WithValue(LocalisedString.Join(separator, values));
         public LocalisedFieldBuilder WithRawName(string rawText)
             => WithName(new RawString(rawText));
         public LocalisedFieldBuilder WithName(string key)
@@ -492,6 +492,9 @@ namespace TitanBot.Commands
 
             return new LocalisedString(text, replyType, values ?? new object[0]);
         }
+
+        public static LocalisedString Join(string separator, params object[] values)
+            => new LocalisedString(string.Join(separator, values.Select((v, i) => $"{{{i}}}")), values);
 
         public static explicit operator LocalisedString(string text)
             => Build(text);
