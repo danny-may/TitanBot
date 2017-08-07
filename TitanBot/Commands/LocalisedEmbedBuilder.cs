@@ -424,10 +424,10 @@ namespace TitanBot.Commands
             => WithValue(new LocalisedString(key, values));
         public LocalisedFieldBuilder WithValue(string key, ReplyType replyType, params object[] values)
             => WithValue(new LocalisedString(key, replyType, values));
-        public LocalisedFieldBuilder WithValues<T>(IEnumerable<T> values, string separator = ", ")
-            => WithValues(values.ToArray(), separator);
-        public LocalisedFieldBuilder WithValues<T>(T[] values, string separator = ", ")
-            => WithValue(LocalisedString.Join(separator, values));
+        public LocalisedFieldBuilder WithValues<T>(string separator, IEnumerable<T> values)
+            => WithValues(separator, values.ToArray());
+        public LocalisedFieldBuilder WithValues<T>(string separator, T[] values)
+            => WithValue(LocalisedString.Join(separator, values.Cast<object>().ToArray()));
         public LocalisedFieldBuilder WithRawName(string rawText)
             => WithName(new RawString(rawText));
         public LocalisedFieldBuilder WithName(string key)

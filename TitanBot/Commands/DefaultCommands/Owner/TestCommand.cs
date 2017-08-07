@@ -9,9 +9,9 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         [Call]
         async Task TestAsync()
         {
-            await Task.Delay(5000);
-            await ReplyAsync(new string('a', 3000));
-            var x = new EmbedBuilder();
+            var builder = new LocalisedEmbedBuilder();
+            builder.AddField(f => f.WithRawName("test").WithValues(", ", new [] { "a", "b", "c" }));
+            await ReplyAsync(builder);
         }
     }
 }
