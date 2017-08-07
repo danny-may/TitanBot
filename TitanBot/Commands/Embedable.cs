@@ -2,25 +2,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Replying;
 
 namespace TitanBot.Commands
 {
     public class Embedable : IEmbedable
     {
-        public EmbedBuilder Builder { get; }
-        private Func<Embed, string> StringFormatter { get; }
+        public ILocalisable<EmbedBuilder> Builder { get; }
+        private Func<ILocalisable<EmbedBuilder>, ILocalisable<string>> StringFormatter { get; }
 
-        private Embedable(EmbedBuilder value, Func<Embed, string> stringFormat)
+        private Embedable(ILocalisable<EmbedBuilder> value, Func<ILocalisable<EmbedBuilder>, ILocalisable<string>> stringFormat)
         {
             Builder = value;
             StringFormatter = stringFormat;
         }
 
-        public Embed GetEmbed()
+        public ILocalisable<EmbedBuilder> GetEmbed()
             => Builder;
 
-        public string GetString()
+        public ILocalisable<string> GetString()
             => StringFormatter(Builder);
 
         public static implicit operator Embedable(Embed embed)
@@ -30,18 +32,18 @@ namespace TitanBot.Commands
 
         public static Embedable FromEmbed(Embed embed)
             => FromEmbed(GetBuilder(embed), GetString);
-        public static Embedable FromEmbed(EmbedBuilder embed)
+        public static Embedable FromEmbed(ILocalisable<EmbedBuilder> embed)
             => FromEmbed(embed, GetString);
-        public static Embedable FromEmbed(Embed embed, Func<Embed, string> stringFormat)
+        public static Embedable FromEmbed(Embed embed, Func<ILocalisable<EmbedBuilder>, ILocalisable<string>> stringFormat)
             => FromEmbed(GetBuilder(embed), stringFormat);
-        public static Embedable FromEmbed(EmbedBuilder embed, Func<Embed, string> stringFormat)
+        public static Embedable FromEmbed(ILocalisable<EmbedBuilder> embed, Func<ILocalisable<EmbedBuilder>, ILocalisable<string>> stringFormat)
             => embed == null ? null : new Embedable(embed, stringFormat);
 
-        private static EmbedBuilder GetBuilder(Embed embed)
+        private static ILocalisable<EmbedBuilder> GetBuilder(Embed embed)
         {
             if (embed == null)
                 return null;
-            var builder = new EmbedBuilder();
+            var builder = new LocalisedEmbedBuilder();
             if (embed.Author != null)
                 builder.WithAuthor(new EmbedAuthorBuilder
                 {
@@ -50,34 +52,38 @@ namespace TitanBot.Commands
                     Url = embed.Author?.Url
                 });
             if (embed.Color != null) builder.WithColor(embed.Color.Value);
-            builder.WithDescription(embed.Description);
+            builder.WithRawDescription(embed.Description);
             if (embed.Footer != null)
                 builder.WithFooter(new EmbedFooterBuilder
                 {
                     IconUrl = embed.Footer?.IconUrl,
                     Text = embed.Footer?.Text
                 });
-            if (embed.Image != null) builder.WithImageUrl(embed.Image?.Url);
-            if (embed.Thumbnail != null) builder.WithThumbnailUrl(embed.Thumbnail?.Url);
+            if (embed.Image != null) builder.WithRawImageUrl(embed.Image?.Url);
+            if (embed.Thumbnail != null) builder.WithRawThumbnailUrl(embed.Thumbnail?.Url);
             if (embed.Timestamp != null) builder.WithTimestamp(embed.Timestamp.Value);
-            builder.WithTitle(embed.Title);
-            builder.WithUrl(embed.Url);
+            builder.WithRawTitle(embed.Title);
+            builder.WithRawUrl(embed.Url);
 
             return builder;
         }
-        private static string GetString(Embed embed)
+        private static ILocalisable<string> GetString(ILocalisable<EmbedBuilder> embed)
         {
-            var blocks = new List<string>();
-            if (embed.Author != null) blocks.Add($"{embed.Author?.Name}\n{embed.Author?.Url}".Trim());
-            if (embed.Title != null) blocks.Add($"**{embed.Title}**".Trim());
-            if (embed.Description != null) blocks.Add(embed.Description.Trim());
-            if (embed.Thumbnail != null) blocks.Add($"Thumbnail: {embed.Thumbnail?.Url}".Trim());
-            foreach (var field in embed.Fields)
-                blocks.Add($"**{field.Name.Trim()}**\n{field.Value.ToString().Trim()}");
-            if (embed.Image != null) blocks.Add(embed.Image?.Url.Trim());
-            blocks.Add(string.Join(" | ", new object[] { embed.Footer?.Text, embed.Timestamp }.Where(v => !string.IsNullOrWhiteSpace(v?.ToString()))).Trim());
+            return new DynamicString(tr =>
+            {
+                var localised = embed.Localise(tr);
+                var blocks = new List<string>();
+                if (localised.Author != null) blocks.Add($"{localised.Author?.Name}\n{localised.Author?.Url}".Trim());
+                if (localised.Title != null) blocks.Add($"**{localised.Title}**".Trim());
+                if (localised.Description != null) blocks.Add(localised.Description.Trim());
+                if (localised.ThumbnailUrl != null) blocks.Add($"Thumbnail: {localised.ThumbnailUrl}".Trim());
+                foreach (var field in localised.Fields)
+                    blocks.Add($"**{field.Name.Trim()}**\n{field.Value.ToString().Trim()}");
+                if (localised.ImageUrl != null) blocks.Add(localised.ImageUrl.Trim());
+                blocks.Add(string.Join(" | ", new object[] { localised.Footer?.Text, localised.Timestamp }.Where(v => !string.IsNullOrWhiteSpace(v?.ToString()))).Trim());
 
-            return string.Join("\n---------\n", blocks.Where(b => !string.IsNullOrWhiteSpace(b)).ToArray());
+                return string.Join("\n---------\n", blocks.Where(b => !string.IsNullOrWhiteSpace(b)).ToArray());
+            });
         }
     }
 }

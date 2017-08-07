@@ -30,15 +30,15 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
             if (full)
             {
-                var text = TextResource.Format(ExceptionText.USER, (user?.Username ?? TBLocalisation.UNKNOWNUSER) + "#" + (user?.Discriminator ?? "0000")) + "\n" +
-                           TextResource.Format(ExceptionText.CHANNEL, channel.Name, channel.Id) + "\n";
+                var text = TextResource.GetResource(ExceptionText.USER)+$":\n{(user?.Username ?? TBLocalisation.UNKNOWNUSER)}#{user?.Discriminator ?? "0000"} ({user?.Id})\n" +
+                           TextResource.GetResource(ExceptionText.CHANNEL)+$":\n{channel.Name} ({channel.Id})\n";
                 if (channel is IGuildChannel guildChannel)
                     text += $"{TextResource.GetResource(ExceptionText.GUILD)}:\n{guildChannel.Guild.Name} ({guildChannel.Guild.Id})\n";
                 text += $"{TextResource.GetResource(ExceptionText.MESSAGE)}:\n{message.Content}\n\n";
                 text += exception.Content;
 
                 await Reply().WithAttachment(() => text.ToStream(), $"Exception{exceptionId}.txt")
-                             .WithMessage(TextResource.Format(ExceptionText.FULLMESSAGE, ReplyType.Success, exceptionId))
+                             .WithMessage((LocalisedString)(ExceptionText.FULLMESSAGE, ReplyType.Success, exceptionId))
                              .SendAsync();
             }
             else

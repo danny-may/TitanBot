@@ -1,10 +1,11 @@
 ﻿using Discord;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Replying
 {
     public interface IEmbedable
     {
-        Embed GetEmbed();
-        string GetString();
+        ILocalisable<EmbedBuilder> GetEmbed();
+        ILocalisable<string> GetString();
     }
 }

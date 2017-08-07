@@ -13,7 +13,7 @@ namespace TitanBot
         {
             public static class ExceptionText
             {
-                private const string BASE_PATH = Commands.BASE_PATH + "ExceptionText";
+                private const string BASE_PATH = Commands.BASE_PATH + "EXCEPTIONTEXT_";
 
                 public const string NOTFOUND = BASE_PATH + nameof(NOTFOUND);
                 public const string MESSAGE = BASE_PATH + nameof(MESSAGE);
@@ -27,10 +27,10 @@ namespace TitanBot
                     {
                         { NOTFOUND, "Exception {0} has not yet occured!" },
                         { MESSAGE, "Message" },
-                        { CHANNEL, "Channel:\n{0} ({1})" },
+                        { CHANNEL, "Channel" },
                         { GUILD, "Guild" },
                         { FULLMESSAGE, "Here is everything that was logged for exception {0}" },
-                        { USER, "USER:\n{0}" }
+                        { USER, "User" }
                     }.ToImmutableDictionary();
             }
         }

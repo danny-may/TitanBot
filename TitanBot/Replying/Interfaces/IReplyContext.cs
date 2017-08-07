@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using TitanBot.Commands;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Replying
 {
@@ -14,14 +15,9 @@ namespace TitanBot.Replying
     {
         event OnSendEventHandler OnSend;
 
-        IReplyContext WithMessage(string message);
-        IReplyContext WithMessage(string message, ReplyType replyType);
-        IReplyContext WithMessage(string message, params object[] values);
-        IReplyContext WithMessage(string message, ReplyType replyType, params object[] values);
+        IReplyContext WithMessage(ILocalisable<string> message);
         IReplyContext WithAttachment(Func<Stream> attachment, string name);
         IReplyContext WithEmbedable(IEmbedable embedable);
-        IReplyContext WithEmbedable(Embedable embedable);
-        IReplyContext WithEmbedable(LocalisedEmbedBuilder embedable);
         IReplyContext WithErrorHandler(MessageSendErrorHandler handler);
         IReplyContext WithTTS(bool tts);
         IReplyContext WithRequestOptions(RequestOptions options);

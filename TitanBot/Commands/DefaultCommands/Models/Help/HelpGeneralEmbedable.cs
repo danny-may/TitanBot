@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TitanBot.Contexts;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Replying;
 using static TitanBot.TBLocalisation.Commands.HelpText;
 
@@ -26,7 +27,7 @@ namespace TitanBot.Commands
             AcceptedPrefixes = acceptedPrefixes;
         }
 
-        public Embed GetEmbed()
+        public ILocalisable<EmbedBuilder> GetEmbed()
         {
             var builder = new LocalisedEmbedBuilder()
             {
@@ -41,19 +42,23 @@ namespace TitanBot.Commands
             foreach (var group in groups)
                 builder.AddField(f => f.WithRawName(group.Key).WithRawValue(string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key))));
 
-            return builder.Localise(TextResource);
+            return builder;
         }
 
-        public string GetString()
+        public ILocalisable<string> GetString()
         {
-            var msg =  TextResource.GetResource(LIST_TITLE, ReplyType.Info) + "\n" +
-                       TextResource.Format(LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)) + "\n" +
-                       "```prolog\n";
+            var entries = new List<LocalisedString>
+            {
+                (LIST_TITLE, ReplyType.Info),
+                (LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
+                (RawString)"```prolog"
+            };
             var groups = Commands.GroupBy(c => c.Group);
             foreach (var group in groups)
-                msg += TextResource.Format(LIST_COMMAND, group.Key.ToTitleCase(), string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))) + "\n";
+                entries.Add((LIST_COMMAND, group.Key.ToTitleCase(), string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))));
+            entries.Add((RawString)"```");
 
-            return msg.Trim() + "```";
+            return LocalisedString.Join("\n", entries.ToArray());
         }
     }
 }

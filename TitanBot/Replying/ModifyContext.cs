@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Settings;
 using TitanBot.Util;
 
@@ -23,7 +24,8 @@ namespace TitanBot.Replying
         private GeneralUserSetting GeneralUserSetting { get; }
         private ITextResourceCollection TextResource { get; }
 
-        private string Text { get; set; }
+        private ILocalisable<string> Text { get; set; }
+        private string Localised => Text.Localise(TextResource);
         private RequestOptions Options { get; set; }
         private IEmbedable Embedable { get; set; }
 
@@ -33,7 +35,7 @@ namespace TitanBot.Replying
         public ModifyContext(IUserMessage message, IUser user, IDependencyFactory factory)
         {
             Message = message;
-            Text = message.Content;
+            Text = (RawString)message.Content;
             Embedable = Commands.Embedable.FromEmbed(message.Embeds.FirstOrDefault(e => e.Type == EmbedType.Rich) as Embed);
 
             User = user;
@@ -58,26 +60,18 @@ namespace TitanBot.Replying
         }
 
         public IModifyContext ChangeMessage(string message)
-        {
-            Text = TextResource.GetResource(message);
-            return this;
-        }
-
+            => ChangeMessage(new LocalisedString(message));
+        public IModifyContext ChangeRawMessage(string message)
+            => ChangeMessage(new RawString(message));
         public IModifyContext ChangeMessage(string message, ReplyType replyType)
-        {
-            Text = TextResource.GetResource(message, replyType);
-            return this;
-        }
-
+            => ChangeMessage(new LocalisedString(message, replyType));
         public IModifyContext ChangeMessage(string message, params object[] values)
-        {
-            Text = TextResource.Format(message, values);
-            return this;
-        }
-
+            => ChangeMessage(new LocalisedString(message, values));
         public IModifyContext ChangeMessage(string message, ReplyType replyType, params object[] values)
+            => ChangeMessage(new LocalisedString(message, replyType, values));
+        public IModifyContext ChangeMessage(ILocalisable<string> message)
         {
-            Text = TextResource.Format(message, replyType, values);
+            Text = message;
             return this;
         }
 
@@ -86,10 +80,9 @@ namespace TitanBot.Replying
             Options = options;
             return this;
         }
-        public IModifyContext ChangeEmbedable(LocalisedEmbedBuilder embedable)
-            => ChangeEmbedable(embedable.Localise(TextResource));
-        public IModifyContext ChangeEmbedable(Embedable embedable)
-            => ChangeEmbedable((IEmbedable)embedable);
+        
+        public IModifyContext ChangeEmbedable(ILocalisable<EmbedBuilder> embedable)
+            => ChangeEmbedable(Commands.Embedable.FromEmbed(embedable));
         public IModifyContext ChangeEmbedable(IEmbedable embedable)
         {
             Embedable = embedable;
@@ -108,21 +101,21 @@ namespace TitanBot.Replying
                 IUser me = Guild?.GetUserAsync(Client.CurrentUser.Id).Result ?? (IUser)Client.CurrentUser;
                 if (!(GeneralUserSetting.UseEmbeds && Message.Channel.UserHasPermission(me, ChannelPermission.EmbedLinks)))
                 {
-                    Text = Text + "\n" + Embedable?.GetString();
+                    Text = new DynamicString(tr => Text.Localise(tr) + "\n" + Embedable?.GetString().Localise(tr));
                     Embedable = null;
                 }
 
                 await Message.ModifyAsync(m =>
                 {
-                    m.Content = Text;
-                    m.Embed = Embedable?.GetEmbed();
+                    m.Content = Text.Localise(TextResource);
+                    m.Embed = Embedable?.GetEmbed().Localise(TextResource).Build();
                 }, Options);
             }
             catch (Exception ex)
             {
                 if (Handler == null)
                     throw;
-                await Handler(ex, Message, Text, Embedable);
+                await Handler(ex, Message, Localised, Embedable);
             }
 
             if (!stealthy)

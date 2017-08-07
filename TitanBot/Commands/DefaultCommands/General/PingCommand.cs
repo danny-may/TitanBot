@@ -8,6 +8,9 @@ namespace TitanBot.Commands.DefautlCommands.General
     [Description(Desc.PING)]
     public class PingCommand : Command
     {
+        protected override bool ShowTyping => false;
+        protected override bool WaitForTyping => false;
+
         [Call]
         [Usage(Usage.PING)]
         async Task SendPongAsync()

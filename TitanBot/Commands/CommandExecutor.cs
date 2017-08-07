@@ -13,6 +13,7 @@ using TitanBot.Settings;
 using TitanBot.Storage;
 using static TitanBot.TBLocalisation.Logic;
 using TitanBot.TypeReaders;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Commands
 {
@@ -50,13 +51,16 @@ namespace TitanBot.Commands
         }
 
         private ValueTask<IUserMessage> ReplyAsync(string text)
-            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text).SendAsync();
+            => ReplyAsync(new LocalisedString(text));
         private ValueTask<IUserMessage> ReplyAsync(string text, ReplyType replyType)
-            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text, replyType).SendAsync();
+            => ReplyAsync(new LocalisedString(text, replyType));
         private ValueTask<IUserMessage> ReplyAsync(string text, params object[] values)
-            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text, values).SendAsync();
+            => ReplyAsync(new LocalisedString(text, values));
         private ValueTask<IUserMessage> ReplyAsync(string text, ReplyType replyType, params object[] values)
-            => Replier.Reply(Context.Channel, Context.Author).WithMessage(text, replyType, values).SendAsync();
+            => ReplyAsync(new LocalisedString(text, replyType, values));
+
+        private ValueTask<IUserMessage> ReplyAsync(ILocalisable<string> message)
+            => Replier.Reply(Context.Channel, Context.Author).WithMessage(message).SendAsync();
 
         public async Task Run()
         {
@@ -128,10 +132,12 @@ namespace TitanBot.Commands
                         foreach (var buildEvent in Owner.GetBuildEvents(instance.GetType()))
                             buildEvent.Invoke(instance);
                         LogCommand(call);
-                        using (Context.Channel.EnterTypingState())
-                        {
-                            await (Task)call.Call.Invoke(instance, response.CallArguments);
-                        }
+                        if (instance._showTyping)
+                            if (instance._waitForTyping)
+                                await Context.Channel.TriggerTypingAsync();
+                            else
+                                Context.Channel.TriggerTypingAsync().DontWait();
+                        await (Task)call.Call.Invoke(instance, response.CallArguments);
                     }
                     return;
                 }

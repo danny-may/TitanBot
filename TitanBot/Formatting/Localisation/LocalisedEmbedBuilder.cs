@@ -146,6 +146,21 @@ namespace TitanBot.Formatting
                 Url = Url?.Localise(textResource)
             };
 
+        public static implicit operator LocalisedEmbedBuilder(EmbedBuilder builder)
+            => new LocalisedEmbedBuilder
+            {
+                Author = builder?.Author,
+                Color = builder?.Color,
+                Description = (RawString)builder?.Description,
+                Fields = builder?.Fields?.Cast<LocalisedFieldBuilder>().ToList(),
+                Footer = builder?.Footer,
+                ImageUrl = (RawString)builder?.ImageUrl,
+                ThumbnailUrl = (RawString)builder?.ThumbnailUrl,
+                Timestamp = builder?.Timestamp,
+                Title = (RawString)builder?.Title,
+                Url = (RawString)builder?.Url
+            };
+
         #region WithX Overloads
         public LocalisedEmbedBuilder WithRawTitle(string rawText)
             => WithTitle(new RawString(rawText));

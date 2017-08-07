@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Reflection;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Commands
 {
-    public class FlagDefinition
+    public class FlagDefinition : ILocalisable<string>
     {
         public char ShortKey { get; }
         public string LongKey { get; }
@@ -26,7 +27,9 @@ namespace TitanBot.Commands
                              (bool)param.DefaultValue == false);
         }
 
-        public string ToString(ITextResourceCollection textResource)
+        object ILocalisable.Localise(ITextResourceCollection textResource)
+            => Localise(textResource);
+        public string Localise(ITextResourceCollection textResource)
         {
             if (LongKey != null)
                 return $"`-{ShortKey}` / `--{LongKey}` = {textResource.GetResource(Description)}";

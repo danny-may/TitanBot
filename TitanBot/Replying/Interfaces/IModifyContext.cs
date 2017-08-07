@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using TitanBot.Commands;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Replying
 {
@@ -14,13 +15,14 @@ namespace TitanBot.Replying
     {
         event OnModifyEventHandler OnModify;
 
+        IModifyContext ChangeMessage(ILocalisable<string> message);
+        IModifyContext ChangeRawMessage(string message);
         IModifyContext ChangeMessage(string message);
         IModifyContext ChangeMessage(string message, ReplyType replyType);
         IModifyContext ChangeMessage(string message, params object[] values);
         IModifyContext ChangeMessage(string message, ReplyType replyType, params object[] values);
         IModifyContext ChangeEmbedable(IEmbedable embedable);
-        IModifyContext ChangeEmbedable(Embedable embedable);
-        IModifyContext ChangeEmbedable(LocalisedEmbedBuilder embedable);
+        IModifyContext ChangeEmbedable(ILocalisable<EmbedBuilder> embedable);
         IModifyContext WithRequestOptions(RequestOptions options);
         IModifyContext WithErrorHandler(MessageModifyErrorHandler handler);
 

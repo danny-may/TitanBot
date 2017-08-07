@@ -10,6 +10,7 @@ using TitanBot.Formatting;
 using TitanBot.Settings;
 using TitanBot.Util;
 using static TitanBot.TBLocalisation.Logic;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Replying
 {
@@ -24,12 +25,14 @@ namespace TitanBot.Replying
         private GeneralUserSetting GeneralUserSetting { get; }
         private ITextResourceCollection TextResource { get; }
 
-        private string Message { get; set; } = "";
+        private ILocalisable<string> Message { get; set; } = (RawString)"";
         private bool IsTTS { get; set; }
         private RequestOptions Options { get; set; }
         private IEmbedable Embedable { get; set; }
         private Func<Stream> Attachment { get; set; }
         private string AttachmentName { get; set; }
+
+        private string Localised => Message.Localise(TextResource);
 
         private event MessageSendErrorHandler Handler;
         public event OnSendEventHandler OnSend;
@@ -57,7 +60,7 @@ namespace TitanBot.Replying
 
         public async ValueTask<IUserMessage> SendAsync(bool stealthy = false)
         {
-            if (string.IsNullOrWhiteSpace(Message) && Embedable == null)
+            if (string.IsNullOrWhiteSpace(Localised) && Embedable == null)
                 throw new InvalidOperationException("Unable to send a message without an embed or message");
 
             IUserMessage msg = null;
@@ -68,15 +71,15 @@ namespace TitanBot.Replying
                 IsTTS = IsTTS && Channel.UserHasPermission(me, ChannelPermission.SendTTSMessages);
                 if (Attachment == null)
                     if (GeneralUserSetting.UseEmbeds && Channel.UserHasPermission(me, ChannelPermission.EmbedLinks))
-                        msg = await Channel.SendMessageAsync(Message, IsTTS, Embedable?.GetEmbed(), Options);
+                        msg = await Channel.SendMessageAsync(Localised, IsTTS, Embedable?.GetEmbed().Localise(TextResource), Options);
                     else
-                        msg = await Channel.SendMessageAsync(Message + "\n" + Embedable?.GetString(), IsTTS, null, Options);
+                        msg = await Channel.SendMessageAsync(Localised + "\n" + Embedable?.GetString(), IsTTS, null, Options);
                 else
-                    msg = await Channel.SendFileAsync(Attachment(), AttachmentName, Message + "\n" + Embedable?.GetString(), IsTTS, Options);
+                    msg = await Channel.SendFileAsync(Attachment(), AttachmentName, Localised + "\n" + Embedable?.GetString().Localise(TextResource), IsTTS, Options);
             }
             catch (HttpException ex) when (ex.DiscordCode == 50013 || ex.DiscordCode == 50001)
             {
-                Message = TextResource.Format(UNABLE_SEND, ReplyType.Error, Channel, Message);
+                Message = (RawString)TextResource.Format(UNABLE_SEND, ReplyType.Error, Channel, Localised);
                 Channel = await User.GetOrCreateDMChannelAsync();
                 return await SendAsync(stealthy);
             }
@@ -87,7 +90,7 @@ namespace TitanBot.Replying
                     message += "\n\n" + TextResource.Format(MESSAGE_CONTAINED_ATTACHMENT, AttachmentName);
                 Attachment = () => message.ToStream();
                 AttachmentName = "Output.txt";
-                Message = TextResource.GetResource(MESSAGE_TOO_LONG, ReplyType.Error);
+                Message = (RawString)TextResource.GetResource(MESSAGE_TOO_LONG, ReplyType.Error);
                 Embedable = null;
 
                 return await SendAsync(stealthy);
@@ -96,7 +99,7 @@ namespace TitanBot.Replying
             {
                 if (Handler == null)
                     throw;
-                await Handler(ex, Channel, Message, Embedable);
+                await Handler(ex, Channel, Localised, Embedable);
             }
             if (!stealthy)
                 await OnSend(this, msg);
@@ -109,27 +112,9 @@ namespace TitanBot.Replying
             return this;
         }
 
-        public IReplyContext WithMessage(string message)
+        public IReplyContext WithMessage(ILocalisable<string> message)
         {
-            Message = TextResource.GetResource(message);
-            return this;
-        }
-
-        public IReplyContext WithMessage(string message, ReplyType replyType)
-        {
-            Message = TextResource.GetResource(message, replyType);
-            return this;
-        }
-
-        public IReplyContext WithMessage(string message, params object[] values)
-        {
-            Message = TextResource.Format(message, values);
-            return this;
-        }
-
-        public IReplyContext WithMessage(string message, ReplyType replyType, params object[] values)
-        {
-            Message = TextResource.Format(message, replyType, values);
+            Message = message;
             return this;
         }
 
@@ -151,11 +136,7 @@ namespace TitanBot.Replying
             AttachmentName = name;
             return this;
         }
-
-        public IReplyContext WithEmbedable(LocalisedEmbedBuilder embedable)
-            => WithEmbedable(embedable.Localise(TextResource));
-        public IReplyContext WithEmbedable(Embedable embedable)
-            => WithEmbedable((IEmbedable)embedable);
+        
         public IReplyContext WithEmbedable(IEmbedable embedable)
         {
             Embedable = embedable;
