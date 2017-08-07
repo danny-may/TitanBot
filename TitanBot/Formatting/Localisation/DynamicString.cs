@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TitanBot.Formatting
 {
-    class DynamicString : LocalisedString
+    public class DynamicString : LocalisedString
     {
         private Func<ITextResourceCollection, string> LocalisationFunc { get; }
         public DynamicString(Func<ITextResourceCollection, string> localisationFunc) : base(localisationFunc.Method.Name)
