@@ -59,13 +59,13 @@ namespace TitanBot.Settings
             var tAccept = typeof(TAccept);
             var interfaces = tAccept.GetInterfaces();
             if (tAccept == typeof(IRole) || interfaces.Contains(typeof(IRole)))
-                return $"<@&{id}>";
+                return id == null ? null : $"<@&{id}>";
             if (tAccept == typeof(IUser) || interfaces.Contains(typeof(IUser)))
-                return $"<@{id}>";
+                return id == null ? null : $"<@{id}>";
             if (tAccept == typeof(IChannel) || interfaces.Contains(typeof(IChannel)))
-                return $"<#{id}>";
+                return id == null ? null : $"<#{id}>";
             if (tAccept == typeof(IGuild) || interfaces.Contains(typeof(IGuild)))
-                return context.Client.GetGuild(id.Value).Name;
+                return id == null ? null : context.Client.GetGuild(id.Value)?.Name;
 
             return id.ToString();
         }
