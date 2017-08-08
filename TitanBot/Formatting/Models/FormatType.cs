@@ -32,10 +32,10 @@ namespace TitanBot.Formatting
             => format1._id != format2._id;
 
         public override bool Equals(object obj)
-            => base.Equals(obj);
+            => obj is FormatType f ? _id.Equals(f._id) : obj is uint u ? _id.Equals(u) : false;
 
         public override int GetHashCode()
-            => base.GetHashCode();
+            => _id.GetHashCode();
 
         public ILocalisable<string> GetDescription()
             => TBLocalisation.FormatType.GetDescription(this);
