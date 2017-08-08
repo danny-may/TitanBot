@@ -7,13 +7,10 @@ namespace TitanBot.Formatting
         public const uint DEFAULT = 0;
 
         private uint _id { get; }
-        private ILocalisable<string> _name { get; }
 
         internal FormatType(uint type)
         {
             _id = type;
-            _name = null;
-            _name = TBLocalisation.FormatType.GetName(this);
         }
 
         public bool Equals(FormatType other)
@@ -41,10 +38,10 @@ namespace TitanBot.Formatting
             => TBLocalisation.FormatType.GetDescription(this);
 
         public ILocalisable<string> GetName()
-            => _name;
+            => TBLocalisation.FormatType.GetName(this);
 
         public string Localise(ITextResourceCollection textResource)
-            => _name?.Localise(textResource) ?? "UNKNOWN";
+            => GetName().Localise(textResource) ?? "UNKNOWN";
 
         object ILocalisable.Localise(ITextResourceCollection textResource)
             => Localise(textResource);
