@@ -85,5 +85,13 @@ namespace TitanBot.Util
 
             return ret;
         }
+
+        public static int IndexOf<T>(this T[] arr, Predicate<T> predicate)
+        {
+            for (int i = 0; i < arr.Length; i++)
+                if (predicate(arr[i]))
+                    return i;
+            return -1;
+        }
     }
 }

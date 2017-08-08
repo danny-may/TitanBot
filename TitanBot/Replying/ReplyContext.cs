@@ -60,7 +60,7 @@ namespace TitanBot.Replying
 
         public async ValueTask<IUserMessage> SendAsync(bool stealthy = false)
         {
-            if (string.IsNullOrWhiteSpace(Localised) && Embedable == null)
+            if (string.IsNullOrWhiteSpace(Localised) && Embedable == null && Attachment == null)
                 throw new InvalidOperationException("Unable to send a message without an embed or message");
 
             IUserMessage msg = null;

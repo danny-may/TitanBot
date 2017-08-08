@@ -9,13 +9,14 @@ namespace TitanBot.Commands
     public struct CallInfo
     {
         public IReadOnlyList<ArgumentInfo[]> ArgumentPermatations { get; }
-        public MethodInfo Call { get; }
+        public MethodInfo Method { get; }
         public string Usage { get; }
         public ulong DefaultPermissions { get; }
         public string PermissionKey { get; }
         public ContextType RequiredContexts { get; }
         public bool RequireOwner { get; }
         public string SubCall { get; }
+        public string[] Aliases { get; }
         public ArgumentInfo[] Parameters { get; }
         public CommandInfo Parent { get; }
         public FlagDefinition[] Flags { get; }
@@ -23,16 +24,17 @@ namespace TitanBot.Commands
 
         private CallInfo(MethodInfo method, CommandInfo info)
         {
-            Call = method;
-            if (!CallAttribute.ExistsOn(Call))
-                throw new InvalidOperationException($"Cannot create CallInfo from {Call} as it does not have the [Call] attribute");
-            Usage = UsageAttribute.GetFor(Call);
-            DefaultPermissions = DefaultPermissionAttribute.GetPermFor(Call);
-            PermissionKey = DefaultPermissionAttribute.GetKeyFor(Call);
-            RequiredContexts = RequireContextAttribute.GetFor(Call);
-            RequireOwner = RequireOwnerAttribute.ExistsOn(Call);
-            SubCall = CallAttribute.GetFor(Call);
-            Hidden = HiddenAttribute.ExistsOn(Call);
+            Method = method;
+            if (!CallAttribute.ExistsOn(Method))
+                throw new InvalidOperationException($"Cannot create CallInfo from {Method} as it does not have the [Call] attribute");
+            Usage = UsageAttribute.GetFor(Method);
+            DefaultPermissions = DefaultPermissionAttribute.GetPermFor(Method);
+            PermissionKey = DefaultPermissionAttribute.GetKeyFor(Method);
+            RequiredContexts = RequireContextAttribute.GetFor(Method);
+            RequireOwner = RequireOwnerAttribute.ExistsOn(Method);
+            SubCall = CallAttribute.GetFor(Method);
+            Aliases = AliasAttribute.GetFor(Method);
+            Hidden = HiddenAttribute.ExistsOn(Method);
             Parent = info;
             Parameters = null;
             Flags = null;

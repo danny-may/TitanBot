@@ -8,12 +8,12 @@ namespace TitanBot.Formatting
     {
         private Dictionary<string, (string defaultText, string langText)> Values { get; }
         private ValueFormatter Formatter { get; }
-        private FormattingType FormatType { get; }
+        private FormatType FormatType { get; }
         public double Coverage { get; }
 
         public string this[string key] => GetResource(key);
 
-        public TextResourceCollection(double coverage, ValueFormatter formatter, FormattingType format, Dictionary<string, (string defaultText, string langText)> values)
+        public TextResourceCollection(double coverage, ValueFormatter formatter, FormatType format, Dictionary<string, (string defaultText, string langText)> values)
         {
             Coverage = coverage;
             Values = values;

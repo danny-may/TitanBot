@@ -41,6 +41,7 @@ namespace TitanBot
              .Concat(Logic.Defaults)
              .Concat(Types.Defaults)
              .Concat(Commands.Defaults)
+             .Concat(FormatType.Defaults)
              .ToImmutableDictionary();
     }
 }

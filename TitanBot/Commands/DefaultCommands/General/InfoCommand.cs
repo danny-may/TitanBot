@@ -41,30 +41,17 @@ namespace TitanBot.Commands.DefautlCommands.General
             Factory = factory;
         }
 
-        [Call("Language")]
-        [Usage(Usage.INFO_LANGUAGE)]
-        async Task ShowLanguageInfo()
-        {
-            var builder = new LocalisedEmbedBuilder().WithDescription(InfoText.LANGUAGE_EMBED_DESCRIPTION);
-            foreach (var lang in TextManager.SupportedLanguages)
-            {
-                builder.AddField(f => f.WithRawName(lang.ToString()).WithValue(InfoText.LANGUAGE_COVERAGE, TextManager.GetLanguageCoverage(lang) * 100 ));
-            }
-
-            await ReplyAsync(builder);
-        }
-
-        [Call("Technical")]
-        [Usage(Usage.INFO_TECHNICAL)]
+        [Call]
+        [Usage(Usage.INFO)]
         async Task ShowInfoAsync()
         {
             var builder = new LocalisedEmbedBuilder
             {
-                Title = (InfoText.TECHNICAL_TITLE, ReplyType.Info),
+                Title = (InfoText.TITLE, ReplyType.Info),
                 Color = System.Drawing.Color.LawnGreen.ToDiscord(),
                 Footer = new LocalisedFooterBuilder
                 {
-                    Text = (InfoText.TECHNICAL_FOOTER, BotUser.Username)
+                    Text = (InfoText.FOOTER, BotUser.Username)
                 },
                 Timestamp = DateTime.Now
             };

@@ -1,5 +1,6 @@
 ﻿using System;
 using TitanBot;
+using TitanBot.Formatting;
 using TitanBot.Logging;
 
 namespace LiveBaseTest
@@ -8,9 +9,11 @@ namespace LiveBaseTest
     {
         static void Main(string[] args)
         {
-            var bot = new BotClient(m => m.Map<ILogger, ConsoleLogger>());
+            var bot = new BotClient(m => {
+                m.Map<ILogger, ConsoleLogger>();
+                m.Map<ValueFormatter, Formatter>();
+                });
             bot.CommandService.Install(bot.DefaultCommands);
-
             bot.StartAsync(c =>
             {
                 if (string.IsNullOrWhiteSpace(c))

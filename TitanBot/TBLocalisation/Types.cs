@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TitanBot.Formatting;
 
 namespace TitanBot
 {
@@ -24,6 +25,7 @@ namespace TitanBot
             public static string DECIMAL = typeof(decimal).Name;
             public static string BOOLEAN = typeof(bool).Name;
             public static string DATETIME = typeof(DateTime).Name;
+            public static string LOCALE = typeof(Locale).Name;
 
             public static IReadOnlyDictionary<string, string> Defaults { get; }
                 = new Dictionary<string, string>
@@ -40,7 +42,8 @@ namespace TitanBot
                     { typeof(float).Name, "a number" },
                     { typeof(decimal).Name, "a number" },
                     { typeof(bool).Name, "true/false" },
-                    { typeof(DateTime).Name, "a date/time" }
+                    { typeof(DateTime).Name, "a date/time" },
+                    { typeof(Locale).Name, "a language" }
                 }.ToImmutableDictionary();
         }
     }

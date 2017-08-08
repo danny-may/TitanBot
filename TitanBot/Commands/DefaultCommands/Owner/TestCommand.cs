@@ -11,6 +11,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         [Call]
         async Task TestAsync()
         {
+            
             var builder = new EmbedBuilder()
             {
                 Author = new EmbedAuthorBuilder

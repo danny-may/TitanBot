@@ -36,7 +36,7 @@ namespace TitanBot.Commands
 
         internal static IEnumerable<ArgumentInfo[]> BuildPermetations(CallInfo call)
         {
-            var parameters = call.Call.GetParameters().TakeWhile(p => !CallFlagAttribute.ExistsOn(p));
+            var parameters = call.Method.GetParameters().TakeWhile(p => !CallFlagAttribute.ExistsOn(p));
             var required = parameters.Where(p => !p.HasDefaultValue);
             var optional = parameters.Where(p => p.HasDefaultValue);
 
@@ -53,7 +53,7 @@ namespace TitanBot.Commands
         }
 
         internal static ArgumentInfo[] BuildFrom(CallInfo call)
-            => call.Call.GetParameters().Select(p => new ArgumentInfo(p, call, false)).ToArray();
+            => call.Method.GetParameters().Select(p => new ArgumentInfo(p, call, false)).ToArray();
 
         public override string ToString()
         {

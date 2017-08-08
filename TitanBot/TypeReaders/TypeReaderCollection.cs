@@ -42,7 +42,7 @@ namespace TitanBot.TypeReaders
                 AddTypeReader(type, PrimitiveTypeReader.Create(type));
 
             AddTypeReader<TimeSpan>(new TimeSpanTypeReader());
-            AddTypeReader<FormattingType>(new FormatingTypeTypeReader());
+            AddTypeReader<FormatType>(new FormatTypeTypeReader());
             AddTypeReader<Locale>(new LocaleTypeReader());
             AddTypeReader<System.Drawing.Color>(new ColourTypeReader());
         }

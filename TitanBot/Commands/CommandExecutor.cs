@@ -14,6 +14,7 @@ using TitanBot.Storage;
 using static TitanBot.TBLocalisation.Logic;
 using TitanBot.TypeReaders;
 using TitanBot.Formatting.Interfaces;
+using TitanBot.Util;
 
 namespace TitanBot.Commands
 {
@@ -109,18 +110,18 @@ namespace TitanBot.Commands
                 await ReplyAsync(COMMANDEXECUTOR_DISALLOWED_CHANNEL, ReplyType.Error);
                 return;
             }
-            calls = CheckSubcommands(calls);
-            if (calls.Count() == 0)
+            var subCalls = CheckSubcommands(calls);
+            if (subCalls.Count() == 0)
             {
                 await ReplyAsync(COMMANDEXECUTOR_SUBCALL_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText);
                 return;
             }
-            foreach (var call in calls)
+            foreach (var subCall in subCalls)
             {
-                response = await MatchArguments(call);
+                response = await MatchArguments(subCall.CallInfo, subCall.CallName);
                 if (response.SuccessStatus == ArgumentCheckResult.Successful)
                 {
-                    var permCheck = PermissionManager.CheckAllowed(Context, new CallInfo[] { call });
+                    var permCheck = PermissionManager.CheckAllowed(Context, new CallInfo[] { subCall.CallInfo });
                     if (!permCheck.IsSuccess)
                     {
                         if (permCheck.ErrorMessage != null)
@@ -131,13 +132,13 @@ namespace TitanBot.Commands
                         instance.Install(Context, DependencyFactory);
                         foreach (var buildEvent in Owner.GetBuildEvents(instance.GetType()))
                             buildEvent.Invoke(instance);
-                        LogCommand(call);
+                        LogCommand(subCall.CallInfo);
                         if (instance._showTyping)
                             if (instance._waitForTyping)
                                 await Context.Channel.TriggerTypingAsync();
                             else
                                 Context.Channel.TriggerTypingAsync().DontWait();
-                        await (Task)call.Call.Invoke(instance, response.CallArguments);
+                        await (Task)subCall.CallInfo.Method.Invoke(instance, response.CallArguments);
                     }
                     return;
                 }
@@ -167,10 +168,15 @@ namespace TitanBot.Commands
             Database.Insert(record);
         }
 
-        private CallInfo[] CheckSubcommands(CallInfo[] calls)
+        private (string CallName, CallInfo CallInfo)[] CheckSubcommands(CallInfo[] calls)
         {
-            var noSubcalls = calls.Where(c => c.SubCall == null);
-            var subcalls = calls.Where(c => c.SubCall != null).GroupBy(c => c.SubCall).OrderByDescending(g => g.Key.Length);
+            var allCalls = calls.Select(c => (CallName: c.SubCall, CallInfo: c))
+                                .Concat(calls.Where(c => c.Aliases != null)
+                                             .SelectMany(c => c.Aliases.Select(a => (CallName: a, CallInfo: c))));
+            var noSubcalls = allCalls.Where(c => c.CallName == null);
+            var subcalls = allCalls.Where(c => c.CallName != null)
+                                   .GroupBy(c => c.CallName)
+                                   .OrderByDescending(g => g.Key.Length);
             foreach (var group in subcalls)
             {
                 if (Context.Message.Content.Substring(Context.ArgPos).ToLower().Trim().StartsWith(group.Key.ToLower()))
@@ -179,32 +185,34 @@ namespace TitanBot.Commands
             return noSubcalls.ToArray();
         }
 
-        private async ValueTask<ArgumentCheckResponse> MatchArguments(CallInfo call)
+        private async ValueTask<ArgumentCheckResponse> MatchArguments(CallInfo call, string callName)
         {
             var reader = Readers.NewCache();
             var responses = new List<ArgumentCheckResponse>();
             foreach (var argPattern in call.ArgumentPermatations.OrderByDescending(p => p.Count(a => !a.UseDefault)))
             {
-                var denseIndex = argPattern.Select((a, i) => a.IsDense ? i : (int?)null).FirstOrDefault(i => i != null);
-                if (call.SubCall != null)
-                    denseIndex++;
-                var maxLength = denseIndex.HasValue ? argPattern.Count(a => !a.UseDefault) + (call.SubCall != null ? 1 : 0) : (int?)null;
-                var stringArgs = Context.SplitArguments(call.Flags.Count() == 0, out (string Key, string Value)[] flagStrings, maxLength, denseIndex);
-                var readResult = await ReadArguments(reader, stringArgs.Select(s => s.Trim()).ToArray(), flagStrings, argPattern, call);
+                var readResult = await ReadArguments(reader, argPattern, call, callName);
                 if (readResult.SuccessStatus == ArgumentCheckResult.Successful)
                     return readResult;
                 responses.Add(readResult);
             }
-            return responses.OrderByDescending(r => r.SuccessStatus).Last();
+            return responses.OrderBy(r => r.SuccessStatus).First();
         }
 
-        private async ValueTask<ArgumentCheckResponse> ReadArguments(ITypeReaderCollection reader, string[] argStrings, (string Key, string Value)[] flags, ArgumentInfo[] argPattern, CallInfo call)
+        private async ValueTask<ArgumentCheckResponse> ReadArguments(ITypeReaderCollection reader, ArgumentInfo[] argPattern, CallInfo call, string callName)
         {
-            if (call.SubCall != null)
+            int? denseIndex = argPattern.IndexOf(p => p.IsDense);
+            if (denseIndex == -1) denseIndex = null;
+            if (callName != null) denseIndex++;
+            var maxLength = denseIndex.HasValue ? argPattern.Count(a => !a.UseDefault) + (callName != null ? 1 : 0) : (int?)null;
+            var stringArgs = Context.SplitArguments(call.Flags.Count() == 0, out var flags, maxLength, denseIndex);
+            var argStrings = stringArgs.Select(s => s.Trim()).ToArray();
+
+            if (callName != null)
             {
                 if (argStrings.Length == 0)
                     return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, COMMANDEXECUTOR_SUBCALL_UNSPECIFIED);
-                if (call.SubCall.ToLower() != argStrings[0].ToLower())
+                if (callName.ToLower() != argStrings[0].ToLower())
                     return ArgumentCheckResponse.FromError(ArgumentCheckResult.InvalidSubcall, COMMANDEXECUTOR_SUBCALL_UNKNOWN);
                 argStrings = argStrings.Skip(1).ToArray();
             }

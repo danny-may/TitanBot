@@ -81,7 +81,6 @@ namespace TitanBot
         private void SetupFeatures()
         {
             TextResourceManager.RequireKeys(TBLocalisation.Defaults);
-            CommandService.AddBuildEvent<ReloadCommand>(c => c.ReloadActions.Add("TextResources", TextResourceManager.Load));
         }
 
         private void InstallSettingEditors()
@@ -104,7 +103,7 @@ namespace TitanBot
                            .WithName("General")
                            .WithDescription(Desc.USER_GENERAL)
                            .AddSetting(s => s.Language, (Locale a) => (string)a)
-                           .AddSetting(s => s.FormatType, (FormattingType a) => (uint)a, b => b.SetViewer((c, f) => c.Formatter.GetName(f)))
+                           .AddSetting(s => s.FormatType, (FormatType a) => (uint)a, b => b.SetViewer((c, f) => ((FormatType)f).Localise(c.TextResource)))
                            .AddSetting(s => s.UseEmbeds, s => s.SetAlias("Embed", "Embeds", "UseEmbed"));
         }
 

@@ -188,6 +188,7 @@
     <Compile Include="Commands\Attributes\RequireGuildAttribute.cs" />
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
+    <Compile Include="Commands\DefaultCommands\General\LanguageCommand.cs" />
     <Compile Include="Formatting\Localisation\DynamicString.cs" />
     <Compile Include="Formatting\Localisation\LocalisedEmbedBuilder.cs" />
     <Compile Include="Formatting\Localisation\LocalisedString.cs" />
@@ -212,7 +213,6 @@
     <Compile Include="Commands\DefaultCommands\Owner\ExecCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\GlobalSettingsCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\SettingsReset.cs" />
-    <Compile Include="Commands\DefaultCommands\Owner\ReloadCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\ShutdownCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\SudoCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\TestCommand.cs" />
@@ -246,7 +246,7 @@
     <Compile Include="Commands\Responses\PermissionCheckResponse.cs" />
     <Compile Include="Commands\Responses\ArgumentCheckResponse.cs" />
     <Compile Include="Commands\Models\CallPermission.cs" />
-    <Compile Include="Formatting\Models\FormattingType.cs" />
+    <Compile Include="Formatting\Models\FormatType.cs" />
     <Compile Include="Formatting\ValueFormatter.cs" />
     <Compile Include="Models\Range.cs" />
     <Compile Include="Contexts\Interfaces\ISchedulerContext.cs" />
@@ -301,7 +301,7 @@
     <Compile Include="Formatting\TextResourceManager.cs" />
     <Compile Include="TBLocalisation\Commands\Commands.cs" />
     <Compile Include="TBLocalisation\Commands\DbPurgeText.cs" />
-    <Compile Include="TBLocalisation\Commands\ReloadText.cs" />
+    <Compile Include="TBLocalisation\Commands\LanguageText.cs" />
     <Compile Include="TBLocalisation\Commands\ExceptionText.cs" />
     <Compile Include="TBLocalisation\Commands\SudoText.cs" />
     <Compile Include="TBLocalisation\Commands\ShutdownText.cs" />
@@ -324,13 +324,14 @@
     <Compile Include="TBLocalisation\Logic.cs" />
     <Compile Include="TBLocalisation\Settings.cs" />
     <Compile Include="TBLocalisation\TBLocalisation.cs" />
+    <Compile Include="TBLocalisation\FormatType.cs" />
     <Compile Include="TBLocalisation\Types.cs" />
     <Compile Include="TypeReaders\ITypeReaderCollection.cs" />
     <Compile Include="TypeReaders\Readers\ArrayTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ChannelTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\ColourTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\EnumTypeReader.cs" />
-    <Compile Include="TypeReaders\Readers\FormattingTypeTypeReader.cs" />
+    <Compile Include="TypeReaders\Readers\FormatTypeTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\LocaleTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\MessageTypeReader.cs" />
     <Compile Include="TypeReaders\Readers\PermissionTypeReader.cs" />

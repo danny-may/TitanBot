@@ -31,13 +31,13 @@ namespace TitanBot
                 public const string SHUTDOWN = BASE_PATH + nameof(SHUTDOWN);
                 public const string SUDOCOMMAND = BASE_PATH + nameof(SUDOCOMMAND);
                 public const string PREFERENCES = BASE_PATH + nameof(PREFERENCES);
-                public const string RELOAD = BASE_PATH + nameof(RELOAD);
                 public const string EXCEPTION = BASE_PATH + nameof(EXCEPTION);
+                public const string LANGUAGE = BASE_PATH + nameof(LANGUAGE);
 
                 public static IReadOnlyDictionary<string, string> Defaults { get; }
                     = new Dictionary<string, string>
                     {
-                        { PING, "Basic command for calculating the delay of the bot." },
+                        { PING, "Basic command for calculating my delay." },
                         { EDITCOMMAND, "Used to allow people with varying roles or permissions to use different commands." },
                         { SETTINGS, "Allows the retrieval and changing of existing settings for the server" },
                         { SETTINGSRESET, "Resets all settings and command permissions for a guild." },
@@ -52,9 +52,9 @@ namespace TitanBot
                         { GLOBALSETTINGS, "Allows the retrieval and changing of existing settings for the server" },
                         { SHUTDOWN, "Shuts me down" },
                         { SUDOCOMMAND, "Executes any command on behalf of another user. Requires a prefix in the message" },
-                        { PREFERENCES, "Allows you to set some options for how the bot will interact with you." },
-                        { RELOAD, "Reloads a given area of the bot" },
-                        { EXCEPTION, "Shows details about exceptions that have occured within the bot" }
+                        { PREFERENCES, "Allows you to set some options for how I will interact with you." },
+                        { EXCEPTION, "Shows details about exceptions that have occured within me" },
+                        { LANGUAGE, "Shows information about any and all languages supported by me" }
                     }.ToImmutableDictionary();
             }
         }

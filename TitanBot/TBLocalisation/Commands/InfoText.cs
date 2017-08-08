@@ -14,8 +14,7 @@ namespace TitanBot
             public static class InfoText
             {
                 private const string BASE_PATH = Commands.BASE_PATH + "INFO_";
-
-                public const string LANGUAGE_EMBED_DESCRIPTION = BASE_PATH + nameof(LANGUAGE_EMBED_DESCRIPTION);
+                
                 public const string FIELD_GUILDS = BASE_PATH + nameof(FIELD_GUILDS);
                 public const string FIELD_CHANNELS = BASE_PATH + nameof(FIELD_CHANNELS);
                 public const string FIELD_USERS = BASE_PATH + nameof(FIELD_USERS);
@@ -28,14 +27,12 @@ namespace TitanBot
                 public const string FIELD_CPU = BASE_PATH + nameof(FIELD_CPU);
                 public const string FIELD_TIMERS = BASE_PATH + nameof(FIELD_TIMERS);
                 public const string FIELD_UPTIME = BASE_PATH + nameof(FIELD_UPTIME);
-                public const string LANGUAGE_COVERAGE = BASE_PATH + nameof(LANGUAGE_COVERAGE);
-                public const string TECHNICAL_TITLE = BASE_PATH + nameof(TECHNICAL_TITLE);
-                public const string TECHNICAL_FOOTER = BASE_PATH + nameof(TECHNICAL_FOOTER);
+                public const string TITLE = BASE_PATH + nameof(TITLE);
+                public const string FOOTER = BASE_PATH + nameof(FOOTER);
 
                 public static IReadOnlyDictionary<string, string> Defaults { get; }
                     = new Dictionary<string, string>
                     {
-                        { LANGUAGE_EMBED_DESCRIPTION, "Here are all the supported languages by me!" },
                         { FIELD_GUILDS, "Guilds" },
                         { FIELD_CHANNELS, "Channels" },
                         { FIELD_USERS, "Users" },
@@ -48,9 +45,8 @@ namespace TitanBot
                         { FIELD_CPU, "CPU" },
                         { FIELD_TIMERS, "Active Timers" },
                         { FIELD_UPTIME, "Uptime" },
-                        { LANGUAGE_COVERAGE, "{0}% Coverage" },
-                        { TECHNICAL_TITLE, "Current execution statistics" },
-                        { TECHNICAL_FOOTER, "{0} | System Data" }
+                        { TITLE, "Current execution statistics" },
+                        { FOOTER, "{0} | System Data" }
                     }.ToImmutableDictionary();
             }
         }
