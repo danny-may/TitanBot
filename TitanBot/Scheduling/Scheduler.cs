@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace TitanBot.Scheduling
 {
     public class Scheduler : IScheduler
     {
+        private Dictionary<Type, ISchedulerCallback> CachedHandlers { get; } = new Dictionary<Type, ISchedulerCallback>();
+
         private readonly IDatabase Database;
         private readonly IDependencyFactory DependencyManager;
         private readonly ILogger Logger;
@@ -120,14 +123,19 @@ namespace TitanBot.Scheduling
                 });
             }
         }
-
+        
         private bool TryGetHandler(string serialisedType, out ISchedulerCallback callback)
         {
             var type = JsonConvert.DeserializeObject<Type>(serialisedType);
+
+            if (CachedHandlers.TryGetValue(type, out callback))
+                return true;
+
             callback = null;
             if (!DependencyManager.TryConstruct(type, out object constructed))
                 return false;
             callback = (ISchedulerCallback)constructed;
+            CachedHandlers[type] = callback;
             return true;
         }
 
