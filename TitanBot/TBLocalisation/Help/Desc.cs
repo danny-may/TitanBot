@@ -33,6 +33,7 @@ namespace TitanBot
                 public const string PREFERENCES = BASE_PATH + nameof(PREFERENCES);
                 public const string EXCEPTION = BASE_PATH + nameof(EXCEPTION);
                 public const string LANGUAGE = BASE_PATH + nameof(LANGUAGE);
+                public const string FORMATTING = BASE_PATH + nameof(FORMATTING);
 
                 public static IReadOnlyDictionary<string, string> Defaults { get; }
                     = new Dictionary<string, string>
@@ -54,7 +55,8 @@ namespace TitanBot
                         { SUDOCOMMAND, "Executes any command on behalf of another user. Requires a prefix in the message" },
                         { PREFERENCES, "Allows you to set some options for how I will interact with you." },
                         { EXCEPTION, "Shows details about exceptions that have occured within me" },
-                        { LANGUAGE, "Shows information about any and all languages supported by me" }
+                        { LANGUAGE, "Shows information about any and all languages supported by me" },
+                        { FORMATTING, "Command used to see and use all the available output formats" }
                     }.ToImmutableDictionary();
             }
         }

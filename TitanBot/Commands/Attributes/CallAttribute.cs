@@ -4,17 +4,10 @@ using System.Reflection;
 namespace TitanBot.Commands
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public class CallAttribute : Attribute
+    public class HideTypingAttribute : Attribute
     {
-        private string Value { get; }
-
-        public CallAttribute(string subCommands = null)
-        {
-            Value = subCommands;
-        }
-
-        public static string GetFor(MethodInfo method)
-            => method.GetCustomAttribute<CallAttribute>()?.Value;
+        public HideTypingAttribute() { }
+        
         public static bool ExistsOn(MethodInfo method)
             => method.GetCustomAttribute<CallAttribute>() != null;
     }

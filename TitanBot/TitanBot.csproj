@@ -173,6 +173,7 @@
   <ItemGroup>
     <Compile Include="BotClient.cs" />
     <Compile Include="Commands\Attributes\AliasAttribute.cs" />
+    <Compile Include="Commands\Attributes\HideTypingAttribute.cs" />
     <Compile Include="Commands\Attributes\CallAttribute.cs" />
     <Compile Include="Commands\Attributes\CallFlagAttribute.cs" />
     <Compile Include="Commands\Attributes\DefaultPermissionAttribute.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Commands\Attributes\RequireGuildAttribute.cs" />
     <Compile Include="Commands\Attributes\RequireOwnerAttribute.cs" />
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
+    <Compile Include="Commands\DefaultCommands\General\FormattingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\LanguageCommand.cs" />
     <Compile Include="Formatting\Localisation\DynamicString.cs" />
     <Compile Include="Formatting\Localisation\LocalisedEmbedBuilder.cs" />
@@ -301,6 +303,7 @@
     <Compile Include="Formatting\TextResourceManager.cs" />
     <Compile Include="TBLocalisation\Commands\Commands.cs" />
     <Compile Include="TBLocalisation\Commands\DbPurgeText.cs" />
+    <Compile Include="TBLocalisation\Commands\FormattingText.cs" />
     <Compile Include="TBLocalisation\Commands\LanguageText.cs" />
     <Compile Include="TBLocalisation\Commands\ExceptionText.cs" />
     <Compile Include="TBLocalisation\Commands\SudoText.cs" />

@@ -9,13 +9,16 @@ namespace TitanBot
     {
         public static class FormatType
         {
-            public static LocalisedString FromFormat(Formatting.FormatType format)
-                => (LocalisedString)("FORMAT_ID_" + (uint)format);
+            public static LocalisedString GetName(Formatting.FormatType format)
+                => (LocalisedString)($"FORMAT_ID_{(uint)format}_NAME");
+            public static LocalisedString GetDescription(Formatting.FormatType format)
+                => (LocalisedString)($"FORMAT_ID_{(uint)format}_DESCRIPTION");
 
             public static IReadOnlyDictionary<string, string> Defaults { get; }
                 = new Dictionary<string, string>
                 {
-                    { FromFormat(Formatting.FormatType.DEFAULT).Key, "Default" }
+                    { GetName(Formatting.FormatType.DEFAULT).Key, "Default" },
+                    { GetDescription(Formatting.FormatType.DEFAULT).Key, "Basic formatting, might look a bit rough" }
                 }.ToImmutableDictionary();
         }
     }

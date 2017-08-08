@@ -49,7 +49,8 @@ namespace TitanBot
                 public const string LANGUAGE_EXPORT = BASE_PATH + nameof(LANGUAGE_EXPORT);
                 public const string LANGUAGE_RELOAD = BASE_PATH + nameof(LANGUAGE_RELOAD);
                 public const string LANGUAGE_USE = BASE_PATH + nameof(LANGUAGE_USE);
-
+                public const string FORMATTING = BASE_PATH + nameof(FORMATTING);
+                public const string FORMATTING_USE = BASE_PATH + nameof(FORMATTING_USE);
 
                 public static IReadOnlyDictionary<string, string> Defaults { get; }
                     = new Dictionary<string, string>
@@ -83,11 +84,13 @@ namespace TitanBot
                         { PREFERENCES_TOGGLE, "Toggles the given preference. Only works for true/false/yes/no preferences" },
                         { PREFERENCES_SET, "Sets the given preference to the given value" },
                         { EXCEPTION, "Shows details about the given exception" },
-                        { LANGUAGE, "Lists all the available languages to you to use." },
+                        { LANGUAGE, "Lists all the available languages for you to use." },
                         { LANGUAGE_EXPORT, "Exports a given language into a json file for you to download" },
                         { LANGUAGE_IMPORT, "Imports an attached file as the given language" },
                         { LANGUAGE_RELOAD, "Reloads the language data from file" },
-                        { LANGUAGE_USE, "Sets the language you would like to use" }
+                        { LANGUAGE_USE, "Sets the language you would like to use" },
+                        { FORMATTING, "Lists all the formatting options available to you" },
+                        { FORMATTING_USE, "Sets what formatting style to use for your commands" }
                     }.ToImmutableDictionary();
             }
         }

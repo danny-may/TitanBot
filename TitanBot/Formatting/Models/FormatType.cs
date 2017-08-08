@@ -1,5 +1,4 @@
 ﻿using TitanBot.Formatting.Interfaces;
-using static TitanBot.TBLocalisation.FormatType;
 
 namespace TitanBot.Formatting
 {
@@ -8,13 +7,13 @@ namespace TitanBot.Formatting
         public const uint DEFAULT = 0;
 
         private uint _id { get; }
-        private LocalisedString Name { get; }
+        private LocalisedString _name { get; }
 
         internal FormatType(uint type)
         {
             _id = type;
-            Name = null;
-            Name = FromFormat(this);
+            _name = null;
+            _name = TBLocalisation.FormatType.GetName(this);
         }
 
         public bool Equals(FormatType other)
@@ -38,8 +37,14 @@ namespace TitanBot.Formatting
         public override int GetHashCode()
             => base.GetHashCode();
 
+        public LocalisedString GetDescription()
+            => TBLocalisation.FormatType.GetDescription(this);
+
+        public LocalisedString GetName()
+            => _name;
+
         public string Localise(ITextResourceCollection textResource)
-            => Name?.Localise(textResource) ?? "UNKNOWN";
+            => _name?.Localise(textResource) ?? "UNKNOWN";
 
         object ILocalisable.Localise(ITextResourceCollection textResource)
             => Localise(textResource);

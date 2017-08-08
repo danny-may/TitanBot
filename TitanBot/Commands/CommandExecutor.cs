@@ -133,11 +133,8 @@ namespace TitanBot.Commands
                         foreach (var buildEvent in Owner.GetBuildEvents(instance.GetType()))
                             buildEvent.Invoke(instance);
                         LogCommand(subCall.CallInfo);
-                        if (instance._showTyping)
-                            if (instance._waitForTyping)
-                                await Context.Channel.TriggerTypingAsync();
-                            else
-                                Context.Channel.TriggerTypingAsync().DontWait();
+                        if (subCall.CallInfo.ShowTyping)
+                            await Context.Channel.TriggerTypingAsync();
                         await (Task)subCall.CallInfo.Method.Invoke(instance, response.CallArguments);
                     }
                     return;

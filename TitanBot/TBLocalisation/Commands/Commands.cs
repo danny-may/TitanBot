@@ -30,6 +30,7 @@ namespace TitanBot
                                                   .Concat(SudoText.Defaults)
                                                   .Concat(ExceptionText.Defaults)
                                                   .Concat(LanguageText.Defaults)
+                                                  .Concat(FormattingText.Defaults)
                                                   .ToImmutableDictionary();
         }
     }

@@ -36,11 +36,6 @@ namespace TitanBot.Commands
 
         protected virtual LocalisedString DelayMessage => (LocalisedString)COMMAND_DELAY_DEFAULT;
         protected virtual int DelayMessageMs => 3000;
-        protected virtual bool WaitForTyping => true;
-        protected virtual bool ShowTyping => true;
-
-        internal bool _waitForTyping => WaitForTyping;
-        internal bool _showTyping => ShowTyping;
 
         protected IUserMessage Message => Context?.Message;
         protected DiscordSocketClient Client => Context?.Client;

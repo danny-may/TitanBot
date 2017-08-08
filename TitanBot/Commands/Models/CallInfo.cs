@@ -15,6 +15,7 @@ namespace TitanBot.Commands
         public string PermissionKey { get; }
         public ContextType RequiredContexts { get; }
         public bool RequireOwner { get; }
+        public bool ShowTyping { get; }
         public string SubCall { get; }
         public string[] Aliases { get; }
         public ArgumentInfo[] Parameters { get; }
@@ -32,6 +33,7 @@ namespace TitanBot.Commands
             PermissionKey = DefaultPermissionAttribute.GetKeyFor(Method);
             RequiredContexts = RequireContextAttribute.GetFor(Method);
             RequireOwner = RequireOwnerAttribute.ExistsOn(Method);
+            ShowTyping = !HideTypingAttribute.ExistsOn(Method);
             SubCall = CallAttribute.GetFor(Method);
             Aliases = AliasAttribute.GetFor(Method);
             Hidden = HiddenAttribute.ExistsOn(Method);
