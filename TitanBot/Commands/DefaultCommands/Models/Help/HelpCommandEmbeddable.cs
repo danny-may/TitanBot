@@ -57,7 +57,7 @@ namespace TitanBot.Commands
             var builder = new LocalisedEmbedBuilder
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = (SINGLE_TITLE, ReplyType.Info, Command.Name),
+                Title = new LocalisedString(SINGLE_TITLE, ReplyType.Info, Command.Name),
                 Timestamp = DateTime.Now,
                 Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl()).WithText(SINGLE_FOOTER, BotUser.Username),
             }.WithDescription(Command.Description ?? SINGLE_NODESCRIPTION);
@@ -82,7 +82,7 @@ namespace TitanBot.Commands
 
             var entries = new List<LocalisedString>
             {
-                (SINGLE_TITLE, ReplyType.Info, Command.Name),
+                new LocalisedString(SINGLE_TITLE, ReplyType.Info, Command.Name),
                 (LocalisedString)(Command.Description ?? SINGLE_NODESCRIPTION),
                 new RawString(baseFormat, (LocalisedString)TBLocalisation.GROUP, Group)
             };

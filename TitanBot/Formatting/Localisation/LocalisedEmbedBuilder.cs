@@ -13,11 +13,11 @@ namespace TitanBot.Formatting
     public class LocalisedEmbedBuilder : ILocalisable<EmbedBuilder>
     {
 
-        public LocalisedString Title { get; set; }
-        public LocalisedString Description { get; set; }
-        public LocalisedString Url { get; set; }
-        public LocalisedString ThumbnailUrl { get; set; }
-        public LocalisedString ImageUrl { get; set; }
+        public ILocalisable<string> Title { get; set; }
+        public ILocalisable<string> Description { get; set; }
+        public ILocalisable<string> Url { get; set; }
+        public ILocalisable<string> ThumbnailUrl { get; set; }
+        public ILocalisable<string> ImageUrl { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
         public Color? Color { get; set; }
 
@@ -35,31 +35,36 @@ namespace TitanBot.Formatting
             }
         }
 
-        public LocalisedEmbedBuilder WithTitle(LocalisedString title)
+        public LocalisedEmbedBuilder WithTitle(ILocalisable<string> title)
         {
             Title = title;
             return this;
         }
-        public LocalisedEmbedBuilder WithDescription(LocalisedString description)
+
+        public LocalisedEmbedBuilder WithDescription(ILocalisable<string> description)
         {
             Description = description;
             return this;
         }
-        public LocalisedEmbedBuilder WithUrl(LocalisedString url)
+
+        public LocalisedEmbedBuilder WithUrl(ILocalisable<string> url)
         {
             Url = url;
             return this;
         }
-        public LocalisedEmbedBuilder WithThumbnailUrl(LocalisedString thumbnailUrl)
+
+        public LocalisedEmbedBuilder WithThumbnailUrl(ILocalisable<string> thumbnailUrl)
         {
             ThumbnailUrl = thumbnailUrl;
             return this;
         }
-        public LocalisedEmbedBuilder WithImageUrl(LocalisedString imageUrl)
+        
+        public LocalisedEmbedBuilder WithImageUrl(ILocalisable<string> imageUrl)
         {
             ImageUrl = imageUrl;
             return this;
         }
+
         public LocalisedEmbedBuilder WithCurrentTimestamp()
         {
             Timestamp = DateTimeOffset.UtcNow;
@@ -81,6 +86,11 @@ namespace TitanBot.Formatting
             Author = author;
             return this;
         }
+        public LocalisedEmbedBuilder WithAuthor(IUser author)
+        {
+            Author = LocalisedAuthorBuilder.FromUser(author);
+            return this;
+        }
         public LocalisedEmbedBuilder WithAuthor(Action<LocalisedAuthorBuilder> action)
         {
             var author = new LocalisedAuthorBuilder();
@@ -88,6 +98,7 @@ namespace TitanBot.Formatting
             Author = author;
             return this;
         }
+
         public LocalisedEmbedBuilder WithFooter(LocalisedFooterBuilder footer)
         {
             Footer = footer;
@@ -101,10 +112,9 @@ namespace TitanBot.Formatting
             return this;
         }
 
-
-        public LocalisedEmbedBuilder AddField(LocalisedString name, LocalisedString value, bool inline = false)
+        public LocalisedEmbedBuilder AddField(ILocalisable<string> name, ILocalisable<string> value, bool inline = false)
             => AddField(new LocalisedFieldBuilder { Name = name, Value = value, IsInline = inline });
-        public LocalisedEmbedBuilder AddInlineField(LocalisedString name, LocalisedString value)
+        public LocalisedEmbedBuilder AddInlineField(ILocalisable<string> name, ILocalisable<string> value)
             => AddField(name, value, true);
         public LocalisedEmbedBuilder AddField(LocalisedFieldBuilder field)
         {
@@ -172,6 +182,7 @@ namespace TitanBot.Formatting
             => WithTitle(new LocalisedString(key, values));
         public LocalisedEmbedBuilder WithTitle(string key, ReplyType replyType, params object[] values)
             => WithTitle(new LocalisedString(key, replyType, values));
+
         public LocalisedEmbedBuilder WithRawDescription(string rawText)
             => WithDescription(new RawString(rawText));
         public LocalisedEmbedBuilder WithDescription(string key)
@@ -182,6 +193,7 @@ namespace TitanBot.Formatting
             => WithDescription(new LocalisedString(key, values));
         public LocalisedEmbedBuilder WithDescription(string key, ReplyType replyType, params object[] values)
             => WithDescription(new LocalisedString(key, replyType, values));
+
         public LocalisedEmbedBuilder WithRawUrl(string rawText)
             => WithUrl(new RawString(rawText));
         public LocalisedEmbedBuilder WithUrl(string key)
@@ -192,6 +204,7 @@ namespace TitanBot.Formatting
             => WithUrl(new LocalisedString(key, values));
         public LocalisedEmbedBuilder WithUrl(string key, ReplyType replyType, params object[] values)
             => WithUrl(new LocalisedString(key, replyType, values));
+
         public LocalisedEmbedBuilder WithRawThumbnailUrl(string rawText)
             => WithThumbnailUrl(new RawString(rawText));
         public LocalisedEmbedBuilder WithThumbnailUrl(string key)
@@ -202,6 +215,7 @@ namespace TitanBot.Formatting
             => WithThumbnailUrl(new LocalisedString(key, values));
         public LocalisedEmbedBuilder WithThumbnailUrl(string key, ReplyType replyType, params object[] values)
             => WithThumbnailUrl(new LocalisedString(key, replyType, values));
+
         public LocalisedEmbedBuilder WithRawImageUrl(string rawText)
             => WithImageUrl(new RawString(rawText));
         public LocalisedEmbedBuilder WithImageUrl(string key)
@@ -217,21 +231,21 @@ namespace TitanBot.Formatting
 
     public class LocalisedAuthorBuilder : ILocalisable<EmbedAuthorBuilder>
     {
-        public LocalisedString Name { get; set; }
-        public LocalisedString Url { get; set; }
-        public LocalisedString IconUrl { get; set; }
+        public ILocalisable<string> Name { get; set; }
+        public ILocalisable<string> Url { get; set; }
+        public ILocalisable<string> IconUrl { get; set; }
         
-        public LocalisedAuthorBuilder WithName(LocalisedString name)
+        public LocalisedAuthorBuilder WithName(ILocalisable<string> name)
         {
             Name = name;
             return this;
         }        
-        public LocalisedAuthorBuilder WithUrl(LocalisedString url)
+        public LocalisedAuthorBuilder WithUrl(ILocalisable<string> url)
         {
             Url = url;
             return this;
         }
-        public LocalisedAuthorBuilder WithIconUrl(LocalisedString iconUrl)
+        public LocalisedAuthorBuilder WithIconUrl(ILocalisable<string> iconUrl)
         {
             IconUrl = iconUrl;
             return this;
@@ -262,35 +276,6 @@ namespace TitanBot.Formatting
                 Name = (RawString)$"{user.Username}#{user.Discriminator}"
             };
 
-        public static implicit operator LocalisedAuthorBuilder(SocketUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(SocketGuildUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(SocketSelfUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(SocketGroupUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(SocketUnknownUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(SocketWebhookUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RestUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RestGuildUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RestSelfUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RestGroupUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RestWebhookUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RpcUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RpcGuildUser user)
-            => FromUser(user);
-        public static implicit operator LocalisedAuthorBuilder(RpcWebhookUser user)
-            => FromUser(user);
-
         #region WithX Overloads
         public LocalisedAuthorBuilder WithRawName(string rawText)
             => WithName(new RawString(rawText));
@@ -302,6 +287,7 @@ namespace TitanBot.Formatting
             => WithName(new LocalisedString(key, values));
         public LocalisedAuthorBuilder WithName(string key, ReplyType replyType, params object[] values)
             => WithName(new LocalisedString(key, replyType, values));
+
         public LocalisedAuthorBuilder WithRawUrl(string rawText)
             => WithUrl(new RawString(rawText));
         public LocalisedAuthorBuilder WithUrl(string key)
@@ -312,6 +298,7 @@ namespace TitanBot.Formatting
             => WithUrl(new LocalisedString(key, values));
         public LocalisedAuthorBuilder WithUrl(string key, ReplyType replyType, params object[] values)
             => WithUrl(new LocalisedString(key, replyType, values));
+
         public LocalisedAuthorBuilder WithRawIconUrl(string rawText)
             => WithIconUrl(new RawString(rawText));
         public LocalisedAuthorBuilder WithIconUrl(string key)
@@ -327,15 +314,15 @@ namespace TitanBot.Formatting
 
     public class LocalisedFooterBuilder : ILocalisable<EmbedFooterBuilder>
     {
-        public LocalisedString Text { get; set; }
-        public LocalisedString IconUrl { get; set; }
+        public ILocalisable<string> Text { get; set; }
+        public ILocalisable<string> IconUrl { get; set; }
 
-        public LocalisedFooterBuilder WithText(LocalisedString text)
+        public LocalisedFooterBuilder WithText(ILocalisable<string> text)
         {
             Text = text;
             return this;
         }
-        public LocalisedFooterBuilder WithIconUrl(LocalisedString iconUrl)
+        public LocalisedFooterBuilder WithIconUrl(ILocalisable<string> iconUrl)
         {
             IconUrl = iconUrl;
             return this;
@@ -368,6 +355,7 @@ namespace TitanBot.Formatting
             => WithText(new LocalisedString(key, values));
         public LocalisedFooterBuilder WithText(string key, ReplyType replyType, params object[] values)
             => WithText(new LocalisedString(key, replyType, values));
+
         public LocalisedFooterBuilder WithRawIconUrl(string rawText)
             => WithIconUrl(new RawString(rawText));
         public LocalisedFooterBuilder WithIconUrl(string key)
@@ -383,16 +371,16 @@ namespace TitanBot.Formatting
 
     public class LocalisedFieldBuilder : ILocalisable<EmbedFieldBuilder>
     {
-        public LocalisedString Name { get; set; }
-        public LocalisedString Value { get; set; }
+        public ILocalisable<string> Name { get; set; }
+        public ILocalisable<string> Value { get; set; }
         public bool IsInline { get; set; }
 
-        public LocalisedFieldBuilder WithName(LocalisedString name)
+        public LocalisedFieldBuilder WithName(ILocalisable<string> name)
         {
             Name = name;
             return this;
         }
-        public LocalisedFieldBuilder WithValue(LocalisedString value)
+        public LocalisedFieldBuilder WithValue(ILocalisable<string> value)
         {
             Value = value;
             return this;
@@ -441,6 +429,7 @@ namespace TitanBot.Formatting
             => WithValues(separator, values.ToArray());
         public LocalisedFieldBuilder WithValues<T>(string separator, T[] values)
             => WithValue(LocalisedString.Join(separator, values.Cast<object>().ToArray()));
+
         public LocalisedFieldBuilder WithRawName(string rawText)
             => WithName(new RawString(rawText));
         public LocalisedFieldBuilder WithName(Func<ITextResourceCollection, string> localisationFunc)

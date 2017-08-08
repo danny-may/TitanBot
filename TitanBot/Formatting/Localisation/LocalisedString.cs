@@ -56,35 +56,5 @@ namespace TitanBot.Formatting
 
         public static explicit operator LocalisedString(string text)
             => Build(text);
-        public static implicit operator LocalisedString((string Text, object Value1) tuple)
-            => Build(tuple.Text, values: new object[] { tuple.Value1 });
-        public static implicit operator LocalisedString((string Text, object Value1, object Value2) tuple)
-            => Build(tuple.Text, values: new object[] { tuple.Value1, tuple.Value2 });
-        public static implicit operator LocalisedString((string Text, object Value1, object Value2, object Value3) tuple)
-            => Build(tuple.Text, values: new object[] { tuple.Value1, tuple.Value2, tuple.Value3 });
-        public static implicit operator LocalisedString((string Text, object Value1, object Value2, object Value3, object Value4) tuple)
-            => Build(tuple.Text, values: new object[] { tuple.Value1, tuple.Value2, tuple.Value3, tuple.Value4 });
-        public static implicit operator LocalisedString((string Text, object Value1, object Value2, object Value3, object Value4, object Value5) tuple)
-            => Build(tuple.Text, values: new object[] { tuple.Value1, tuple.Value2, tuple.Value3, tuple.Value4, tuple.Value5 });
-        public static implicit operator LocalisedString((string Text, object Value1, object Value2, object, object Value3, object Value4, object Value5, object Value6) tuple)
-            => Build(tuple.Text, values: new object[] { tuple.Value1, tuple.Value2, tuple.Value3, tuple.Value4, tuple.Value5, tuple.Value6});
-        public static implicit operator LocalisedString((string Key, ReplyType ReplyType) tuple)
-            => Build(tuple.Key, tuple.ReplyType);
-        public static implicit operator LocalisedString((string Text, ReplyType ReplyType, object Value1) tuple)
-            => Build(tuple.Text, tuple.ReplyType, new object[] { tuple.Value1 });
-        public static implicit operator LocalisedString((string Text, ReplyType ReplyType, object Value1, object Value2) tuple)
-            => Build(tuple.Text, tuple.ReplyType, new object[] { tuple.Value1, tuple.Value2 });
-        public static implicit operator LocalisedString((string Text, ReplyType ReplyType, object Value1, object Value2, object Value3) tuple)
-            => Build(tuple.Text, tuple.ReplyType, new object[] { tuple.Value1, tuple.Value2, tuple.Value3 });
-        public static implicit operator LocalisedString((string Text, ReplyType ReplyType, object Value1, object Value2, object Value3, object Value4) tuple)
-            => Build(tuple.Text, tuple.ReplyType, new object[] { tuple.Value1, tuple.Value2, tuple.Value3, tuple.Value4 });
-        public static implicit operator LocalisedString((string Text, ReplyType ReplyType, object Value1, object Value2, object Value3, object Value4, object Value5) tuple)
-            => Build(tuple.Text, tuple.ReplyType, new object[] { tuple.Value1, tuple.Value2, tuple.Value3, tuple.Value4, tuple.Value5 });
-        public static implicit operator LocalisedString((string Text, ReplyType ReplyType, object Value1, object Value2, object, object Value3, object Value4, object Value5, object Value6) tuple)
-            => Build(tuple.Text, tuple.ReplyType, new object[] { tuple.Value1, tuple.Value2, tuple.Value3, tuple.Value4, tuple.Value5, tuple.Value6 });
-        public static implicit operator LocalisedString((string Key, object[] Values) tuple)
-            => Build(tuple.Key, values: tuple.Values);
-        public static implicit operator LocalisedString((string Key, ReplyType ReplyType, object[] Values) tuple)
-            => Build(tuple.Key, tuple.ReplyType, tuple.Values);
     }
 }

@@ -32,11 +32,10 @@ namespace TitanBot.Commands
             var builder = new LocalisedEmbedBuilder()
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
-                Title = (LIST_TITLE, ReplyType.Info),
-                Description = (LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
                 Timestamp = DateTime.Now,
-                Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl()).WithText((SINGLE_FOOTER, BotUser.Username))
-            };
+                Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl()).WithText(SINGLE_FOOTER, BotUser.Username)
+            }.WithTitle(LIST_TITLE, ReplyType.Info)
+             .WithDescription(LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes));
 
             var groups = Commands.GroupBy(c => c.Group);
             foreach (var group in groups)
@@ -49,13 +48,13 @@ namespace TitanBot.Commands
         {
             var entries = new List<LocalisedString>
             {
-                (LIST_TITLE, ReplyType.Info),
-                (LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
+                new LocalisedString(LIST_TITLE, ReplyType.Info),
+                new LocalisedString(LIST_DESCRIPTION, Prefix, string.Join("\", \"", AcceptedPrefixes)),
                 (RawString)"```prolog"
             };
             var groups = Commands.GroupBy(c => c.Group);
             foreach (var group in groups)
-                entries.Add((LIST_COMMAND, group.Key.ToTitleCase(), string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))));
+                entries.Add(new LocalisedString(LIST_COMMAND, group.Key.ToTitleCase(), string.Join(", ", group.GroupBy(g => g.Name).Select(g => g.Key.ToLower()))));
             entries.Add((RawString)"```");
 
             return LocalisedString.Join("\n", entries.ToArray());

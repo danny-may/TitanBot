@@ -7,7 +7,7 @@ namespace TitanBot.Formatting
         public const uint DEFAULT = 0;
 
         private uint _id { get; }
-        private LocalisedString _name { get; }
+        private ILocalisable<string> _name { get; }
 
         internal FormatType(uint type)
         {
@@ -37,10 +37,10 @@ namespace TitanBot.Formatting
         public override int GetHashCode()
             => base.GetHashCode();
 
-        public LocalisedString GetDescription()
+        public ILocalisable<string> GetDescription()
             => TBLocalisation.FormatType.GetDescription(this);
 
-        public LocalisedString GetName()
+        public ILocalisable<string> GetName()
             => _name;
 
         public string Localise(ITextResourceCollection textResource)

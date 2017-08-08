@@ -21,6 +21,7 @@ using TitanBot.Storage;
 using TitanBot.Util;
 using static TitanBot.TBLocalisation.Help;
 using static TitanBot.TBLocalisation.Commands;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
@@ -117,25 +118,25 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             var globals = GetGlobals(this);
             object result = null;
 
-            LocalisedString footerText;
+            ILocalisable<string> footerText;
 
             if (!TryConstruct(codeWithUsings, assemblies.ToArray(), globals.GetType(), out var constructTime, out var constructRes))
             {
                 result = constructRes;
-                footerText = (ExecText.FOOTER_CONSTRUCTFAILED, constructTime);
+                footerText = new LocalisedString(ExecText.FOOTER_CONSTRUCTFAILED, constructTime);
             }
             else if (!TryCompile(constructRes as Script<object>, out var compileTime, out var compileRes))
             {
                 result = compileRes;
-                footerText = (ExecText.FOOTER_COMPILEFAILED, constructTime, compileTime);
+                footerText = new LocalisedString(ExecText.FOOTER_COMPILEFAILED, constructTime, compileTime);
             }
             else if (!TryExecute(constructRes as Script<object>, globals, out var execTime, out result))
             {
-                footerText = (ExecText.FOOTER_EXECUTEFAILED, constructTime, compileTime, execTime);
+                footerText = new LocalisedString(ExecText.FOOTER_EXECUTEFAILED, constructTime, compileTime, execTime);
             }
             else
             {
-                footerText = (ExecText.FOOTER_SUCCESS, constructTime, compileTime, execTime);
+                footerText = new LocalisedString(ExecText.FOOTER_SUCCESS, constructTime, compileTime, execTime);
             }
 
             var builder = new LocalisedEmbedBuilder

@@ -38,7 +38,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 text += exception.Content;
 
                 await Reply().WithAttachment(() => text.ToStream(), $"Exception{exceptionId}.txt")
-                             .WithMessage((LocalisedString)(ExceptionText.FULLMESSAGE, ReplyType.Success, exceptionId))
+                             .WithMessage(new LocalisedString(ExceptionText.FULLMESSAGE, ReplyType.Success, exceptionId))
                              .SendAsync();
             }
             else

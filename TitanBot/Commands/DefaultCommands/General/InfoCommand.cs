@@ -9,13 +9,14 @@ using TitanBot.Formatting;
 using TitanBot.Replying;
 using static TitanBot.TBLocalisation.Help;
 using static TitanBot.TBLocalisation.Commands;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
     [Description(Desc.INFO)]
     public class InfoCommand : Command
     {
-        public static List<Func<InfoCommand, (LocalisedString Title, object Value, bool IsInline)>> TechnicalActions { get; } = new List<Func<InfoCommand, (LocalisedString, object, bool)>>();
+        public static List<Func<InfoCommand, (ILocalisable<string> Title, object Value, bool IsInline)>> TechnicalActions { get; } = new List<Func<InfoCommand, (ILocalisable<string>, object, bool)>>();
         private ITextResourceManager TextManager { get; }
         private IDependencyFactory Factory { get; }
 
@@ -47,12 +48,9 @@ namespace TitanBot.Commands.DefautlCommands.General
         {
             var builder = new LocalisedEmbedBuilder
             {
-                Title = (InfoText.TITLE, ReplyType.Info),
+                Title = new LocalisedString(InfoText.TITLE, ReplyType.Info),
                 Color = System.Drawing.Color.LawnGreen.ToDiscord(),
-                Footer = new LocalisedFooterBuilder
-                {
-                    Text = (InfoText.FOOTER, BotUser.Username)
-                },
+                Footer = new LocalisedFooterBuilder().WithText(InfoText.FOOTER, BotUser.Username),
                 Timestamp = DateTime.Now
             };
 

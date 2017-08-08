@@ -40,7 +40,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                 Timestamp = DateTime.Now,
                 Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl())
-                                                     .WithText((SettingText.FOOTERTEXT, BotUser.Username))
+                                                     .WithText(SettingText.FOOTERTEXT, BotUser.Username)
             };
 
             if (Settings.Count == 1)
@@ -102,12 +102,15 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     var newDisplay = setting.Display(Context, SettingContext);
                     var builder = new LocalisedEmbedBuilder
                     {
-                        Title = (SettingText.VALUE_CHANGED_TITLE, setting.Name),
-                        Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl()).WithText(BotUser.Username),
+                        Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl())
+                                                             .WithText(BotUser.Username),
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(f => f.WithName(SettingText.VALUE_OLD).WithValue(string.IsNullOrWhiteSpace(oldDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)oldDisplay))
-                     .AddField(f => f.WithName(SettingText.VALUE_NEW).WithValue(string.IsNullOrWhiteSpace(newDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)newDisplay));
+                    }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
+                     .AddField(f => f.WithName(SettingText.VALUE_OLD)
+                                     .WithValue(string.IsNullOrWhiteSpace(oldDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)oldDisplay))
+                     .AddField(f => f.WithName(SettingText.VALUE_NEW)
+                                     .WithValue(string.IsNullOrWhiteSpace(newDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)newDisplay));
                     await ReplyAsync(builder);
                 }
             }
@@ -137,12 +140,15 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                     var newValue = setting.Display(Context, SettingContext);
                     var builder = new LocalisedEmbedBuilder
                     {
-                        Title = (SettingText.VALUE_CHANGED_TITLE, setting.Name),
-                        Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl()).WithText(BotUser.Username),
+                        Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl())
+                                                             .WithText(BotUser.Username),
                         Timestamp = DateTime.Now,
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
-                    }.AddField(f => f.WithName(SettingText.VALUE_OLD).WithValue(string.IsNullOrWhiteSpace(oldValue) ? (LocalisedString)SettingText.NOTSET : (RawString)oldValue))
-                     .AddField(f => f.WithName(SettingText.VALUE_NEW).WithValue(string.IsNullOrWhiteSpace(newValue) ? (LocalisedString)SettingText.NOTSET : (RawString)newValue));
+                    }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
+                     .AddField(f => f.WithName(SettingText.VALUE_OLD)
+                                     .WithValue(string.IsNullOrWhiteSpace(oldValue) ? (LocalisedString)SettingText.NOTSET : (RawString)oldValue))
+                     .AddField(f => f.WithName(SettingText.VALUE_NEW)
+                                     .WithValue(string.IsNullOrWhiteSpace(newValue) ? (LocalisedString)SettingText.NOTSET : (RawString)newValue));
                     await ReplyAsync(builder);
                 }
             }
