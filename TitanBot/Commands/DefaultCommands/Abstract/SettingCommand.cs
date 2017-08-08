@@ -67,11 +67,11 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             builder.WithTitle(SettingText.TITLE_GROUP, groups.First().Name);
             foreach (var setting in groups.SelectMany(s => s))
             {
-                string value = setting.Display(Context, SettingContext);
-                if (string.IsNullOrWhiteSpace(value))
+                var value = setting.Display(Context, SettingContext);
+                if (value == null)
                     builder.AddInlineField(f => f.WithRawName(setting.Name).WithValue(SettingText.NOTSET));
                 else
-                    builder.AddInlineField(f => f.WithRawName(setting.Name).WithRawValue(value));
+                    builder.AddInlineField(f => f.WithRawName(setting.Name).WithValue(value));
             }
             var descriptions = LocalisedString.JoinEnumerable("\n", groups.Where(g => g.Description != null).Select(g => g.Description));
             var notes = LocalisedString.JoinEnumerable("\n", groups.Where(g => g.Notes != null).Select(g => g.Notes));
@@ -93,8 +93,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             {
                 var oldValue = (bool)setting.Get(SettingContext);
                 var oldDisplay = setting.Display(Context, SettingContext);
-                if (!setting.TrySet(Context, SettingContext, !oldValue, out string errors))
-                    await ReplyAsync(errors, ReplyType.Error, !oldValue);
+                if (!setting.TrySet(Context, SettingContext, !oldValue, out var errors))
+                    await ReplyAsync(errors);
                 else
                 {
                     var newDisplay = setting.Display(Context, SettingContext);
@@ -106,9 +106,9 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                     }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
                      .AddField(f => f.WithName(SettingText.VALUE_OLD)
-                                     .WithValue(string.IsNullOrWhiteSpace(oldDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)oldDisplay))
+                                     .WithValue(oldDisplay ?? (LocalisedString)SettingText.NOTSET))
                      .AddField(f => f.WithName(SettingText.VALUE_NEW)
-                                     .WithValue(string.IsNullOrWhiteSpace(newDisplay) ? (LocalisedString)SettingText.NOTSET : (RawString)newDisplay));
+                                     .WithValue(newDisplay ?? (LocalisedString)SettingText.NOTSET));
                     await ReplyAsync(builder);
                 }
             }
@@ -131,8 +131,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             
                 var oldValue = setting.Display(Context, SettingContext);
             
-                if (!setting.TrySet(Context, SettingContext, readerResult.Best, out string errors))
-                    await ReplyAsync(errors, ReplyType.Error, value);
+                if (!setting.TrySet(Context, SettingContext, readerResult.Best, out var errors))
+                    await ReplyAsync(errors);
                 else
                 {
                     var newValue = setting.Display(Context, SettingContext);
@@ -144,9 +144,9 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                     }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
                      .AddField(f => f.WithName(SettingText.VALUE_OLD)
-                                     .WithValue(string.IsNullOrWhiteSpace(oldValue) ? (LocalisedString)SettingText.NOTSET : (RawString)oldValue))
+                                     .WithValue(oldValue ?? (LocalisedString)SettingText.NOTSET))
                      .AddField(f => f.WithName(SettingText.VALUE_NEW)
-                                     .WithValue(string.IsNullOrWhiteSpace(newValue) ? (LocalisedString)SettingText.NOTSET : (RawString)newValue));
+                                     .WithValue(newValue ?? (LocalisedString)SettingText.NOTSET));
                     await ReplyAsync(builder);
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System;
 using TitanBot.Contexts;
+using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Settings
 {
@@ -9,8 +10,8 @@ namespace TitanBot.Settings
         string Name { get; }
         string[] Aliases { get; }
         Type Type { get; }
-        bool TrySet(ICommandContext context, IEntity<ulong> entity, object value, out string errors);
-        string Display(ICommandContext context, IEntity<ulong> entity);
+        bool TrySet(ICommandContext context, IEntity<ulong> entity, object value, out ILocalisable<string> errors);
+        ILocalisable<string> Display(ICommandContext context, IEntity<ulong> entity);
         object Get(IEntity<ulong> entity);
     }
 }

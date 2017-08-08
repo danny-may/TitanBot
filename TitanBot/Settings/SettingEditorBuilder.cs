@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using TitanBot.Contexts;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Util;
 
 namespace TitanBot.Settings
@@ -11,8 +12,8 @@ namespace TitanBot.Settings
         public string Name { get; private set; }
         public string[] Aliases { get; private set; }
         public Func<IMessageContext, TAccept, TStore> Converter { get; }
-        public Func<IMessageContext, TAccept, string> Validator { get; private set; }
-        public Func<IMessageContext, TStore, string> Viewer { get; private set; }
+        public Func<IMessageContext, TAccept, ILocalisable<string>> Validator { get; private set; }
+        public Func<IMessageContext, TStore, ILocalisable<string>> Viewer { get; private set; }
         private Expression<Func<TSetting, TStore>> Property { get; }
         private ISettingManager Parent { get; }
 
@@ -38,17 +39,17 @@ namespace TitanBot.Settings
             return this;
         }
 
-        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<TAccept, string> validator)
+        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<TAccept, ILocalisable<string>> validator)
             => SetValidator((c, a) => validator(a));
-        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<IMessageContext, TAccept, string> validator)
+        public ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<IMessageContext, TAccept, ILocalisable<string>> validator)
         {
             Validator = validator;
             return this;
         }
 
-        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<TStore, string> viewer)
+        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<TStore, ILocalisable<string>> viewer)
             => SetViewer((c, s) => viewer(s));
-        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<IMessageContext, TStore, string> viewer)
+        public ISettingEditorBuilder<TStore, TAccept> SetViewer(Func<IMessageContext, TStore, ILocalisable<string>> viewer)
         {
             Viewer = viewer;
             return this;

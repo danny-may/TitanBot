@@ -49,28 +49,28 @@ namespace TitanBot.Settings
                 var temp = MakeBuilder<TStore, TAccept>(null, null);
                 templateEditor?.Invoke(temp);
                 b.SetName(temp.Name);
-                b.SetValidator((c, a) => a.Select(v => temp.Validator(c, v)).FirstOrDefault(v => !string.IsNullOrWhiteSpace(v)));
-                b.SetViewer((c, s) => string.Join(", ", s.Select(v => temp.Viewer(c, v))));
+                b.SetValidator((c, a) => a.Select(v => temp.Validator(c, v)).FirstOrDefault(v => v != null));
+                b.SetViewer((c, s) => LocalisedString.JoinEnumerable(", ", s.Select(v => temp.Viewer(c, v))));
             };
 
-        private string EntityViewer<TAccept>(IMessageContext context, ulong id)
+        private ILocalisable<string> EntityViewer<TAccept>(IMessageContext context, ulong id)
             => EntityViewer<TAccept>(context, (ulong?)id);
-        private string EntityViewer<TAccept>(IMessageContext context, ulong? id)
+        private ILocalisable<string> EntityViewer<TAccept>(IMessageContext context, ulong? id)
         {
             if (id == null)
                 return null;
             var tAccept = typeof(TAccept);
             var interfaces = tAccept.GetInterfaces();
             if (tAccept == typeof(IRole) || interfaces.Contains(typeof(IRole)))
-                return $"<@&{id}>";
+                return (RawString)$"<@&{id}>";
             if (tAccept == typeof(IUser) || interfaces.Contains(typeof(IUser)))
-                return $"<@{id}>";
+                return (RawString)$"<@{id}>";
             if (tAccept == typeof(IChannel) || interfaces.Contains(typeof(IChannel)))
-                return $"<#{id}>";
+                return (RawString)$"<#{id}>";
             if (tAccept == typeof(IGuild) || interfaces.Contains(typeof(IGuild)))
-                return context.Client.GetGuild(id.Value).Name;
+                return (RawString)context.Client.GetGuild(id.Value).Name;
 
-            return id.ToString();
+            return (RawString)id.ToString();
         }
 
         private ISettingEditorBuilder<TStore, TAccept> MakeBuilder<TStore, TAccept>(Expression<Func<TSetting, TStore>> property, Func<IMessageContext, TAccept, TStore> converter)
