@@ -5,7 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using TitanBot.Contexts;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Util;
+using TitanBot.Replying;
+using TitanBot.Formatting;
 
 namespace TitanBot.Settings
 {
@@ -15,8 +18,8 @@ namespace TitanBot.Settings
         public int Count => SettingEditors.Count;
 
         public string Name { get; private set; } = typeof(TSetting).Name;
-        public string Description { get; private set; }
-        public string Notes { get; private set; }
+        public ILocalisable<string> Description { get; private set; }
+        public ILocalisable<string> Notes { get; private set; }
         public ISettingManager Parent { get; }
 
         private List<ISettingEditor> SettingEditors { get; } = new List<ISettingEditor>();
@@ -103,23 +106,65 @@ namespace TitanBot.Settings
             return this;
         }
 
-        public ISettingEditorCollection<TSetting> WithDescription(string description)
+        public ISettingEditorCollection<TSetting> WithDescription(ILocalisable<string> description)
         {
             Description = description;
             return this;
         }
 
-        public ISettingEditorCollection<TSetting> WithNotes(string notes)
+        public ISettingEditorCollection<TSetting> WithNotes(ILocalisable<string> notes)
         {
             Notes = notes;
             return this;
         }
 
+        public ISettingEditorCollection<TSetting> WithRawDescription(string text)
+            => WithDescription(new RawString(text));
+        public ISettingEditorCollection<TSetting> WithRawNotes(string text)
+            => WithNotes(new RawString(text));
+        public ISettingEditorCollection<TSetting> WithDescription(string key)
+            => WithDescription(new LocalisedString(key));
+        public ISettingEditorCollection<TSetting> WithNotes(string key)
+            => WithNotes(new LocalisedString(key));
+        public ISettingEditorCollection<TSetting> WithDescription(string key, ReplyType replyType) 
+            => WithDescription(new LocalisedString(key, replyType));
+        public ISettingEditorCollection<TSetting> WithNotes(string key, ReplyType replyType)
+            => WithNotes(new LocalisedString(key, replyType));
+        public ISettingEditorCollection<TSetting> WithDescription(string key, params object[] values)
+            => WithDescription(new LocalisedString(key, values));
+        public ISettingEditorCollection<TSetting> WithNotes(string key, params object[] values)
+            => WithNotes(new LocalisedString(key, values));
+        public ISettingEditorCollection<TSetting> WithDescription(string key, ReplyType replyType, params object[] values)
+            => WithDescription(new LocalisedString(key, replyType, values));
+        public ISettingEditorCollection<TSetting> WithNotes(string key, ReplyType replyType, params object[] values)
+            => WithNotes(new LocalisedString(key, replyType, values));
+
+        ISettingEditorCollection ISettingEditorCollection.WithRawDescription(string text)
+            => WithRawDescription(text);
+        ISettingEditorCollection ISettingEditorCollection.WithRawNotes(string text)
+            => WithRawNotes(text);
+        ISettingEditorCollection ISettingEditorCollection.WithDescription(string key)
+            => WithDescription(key);
+        ISettingEditorCollection ISettingEditorCollection.WithNotes(string key)
+            => WithNotes(key);
+        ISettingEditorCollection ISettingEditorCollection.WithDescription(string key, ReplyType replyType)
+            => WithDescription(key, replyType);
+        ISettingEditorCollection ISettingEditorCollection.WithNotes(string key, ReplyType replyType)
+            => WithNotes(key, replyType);
+        ISettingEditorCollection ISettingEditorCollection.WithDescription(string key, params object[] values)
+            => WithDescription(key, values);
+        ISettingEditorCollection ISettingEditorCollection.WithNotes(string key, params object[] values)
+            => WithNotes(key, values);
+        ISettingEditorCollection ISettingEditorCollection.WithDescription(string key, ReplyType replyType, params object[] values)
+            => WithDescription(key, replyType, values);
+        ISettingEditorCollection ISettingEditorCollection.WithNotes(string key, ReplyType replyType, params object[] values)
+            => WithNotes(key, replyType, values);
+
         ISettingEditorCollection ISettingEditorCollection.WithName(string name)
             => WithName(name);
-        ISettingEditorCollection ISettingEditorCollection.WithDescription(string description)
+        ISettingEditorCollection ISettingEditorCollection.WithDescription(ILocalisable<string> description)
             => WithDescription(description);
-        ISettingEditorCollection ISettingEditorCollection.WithNotes(string notes)
+        ISettingEditorCollection ISettingEditorCollection.WithNotes(ILocalisable<string> notes)
             => WithNotes(notes);
 
         public IEnumerator<ISettingEditor> GetEnumerator()

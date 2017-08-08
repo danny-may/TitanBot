@@ -57,7 +57,7 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 await ReplyAsync(builder);
                 return;
             }
-            var groups = Settings.Where(g => g.Name.ToLower() == settingGroup.ToLower());
+            var groups = Settings.Where(g => g.Name.ToLower() == settingGroup.ToLower()).ToList();
             if (groups.Count() == 0)
             {
                 await ReplyAsync(SettingText.INVALIDGROUP, ReplyType.Error, settingGroup);
@@ -73,14 +73,12 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 else
                     builder.AddInlineField(f => f.WithRawName(setting.Name).WithRawValue(value));
             }
-            var descriptions = string.Join("\n", groups.Where(g => !string.IsNullOrWhiteSpace(g.Description))
-                                                       .Select(g => TextResource.GetResource(g.Description)));
-            var notes = string.Join("\n", groups.Where(g => !string.IsNullOrWhiteSpace(g.Notes))
-                                                .Select(g => TextResource.GetResource(g.Notes)));
-            if (!string.IsNullOrWhiteSpace(descriptions))
-                builder.WithRawDescription(descriptions);
-            if (!string.IsNullOrWhiteSpace(notes))
-                builder.AddField(f => f.WithName(TBLocalisation.NOTES).WithRawValue(notes));
+            var descriptions = LocalisedString.JoinEnumerable("\n", groups.Where(g => g.Description != null).Select(g => g.Description));
+            var notes = LocalisedString.JoinEnumerable("\n", groups.Where(g => g.Notes != null).Select(g => g.Notes));
+            if (groups.Exists(g => g.Description != null))
+                builder.WithDescription(descriptions);
+            if (groups.Exists(g => g.Notes != null))
+                builder.AddField(f => f.WithName(TBLocalisation.NOTES).WithValue(notes));
             await ReplyAsync(builder);
         }
 

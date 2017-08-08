@@ -49,7 +49,7 @@ namespace TitanBot.Commands
             Flags.AddRange(Permitted.SelectMany(c => c.Flags)
                                     .GroupBy(f => f.ShortKey)
                                     .Select(g => g.First()));
-            Flag = LocalisedString.Join("\n", Flags.ToArray());
+            Flag = LocalisedString.JoinEnumerable("\n", Flags);
         }
 
         public ILocalisable<EmbedBuilder> GetEmbed()
@@ -96,7 +96,7 @@ namespace TitanBot.Commands
             if (Usages.Count > 0)
                 entries.Add(NotesFooter);
 
-            return LocalisedString.Join("\n", entries.ToArray());
+            return LocalisedString.JoinEnumerable("\n", entries);
         }
     }
 }

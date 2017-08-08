@@ -53,6 +53,8 @@ namespace TitanBot.Formatting
 
         public static LocalisedString Join(string separator, params object[] values)
             => new LocalisedString(string.Join(separator, values.Select((v, i) => $"{{{i}}}")), values);
+        public static LocalisedString JoinEnumerable<T>(string separator, IEnumerable<T> values)
+            => Join(separator, values.Cast<object>().ToArray());
 
         public static explicit operator LocalisedString(string text)
             => Build(text);
