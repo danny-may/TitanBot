@@ -80,7 +80,7 @@ namespace TitanBot
 
         private void SetupFeatures()
         {
-            TextResourceManager.RequireKeys(TBLocalisation.Defaults);
+            TextResourceManager.RegisterKeys(TBLocalisation.Defaults);
         }
 
         private void InstallSettingEditors()

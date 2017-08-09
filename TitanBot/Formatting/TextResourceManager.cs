@@ -14,7 +14,7 @@ namespace TitanBot.Formatting
         static readonly string DirectoryPath = Path.GetDirectoryName(FileName);
         private ValueFormatter ValueFormatter { get; }
 
-        private Dictionary<string, Dictionary<Locale, string>> Defaults { get; } = new Dictionary<string, Dictionary<Locale, string>>();
+        private Dictionary<string, string> Defaults { get; } = new Dictionary<string, string>();
 
         public Locale[] SupportedLanguages => TextMap.SelectMany(t => t.Value.Keys).Distinct().ToArray();
 
@@ -85,65 +85,43 @@ namespace TitanBot.Formatting
         }
 
         public Dictionary<string, string> GetCurrent(Locale language)
-            => TextMap.Where(m => m.Value.ContainsKey(language)).ToDictionary(m => m.Key, m => m.Value[language]);
+            => Defaults.ToDictionary(k => k.Key, v => TextMap.TryGetValue(v.Key, out var vals) && vals.TryGetValue(language, out var text) ? text : v.Value);
 
         public void SaveChanges()
         {
             if (!Directory.Exists(DirectoryPath))
                 Directory.CreateDirectory(DirectoryPath);
-            EnsureKeys();
             File.WriteAllText(FileName, JsonConvert.SerializeObject(TextMap.OrderBy(k => k.Key).ToDictionary(k => k.Key, k => k.Value), Newtonsoft.Json.Formatting.Indented));
         }
 
         public void Reload()
         {
-            if (!File.Exists(FileName))
-                SaveChanges();
-            TextMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Locale, string>>>(File.ReadAllText(FileName));
+            if (File.Exists(FileName))
+                TextMap = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<Locale, string>>>(File.ReadAllText(FileName));
             TextMap = TextMap?.ToDictionary(v => SanitiseKey(v.Key), v => v.Value) ?? new Dictionary<string, Dictionary<Locale, string>>();
             SaveChanges();
         }
 
         public ITextResourceCollection GetForLanguage(Locale language, FormatType format)
-        {
-            var defaults = GetCurrent(Locale.DEFAULT);
-            var forLang = GetCurrent(language);
-            var joined = defaults.ToDictionary(d => d.Key, d => (defaultText: d.Value, langText: forLang.TryGetValue(d.Key, out var l) ? l : d.Value));
-            return new TextResourceCollection(GetLanguageCoverage(language), ValueFormatter, format, joined);
-        }
+            => new TextResourceCollection(GetLanguageCoverage(language), ValueFormatter, format, GetCurrent(language));
 
         public double GetLanguageCoverage(Locale language)
         {
+            if (language == Locale.DEFAULT)
+                return 1;
             var totalString = (double)Defaults.Count;
             var covered = (double)TextMap.Count(v => v.Value.ContainsKey(language));
             return covered / totalString;
         }
 
-        private void EnsureKeys()
-        {
-            TextMap = TextMap ?? new Dictionary<string, Dictionary<Locale, string>>();
-            var missing = Defaults.Where(d => !TextMap.ContainsKey(d.Key));
-            foreach (var key in missing)
-                TextMap[key.Key] = new Dictionary<Locale, string>();
-
-            foreach (var key in Defaults)
-                foreach (var vals in key.Value)
-                    if (!TextMap[key.Key].ContainsKey(vals.Key))
-                        TextMap[key.Key][vals.Key] = vals.Value;
-        }
-
-        public void RequireKeys(IReadOnlyDictionary<string, string> values)
+        public void RegisterKeys(IReadOnlyDictionary<string, string> values)
         {
             values = values ?? new Dictionary<string, string>();
             foreach (var pair in values)
             {
                 var key = SanitiseKey(pair.Key);
-                if (!Defaults.ContainsKey(key))
-                    Defaults[key] = new Dictionary<Locale, string>();
-                Defaults[key][Locale.DEFAULT] = pair.Value;
+                Defaults[key] = pair.Value;
             }
-
-            SaveChanges();
         }
     }
 }

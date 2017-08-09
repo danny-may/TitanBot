@@ -6,14 +6,14 @@ namespace TitanBot.Formatting
 {
     class TextResourceCollection : ITextResourceCollection
     {
-        private Dictionary<string, (string defaultText, string langText)> Values { get; }
+        private Dictionary<string, string> Values { get; }
         private ValueFormatter Formatter { get; }
         private FormatType FormatType { get; }
         public double Coverage { get; }
 
         public string this[string key] => GetResource(key);
 
-        public TextResourceCollection(double coverage, ValueFormatter formatter, FormatType format, Dictionary<string, (string defaultText, string langText)> values)
+        public TextResourceCollection(double coverage, ValueFormatter formatter, FormatType format, Dictionary<string, string> values)
         {
             Coverage = coverage;
             Values = values;
@@ -30,7 +30,7 @@ namespace TitanBot.Formatting
             if (!Values.ContainsKey(key.ToUpper()))
                 return key;
             var val = Values[key.ToUpper()];
-            return val.langText ?? val.defaultText ?? key;
+            return val ?? key;
         }
 
         public string Format(string key, params object[] items)

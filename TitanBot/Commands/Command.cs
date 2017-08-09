@@ -54,7 +54,7 @@ namespace TitanBot.Commands
         protected ISettingContext UserSettings => SettingsManager.GetContext(Author);
         protected ISettingContext ChannelSettings => SettingsManager.GetContext(Channel);
         protected GeneralGlobalSetting GeneralGlobalSetting => GlobalSettings.Get<GeneralGlobalSetting>();
-        protected GeneralGuildSetting GeneralGuildSetting => GuildSettings.Get<GeneralGuildSetting>();
+        protected GeneralGuildSetting GeneralGuildSetting => GuildSettings?.Get<GeneralGuildSetting>();
         protected GeneralUserSetting GeneralUserSetting => UserSettings.Get<GeneralUserSetting>();
         protected IGuildUser GuildBotUser => Guild?.GetCurrentUserAsync().Result;
         protected IGuildUser GuildAuthor => Author as IGuildUser;

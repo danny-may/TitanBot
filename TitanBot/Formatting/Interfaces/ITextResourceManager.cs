@@ -12,7 +12,7 @@ namespace TitanBot.Formatting
         Locale[] SupportedLanguages { get; }
         void Reload();
 
-        void RequireKeys(IReadOnlyDictionary<string, string> values);
+        void RegisterKeys(IReadOnlyDictionary<string, string> values);
         string Export(Locale language);
         void Import(Locale language, string jsonText);
         Dictionary<string, string> GetCurrent(Locale language);
