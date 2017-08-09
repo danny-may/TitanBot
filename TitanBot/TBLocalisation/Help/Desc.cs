@@ -34,6 +34,7 @@ namespace TitanBot
                 public const string EXCEPTION = BASE_PATH + nameof(EXCEPTION);
                 public const string LANGUAGE = BASE_PATH + nameof(LANGUAGE);
                 public const string FORMATTING = BASE_PATH + nameof(FORMATTING);
+                public const string SCHEDULER = BASE_PATH + nameof(SCHEDULER);
 
                 public static IReadOnlyDictionary<string, string> Defaults { get; }
                     = new Dictionary<string, string>
@@ -56,7 +57,8 @@ namespace TitanBot
                         { PREFERENCES, "Allows you to set some options for how I will interact with you." },
                         { EXCEPTION, "Shows details about exceptions that have occured within me" },
                         { LANGUAGE, "Shows information about any and all languages supported by me" },
-                        { FORMATTING, "Command used to see and use all the available output formats" }
+                        { FORMATTING, "Command used to see and use all the available output formats" },
+                        { SCHEDULER, "Used to perform various actions direct on the scheduler" }
                     }.ToImmutableDictionary();
             }
         }

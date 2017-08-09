@@ -36,8 +36,6 @@ namespace TitanBot.Scheduling
             Logger = logger;
         }
 
-
-
         public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), ulong? message = null, ulong? channel = null, string data = null) where T : ISchedulerCallback
         {
             var record = new SchedulerRecord
@@ -182,5 +180,8 @@ namespace TitanBot.Scheduling
             var type = JsonConvert.SerializeObject(typeof(T));
             return Database.Find((SchedulerRecord r) => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
         }
+
+        public async ValueTask<int> PruneBefore(DateTime date)
+            => await Database.Delete<SchedulerRecord>(r => r.Complete && r.EndTime < date);
     }
 }

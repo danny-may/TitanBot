@@ -191,6 +191,7 @@
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
     <Compile Include="Commands\DefaultCommands\General\FormattingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\LanguageCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\Owner\SchedulerCommand.cs" />
     <Compile Include="Formatting\Localisation\DynamicString.cs" />
     <Compile Include="Formatting\Localisation\LocalisedEmbedBuilder.cs" />
     <Compile Include="Formatting\Localisation\LocalisedString.cs" />
@@ -306,6 +307,7 @@
     <Compile Include="TBLocalisation\Commands\FormattingText.cs" />
     <Compile Include="TBLocalisation\Commands\LanguageText.cs" />
     <Compile Include="TBLocalisation\Commands\ExceptionText.cs" />
+    <Compile Include="TBLocalisation\Commands\SchedulerText.cs" />
     <Compile Include="TBLocalisation\Commands\SudoText.cs" />
     <Compile Include="TBLocalisation\Commands\ShutdownText.cs" />
     <Compile Include="TBLocalisation\Commands\ExecText.cs" />

@@ -31,6 +31,7 @@ namespace TitanBot
                                                   .Concat(ExceptionText.Defaults)
                                                   .Concat(LanguageText.Defaults)
                                                   .Concat(FormattingText.Defaults)
+                                                  .Concat(SchedulerText.Defaults)
                                                   .ToImmutableDictionary();
         }
     }

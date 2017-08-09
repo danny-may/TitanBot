@@ -13,6 +13,7 @@ namespace TitanBot.Scheduling
             where T : ISchedulerCallback;
         ISchedulerRecord Complete(ulong id, bool wasCancelled = true);
         ISchedulerRecord[] Complete(IEnumerable<ulong> ids, bool wasCancelled = true);
+        ValueTask<int> PruneBefore(DateTime date);
         Task StartAsync();
         Task StopAsync();
         int ActiveCount();
