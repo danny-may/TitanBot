@@ -43,13 +43,9 @@ namespace TitanBot.Formatting
 
         public override string ToString()
             => Key;
-        
-        private static LocalisedString Build(string text, ReplyType replyType = ReplyType.None, object[] values = null)
-        {
-            if (text == null) return null;            
 
-            return new LocalisedString(text, replyType, values ?? new object[0]);
-        }
+        private static LocalisedString Build(string text, ReplyType replyType = ReplyType.None, object[] values = null)
+            => text == null ? null : new LocalisedString(text, replyType, values ?? new object[0]);
 
         public static LocalisedString Join(string separator, params object[] values)
             => new LocalisedString(string.Join(separator, values.Select((v, i) => $"{{{i}}}")), values);

@@ -50,7 +50,7 @@ namespace TitanBot.Settings
                 templateEditor?.Invoke(temp);
                 b.SetName(temp.Name);
                 b.SetValidator((c, a) => a.Select(v => temp.Validator(c, v)).FirstOrDefault(v => v != null));
-                b.SetViewer((c, s) => LocalisedString.JoinEnumerable(", ", s.Select(v => temp.Viewer(c, v))));
+                b.SetViewer((c, s) => s.Length == 0 ? null : LocalisedString.JoinEnumerable(", ", s.Select(v => temp.Viewer(c, v))));
             };
 
         private ILocalisable<string> EntityViewer<TAccept>(IMessageContext context, ulong id)

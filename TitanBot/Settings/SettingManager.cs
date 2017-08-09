@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,5 +70,35 @@ namespace TitanBot.Settings
 
         public void ResetSettings(ulong entity)
             => GetContext(entity).ResetAll();
+
+        public async void Migrate(Dictionary<string, Type> typeMap)
+        {
+            var records = await Database.Find<Setting>(r => true);
+            foreach (var record in records)
+            {
+                if (string.IsNullOrWhiteSpace(record.Serialized))
+                    continue;
+                var parsed = JObject.Parse(record.Serialized);
+
+                var removals = new List<string>();
+
+                foreach (var entry in parsed)
+                {
+                    if (!typeMap.TryGetValue(entry.Key, out var type))
+                        continue;
+                    var obj = entry.Value.ToObject(type);
+                    record.Settings[type.Name] = obj;
+                    removals.Add(entry.Key);
+                }
+
+                removals.ForEach(r => parsed.Remove(r));
+
+                if (parsed.Count == 0)
+                    record.Serialized = "";
+                else
+                    record.Serialized = parsed.ToString();
+            }
+            await Database.Upsert(records);
+        }
     }
 }

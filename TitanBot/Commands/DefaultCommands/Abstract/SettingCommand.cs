@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Replying;
 using TitanBot.Settings;
 using TitanBot.TypeReaders;
@@ -82,6 +83,15 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             await ReplyAsync(builder);
         }
 
+        private ILocalisable<string> ValueViewer(ILocalisable<string> baseValue)
+            => new DynamicString(tr =>
+            {
+                var x = baseValue?.Localise(tr);
+                if (string.IsNullOrWhiteSpace(x))
+                    return ((LocalisedString)SettingText.NOTSET).Localise(tr);
+                return x;
+            });
+
         protected async Task ToggleSettingAsync(string key)
         {
             var setting = Find(key);
@@ -106,9 +116,9 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                     }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
                      .AddField(f => f.WithName(SettingText.VALUE_OLD)
-                                     .WithValue(oldDisplay ?? (LocalisedString)SettingText.NOTSET))
+                                     .WithValue(ValueViewer(oldDisplay)))
                      .AddField(f => f.WithName(SettingText.VALUE_NEW)
-                                     .WithValue(newDisplay ?? (LocalisedString)SettingText.NOTSET));
+                                     .WithValue(ValueViewer(newDisplay)));
                     await ReplyAsync(builder);
                 }
             }
@@ -144,9 +154,9 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                         Color = System.Drawing.Color.SkyBlue.ToDiscord(),
                     }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
                      .AddField(f => f.WithName(SettingText.VALUE_OLD)
-                                     .WithValue(oldValue ?? (LocalisedString)SettingText.NOTSET))
+                                     .WithValue(ValueViewer(oldValue)))
                      .AddField(f => f.WithName(SettingText.VALUE_NEW)
-                                     .WithValue(newValue ?? (LocalisedString)SettingText.NOTSET));
+                                     .WithValue(ValueViewer(newValue)));
                     await ReplyAsync(builder);
                 }
             }

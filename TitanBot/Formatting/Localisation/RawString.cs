@@ -19,6 +19,6 @@ namespace TitanBot.Formatting
         }
 
         public static implicit operator RawString(string text)
-            => new RawString(text);
+            => text == null ? null : new RawString(text);
     }
 }

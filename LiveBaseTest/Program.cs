@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TitanBot;
 using TitanBot.Formatting;
 using TitanBot.Logging;

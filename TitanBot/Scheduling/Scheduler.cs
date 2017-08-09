@@ -124,12 +124,16 @@ namespace TitanBot.Scheduling
         
         private bool TryGetHandler(string serialisedType, out ISchedulerCallback callback)
         {
-            var type = JsonConvert.DeserializeObject<Type>(serialisedType);
+            callback = null;
+            Type type;
+            try
+            {
+                type = JsonConvert.DeserializeObject<Type>(serialisedType);
+            }
+            catch { return false; }
 
             if (CachedHandlers.TryGetValue(type, out callback))
                 return true;
-
-            callback = null;
             if (!DependencyManager.TryConstruct(type, out object constructed))
                 return false;
             callback = (ISchedulerCallback)constructed;
