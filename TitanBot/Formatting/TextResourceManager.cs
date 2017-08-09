@@ -16,7 +16,9 @@ namespace TitanBot.Formatting
 
         private Dictionary<string, string> Defaults { get; } = new Dictionary<string, string>();
 
-        public Locale[] SupportedLanguages => TextMap.SelectMany(t => t.Value.Keys).Distinct().ToArray();
+        public Locale[] SupportedLanguages => new Locale[] { Locale.DEFAULT }.Concat(TextMap.SelectMany(t => t.Value.Keys))
+                                                                             .Distinct()
+                                                                             .ToArray();
 
         public TextResourceManager(ValueFormatter valueFormatter)
         {
