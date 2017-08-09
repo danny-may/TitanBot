@@ -69,6 +69,7 @@ namespace TitanBot
             DependencyFactory.GetOrStore<IDownloader>();
             DependencyFactory.GetOrStore<ValueFormatter>();
             DependencyFactory.GetOrStore<IReplier>();
+            DependencyFactory.GetOrStore<IPermissionManager>();
             TextResourceManager = DependencyFactory.GetOrStore<ITextResourceManager>();
 
             SetupFeatures();
