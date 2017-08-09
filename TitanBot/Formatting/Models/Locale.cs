@@ -4,7 +4,7 @@ namespace TitanBot.Formatting
 {
     public struct Locale
     {
-        public const string DEFAULT = "DEFAULT";
+        public const string DEFAULT = "Default";
         
         private string _id { get; }
         private string _idUpper { get; }
