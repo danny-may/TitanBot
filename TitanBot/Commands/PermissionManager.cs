@@ -147,10 +147,16 @@ namespace TitanBot.Commands
 
             return calls.Where(c =>
             {
-                var permission = CachedPermissions.FirstOrDefault(p => p.CallName == c.PermissionKey && p.GuildId == context.Guild.Id);
-                if (permission == null || (permission.Roles == null || permission.Roles.Count() == 0))
-                    return guildUser.HasAll(permission?.Permission ?? c.DefaultPermissions);
-                return permission.Roles != null && guildUser.RoleIds.Any(r => permission.Roles.Contains(r));
+                var callPerm = CachedPermissions.FirstOrDefault(p => p.CallName == c.PermissionKey && p.GuildId == context.Guild.Id);
+                var hasPerm = callPerm?.Permission != null;
+                var hasRoles = (callPerm?.Roles?.Length ?? 0) != 0;
+                if (callPerm == null || (!hasPerm && !hasRoles))
+                    return guildUser.HasAll(c.DefaultPermissions);
+                if (hasPerm && guildUser.HasAll(callPerm.Permission.Value))
+                    return true;
+                if (hasRoles && guildUser.RoleIds.Any(r => callPerm.Roles.Contains(r)))
+                    return true;
+                return false;
             }).ToArray();
         }
 
