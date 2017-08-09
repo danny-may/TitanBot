@@ -49,8 +49,8 @@ namespace TitanBot.Settings
                 var temp = MakeBuilder<TStore, TAccept>(null, null);
                 templateEditor?.Invoke(temp);
                 b.SetName(temp.Name);
-                b.SetValidator((c, a) => a.Select(v => temp.Validator(c, v)).FirstOrDefault(v => v != null));
-                b.SetViewer((c, s) => s.Length == 0 ? null : LocalisedString.JoinEnumerable(", ", s.Select(v => temp.Viewer(c, v))));
+                b.SetValidator((c, a) => a.Select(v => temp.Validator?.Invoke(c, v)).FirstOrDefault(v => v != null));
+                b.SetViewer((c, s) => s.Length == 0 ? null : LocalisedString.JoinEnumerable(", ", s.Select(v => temp.Viewer?.Invoke(c, v))));
             };
 
         private ILocalisable<string> EntityViewer<TAccept>(IMessageContext context, ulong id)
