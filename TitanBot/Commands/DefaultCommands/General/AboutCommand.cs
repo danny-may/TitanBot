@@ -13,7 +13,7 @@ namespace TitanBot.Commands.General
         [Usage(Usage.ABOUT)]
         async Task ShowAbout()
         {
-            await ReplyAsync(AboutText.MESSAGE, ReplyType.Info);
+            await ReplyAsync(AboutText.MESSAGE, ReplyType.Info, Prefix, CommandName);
         }
     }
 }
