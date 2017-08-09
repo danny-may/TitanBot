@@ -132,7 +132,7 @@ namespace TitanBot.Commands
                     return new CallInfo[0];
 
             return calls.Where(c => {
-                var permission = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == c.PermissionKey.ToLower());
+                var permission = CachedPermissions.FirstOrDefault(p => p.CallName == c.PermissionKey);
                 if (permission == null)
                     return true;
                 if (permission.Blacklisted != null)
@@ -147,7 +147,7 @@ namespace TitanBot.Commands
 
             return calls.Where(c =>
             {
-                var permission = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == c.PermissionKey.ToLower());
+                var permission = CachedPermissions.FirstOrDefault(p => p.CallName == c.PermissionKey && p.GuildId == context.Guild.Id);
                 if (permission == null || (permission.Roles == null || permission.Roles.Count() == 0))
                     return guildUser.HasAll(permission?.Permission ?? c.DefaultPermissions);
                 return permission.Roles != null && guildUser.RoleIds.Any(r => permission.Roles.Contains(r));
@@ -158,7 +158,7 @@ namespace TitanBot.Commands
         {
             foreach (var call in calls)
             {
-                var current = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == call.PermissionKey.ToLower() && p.GuildId == context.Guild.Id);
+                var current = CachedPermissions.FirstOrDefault(p => p.CallName == call.PermissionKey && p.GuildId == context.Guild.Id);
                 if (current == null)
                 {
                     current = new CallPermission
