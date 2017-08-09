@@ -23,7 +23,7 @@ namespace TitanBot
                     = new Dictionary<string, string>
                     {
                         { SHOW_NOPREFIX, "You do not require prefixes in this channel" },
-                        { SHOW_MESSAGE, "Your available prefixes are {0)}" },
+                        { SHOW_MESSAGE, "Your available prefixes are {0}" },
                         { SET_MESSAGE, "Your guilds prefix has been set to `{0}`" }
                     }.ToImmutableDictionary();
             }
