@@ -24,9 +24,9 @@ namespace TitanBot.Commands.DefaultCommands.Admin
 
         IEnumerable<CallInfo> FindCalls(string[] cmds)
             =>  CommandService.CommandList.SelectMany(c => c.Calls)
-                                       .Select(c => (Call: c, Path: c.PermissionKey.Split('.')))
-                                       .Where(c => cmds.Count(t => c.Path.Zip(t.Split('.'), (p, v) => p.ToLower() == v.ToLower()).All(a => a)) > 0)
-                                       .Select(c => c.Call);
+                                          .Select(c => (Call: c, Path: c.PermissionKey.Split('.')))
+                                          .Where(c => cmds.Count(t => c.Path.Zip(t.Split('.'), (p, v) => p.ToLower() == v.ToLower()).All(a => a)) > 0)
+                                          .Select(c => c.Call);
 
         [Call("SetRole")]
         [Usage(Usage.EDITCOMMAND_SETROLE)]
@@ -40,14 +40,14 @@ namespace TitanBot.Commands.DefaultCommands.Admin
                 return;
             }
 
-            PermissionManager.SetPermissions(Context, validCalls.ToArray(), null, roles.Select(r => r.Id).ToArray(), null);
+            PermissionManager.SetPermissions(Context, validCalls.ToArray(), roles: roles.Select(r => r.Id).ToArray());
             
             await ReplyAsync(EditCommandText.SUCCESS, ReplyType.Success, "Roles", validCalls.Select(c => c.Parent).Distinct().Count());
         }
 
         [Call("SetPerm")]
         [Usage(Usage.EDITCOMMAND_SETPERM)]
-        async Task SetPermAsync(string[] cmds, ulong permission)
+        async Task SetPermAsync(string[] cmds, ulong? permission = null)
         {
             var validCalls = FindCalls(cmds);
 
@@ -57,7 +57,7 @@ namespace TitanBot.Commands.DefaultCommands.Admin
                 return;
             }
 
-            PermissionManager.SetPermissions(Context, validCalls.ToArray(), permission, null, null);
+            PermissionManager.SetPermissions(Context, validCalls.ToArray(), permission: permission);
 
             await ReplyAsync(EditCommandText.SUCCESS, ReplyType.Success, "Permissions", validCalls.Select(c => c.Parent).Distinct().Count());
         }
@@ -91,7 +91,7 @@ namespace TitanBot.Commands.DefaultCommands.Admin
                 return;
             }
 
-            PermissionManager.SetPermissions(Context, validCalls.ToArray(), null, null, channels.Select(c => c.Id).ToArray());
+            PermissionManager.SetPermissions(Context, validCalls.ToArray(), blacklist: channels.Select(c => c.Id).ToArray());
 
             await ReplyAsync(EditCommandText.SUCCESS, ReplyType.Success, "Blacklist", validCalls.Select(c => c.Parent).Distinct().Count());
         }

@@ -30,9 +30,9 @@ namespace TitanBot.Models
         public event CacheUpdateEventHandler<T> OnUpdate;
 
         public T Value => GetValue();
-        public TimeSpan InvalidationPeriod { get; }
+        public TimeSpan? InvalidationPeriod { get; }
         public bool IsFresh => _lastUpdate != DateTime.MinValue &&
-                               _lastUpdate + InvalidationPeriod > DateTime.Now;
+                               (InvalidationPeriod == null || (DateTime.Now - _lastUpdate < InvalidationPeriod));
 
         public static Cached<T> FromValue(T value) => new Cached<T>(() => new ValueTask<T>(value), TimeSpan.MaxValue);
 
@@ -47,7 +47,7 @@ namespace TitanBot.Models
         private Cached(Func<ValueTask<T>> source, TimeSpan? validFor)
         {
             _source = source;
-            InvalidationPeriod = validFor ?? TimeSpan.MaxValue;
+            InvalidationPeriod = validFor;
         }
 
         public void Invalidate()

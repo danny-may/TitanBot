@@ -18,19 +18,18 @@ namespace TitanBot.Commands
         private IDatabase Database { get; }
         private BotClient BotClient { get; }
         private ISettingManager Settings { get; }
-        private Cached<List<CallPermission>> _cachedPermissions { get; }
-        private List<CallPermission> CachedPermissions => _cachedPermissions.Value;
+        private CachedDictionary<ulong?, Dictionary<string, CallPermission>> CachedPermissions { get; }
 
         public PermissionManager(IDatabase database, BotClient botClient, ISettingManager settings)
         {
             Database = database;
             BotClient = botClient;
             Settings = settings;
-            _cachedPermissions = Cached.FromSource(GetPermissions, 10000);
+            CachedPermissions = CachedDictionary.FromSource((ulong? key) => LoadPerms(key), new TimeSpan(0, 30, 0), 100);
         }
 
-        private async ValueTask<List<CallPermission>> GetPermissions()
-            => (await Database.Find<CallPermission>(x => true)).ToList();
+        private async ValueTask<Dictionary<string, CallPermission>> LoadPerms(ulong? guildId)
+            => (await Database.Find<CallPermission>(r => r.GuildId == guildId)).GroupBy(s => s.CallName).ToDictionary(s => s.Key, s => s.First());
 
         public PermissionCheckResponse CheckAllowed(IMessageContext context, CallInfo[] calls)
         {
@@ -128,69 +127,84 @@ namespace TitanBot.Commands
                 if (context.GeneralGuildSetting.BlackListed.Contains(context.Channel.Id))
                     return new CallInfo[0];
 
-            return calls.Where(c => {
-                var permission = CachedPermissions.FirstOrDefault(p => p.CallName == c.PermissionKey);
-                if (permission == null)
-                    return true;
-                if (permission.Blacklisted != null)
-                    return !permission.Blacklisted.Contains(context.Channel.Id);
-                return true;
-            }).ToArray();
+            var callPerms = GetPerms(context.Guild?.Id, calls);
+
+            return callPerms.Where(p => p.Value == null ||
+                                        p.Value.Blacklisted == null ||
+                                        !p.Value.Blacklisted.Contains(context.Channel.Id))
+                            .Select(p => p.Key)
+                            .ToArray();
         }
 
         public CallInfo[] CheckPermissions(IMessageContext context, CallInfo[] calls)
         {
             var guildUser = context.Author as IGuildUser;
 
-            return calls.Where(c =>
+            var callPerms = GetPerms(context.Guild?.Id, calls);
+
+            return callPerms.Where(p =>
             {
-                var callPerm = CachedPermissions.FirstOrDefault(p => p.CallName == c.PermissionKey && p.GuildId == context.Guild.Id);
-                var hasPerm = callPerm?.Permission != null;
-                var hasRoles = (callPerm?.Roles?.Length ?? 0) != 0;
-                if (callPerm == null || (!hasPerm && !hasRoles))
-                    return guildUser.HasAll(c.DefaultPermissions);
-                if (hasPerm && guildUser.HasAll(callPerm.Permission.Value))
+                var hasPerm = p.Value?.Permission != null;
+                var hasRoles = (p.Value?.Roles?.Length ?? 0) != 0;
+                if (p.Value == null || (!hasPerm && !hasRoles))
+                    return guildUser.HasAll(p.Key.DefaultPermissions);
+                if (hasPerm && guildUser.HasAll(p.Value.Permission.Value))
                     return true;
-                if (hasRoles && guildUser.RoleIds.Any(r => callPerm.Roles.Contains(r)))
+                if (hasRoles && guildUser.RoleIds.Any(r => p.Value.Roles.Contains(r)))
                     return true;
                 return false;
-            }).ToArray();
+            }).Select(p => p.Key).ToArray();
         }
 
-        public async void SetPermissions(IMessageContext context, CallInfo[] calls, ulong? permission, ulong[] roles, ulong[] blacklist)
+        public async void SetPermissions(IMessageContext context, CallInfo[] calls, Optional<ulong?> permId, Optional<ulong[]> roles, Optional<ulong[]> blacklist)
         {
-            foreach (var call in calls)
+            var callPerms = GetPerms(context.Guild?.Id, calls);
+
+            var toUpdate = new List<CallPermission>();
+
+            foreach (var call in callPerms)
             {
-                var current = CachedPermissions.FirstOrDefault(p => p.CallName == call.PermissionKey && p.GuildId == context.Guild.Id);
-                if (current == null)
-                {
-                    current = new CallPermission
+                var perm = call.Value ?? 
+                    new CallPermission
                     {
-                        CallName = call.PermissionKey,
+                        CallName = call.Key.PermissionKey,
                         GuildId = context.Guild.Id,
                     };
-                }
-                if (permission != null)
-                    current.Permission = permission;
-                if (roles != null)
-                    current.Roles = roles;
-                if (blacklist != null)
-                    current.Blacklisted = blacklist;
-                await Database.Upsert(current);
-                _cachedPermissions.Invalidate();
+                toUpdate.Add(perm);
+                if (permId.IsSpecified)
+                    perm.Permission = permId.Value;
+                if (roles.IsSpecified)
+                    perm.Roles = roles.Value;
+                if (blacklist.IsSpecified)
+                    perm.Blacklisted = blacklist.Value;
             }
+
+            if (toUpdate.Count == 0)
+                return;
+            await Database.Upsert(toUpdate as IEnumerable<CallPermission>);
+            CachedPermissions.Invalidate();
         }
 
         public async void ResetPermissions(IMessageContext context, CallInfo[] calls)
         {
-            foreach (var call in calls)
-            {
-                var current = CachedPermissions.FirstOrDefault(p => p.CallName.ToLower() == call.PermissionKey.ToLower() && p.GuildId == context.Guild.Id);
-                if (current == null)
-                    continue;
-                CachedPermissions.Remove(current);
-                await Database.Delete(current);
-            }
+            var callPerms = GetPerms(context.Guild?.Id, calls);
+
+            var removing = callPerms.Values.Where(p => p != null);
+            if (removing.Count() == 0)
+                return;
+
+            await Database.Delete(removing);
+            CachedPermissions.Invalidate();
         }
+
+        private Dictionary<CallInfo, CallPermission> GetPerms(ulong? guildId, params CallInfo[] calls)
+        {
+            var dict = CachedPermissions[guildId];
+            if (dict.Count == 0)
+                return calls.ToDictionary(c => c, c => (CallPermission)null);
+
+            return calls.Distinct().ToDictionary(c => c, c => dict.TryGetValue(c.PermissionKey, out var perm) ? perm : null);
+        }
+
     }
 }
