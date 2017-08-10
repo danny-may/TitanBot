@@ -1,10 +1,12 @@
 ﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Commands.Models;
 using TitanBot.Commands.Responses;
 using TitanBot.Contexts;
+using TitanBot.Models;
 using TitanBot.Settings;
 using TitanBot.Storage;
 using static TitanBot.TBLocalisation.Logic;
@@ -16,24 +18,19 @@ namespace TitanBot.Commands
         private IDatabase Database { get; }
         private BotClient BotClient { get; }
         private ISettingManager Settings { get; }
-        private List<CallPermission> CachedPermissions { get; set; }
+        private Cached<List<CallPermission>> _cachedPermissions { get; }
+        private List<CallPermission> CachedPermissions => _cachedPermissions.Value;
 
         public PermissionManager(IDatabase database, BotClient botClient, ISettingManager settings)
         {
             Database = database;
             BotClient = botClient;
             Settings = settings;
-            Task.Run(() => RefreshCache()).DontWait();
+            _cachedPermissions = Cached.FromSource(GetPermissions, 10000);
         }
 
-        private async void RefreshCache()
-        {
-            while (true)
-            {
-                CachedPermissions = Database.Find<CallPermission>(x => true).Result.ToList();
-                await Task.Delay(10000);
-            }
-        }
+        private async ValueTask<List<CallPermission>> GetPermissions()
+            => (await Database.Find<CallPermission>(x => true)).ToList();
 
         public PermissionCheckResponse CheckAllowed(IMessageContext context, CallInfo[] calls)
         {
@@ -172,7 +169,6 @@ namespace TitanBot.Commands
                         CallName = call.PermissionKey,
                         GuildId = context.Guild.Id,
                     };
-                    CachedPermissions.Add(current);
                 }
                 if (permission != null)
                     current.Permission = permission;
@@ -181,6 +177,7 @@ namespace TitanBot.Commands
                 if (blacklist != null)
                     current.Blacklisted = blacklist;
                 await Database.Upsert(current);
+                _cachedPermissions.Invalidate();
             }
         }
 

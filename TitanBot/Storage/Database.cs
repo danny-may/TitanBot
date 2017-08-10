@@ -70,7 +70,9 @@ namespace TitanBot.Storage
         public void Dispose()
             => LiteDatabase.Dispose();
 
-        public ValueTask<IEnumerable<T>> Find<T>(Expression<Func<T, bool>> predicate, int skip = 0, int limit = int.MaxValue)where T : IDbRecord
+        public ValueTask<IEnumerable<T>> All<T>() where T : IDbRecord
+            => QueryAsync(conn => conn.GetTable<T>().Find(t => true).ToList() as IEnumerable<T>);
+        public ValueTask<IEnumerable<T>> Find<T>(Expression<Func<T, bool>> predicate, int skip = 0, int limit = int.MaxValue) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().Find(predicate, skip, limit).ToList() as IEnumerable<T>);
         public ValueTask<T> FindOne<T>(Expression<Func<T, bool>> predicate) where T : IDbRecord
             => QueryAsync(conn => conn.GetTable<T>().FindOne(predicate));
