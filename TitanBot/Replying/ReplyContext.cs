@@ -4,13 +4,12 @@ using Discord.WebSocket;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Settings;
 using TitanBot.Util;
 using static TitanBot.TBLocalisation.Logic;
-using TitanBot.Formatting.Interfaces;
 
 namespace TitanBot.Replying
 {
@@ -36,7 +35,7 @@ namespace TitanBot.Replying
 
         private event MessageSendErrorHandler Handler;
         public event OnSendEventHandler OnSend;
-        
+
         public ReplyContext(IMessageChannel channel, IUser user, IDependencyFactory factory)
         {
             Channel = channel;
@@ -61,7 +60,7 @@ namespace TitanBot.Replying
         public async ValueTask<IUserMessage> SendAsync(bool stealthy = false)
         {
             if (string.IsNullOrWhiteSpace(Localised) && Embedable == null && Attachment == null)
-                throw new InvalidOperationException("Unable to send a message without an embed or message");
+                return null;
 
             IUserMessage msg = null;
 
@@ -136,7 +135,7 @@ namespace TitanBot.Replying
             AttachmentName = name;
             return this;
         }
-        
+
         public IReplyContext WithEmbedable(IEmbedable embedable)
         {
             Embedable = embedable;

@@ -85,8 +85,8 @@ namespace TitanBot.Commands
                 if ((c.RequiredContexts & ContextType.Group) != 0)
                     isValid = isValid || context.Channel is IGroupChannel;
 
-                return isValid && (c.Parent.RequireGuild == null || 
-                                   c.Parent.RequireGuild.Length == 0 || 
+                return isValid && (c.Parent.RequireGuild == null ||
+                                   c.Parent.RequireGuild.Length == 0 ||
                                    (context.Guild != null && c.Parent.RequireGuild.Contains(context.Guild.Id)));
             }).ToArray();
         }
@@ -164,7 +164,7 @@ namespace TitanBot.Commands
 
             foreach (var call in callPerms)
             {
-                var perm = call.Value ?? 
+                var perm = call.Value ??
                     new CallPermission
                     {
                         CallName = call.Key.PermissionKey,
@@ -182,7 +182,7 @@ namespace TitanBot.Commands
             if (toUpdate.Count == 0)
                 return;
             await Database.Upsert(toUpdate as IEnumerable<CallPermission>);
-            CachedPermissions.Invalidate();
+            CachedPermissions.Invalidate(context.Guild?.Id);
         }
 
         public async void ResetPermissions(IMessageContext context, CallInfo[] calls)
@@ -194,7 +194,7 @@ namespace TitanBot.Commands
                 return;
 
             await Database.Delete(removing);
-            CachedPermissions.Invalidate();
+            CachedPermissions.Invalidate(context.Guild?.Id);
         }
 
         private Dictionary<CallInfo, CallPermission> GetPerms(ulong? guildId, params CallInfo[] calls)

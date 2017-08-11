@@ -1,13 +1,13 @@
 ﻿using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.Logging;
+using TitanBot.Models;
 using TitanBot.Storage;
 
 namespace TitanBot.Scheduling
@@ -20,13 +20,15 @@ namespace TitanBot.Scheduling
         private readonly IDependencyFactory DependencyManager;
         private readonly ILogger Logger;
         private readonly DiscordSocketClient Client;
-        private Task LoopTask;
-        private bool ShouldStop;
-        public int PollingPeriod = 1000;
+        private ClockTimer MainLoop { get; }
+        private Cached<List<SchedulerRecord>> CachedRecords { get; }
 
-        public bool IsRunning => LoopTask != null &&
-                                !LoopTask.IsCanceled &&
-                                !LoopTask.IsFaulted;
+        public double PollingPeriod { get => MainLoop.Interval.TotalMilliseconds; set => MainLoop.Interval = new TimeSpan(0, 0, 0, 0, (int)value); }
+        public bool Enabled { get => MainLoop.Enabled; set => MainLoop.Enabled = value; }
+        private DateTime StartTime { get; set; }
+
+        private async ValueTask<List<SchedulerRecord>> GetRecords()
+            => (await Database.All<SchedulerRecord>()).ToList();
 
         public Scheduler(DiscordSocketClient client, IDependencyFactory manager, IDatabase database, ILogger logger)
         {
@@ -34,6 +36,16 @@ namespace TitanBot.Scheduling
             DependencyManager = manager;
             Database = database;
             Logger = logger;
+            CachedRecords = Cached.FromSource(GetRecords);
+            MainLoop = new ClockTimer();
+            PollingPeriod = 1000;
+
+            MainLoop.Elapsed += Cycle;
+        }
+
+        private void Cycle(object sender, ClockTimerElapsedEventArgs e)
+        {
+            Console.WriteLine($"Time: {e.SignalTime} | Slowdown: {e.Slowdown.TotalMilliseconds:0.0000}ms | Devaition: {(DateTime.Now - MainLoop.BaseTime).TotalMilliseconds % PollingPeriod:0.0000}ms");
         }
 
         public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), ulong? message = null, ulong? channel = null, string data = null) where T : ISchedulerCallback
@@ -54,34 +66,17 @@ namespace TitanBot.Scheduling
             return record.Id;
         }
 
-        public Task StartAsync()
-        {
-            if (IsRunning)
-                throw new InvalidOperationException("Scheduler is already running");
-            ShouldStop = false;
-            LoopTask = Task.Run((Action)MainLoop);
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync()
-        {
-            if (ShouldStop || !IsRunning)
-                throw new InvalidOperationException("Scheduler is already stopped/stopping");
-            ShouldStop = true;
-            return LoopTask;
-        }
-
-        private async void MainLoop()
+        private async void old_MainLoop()
         {
             var pollTime = DateTime.MinValue;
-            while (!ShouldStop)
+            while (!Enabled)
             {
                 await LogErrors(async () =>
                 {
                     var msSincePrev = (int)(DateTime.Now - pollTime).TotalMilliseconds;
                     if (pollTime != DateTime.MinValue && msSincePrev > PollingPeriod)
                         Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {msSincePrev - PollingPeriod}ms", "MainLoop");
-                    await Task.Delay((PollingPeriod - msSincePrev).Clamp(0, int.MaxValue));
+                    await Task.Delay((int)(PollingPeriod - msSincePrev).Clamp(0, int.MaxValue));
                     pollTime = DateTime.Now;
                     var actives = await FindActives(pollTime);
                     var completed = actives.Where(r => r.EndTime < pollTime).ToList();
@@ -89,8 +84,9 @@ namespace TitanBot.Scheduling
                     Complete(completed, false);
                     foreach (var record in ongoing)
                     {
+                        var absDelta = (pollTime - record.StartTime).Ticks;
                         var intervalDelta = (pollTime - record.StartTime).Ticks % record.Interval.Ticks;
-                        if (intervalDelta / 10000 > PollingPeriod || !TryGetHandler(record.Callback, out ISchedulerCallback callback))
+                        if (absDelta < record.Interval.Ticks || intervalDelta / 10000 > PollingPeriod || !TryGetHandler(record.Callback, out ISchedulerCallback callback))
                             continue;
                         Task.Run(() => LogErrors(() => callback.Handle(new SchedulerContext(record, Client, DependencyManager), pollTime.AddTicks(-intervalDelta))))
                             .DontWait();
@@ -121,7 +117,7 @@ namespace TitanBot.Scheduling
                 });
             }
         }
-        
+
         private bool TryGetHandler(string serialisedType, out ISchedulerCallback callback)
         {
             callback = null;
@@ -170,7 +166,7 @@ namespace TitanBot.Scheduling
             IEnumerable<SchedulerRecord> records;
             if (userId != null)
                 records = Database.Find<SchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type && r.UserId == userId).Result;
-            else 
+            else
                 records = Database.Find<SchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type).Result;
 
             return Complete(records, wasCancelled);
