@@ -14,7 +14,7 @@ namespace TitanBot.Helpers
         private void Process()
         {
             if (ProcessOnThread)
-                Task.Run(() => DoWork());
+                Task.Run((Action)DoWork);
             else
                 DoWork();
 
