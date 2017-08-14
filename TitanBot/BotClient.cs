@@ -139,7 +139,7 @@ namespace TitanBot
         private void SubscribeEvents()
         {
             DiscordClient.Ready += () => Task.Run(() => readyEvent.Set());
-            DiscordClient.Log += m => Logger.LogAsync(DiscordUtil.ToLoggable(m));
+            DiscordClient.Log += m => Task.Run(() => Logger.Log(DiscordUtil.ToLoggable(m)));
         }
 
         public Task StartAsync()

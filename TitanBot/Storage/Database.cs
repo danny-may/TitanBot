@@ -6,14 +6,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TitanBot.Logging;
+using TitanBot.Helpers;
 
 namespace TitanBot.Storage
 {
     public class Database : IDatabase
     {
         LiteDatabase LiteDatabase { get; }
-        object SyncLock { get; } = new object();
         ILogger Logger { get; }
+        SynchronisedExecutor SyncExec { get; } = new SynchronisedExecutor();
 
         public int TotalCalls { get; private set; } = 0;
 
@@ -35,31 +36,26 @@ namespace TitanBot.Storage
         public Task QueryAsync(Action<IDbTransaction> query)
             => QueryAsync<object>(conn => { query(conn); return null; }).AsTask();
 
-        public ValueTask<T> QueryAsync<T>(Func<IDbTransaction, T> query)
-        {
-            return new ValueTask<T>(Task.Run(() =>
+        public async ValueTask<T> QueryAsync<T>(Func<IDbTransaction, T> query)
+            => await SyncExec.Run(() =>
             {
                 T result = default(T);
-                lock (SyncLock)
+                TotalCalls++;
+                using (var conn = new DbTransaction(LiteDatabase))
                 {
-                    TotalCalls++;
-                    using (var conn = new DbTransaction(LiteDatabase))
+                    try
                     {
-                        try
-                        {
-                            result = query(conn);
-                            conn.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log(ex, "DatabaseQuery");
-                            conn.Rollback();
-                        }
+                        result = query(conn);
+                        conn.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex, "DatabaseQuery");
+                        conn.Rollback();
                     }
                 }
                 return result;
-            }));
-        }
+            });
 
         public Task QueryTableAsync<T>(Action<IDbTable<T>> query) where T : IDbRecord
             => QueryAsync(conn => query(conn.GetTable<T>()));

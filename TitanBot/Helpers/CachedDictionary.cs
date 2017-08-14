@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TitanBot.Models
+namespace TitanBot.Helpers
 {
     public delegate void CachedDictionaryUpdateEventHandler<TKey, TValue>(object sender, CachedDictionaryUpdateEventArgs<TKey, TValue> args);
 

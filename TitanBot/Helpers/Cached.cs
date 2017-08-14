@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TitanBot.Models
+namespace TitanBot.Helpers
 {
     public delegate void CacheUpdateEventHandler<T>(object sender, CacheUpdateEventArgs<T> args);
 

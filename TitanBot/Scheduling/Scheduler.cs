@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.Logging;
-using TitanBot.Models;
+using TitanBot.Helpers;
 using TitanBot.Storage;
 
 namespace TitanBot.Scheduling
@@ -66,9 +66,9 @@ namespace TitanBot.Scheduling
 
         private void Cycle(ClockTimer sender, ClockTimerElapsedEventArgs e)
         {
-            //if (e.Slowdown > sender.Interval)
-            //    Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {e.Slowdown.TotalMilliseconds - sender.Interval.TotalMilliseconds}ms", "MainLoop");
-            Logger.Log(LogSeverity.Info, LogType.Scheduler, $"{e.SignalTime} Slowdown: {e.Slowdown}", "SchedulerCycle");
+            if (e.Slowdown > sender.Interval)
+                Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {e.Slowdown.TotalMilliseconds - sender.Interval.TotalMilliseconds}ms", "MainLoop");
+            //Logger.Log(LogSeverity.Info, LogType.Scheduler, $"{e.SignalTime} Slowdown: {e.Slowdown}", "SchedulerCycle");
             try
             {
                 var records = GetActive(e.SignalTime);

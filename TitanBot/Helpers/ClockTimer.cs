@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TitanBot.Models
+namespace TitanBot.Helpers
 {
     public delegate void ClockTimerElapsedEventHandler(ClockTimer sender, ClockTimerElapsedEventArgs e);
 

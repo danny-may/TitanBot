@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading;
 using TitanBot;
 using TitanBot.Formatting;
 using TitanBot.Logging;
@@ -10,10 +10,12 @@ namespace LiveBaseTest
     {
         static void Main(string[] args)
         {
-            var bot = new BotClient(m => {
+            ThreadPool.SetMinThreads(100, 100);
+            var bot = new BotClient(m =>
+            {
                 m.Map<ILogger, ConsoleLogger>();
                 m.Map<ValueFormatter, Formatter>();
-                });
+            });
             bot.CommandService.Install(bot.DefaultCommands);
             bot.StartAsync(c =>
             {

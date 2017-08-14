@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using System;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
-using TitanBot.Models;
+using TitanBot.Helpers;
 using TitanBot.Replying;
 using TitanBot.Scheduling;
 using TitanBot.Settings;

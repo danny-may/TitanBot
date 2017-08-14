@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using TitanBot.Commands.Models;
 using TitanBot.Commands.Responses;
 using TitanBot.Contexts;
-using TitanBot.Models;
+using TitanBot.Helpers;
 using TitanBot.Settings;
 using TitanBot.Storage;
 using static TitanBot.TBLocalisation.Logic;

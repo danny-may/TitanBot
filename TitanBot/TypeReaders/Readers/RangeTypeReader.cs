@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TitanBot.Contexts;
-using TitanBot.Models;
+using TitanBot.Helpers;
 using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.TypeReaders

@@ -226,9 +226,10 @@
     <Compile Include="Debugging\Timer.cs" />
     <Compile Include="Formatting\Interfaces\ILocalisable.cs" />
     <Compile Include="Formatting\Localisation\RawString.cs" />
-    <Compile Include="Models\Cached.cs" />
-    <Compile Include="Models\CachedDictionary.cs" />
-    <Compile Include="Models\ClockTimer.cs" />
+    <Compile Include="Helpers\SynchronisedExecutor.cs" />
+    <Compile Include="Helpers\Cached.cs" />
+    <Compile Include="Helpers\CachedDictionary.cs" />
+    <Compile Include="Helpers\ClockTimer.cs" />
     <Compile Include="Replying\Interfaces\IEmbeddable.cs" />
     <Compile Include="Contexts\Interfaces\ICommandContext.cs" />
     <Compile Include="Contexts\Interfaces\IMessageContext.cs" />

@@ -7,14 +7,14 @@ using TitanBot.Commands.Responses;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Logging;
 using TitanBot.Replying;
 using TitanBot.Settings;
 using TitanBot.Storage;
-using static TitanBot.TBLocalisation.Logic;
 using TitanBot.TypeReaders;
-using TitanBot.Formatting.Interfaces;
 using TitanBot.Util;
+using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.Commands
 {
@@ -34,7 +34,7 @@ namespace TitanBot.Commands
 
         public CommandExecutor(IDependencyFactory factory,
                                ICommandService owner,
-                               ICommandContext context, 
+                               ICommandContext context,
                                IPermissionManager permissionManager,
                                IDatabase database,
                                ILogger logger,
@@ -161,7 +161,7 @@ namespace TitanBot.Commands
                 Prefix = Context.Prefix,
                 CommandName = Context.Command?.Name
             };
-            Logger.LogAsync(Logging.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
+            Logger.Log(Logging.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
             Database.Insert(record);
         }
 
