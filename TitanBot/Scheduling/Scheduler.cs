@@ -117,16 +117,18 @@ namespace TitanBot.Scheduling
         private IEnumerable<SchedulerRecord> FindById(IEnumerable<ulong> ids)
         {
             var cached = CachedRecords.Value.Where(r => ids.Contains(r.Id));
-            if (cached.Count() == 0)
-                return Database.FindById<SchedulerRecord>(ids).Result;
-            return cached;
+            if (cached.Count() != 0)
+                return cached;
+            CachedRecords.Invalidate();
+            return CachedRecords.Value.Where(r => ids.Contains(r.Id));
         }
         private IEnumerable<SchedulerRecord> Find(Expression<Func<SchedulerRecord, bool>> predicate)
         {
             var cached = CachedRecords.Value.Where(predicate.Compile());
-            if (cached.Count() == 0)
-                return Database.Find(predicate).Result;
-            return cached;
+            if (cached.Count() != 0)
+                return cached;
+            CachedRecords.Invalidate();
+            return CachedRecords.Value.Where(predicate.Compile());
         }
 
         private List<SchedulerRecord> GetActive(DateTime atTime)
@@ -190,8 +192,13 @@ namespace TitanBot.Scheduling
             return records.ToArray();
         }
 
-        public ValueTask<int> PruneBefore(DateTime date)
-            => Database.Delete<SchedulerRecord>(r => r.IsComplete && r.CompleteTime < date);
+        public async ValueTask<int> PruneBefore(DateTime date)
+        {
+            var res = await Database.Delete<SchedulerRecord>(r => r.IsComplete && r.CompleteTime < date);
+            CachedRecords.Invalidate();
+            return res;
+        }
+
 
         public int ActiveCount()
             => GetActive(DateTime.Now).Count;
