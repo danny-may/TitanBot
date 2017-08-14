@@ -9,13 +9,13 @@ namespace TitanBot.Scheduling
         bool Enabled { get; set; }
         ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = null, DateTime? to = null, ulong? message = null, ulong? channel = null, string data = null)
             where T : ISchedulerCallback;
-        ISchedulerRecord[] Complete<T>(ulong? guildId, ulong? userId, bool wasCancelled = true)
+        ISchedulerRecord[] Cancel<T>(ulong? guildId, ulong? userId)
             where T : ISchedulerCallback;
-        ISchedulerRecord Complete(ulong id, bool wasCancelled = true);
-        ISchedulerRecord[] Complete(IEnumerable<ulong> ids, bool wasCancelled = true);
+        ISchedulerRecord Cancel(ulong id);
+        ISchedulerRecord[] Cancel(IEnumerable<ulong> ids);
         ValueTask<int> PruneBefore(DateTime date);
         int ActiveCount();
-        ISchedulerRecord GetMostRecent<T>(ulong guildId)
+        ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userId)
             where T : ISchedulerCallback;
     }
 }

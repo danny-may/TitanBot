@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TitanBot.Models
@@ -12,18 +9,10 @@ namespace TitanBot.Models
 
     public static class CachedDictionary
     {
-        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, ValueTask<TValue>> source, TimeSpan validFor, uint capacity = 0)
+        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, ValueTask<TValue>> source, TimeSpan? validFor = null, uint capacity = 0)
             => CachedDictionary<TKey, TValue>.FromSource(source, validFor, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, Task<TValue>> source, TimeSpan validFor, uint capacity = 0)
+        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, TValue> source, TimeSpan? validFor = null, uint capacity = 0)
             => CachedDictionary<TKey, TValue>.FromSource(source, validFor, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, TValue> source, TimeSpan validFor, uint capacity = 0)
-            => CachedDictionary<TKey, TValue>.FromSource(source, validFor, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, ValueTask<TValue>> source, int validForMS, uint capacity = 0)
-            => CachedDictionary<TKey, TValue>.FromSource(source, validForMS, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, Task<TValue>> source, int validForMS, uint capacity = 0)
-            => CachedDictionary<TKey, TValue>.FromSource(source, validForMS, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource<TKey, TValue>(Func<TKey, TValue> source, int validForMS, uint capacity = 0)
-            => CachedDictionary<TKey, TValue>.FromSource(source, validForMS, capacity);
     }
 
     public class CachedDictionary<TKey, TValue>
@@ -37,24 +26,18 @@ namespace TitanBot.Models
         public event CachedDictionaryUpdateEventHandler<TKey, TValue> OnUpdate;
 
 
-        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, ValueTask<TValue>> source, TimeSpan validFor, uint capacity = 0)
+        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, ValueTask<TValue>> source, TimeSpan? validFor = null, uint capacity = 0)
             => new CachedDictionary<TKey, TValue>(source, validFor, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, Task<TValue>> source, TimeSpan validFor, uint capacity = 0)
+        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, TValue> source, TimeSpan? validFor = null, uint capacity = 0)
             => FromSource(k => new ValueTask<TValue>(source(k)), validFor, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, TValue> source, TimeSpan validFor, uint capacity = 0)
-            => FromSource(k => new ValueTask<TValue>(source(k)), validFor, capacity);
-        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, ValueTask<TValue>> source, int validForMS, uint capacity = 0)
-            => FromSource(source, new TimeSpan(0,0,0,0,validForMS), capacity);
-        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, Task<TValue>> source, int validForMS, uint capacity = 0)
-            => FromSource(k => new ValueTask<TValue>(source(k)), new TimeSpan(0, 0, 0, 0, validForMS), capacity);
-        public static CachedDictionary<TKey, TValue> FromSource(Func<TKey, TValue> source, int validForMS, uint capacity = 0)
-            => FromSource(k => new ValueTask<TValue>(source(k)), new TimeSpan(0, 0, 0, 0, validForMS), capacity);
 
-        private CachedDictionary(Func<TKey, ValueTask<TValue>> source, TimeSpan validFor, uint capacity)
+        private CachedDictionary(Func<TKey, ValueTask<TValue>> source, TimeSpan? validFor = null, uint capacity = 0)
         {
             Cache = new ConcurrentDictionary<TKey, (TValue Value, DateTime LastUpdated)>();
             Source = source;
-            ValidPeriod = validFor;
+            ValidPeriod = validFor ?? TimeSpan.MaxValue;
+            if (ValidPeriod < new TimeSpan())
+                ValidPeriod = TimeSpan.MaxValue;
             Capacity = capacity;
         }
 
@@ -78,7 +61,7 @@ namespace TitanBot.Models
             Cache.TryGetValue(key, out var old);
             if (Capacity != 0 && Cache.Count == Capacity)
                 Cache.TryRemove(Oldest, out _);
-            Cache.AddOrUpdate(key, value , (k, x) => value);
+            Cache.AddOrUpdate(key, value, (k, x) => value);
             OnUpdate?.Invoke(this, new CachedDictionaryUpdateEventArgs<TKey, TValue>(key, old.Value, value.Value, value.LastUpdate, DateTime.Now));
             return value.Value;
         }
@@ -98,7 +81,7 @@ namespace TitanBot.Models
     {
         public TKey Key { get; }
 
-        internal CachedDictionaryUpdateEventArgs(TKey key, TValue old, TValue @new, DateTime start, DateTime finish) : base (old, @new, start, finish)
+        internal CachedDictionaryUpdateEventArgs(TKey key, TValue old, TValue @new, DateTime start, DateTime finish) : base(old, @new, start, finish)
         {
             Key = key;
         }

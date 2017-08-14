@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Commands.Models;
@@ -18,7 +19,7 @@ namespace TitanBot.Commands
         private IDatabase Database { get; }
         private BotClient BotClient { get; }
         private ISettingManager Settings { get; }
-        private CachedDictionary<ulong?, Dictionary<string, CallPermission>> CachedPermissions { get; }
+        private CachedDictionary<ulong?, IReadOnlyDictionary<string, CallPermission>> CachedPermissions { get; }
 
         public PermissionManager(IDatabase database, BotClient botClient, ISettingManager settings)
         {
@@ -28,8 +29,8 @@ namespace TitanBot.Commands
             CachedPermissions = CachedDictionary.FromSource((ulong? key) => LoadPerms(key), new TimeSpan(0, 30, 0), 100);
         }
 
-        private async ValueTask<Dictionary<string, CallPermission>> LoadPerms(ulong? guildId)
-            => (await Database.Find<CallPermission>(r => r.GuildId == guildId)).GroupBy(s => s.CallName).ToDictionary(s => s.Key, s => s.First());
+        private async ValueTask<IReadOnlyDictionary<string, CallPermission>> LoadPerms(ulong? guildId)
+            => (await Database.Find<CallPermission>(r => r.GuildId == guildId)).GroupBy(s => s.CallName).ToImmutableDictionary(s => s.Key, s => s.First());
 
         public PermissionCheckResponse CheckAllowed(IMessageContext context, CallInfo[] calls)
         {

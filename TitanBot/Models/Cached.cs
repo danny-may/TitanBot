@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TitanBot.Models
@@ -13,12 +10,7 @@ namespace TitanBot.Models
         public static Cached<T> FromValue<T>(T value) => Cached<T>.FromValue(value);
 
         public static Cached<T> FromSource<T>(Func<T> source, TimeSpan? validFor = null) => Cached<T>.FromSource(source, validFor);
-        public static Cached<T> FromSource<T>(Func<Task<T>> source, TimeSpan? validFor = null) => Cached<T>.FromSource(source, validFor);
         public static Cached<T> FromSource<T>(Func<ValueTask<T>> source, TimeSpan? validFor = null) => Cached<T>.FromSource(source, validFor);
-
-        public static Cached<T> FromSource<T>(Func<T> source, int validForMs) => Cached<T>.FromSource(source, validForMs);
-        public static Cached<T> FromSource<T>(Func<Task<T>> source, int validForMs) => Cached<T>.FromSource(source, validForMs);
-        public static Cached<T> FromSource<T>(Func<ValueTask<T>> source, int validForMs) => Cached<T>.FromSource(source, validForMs);
     }
 
     public class Cached<T>
@@ -37,12 +29,7 @@ namespace TitanBot.Models
         public static Cached<T> FromValue(T value) => new Cached<T>(() => new ValueTask<T>(value), TimeSpan.MaxValue);
 
         public static Cached<T> FromSource(Func<T> source, TimeSpan? validFor = null) => FromSource(() => new ValueTask<T>(source()), validFor);
-        public static Cached<T> FromSource(Func<Task<T>> source, TimeSpan? validFor = null) => FromSource(() => new ValueTask<T>(source()), validFor);
         public static Cached<T> FromSource(Func<ValueTask<T>> source, TimeSpan? validFor = null) => new Cached<T>(source, validFor);
-
-        public static Cached<T> FromSource(Func<T> source, int validForMs) => FromSource(source, new TimeSpan(0, 0, 0, 0, validForMs));
-        public static Cached<T> FromSource(Func<Task<T>> source, int validForMs) => FromSource(source, new TimeSpan(0, 0, 0, 0, validForMs));
-        public static Cached<T> FromSource(Func<ValueTask<T>> source, int validForMs) => FromSource(source, new TimeSpan(0, 0, 0, 0, validForMs));
 
         private Cached(Func<ValueTask<T>> source, TimeSpan? validFor)
         {

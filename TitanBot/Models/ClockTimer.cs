@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace TitanBot.Models
 {
-    public delegate void ClockTimerElapsedEventHandler(object sender, ClockTimerElapsedEventArgs e);
+    public delegate void ClockTimerElapsedEventHandler(ClockTimer sender, ClockTimerElapsedEventArgs e);
 
     public class ClockTimer
     {
@@ -15,12 +15,11 @@ namespace TitanBot.Models
         /// The time between calls
         /// </summary>
         public TimeSpan Interval { get => _interval; set { _interval = value; UpdateBaseline(); } }
-        public bool Enabled { get => _enabled; set { _enabled = value; RunClock(); } }
+        public bool Enabled { get => _enabled; set { _enabled = value; Task.Run(() => RunClock()); } }
 
         public DateTime BaseTime { get; private set; }
 
         public event ClockTimerElapsedEventHandler Elapsed;
-        public event ClockTimerElapsedEventHandler ElapsedAsync;
 
         private TimeSpan _offset;
         private TimeSpan _interval;
@@ -42,21 +41,18 @@ namespace TitanBot.Models
 
         public async void RunClock()
         {
+            var previous = NextInterval - Interval;
+
             while (Enabled)
             {
-                var nextInterval = NextInterval;
-                await Task.Delay(TimeToNextInterval);
-                var args = new ClockTimerElapsedEventArgs(nextInterval);
-                OnCycle(args);
-                await Task.Delay(1);
+                var thisCycle = NextInterval;
+                Elapsed?.BeginInvoke(this, new ClockTimerElapsedEventArgs(previous), null, null);
+                var delay = (thisCycle - DateTime.Now).Add(new TimeSpan(10000));
+                if (delay < new TimeSpan())
+                    delay = new TimeSpan();
+                await Task.Delay(delay);
+                previous = thisCycle;
             }
-        }
-
-        private void OnCycle(ClockTimerElapsedEventArgs args)
-        {
-            Elapsed?.Invoke(this, args);
-            if (ElapsedAsync != null)
-                Task.Run(() => ElapsedAsync(this, args));
         }
     }
 

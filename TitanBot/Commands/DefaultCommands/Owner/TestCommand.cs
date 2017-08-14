@@ -1,17 +1,40 @@
 ﻿using Discord;
 using System;
 using System.Threading.Tasks;
+using TitanBot.Contexts;
 using TitanBot.Formatting;
+using TitanBot.Scheduling;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
     [RequireOwner]
     class TestCommand : Command
     {
-        [Call]
-        async Task TestAsync()
+        [Call("Scheduler")]
+        async Task TestSchedulerAsync()
         {
-            
+            for (int i = 0; i < 50; i++)
+                Scheduler.Queue<SchedulerTestHandler>(BotUser.Id, null, DateTime.Now, new TimeSpan(0, 0, 1), DateTime.Now.AddSeconds(33));
+
+            await ReplyAsync((RawString)"Queued uccessfully");
+        }
+
+        private class SchedulerTestHandler : ISchedulerCallback
+        {
+            public void Complete(ISchedulerContext context, bool wasCancelled)
+                => Handle(null, DateTime.MinValue);
+
+            public void Handle(ISchedulerContext context, DateTime eventTime)
+            {
+                var endAt = DateTime.Now.AddMilliseconds(200);
+                while (DateTime.Now < endAt) { }
+            }
+        }
+
+        [Call("Embed")]
+        async Task TestEmbedAsync()
+        {
+
             var builder = new EmbedBuilder()
             {
                 Author = new EmbedAuthorBuilder
