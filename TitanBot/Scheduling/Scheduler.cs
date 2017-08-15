@@ -94,7 +94,7 @@ namespace TitanBot.Scheduling
                     }
                 });
                 if (completed.Count > 0)
-                    Complete(completed, e, false);
+                    Complete(completed.ToArray(), e, false);
             }
             catch (Exception ex)
             {
@@ -112,21 +112,21 @@ namespace TitanBot.Scheduling
             });
         }
 
-        private IEnumerable<SchedulerRecord> FindById(IEnumerable<ulong> ids)
+        private SchedulerRecord[] FindById(ulong[] ids)
         {
             var cached = CachedRecords.Value.Where(r => ids.Contains(r.Id));
             if (cached.Count() != 0)
-                return cached;
+                return cached.ToArray();
             CachedRecords.Invalidate();
-            return CachedRecords.Value.Where(r => ids.Contains(r.Id));
+            return CachedRecords.Value.Where(r => ids.Contains(r.Id)).ToArray();
         }
-        private IEnumerable<SchedulerRecord> Find(Expression<Func<SchedulerRecord, bool>> predicate)
+        private SchedulerRecord[] Find(Expression<Func<SchedulerRecord, bool>> predicate)
         {
             var cached = CachedRecords.Value.Where(predicate.Compile());
             if (cached.Count() != 0)
-                return cached;
+                return cached.ToArray();
             CachedRecords.Invalidate();
-            return CachedRecords.Value.Where(predicate.Compile());
+            return CachedRecords.Value.Where(predicate.Compile()).ToArray();
         }
 
         private List<SchedulerRecord> GetActive(DateTime atTime)
@@ -165,12 +165,12 @@ namespace TitanBot.Scheduling
         }
         public ISchedulerRecord Cancel(ulong id)
             => Cancel(new ulong[] { id })[0];
-        public ISchedulerRecord[] Cancel(IEnumerable<ulong> ids)
+        public ISchedulerRecord[] Cancel(ulong[] ids)
             => Complete(FindById(ids), null, true);
-        private ISchedulerRecord[] Complete(IEnumerable<SchedulerRecord> records, ClockTimerElapsedEventArgs e, bool wasCancelled)
+        private ISchedulerRecord[] Complete(SchedulerRecord[] records, ClockTimerElapsedEventArgs e, bool wasCancelled)
         {
             var completeTime = DateTime.Now;
-            records = records.Where(r => r != null).ToList();
+            records = records.Where(r => r != null).ToArray();
             foreach (var record in records)
             {
                 record.CompleteTime = completeTime;
@@ -184,7 +184,7 @@ namespace TitanBot.Scheduling
                         Log(ex);
                     }
             }
-            Database.Upsert(records).Wait();
+            Database.Upsert<SchedulerRecord>(records).Wait();
             return records.ToArray();
         }
 
@@ -204,10 +204,10 @@ namespace TitanBot.Scheduling
             var type = JsonConvert.SerializeObject(typeof(T));
             var initial = Find(r => r.Callback == type && r.GuildId == guildId);
             if (userid != null)
-                initial = initial.Where(r => r.UserId == userid);
-            initial = initial.OrderByDescending(r => r.EndTime)
-                             .ThenByDescending(r => r.StartTime);
-            return initial.FirstOrDefault();
+                initial = initial.Where(r => r.UserId == userid).ToArray();
+            return initial.OrderByDescending(r => r.EndTime)
+                           .ThenByDescending(r => r.StartTime)
+                           .FirstOrDefault();
         }
 
         public void PreRegister<T>(T handler) where T : ISchedulerCallback

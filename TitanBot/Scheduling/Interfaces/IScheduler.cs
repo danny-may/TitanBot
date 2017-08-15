@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TitanBot.Scheduling
@@ -12,7 +11,7 @@ namespace TitanBot.Scheduling
         ISchedulerRecord[] Cancel<T>(ulong? guildId, ulong? userId)
             where T : ISchedulerCallback;
         ISchedulerRecord Cancel(ulong id);
-        ISchedulerRecord[] Cancel(IEnumerable<ulong> ids);
+        ISchedulerRecord[] Cancel(ulong[] ids);
         ValueTask<int> PruneBefore(DateTime date);
         int ActiveCount();
         ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userId)
