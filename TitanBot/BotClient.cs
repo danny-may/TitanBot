@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using TitanBot.Commands;
+using TitanBot.Commands.DefaultCommands.Owner;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.DiscordHandlers;
@@ -74,6 +75,8 @@ namespace TitanBot
             SetupFeatures();
             InstallSettingEditors();
             SubscribeEvents();
+
+            var x = Scheduler.GetMostRecent<TestCommand.SchedulerTestHandler>(null, null);
 
             InstallHandlers(Assembly.GetExecutingAssembly());
         }

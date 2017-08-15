@@ -19,7 +19,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             await ReplyAsync((RawString)"Queued uccessfully");
         }
 
-        private class SchedulerTestHandler : ISchedulerCallback
+        public class SchedulerTestHandler : ISchedulerCallback
         {
             public void Complete(ISchedulerContext context, bool wasCancelled)
                 => Handle(null, DateTime.MinValue);

@@ -117,16 +117,14 @@ namespace TitanBot.Scheduling
             var cached = CachedRecords.Value.Where(r => ids.Contains(r.Id));
             if (cached.Count() != 0)
                 return cached.ToArray();
-            CachedRecords.Invalidate();
-            return CachedRecords.Value.Where(r => ids.Contains(r.Id)).ToArray();
+            return Database.FindById<SchedulerRecord>(ids).Result.ToArray();
         }
         private SchedulerRecord[] Find(Expression<Func<SchedulerRecord, bool>> predicate)
         {
             var cached = CachedRecords.Value.Where(predicate.Compile());
             if (cached.Count() != 0)
                 return cached.ToArray();
-            CachedRecords.Invalidate();
-            return CachedRecords.Value.Where(predicate.Compile()).ToArray();
+            return Database.Find(predicate).Result.ToArray();
         }
 
         private List<SchedulerRecord> GetActive(DateTime atTime)
@@ -216,6 +214,11 @@ namespace TitanBot.Scheduling
             CachedHandlers[key] = handler;
             CachedTypes[key] = typeof(T);
 
+        }
+
+        public void Cancel(Expression<Func<ISchedulerRecord, bool>> predicate)
+        {
+            Complete(Find(Expression.Lambda<Func<SchedulerRecord, bool>>(predicate.Body, Expression.Parameter(typeof(SchedulerRecord)))).ToArray(), null, true);
         }
     }
 }

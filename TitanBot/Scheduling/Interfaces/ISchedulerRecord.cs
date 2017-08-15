@@ -15,5 +15,6 @@ namespace TitanBot.Scheduling
         ulong UserId { get; set; }
         ulong? MessageId { get; set; }
         ulong? ChannelId { get; set; }
+        string Callback { get; set; }
     }
 }
