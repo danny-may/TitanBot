@@ -93,7 +93,8 @@ namespace TitanBot.Scheduling
                         }
                     }
                 });
-                Complete(completed, e, false);
+                if (completed.Count > 0)
+                    Complete(completed, e, false);
             }
             catch (Exception ex)
             {
@@ -169,7 +170,8 @@ namespace TitanBot.Scheduling
         private ISchedulerRecord[] Complete(IEnumerable<SchedulerRecord> records, ClockTimerElapsedEventArgs e, bool wasCancelled)
         {
             var completeTime = DateTime.Now;
-            foreach (var record in records.Where(r => r != null))
+            records = records.Where(r => r != null).ToList();
+            foreach (var record in records)
             {
                 record.CompleteTime = completeTime;
                 if (CachedHandlers[record.Callback] != null)
