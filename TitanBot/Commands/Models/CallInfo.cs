@@ -30,7 +30,7 @@ namespace TitanBot.Commands
                 throw new InvalidOperationException($"Cannot create CallInfo from {Method} as it does not have the [Call] attribute");
             Usage = UsageAttribute.GetFor(Method);
             DefaultPermissions = DefaultPermissionAttribute.GetPermFor(Method);
-            PermissionKey = DefaultPermissionAttribute.GetKeyFor(Method);
+            PermissionKey = DefaultPermissionAttribute.GetKeyFor(Method).ToLower();
             RequiredContexts = RequireContextAttribute.GetFor(Method);
             RequireOwner = RequireOwnerAttribute.ExistsOn(Method);
             ShowTyping = !HideTypingAttribute.ExistsOn(Method);

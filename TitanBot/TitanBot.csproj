@@ -172,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotClient.cs" />
+    <Compile Include="Callbacks\RemindMeHandler.cs" />
     <Compile Include="Commands\Attributes\AliasAttribute.cs" />
     <Compile Include="Commands\Attributes\HideTypingAttribute.cs" />
     <Compile Include="Commands\Attributes\CallAttribute.cs" />
@@ -191,6 +192,8 @@
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
     <Compile Include="Commands\DefaultCommands\General\FormattingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\LanguageCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\General\RemindMeCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\Owner\LogoutCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\SchedulerCommand.cs" />
     <Compile Include="Formatting\Localisation\DynamicString.cs" />
     <Compile Include="Formatting\Localisation\LocalisedEmbedBuilder.cs" />
@@ -199,7 +202,7 @@
     <Compile Include="Commands\DefaultCommands\Abstract\SettingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\EditCommandCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Admin\SettingsCommand.cs" />
-    <Compile Include="Commands\CommandExecutor.cs" />
+    <Compile Include="Commands\CommandProcessor.cs" />
     <Compile Include="Commands\DefaultCommands\General\AboutCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\Donate.cs" />
     <Compile Include="Commands\DefaultCommands\General\HelpCommand.cs" />
@@ -224,6 +227,10 @@
     <Compile Include="Debugging\Timer.cs" />
     <Compile Include="Formatting\Interfaces\ILocalisable.cs" />
     <Compile Include="Formatting\Localisation\RawString.cs" />
+    <Compile Include="Helpers\SynchronisedExecutor.cs" />
+    <Compile Include="Helpers\Cached.cs" />
+    <Compile Include="Helpers\CachedDictionary.cs" />
+    <Compile Include="Helpers\ClockTimer.cs" />
     <Compile Include="Replying\Interfaces\IEmbeddable.cs" />
     <Compile Include="Contexts\Interfaces\ICommandContext.cs" />
     <Compile Include="Contexts\Interfaces\IMessageContext.cs" />
@@ -350,7 +357,7 @@
     <Compile Include="TypeReaders\TypeReaderResponse.cs" />
     <Compile Include="Util\DiscordUtil.cs" />
     <Compile Include="Util\FileUtil.cs" />
-    <Compile Include="Util\IEnumerableUtil.cs" />
+    <Compile Include="Util\LinqAdditions.cs" />
     <Compile Include="Util\ImageUtil.cs" />
     <Compile Include="Util\MiscUtil.cs" />
     <Compile Include="Util\NumericUtil.cs" />

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TitanBot
 {
@@ -52,6 +48,7 @@ namespace TitanBot
                 public const string FORMATTING = BASE_PATH + nameof(FORMATTING);
                 public const string FORMATTING_USE = BASE_PATH + nameof(FORMATTING_USE);
                 public const string SCHEDULER_PRUNE = BASE_PATH + nameof(SCHEDULER_PRUNE);
+                public const string LOGOUT = BASE_PATH + nameof(LOGOUT);
 
                 public static IReadOnlyDictionary<string, string> Defaults { get; }
                     = new Dictionary<string, string>
@@ -92,7 +89,8 @@ namespace TitanBot
                         { LANGUAGE_USE, "Sets the language you would like to use" },
                         { FORMATTING, "Lists all the formatting options available to you" },
                         { FORMATTING_USE, "Sets what formatting style to use for your commands" },
-                        { SCHEDULER_PRUNE, "Deletes all completed scheduler events that finished before the given date" }
+                        { SCHEDULER_PRUNE, "Deletes all completed scheduler events that finished before the given date" },
+                        { LOGOUT, "Logs the bot out and shuts down" }
                     }.ToImmutableDictionary();
             }
         }

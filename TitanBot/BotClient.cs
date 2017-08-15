@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using TitanBot.Commands;
-using TitanBot.Commands.DefaultCommands.Owner;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.DiscordHandlers;
@@ -139,8 +138,8 @@ namespace TitanBot
 
         private void SubscribeEvents()
         {
-            DiscordClient.Ready += () => Task.Run(() => readyEvent.Set());
-            DiscordClient.Log += m => Logger.LogAsync(DiscordUtil.ToLoggable(m));
+            DiscordClient.Ready += () => { readyEvent.Set(); return Task.CompletedTask; };
+            DiscordClient.Log += m => { Logger.Log(DiscordUtil.ToLoggable(m)); return Task.CompletedTask; };
         }
 
         public Task StartAsync()
@@ -150,7 +149,7 @@ namespace TitanBot
         public async Task StartAsync(Func<string, string> tokenInput)
         {
             var token = tokenInput(GeneralGlobalSettings.Token) ?? GeneralGlobalSettings.Token;
-            GlobalSettings.Edit<GeneralGlobalSetting>(s => {if (!string.IsNullOrWhiteSpace(token)) { s.Token = token; } });
+            GlobalSettings.Edit<GeneralGlobalSetting>(s => { if (!string.IsNullOrWhiteSpace(token)) { s.Token = token; } });
             if (DiscordClient.LoginState != LoginState.LoggedOut)
                 return;
             try
@@ -167,12 +166,12 @@ namespace TitanBot
             readyEvent.WaitOne();
             readyEvent.Reset();
 
-            await Scheduler.StartAsync();
+            Scheduler.Enabled = true;
         }
 
         public async Task StopAsync()
         {
-            await Scheduler.StopAsync();
+            Scheduler.Enabled = false;
             await DiscordClient.LogoutAsync();
         }
 

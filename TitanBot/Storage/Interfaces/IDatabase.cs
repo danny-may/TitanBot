@@ -16,6 +16,8 @@ namespace TitanBot.Storage
         ValueTask<TReturn> QueryTableAsync<TRecord, TReturn>(Func<IDbTable<TRecord>, TReturn> query)
             where TRecord : IDbRecord;
 
+        ValueTask<IEnumerable<TRecord>> All<TRecord>()
+            where TRecord : IDbRecord;
         ValueTask<IEnumerable<TRecord>> Find<TRecord>(Expression<Func<TRecord, bool>> predicate, int skip = 0, int limit = 2147483647)
             where TRecord : IDbRecord;
         ValueTask<TRecord> FindOne<TRecord>(Expression<Func<TRecord, bool>> predicate)

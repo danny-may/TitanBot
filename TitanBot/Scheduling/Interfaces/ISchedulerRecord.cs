@@ -4,8 +4,9 @@ namespace TitanBot.Scheduling
 {
     public interface ISchedulerRecord
     {
-        bool Complete { get; set; }
+        bool IsComplete { get; }
         string Data { get; set; }
+        DateTime? CompleteTime { get; set; }
         DateTime EndTime { get; set; }
         ulong? GuildId { get; set; }
         ulong Id { get; set; }

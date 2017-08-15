@@ -10,7 +10,8 @@ namespace TitanBot.Scheduling
         public ulong? MessageId { get; set; }
         public ulong? ChannelId { get; set; }
         public ulong UserId { get; set; }
-        public bool Complete { get; set; }
+        public bool IsComplete => CompleteTime.HasValue;
+        public DateTime? CompleteTime { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public TimeSpan Interval { get; set; }

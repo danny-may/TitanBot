@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using TitanBot;
 using TitanBot.Formatting;
 using TitanBot.Logging;
@@ -10,10 +9,12 @@ namespace LiveBaseTest
     {
         static void Main(string[] args)
         {
-            var bot = new BotClient(m => {
+            //ThreadPool.SetMinThreads(100, 100);
+            var bot = new BotClient(m =>
+            {
                 m.Map<ILogger, ConsoleLogger>();
                 m.Map<ValueFormatter, Formatter>();
-                });
+            });
             bot.CommandService.Install(bot.DefaultCommands);
             bot.StartAsync(c =>
             {
@@ -25,17 +26,6 @@ namespace LiveBaseTest
                 return c;
             }).Wait();
             bot.UntilOffline.Wait();
-        }
-
-        class ConsoleLogger : Logger
-        {
-            protected override LogSeverity LogLevel => LogSeverity.Critical | LogSeverity.Debug | LogSeverity.Error | LogSeverity.Info | LogSeverity.Verbose;
-
-            protected override void WriteLog(ILoggable entry)
-            {
-                Console.WriteLine(entry);
-                base.WriteLog(entry);
-            }
         }
     }
 }

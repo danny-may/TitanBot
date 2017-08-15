@@ -177,7 +177,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                     builder.AddField(f => f.WithName(TBLocalisation.OUTPUT).WithName(ExecText.OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
                 }
             }
-
+            
             await ReplyAsync(builder);
         }
 

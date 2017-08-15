@@ -1,12 +1,13 @@
 ﻿using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
+using TitanBot.Helpers;
 using TitanBot.Logging;
 using TitanBot.Storage;
 
@@ -14,33 +15,127 @@ namespace TitanBot.Scheduling
 {
     public class Scheduler : IScheduler
     {
-        private Dictionary<Type, ISchedulerCallback> CachedHandlers { get; } = new Dictionary<Type, ISchedulerCallback>();
-
         private readonly IDatabase Database;
-        private readonly IDependencyFactory DependencyManager;
+        private readonly IDependencyFactory DependencyFactory;
         private readonly ILogger Logger;
         private readonly DiscordSocketClient Client;
-        private Task LoopTask;
-        private bool ShouldStop;
-        public int PollingPeriod = 1000;
+        private ClockTimer MainLoop { get; }
+        private Cached<List<SchedulerRecord>> CachedRecords { get; }
+        private CachedDictionary<string, Type> CachedTypes { get; }
+        private CachedDictionary<string, ISchedulerCallback> CachedHandlers { get; }
 
-        public bool IsRunning => LoopTask != null &&
-                                !LoopTask.IsCanceled &&
-                                !LoopTask.IsFaulted;
+        public double PollingPeriod { get => MainLoop.Interval.TotalMilliseconds; set => MainLoop.Interval = new TimeSpan(0, 0, 0, 0, (int)value); }
+        public bool Enabled { get => MainLoop.Enabled; set => MainLoop.Enabled = value; }
+        private DateTime StartTime { get; set; }
 
-        public Scheduler(DiscordSocketClient client, IDependencyFactory manager, IDatabase database, ILogger logger)
+        public Scheduler(DiscordSocketClient client, IDependencyFactory factory, IDatabase database, ILogger logger)
         {
             Client = client;
-            DependencyManager = manager;
+            DependencyFactory = factory;
             Database = database;
             Logger = logger;
+            CachedRecords = Cached.FromSource(GetRecords, new TimeSpan(0, 30, 0));
+            CachedTypes = CachedDictionary.FromSource((Func<string, Type>)DeserialiseType);
+            CachedHandlers = CachedDictionary.FromSource((Func<string, ISchedulerCallback>)GetCallback);
+            MainLoop = new ClockTimer();
+            PollingPeriod = 1000;
+
+            MainLoop.Elapsed += Cycle;
         }
+
+        private ISchedulerCallback GetCallback(string callbackType)
+        {
+            if (CachedTypes[callbackType] != null && DependencyFactory.TryGetOrConstruct(CachedTypes[callbackType], out var callback))
+                return (ISchedulerCallback)callback;
+            return null;
+        }
+
+        private Type DeserialiseType(string callbackType)
+        {
+            try
+            {
+                return Type.GetType(callbackType) ?? JsonConvert.DeserializeObject<Type>(callbackType);
+            }
+            catch { }
+            return null;
+
+        }
+
+        private async ValueTask<List<SchedulerRecord>> GetRecords()
+            => (await Database.Find<SchedulerRecord>(r => !r.IsComplete)).ToList();
+
+        private void Cycle(ClockTimer sender, ClockTimerElapsedEventArgs e)
+        {
+            if (e.Slowdown > sender.Interval)
+                Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {e.Slowdown.TotalMilliseconds - sender.Interval.TotalMilliseconds}ms", "MainLoop");
+            Logger.Log(LogSeverity.Verbose, LogType.Scheduler, $"{e.SignalTime} Slowdown: {e.Slowdown}", "SchedulerCycle");
+            try
+            {
+                var records = GetActive(e.SignalTime);
+                var completed = new List<SchedulerRecord>();
+                Parallel.ForEach(records, record =>
+                {
+                    if (record.EndTime < e.SignalTime)
+                        completed.Add(record);
+                    else
+                    {
+                        var absDelta = (e.SignalTime - record.StartTime).Ticks;
+                        var intervalDelta = (e.SignalTime - record.StartTime).Ticks % record.Interval.Ticks;
+                        if (absDelta < record.Interval.Ticks || intervalDelta / 10000 > PollingPeriod || CachedHandlers[record.Callback] == null)
+                            return;
+                        try
+                        {
+                            CachedHandlers[record.Callback].Handle(new SchedulerContext(record, Client, e, DependencyFactory), e.SignalTime.AddTicks(-intervalDelta));
+                        }
+                        catch (Exception ex)
+                        {
+                            Log(ex);
+                        }
+                    }
+                });
+                Complete(completed, e, false);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+            }
+        }
+
+        private async void Log(Exception ex)
+        {
+            await Database.Insert(new Error
+            {
+                Content = ex.ToString(),
+                Description = ex.Message,
+                Type = ex.GetType().Name
+            });
+        }
+
+        private IEnumerable<SchedulerRecord> FindById(IEnumerable<ulong> ids)
+        {
+            var cached = CachedRecords.Value.Where(r => ids.Contains(r.Id));
+            if (cached.Count() != 0)
+                return cached;
+            CachedRecords.Invalidate();
+            return CachedRecords.Value.Where(r => ids.Contains(r.Id));
+        }
+        private IEnumerable<SchedulerRecord> Find(Expression<Func<SchedulerRecord, bool>> predicate)
+        {
+            var cached = CachedRecords.Value.Where(predicate.Compile());
+            if (cached.Count() != 0)
+                return cached;
+            CachedRecords.Invalidate();
+            return CachedRecords.Value.Where(predicate.Compile());
+        }
+
+        private List<SchedulerRecord> GetActive(DateTime atTime)
+            => CachedRecords.Value.Where(r => r.StartTime < atTime && (r.CompleteTime ?? DateTime.MaxValue) > atTime).ToList();
 
         public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), ulong? message = null, ulong? channel = null, string data = null) where T : ISchedulerCallback
         {
             var record = new SchedulerRecord
             {
-                Callback = JsonConvert.SerializeObject(typeof(T)),
+                Callback = typeof(T).FullName,
                 UserId = userId,
                 GuildId = guildID,
                 EndTime = to ?? DateTime.MaxValue,
@@ -51,141 +146,73 @@ namespace TitanBot.Scheduling
                 Data = data
             };
             Database.Insert(record).Wait();
+            CachedRecords.Value.Add(record);
             return record.Id;
         }
 
-        public Task StartAsync()
+        public ISchedulerRecord[] Cancel<T>(ulong? guildId, ulong? userId)
+            where T : ISchedulerCallback
         {
-            if (IsRunning)
-                throw new InvalidOperationException("Scheduler is already running");
-            ShouldStop = false;
-            LoopTask = Task.Run((Action)MainLoop);
-            return Task.CompletedTask;
+            var type = typeof(T).FullName;
+            Expression<Func<SchedulerRecord, bool>> predicate;
+            if (userId != null)
+                predicate = r => !r.IsComplete && r.GuildId == guildId && r.Callback == type && r.UserId == userId;
+            else
+                predicate = r => !r.IsComplete && r.GuildId == guildId && r.Callback == type;
+
+            return Complete(Find(predicate), null, true);
         }
-
-        public Task StopAsync()
+        public ISchedulerRecord Cancel(ulong id)
+            => Cancel(new ulong[] { id })[0];
+        public ISchedulerRecord[] Cancel(IEnumerable<ulong> ids)
+            => Complete(FindById(ids), null, true);
+        private ISchedulerRecord[] Complete(IEnumerable<SchedulerRecord> records, ClockTimerElapsedEventArgs e, bool wasCancelled)
         {
-            if (ShouldStop || !IsRunning)
-                throw new InvalidOperationException("Scheduler is already stopped/stopping");
-            ShouldStop = true;
-            return LoopTask;
-        }
-
-        private async void MainLoop()
-        {
-            var pollTime = DateTime.MinValue;
-            while (!ShouldStop)
-            {
-                await LogErrors(async () =>
-                {
-                    var msSincePrev = (int)(DateTime.Now - pollTime).TotalMilliseconds;
-                    if (pollTime != DateTime.MinValue && msSincePrev > PollingPeriod)
-                        Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {msSincePrev - PollingPeriod}ms", "MainLoop");
-                    await Task.Delay((PollingPeriod - msSincePrev).Clamp(0, int.MaxValue));
-                    pollTime = DateTime.Now;
-                    var actives = await FindActives(pollTime);
-                    var completed = actives.Where(r => r.EndTime < pollTime).ToList();
-                    var ongoing = actives.Where(r => r.EndTime > pollTime).ToList();
-                    Complete(completed, false);
-                    foreach (var record in ongoing)
-                    {
-                        var intervalDelta = (pollTime - record.StartTime).Ticks % record.Interval.Ticks;
-                        if (intervalDelta / 10000 > PollingPeriod || !TryGetHandler(record.Callback, out ISchedulerCallback callback))
-                            continue;
-                        Task.Run(() => LogErrors(() => callback.Handle(new SchedulerContext(record, Client, DependencyManager), pollTime.AddTicks(-intervalDelta))))
-                            .DontWait();
-                    }
-                });
-            }
-        }
-
-        private async void LogErrors(Action action)
-            => await LogErrors(() => { action(); return Task.CompletedTask; });
-
-        private async Task LogErrors(Func<Task> action)
-        {
-            try
-            {
-                await action();
-            }
-            catch (Exception ex)
-            {
-                await Database.Upsert(new Error
-                {
-                    Channel = null,
-                    Content = ex.ToString(),
-                    Description = ex.Message,
-                    Message = null,
-                    Type = ex.GetType().Name,
-                    User = null
-                });
-            }
-        }
-        
-        private bool TryGetHandler(string serialisedType, out ISchedulerCallback callback)
-        {
-            callback = null;
-            Type type;
-            try
-            {
-                type = JsonConvert.DeserializeObject<Type>(serialisedType);
-            }
-            catch { return false; }
-
-            if (CachedHandlers.TryGetValue(type, out callback))
-                return true;
-            if (!DependencyManager.TryConstruct(type, out object constructed))
-                return false;
-            callback = (ISchedulerCallback)constructed;
-            CachedHandlers[type] = callback;
-            return true;
-        }
-
-        private ValueTask<IEnumerable<SchedulerRecord>> FindActives(DateTime pollTime)
-            => Database.Find((SchedulerRecord r) => !r.Complete && r.StartTime < pollTime);
-
-        public ISchedulerRecord[] Complete(IEnumerable<ulong> ids, bool wasCancelled = true)
-            => Complete(Database.FindById<SchedulerRecord>(ids).Result, wasCancelled);
-
-        private ISchedulerRecord[] Complete(IEnumerable<SchedulerRecord> records, bool wasCancelled = true)
-        {
+            var completeTime = DateTime.Now;
             foreach (var record in records)
             {
-                if (TryGetHandler(record.Callback, out ISchedulerCallback callback))
-                    Task.Run(() => callback.Complete(new SchedulerContext(record, Client, DependencyManager), wasCancelled)).DontWait();
-                record.Complete = true;
-                record.EndTime = DateTime.Now;
+                record.CompleteTime = completeTime;
+                if (CachedHandlers[record.Callback] != null)
+                    try
+                    {
+                        CachedHandlers[record.Callback].Complete(new SchedulerContext(record, Client, e, DependencyFactory), wasCancelled);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log(ex);
+                    }
             }
             Database.Upsert(records).Wait();
             return records.ToArray();
         }
 
-        public int ActiveCount()
-            => FindActives(DateTime.Now).Result.Count();
-
-        public ISchedulerRecord[] Complete<T>(ulong? guildId, ulong? userId, bool wasCancelled = true) where T : ISchedulerCallback
-        {
-            var callback = typeof(T);
-            var type = JsonConvert.SerializeObject(typeof(T));
-            IEnumerable<SchedulerRecord> records;
-            if (userId != null)
-                records = Database.Find<SchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type && r.UserId == userId).Result;
-            else 
-                records = Database.Find<SchedulerRecord>(r => !r.Complete && r.GuildId == guildId && r.Callback == type).Result;
-
-            return Complete(records, wasCancelled);
-        }
-
-        public ISchedulerRecord Complete(ulong id, bool wasCancelled = true)
-            => Complete(new ulong[] { id }, wasCancelled).First();
-
-        public ISchedulerRecord GetMostRecent<T>(ulong guildId) where T : ISchedulerCallback
-        {
-            var type = JsonConvert.SerializeObject(typeof(T));
-            return Database.Find((SchedulerRecord r) => r.Callback == type && r.GuildId == guildId).Result.OrderByDescending(r => r.EndTime).FirstOrDefault();
-        }
-
         public async ValueTask<int> PruneBefore(DateTime date)
-            => await Database.Delete<SchedulerRecord>(r => r.Complete && r.EndTime < date);
+        {
+            var res = await Database.Delete<SchedulerRecord>(r => r.IsComplete && r.CompleteTime < date);
+            CachedRecords.Invalidate();
+            return res;
+        }
+
+
+        public int ActiveCount()
+            => GetActive(DateTime.Now).Count;
+
+        public ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userid) where T : ISchedulerCallback
+        {
+            var type = typeof(T).FullName;
+            var initial = Find(r => r.Callback == type && r.GuildId == guildId);
+            if (userid != null)
+                initial = initial.Where(r => r.UserId == userid);
+            initial = initial.OrderByDescending(r => r.EndTime)
+                             .ThenByDescending(r => r.StartTime);
+            return initial.FirstOrDefault();
+        }
+
+        public void PreRegister<T>(T handler) where T : ISchedulerCallback
+        {
+            CachedHandlers[typeof(T).Name] = CachedHandlers[typeof(T).FullName] = handler;
+            CachedTypes[typeof(T).Name] = CachedTypes[typeof(T).FullName] = typeof(T);
+
+        }
     }
 }

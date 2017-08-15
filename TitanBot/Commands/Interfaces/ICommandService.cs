@@ -11,7 +11,7 @@ namespace TitanBot.Commands
         IReadOnlyList<CommandInfo> CommandList { get; }
         void Install(Assembly assembly);
         void Install(Type[] types);
-        Task ParseAndExecute(IUserMessage message);
+        Task AddToProcessQueue(IUserMessage message);
         CommandInfo? Search(string command, out int commandLength);
         void AddBuildEvent<T>(Action<T> handler) where T : Command;
         List<Action<Command>> GetBuildEvents(Type commandType);
