@@ -3,12 +3,10 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TitanBot.Commands;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Formatting.Interfaces;
 using TitanBot.Settings;
-using TitanBot.Util;
 
 namespace TitanBot.Replying
 {
@@ -80,7 +78,7 @@ namespace TitanBot.Replying
             Options = options;
             return this;
         }
-        
+
         public IModifyContext ChangeEmbedable(ILocalisable<EmbedBuilder> embedable)
             => ChangeEmbedable(Commands.Embedable.FromEmbed(embedable));
         public IModifyContext ChangeEmbedable(IEmbedable embedable)
@@ -98,16 +96,17 @@ namespace TitanBot.Replying
                 throw new InvalidOperationException($"Unable to modify the message of another person.\n{Message.Id}");
             try
             {
+                var message = Text.Localise(TextResource);
                 IUser me = Guild?.GetUserAsync(Client.CurrentUser.Id).Result ?? (IUser)Client.CurrentUser;
                 if (!(GeneralUserSetting.UseEmbeds && Message.Channel.UserHasPermission(me, ChannelPermission.EmbedLinks)))
                 {
-                    Text = new DynamicString(tr => Text.Localise(tr) + "\n" + Embedable?.GetString().Localise(tr));
+                    message = message + "\n" + Embedable?.GetString().Localise(TextResource);
                     Embedable = null;
                 }
 
                 await Message.ModifyAsync(m =>
                 {
-                    m.Content = Text.Localise(TextResource);
+                    m.Content = message;
                     m.Embed = Embedable?.GetEmbed().Localise(TextResource).Build();
                 }, Options);
             }

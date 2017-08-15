@@ -54,7 +54,7 @@ namespace TitanBot.Scheduling
         {
             try
             {
-                return Type.GetType(callbackType) ?? JsonConvert.DeserializeObject<Type>(callbackType);
+                return JsonConvert.DeserializeObject<Type>(callbackType);
             }
             catch { }
             return null;
@@ -135,7 +135,7 @@ namespace TitanBot.Scheduling
         {
             var record = new SchedulerRecord
             {
-                Callback = typeof(T).FullName,
+                Callback = JsonConvert.SerializeObject(typeof(T)),
                 UserId = userId,
                 GuildId = guildID,
                 EndTime = to ?? DateTime.MaxValue,
@@ -153,7 +153,7 @@ namespace TitanBot.Scheduling
         public ISchedulerRecord[] Cancel<T>(ulong? guildId, ulong? userId)
             where T : ISchedulerCallback
         {
-            var type = typeof(T).FullName;
+            var type = JsonConvert.SerializeObject(typeof(T));
             Expression<Func<SchedulerRecord, bool>> predicate;
             if (userId != null)
                 predicate = r => !r.IsComplete && r.GuildId == guildId && r.Callback == type && r.UserId == userId;
@@ -169,7 +169,7 @@ namespace TitanBot.Scheduling
         private ISchedulerRecord[] Complete(IEnumerable<SchedulerRecord> records, ClockTimerElapsedEventArgs e, bool wasCancelled)
         {
             var completeTime = DateTime.Now;
-            foreach (var record in records)
+            foreach (var record in records.Where(r => r != null))
             {
                 record.CompleteTime = completeTime;
                 if (CachedHandlers[record.Callback] != null)
@@ -199,7 +199,7 @@ namespace TitanBot.Scheduling
 
         public ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userid) where T : ISchedulerCallback
         {
-            var type = typeof(T).FullName;
+            var type = JsonConvert.SerializeObject(typeof(T));
             var initial = Find(r => r.Callback == type && r.GuildId == guildId);
             if (userid != null)
                 initial = initial.Where(r => r.UserId == userid);
@@ -210,8 +210,9 @@ namespace TitanBot.Scheduling
 
         public void PreRegister<T>(T handler) where T : ISchedulerCallback
         {
-            CachedHandlers[typeof(T).Name] = CachedHandlers[typeof(T).FullName] = handler;
-            CachedTypes[typeof(T).Name] = CachedTypes[typeof(T).FullName] = typeof(T);
+            var key = JsonConvert.SerializeObject(typeof(T));
+            CachedHandlers[key] = handler;
+            CachedTypes[key] = typeof(T);
 
         }
     }

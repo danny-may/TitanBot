@@ -78,18 +78,18 @@ namespace TitanBot.Replying
             }
             catch (HttpException ex) when (ex.DiscordCode == 50013 || ex.DiscordCode == 50001)
             {
-                Message = (RawString)TextResource.Format(UNABLE_SEND, ReplyType.Error, Channel, Localised);
+                Message = new LocalisedString(UNABLE_SEND, ReplyType.Error, Channel, Localised);
                 Channel = await User.GetOrCreateDMChannelAsync();
                 return await SendAsync(stealthy);
             }
             catch (ArgumentException ex) when (ex.Message.StartsWith("Message content is too long,"))
             {
-                var message = (Message + "\n" + Embedable?.GetString()).Trim();
+                var message = (Localised + "\n" + Embedable?.GetString()).Trim();
                 if (Attachment != null)
                     message += "\n\n" + TextResource.Format(MESSAGE_CONTAINED_ATTACHMENT, AttachmentName);
                 Attachment = () => message.ToStream();
                 AttachmentName = "Output.txt";
-                Message = (RawString)TextResource.GetResource(MESSAGE_TOO_LONG, ReplyType.Error);
+                Message = new LocalisedString(MESSAGE_TOO_LONG, ReplyType.Error);
                 Embedable = null;
 
                 return await SendAsync(stealthy);
