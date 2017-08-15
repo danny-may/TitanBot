@@ -203,9 +203,9 @@ namespace TitanBot.Scheduling
             var initial = Find(r => r.Callback == type && r.GuildId == guildId);
             if (userid != null)
                 initial = initial.Where(r => r.UserId == userid).ToArray();
-            return initial.OrderByDescending(r => r.EndTime)
-                           .ThenByDescending(r => r.StartTime)
-                           .FirstOrDefault();
+            return initial.OrderByDescending(r => r.CompleteTime)
+                          .ThenByDescending(r => r.StartTime)
+                          .FirstOrDefault();
         }
 
         public void PreRegister<T>(T handler) where T : ISchedulerCallback
