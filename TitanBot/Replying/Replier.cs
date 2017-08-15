@@ -1,8 +1,6 @@
 ﻿using Discord;
-using System.Threading.Tasks;
 using TitanBot.Dependencies;
 using TitanBot.Logging;
-using TitanBot.Util;
 
 namespace TitanBot.Replying
 {
@@ -18,8 +16,8 @@ namespace TitanBot.Replying
         }
 
         public IReplyContext Reply(IMessageChannel channel, IUser user)
-            => new ReplyContext(channel, user, Factory);
+            => new ReplyContext(channel, user, Factory, Logger);
         public IModifyContext Modify(IUserMessage message, IUser user)
-            => new ModifyContext(message, user, Factory);
+            => new ModifyContext(message, user, Factory, Logger);
     }
 }

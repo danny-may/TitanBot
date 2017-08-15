@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Formatting.Interfaces;
+using TitanBot.Logging;
 using TitanBot.Settings;
 
 namespace TitanBot.Replying
@@ -15,6 +16,7 @@ namespace TitanBot.Replying
         private IUserMessage Message { get; }
         private IMessageChannel Channel => Message.Channel;
         private IUser User { get; }
+        private ILogger Logger { get; }
         private DiscordSocketClient Client { get; }
 
         private IGuild Guild => (Channel as IGuildChannel)?.Guild;
@@ -30,11 +32,12 @@ namespace TitanBot.Replying
         private event MessageModifyErrorHandler Handler;
         public event OnModifyEventHandler OnModify;
 
-        public ModifyContext(IUserMessage message, IUser user, IDependencyFactory factory)
+        public ModifyContext(IUserMessage message, IUser user, IDependencyFactory factory, ILogger logger)
         {
             Message = message;
             Text = (RawString)message.Content;
             Embedable = Commands.Embedable.FromEmbed(message.Embeds.FirstOrDefault(e => e.Type == EmbedType.Rich) as Embed);
+            Logger = logger;
 
             User = user;
             Client = factory.Get<DiscordSocketClient>();
@@ -119,6 +122,8 @@ namespace TitanBot.Replying
 
             if (!stealthy)
                 await OnModify(this, Message);
+
+            Logger.Log(Logging.LogSeverity.Verbose, LogType.Message, $"Modified Message | Channel: {Channel} | Guild: {Guild} | Message: {Message.Id}", "Modifier");
         }
     }
 }

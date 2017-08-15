@@ -5,7 +5,7 @@ namespace LiveBaseTest
 {
     class ConsoleLogger : Logger
     {
-        protected override LogSeverity LogLevel => LogSeverity.Critical | LogSeverity.Debug | LogSeverity.Error | LogSeverity.Info | LogSeverity.Verbose;
+        protected override LogSeverity LogLevel => LogSeverity.Critical | LogSeverity.Debug | LogSeverity.Error | LogSeverity.Info;
 
         protected override void WriteLog(ILoggable entry)
         {

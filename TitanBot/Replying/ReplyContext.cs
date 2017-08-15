@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TitanBot.Dependencies;
 using TitanBot.Formatting;
 using TitanBot.Formatting.Interfaces;
+using TitanBot.Logging;
 using TitanBot.Settings;
 using TitanBot.Util;
 using static TitanBot.TBLocalisation.Logic;
@@ -18,6 +19,7 @@ namespace TitanBot.Replying
         private IMessageChannel Channel { get; set; }
         private IUser User { get; }
         private DiscordSocketClient Client { get; }
+        private ILogger Logger { get; }
 
         private IGuild Guild => (Channel as IGuildChannel)?.Guild;
 
@@ -36,11 +38,12 @@ namespace TitanBot.Replying
         private event MessageSendErrorHandler Handler;
         public event OnSendEventHandler OnSend;
 
-        public ReplyContext(IMessageChannel channel, IUser user, IDependencyFactory factory)
+        public ReplyContext(IMessageChannel channel, IUser user, IDependencyFactory factory, ILogger logger)
         {
             Channel = channel;
             User = user;
             Client = factory.Get<DiscordSocketClient>();
+            Logger = logger;
 
             var settings = factory.Get<ISettingManager>();
 
@@ -102,6 +105,7 @@ namespace TitanBot.Replying
             }
             if (!stealthy)
                 await OnSend(this, msg);
+            Logger.Log(Logging.LogSeverity.Verbose, LogType.Message, $"Sent Message | Channel: {Channel} | Guild: {Guild} | Content: {msg.Content}", "Replier");
             return msg;
         }
 
