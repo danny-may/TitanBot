@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using TitanBot.Commands.Models;
 using TitanBot.Dependencies;
 using TitanBot.Replying;
-using static TitanBot.TBLocalisation.Help;
 using static TitanBot.TBLocalisation.Commands;
+using static TitanBot.TBLocalisation.Help;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
@@ -23,11 +23,13 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         [Usage(Usage.SUDOCOMMAND)]
         async Task SudoAsync(IUser user, [Dense]string command)
         {
-            var spoofMessage = new SudoMessage(Message);
-            spoofMessage.Author = user;
-            spoofMessage.Content = command;
+            var spoofMessage = new SudoMessage(Message)
+            {
+                Author = user,
+                Content = command
+            };
             await ReplyAsync(SudoText.SUCCESS, ReplyType.Success, command, user);
-            await CommandService.ParseAndExecute(spoofMessage);
+            CommandService.AddToProcessQueue(spoofMessage).DontWait();
         }
     }
 }

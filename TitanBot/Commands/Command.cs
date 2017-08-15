@@ -43,7 +43,7 @@ namespace TitanBot.Commands
         protected IMessageChannel Channel => Context?.Channel;
         protected SocketSelfUser BotUser => Client?.CurrentUser;
         protected IGuild Guild => Context?.Guild;
-        
+
         protected ValueFormatter Formatter => Context?.Formatter;
         private IReplier Replier => Context?.Replier;
         protected ITextResourceCollection TextResource => Context?.TextResource;

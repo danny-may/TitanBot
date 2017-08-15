@@ -17,5 +17,7 @@ namespace TitanBot.Scheduling
         int ActiveCount();
         ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userId)
             where T : ISchedulerCallback;
+        void PreRegister<T>(T handler)
+            where T : ISchedulerCallback;
     }
 }

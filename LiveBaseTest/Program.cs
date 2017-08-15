@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using TitanBot;
 using TitanBot.Formatting;
 using TitanBot.Logging;
@@ -10,7 +9,7 @@ namespace LiveBaseTest
     {
         static void Main(string[] args)
         {
-            ThreadPool.SetMinThreads(100, 100);
+            //ThreadPool.SetMinThreads(100, 100);
             var bot = new BotClient(m =>
             {
                 m.Map<ILogger, ConsoleLogger>();

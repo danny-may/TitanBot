@@ -138,8 +138,8 @@ namespace TitanBot
 
         private void SubscribeEvents()
         {
-            DiscordClient.Ready += () => Task.Run(() => readyEvent.Set());
-            DiscordClient.Log += m => Task.Run(() => Logger.Log(DiscordUtil.ToLoggable(m)));
+            DiscordClient.Ready += () => { readyEvent.Set(); return Task.CompletedTask; };
+            DiscordClient.Log += m => { Logger.Log(DiscordUtil.ToLoggable(m)); return Task.CompletedTask; };
         }
 
         public Task StartAsync()

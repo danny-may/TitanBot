@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
+using TitanBot.Helpers;
 using TitanBot.Logging;
 using TitanBot.Settings;
 using TitanBot.Storage;
@@ -18,6 +19,8 @@ namespace TitanBot.Commands
     public class CommandService : ICommandService
     {
         public IReadOnlyList<CommandInfo> CommandList { get; }
+        private SynchronisedExecutor MessageQueue { get; } = new SynchronisedExecutor { ProcessOnThread = false };
+        private SynchronisedExecutor CommandQueue { get; } = new SynchronisedExecutor { ProcessOnThread = false };
         private List<CommandInfo> Command { get; } = new List<CommandInfo>();
         private IDependencyFactory DependencyFactory { get; }
         private ILogger Logger { get; }
@@ -27,6 +30,7 @@ namespace TitanBot.Commands
         private BotClient Client { get; }
         private DiscordSocketClient DiscordClient { get; }
         private IPermissionManager PermissionManager { get; }
+        private CommandProcessor Processor { get; }
         private Dictionary<Type, List<(MethodInfo Method, object Parent)>> CommandBuildActions { get; } = new Dictionary<Type, List<(MethodInfo, object)>>();
 
         public CommandService(IDependencyFactory factory,
@@ -47,6 +51,7 @@ namespace TitanBot.Commands
             CommandList = Command.AsReadOnly();
             SettingsManager = settings;
             PermissionManager = permissionManager;
+            Processor = new CommandProcessor(DependencyFactory, this, PermissionManager, Database, Logger, Readers, SettingsManager);
         }
 
         public void Install(Assembly assembly)
@@ -90,12 +95,13 @@ namespace TitanBot.Commands
             return null;
         }
 
-        public Task ParseAndExecute(IUserMessage message)
+        public void ParseAndExecute(IUserMessage message)
         {
             var context = DependencyFactory.WithInstance(message)
                                            .Construct<ICommandContext>();
             context.CheckCommand(this, SettingsManager.GetContext(SettingsManager.Global).Get<GeneralGlobalSetting>().DefaultPrefix);
-            return new CommandExecutor(DependencyFactory, this, context, PermissionManager, Database, Logger, Readers, SettingsManager).Run();
+            if (Processor.ShouldRun(context, out var call))
+                CommandQueue.Run(call);
         }
 
         public void AddBuildEvent<T>(Action<T> handler) where T : Command
@@ -117,5 +123,8 @@ namespace TitanBot.Commands
 
         public List<Action<T>> GetBuildEvents<T>() where T : Command
             => GetBuildEvents(typeof(T)).Select(e => (Action<T>)e).ToList();
+
+        public Task AddToProcessQueue(IUserMessage message)
+            => MessageQueue.Run(() => ParseAndExecute(message));
     }
 }

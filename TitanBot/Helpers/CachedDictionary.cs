@@ -74,7 +74,10 @@ namespace TitanBot.Helpers
         }
 
         public TValue this[TKey key]
-            => Get(key);
+        {
+            get => Get(key);
+            set => Cache.AddOrUpdate(key, (value, DateTime.Now), (k, x) => (value, DateTime.Now));
+        }
     }
 
     public class CachedDictionaryUpdateEventArgs<TKey, TValue> : CacheUpdateEventArgs<TValue>

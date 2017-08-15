@@ -5,15 +5,10 @@ namespace System.Threading.Tasks
 {
     public static class TaskUtil
     {
-        public static void DontWait(this Task task)
-        {
-            if (task.Status == TaskStatus.Created)
-                task.Start();
-        }
-        public static void DontWait<T>(this ValueTask<T> task)
-            => task.AsTask().DontWait();
+        public static void DontWait(this Task task) { }
+        public static void DontWait<T>(this ValueTask<T> task) { }
         public static void Wait<T>(this ValueTask<T> task)
-            => task.AsTask().Wait();
+            => task.GetAwaiter().GetResult();
     }
 
     public static class ValueTask

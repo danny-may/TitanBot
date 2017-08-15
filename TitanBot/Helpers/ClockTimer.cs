@@ -46,7 +46,7 @@ namespace TitanBot.Helpers
             while (Enabled)
             {
                 var thisCycle = NextInterval;
-                Elapsed?.BeginInvoke(this, new ClockTimerElapsedEventArgs(previous), null, null);
+                Elapsed?.Invoke(this, new ClockTimerElapsedEventArgs(previous));
                 var delay = (thisCycle - DateTime.Now).Add(new TimeSpan(10000));
                 if (delay < new TimeSpan())
                     delay = new TimeSpan();

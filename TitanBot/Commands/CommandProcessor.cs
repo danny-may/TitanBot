@@ -1,5 +1,4 @@
-﻿using Discord;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +17,7 @@ using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.Commands
 {
-    class CommandExecutor
+    public class CommandProcessor
     {
         private IDependencyFactory DependencyFactory { get; }
         private ICommandService Owner { get; }
@@ -26,15 +25,11 @@ namespace TitanBot.Commands
         private IDatabase Database { get; }
         private ILogger Logger { get; }
         private ITypeReaderCollection Readers { get; }
-        private ICommandContext Context { get; }
         private ITextResourceManager TextManager { get; }
-        private ITextResourceCollection TextResource => Context.TextResource;
         private ISettingManager Settings { get; }
-        private IReplier Replier => Context.Replier;
 
-        public CommandExecutor(IDependencyFactory factory,
+        public CommandProcessor(IDependencyFactory factory,
                                ICommandService owner,
-                               ICommandContext context,
                                IPermissionManager permissionManager,
                                IDatabase database,
                                ILogger logger,
@@ -44,128 +39,133 @@ namespace TitanBot.Commands
             DependencyFactory = factory;
             Owner = owner;
             PermissionManager = permissionManager;
-            Context = context;
             Database = database;
             Logger = logger;
             Readers = typeReaders;
             Settings = settings;
         }
 
-        private ValueTask<IUserMessage> ReplyAsync(string text)
-            => ReplyAsync(new LocalisedString(text));
-        private ValueTask<IUserMessage> ReplyAsync(string text, ReplyType replyType)
-            => ReplyAsync(new LocalisedString(text, replyType));
-        private ValueTask<IUserMessage> ReplyAsync(string text, params object[] values)
-            => ReplyAsync(new LocalisedString(text, values));
-        private ValueTask<IUserMessage> ReplyAsync(string text, ReplyType replyType, params object[] values)
-            => ReplyAsync(new LocalisedString(text, replyType, values));
+        private void ReplyAsync(ICommandContext context, string text)
+            => ReplyAsync(context, new LocalisedString(text));
+        private void ReplyAsync(ICommandContext context, string text, ReplyType replyType)
+            => ReplyAsync(context, new LocalisedString(text, replyType));
+        private void ReplyAsync(ICommandContext context, string text, params object[] values)
+            => ReplyAsync(context, new LocalisedString(text, values));
+        private void ReplyAsync(ICommandContext context, string text, ReplyType replyType, params object[] values)
+            => ReplyAsync(context, new LocalisedString(text, replyType, values));
 
-        private ValueTask<IUserMessage> ReplyAsync(ILocalisable<string> message)
-            => Replier.Reply(Context.Channel, Context.Author).WithMessage(message).SendAsync();
+        private async void ReplyAsync(ICommandContext context, ILocalisable<string> message)
+            => await context.Replier.Reply(context.Channel, context.Author).WithMessage(message).SendAsync();
 
-        public async Task Run()
+        public bool ShouldRun(ICommandContext context, out Func<Task> call)
         {
+            call = null;
             try
             {
-                if (!Context.IsCommand && !Context.ExplicitPrefix)
-                    return;
-                else if (!Context.IsCommand)
-                    await ReplyAsync(COMMANDEXECUTOR_COMMAND_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText);
-                await TryExecute();
+                if (!context.IsCommand && !context.ExplicitPrefix)
+                    return false;
+                else if (!context.IsCommand)
+                    ReplyAsync(context, COMMANDEXECUTOR_COMMAND_UNKNOWN, ReplyType.Error, context.Prefix, context.CommandText);
+                return TryExecute(context, out call);
             }
             catch (Exception ex)
             {
                 var record = new Error
                 {
-                    Channel = Context.Channel.Id,
-                    Message = Context.Message.Id,
-                    User = Context.Author.Id,
+                    Channel = context.Channel.Id,
+                    Message = context.Message.Id,
+                    User = context.Author.Id,
                     Description = $"{ex.GetType()}\n{ex.Message}",
                     Content = ex.ToString(),
                     Type = ex.GetType().Name
                 };
-                await Database.Insert(record);
+                Database.Insert(record).Wait();
                 try
                 {
-                    await ReplyAsync(COMMANDEXECUTOR_EXCEPTION_ALERT, ReplyType.Error, ex.GetType().Name, record.Id);
+                    ReplyAsync(context, COMMANDEXECUTOR_EXCEPTION_ALERT, ReplyType.Error, ex.GetType().Name, record.Id);
                 }
                 catch { }
+                return false;
             }
         }
 
-        private async Task TryExecute()
+        private bool TryExecute(ICommandContext context, out Func<Task> call)
         {
-            if (Context.Command == null)
-                return;
+            call = null;
+            if (context.Command == null)
+                return false;
 
-            var command = Context.Command.Value;
+            var command = context.Command.Value;
 
-            var instance = DependencyFactory.WithInstance(Context).Construct(command.CommandType) as Command;
+            var instance = DependencyFactory.WithInstance(context).Construct(command.CommandType) as Command;
             if (instance == null)
                 throw new InvalidOperationException($"Unable to create an instance of the {command.CommandType} command");
             ArgumentCheckResponse response = default(ArgumentCheckResponse);
-            var calls = PermissionManager.CheckContext(Context, command.Calls.ToArray());
+            var calls = PermissionManager.CheckContext(context, command.Calls.ToArray());
             if (calls.Count() == 0)
             {
-                await ReplyAsync(COMMANDEXECUTOR_DISALLOWED_CHANNEL, ReplyType.Error);
-                return;
+                ReplyAsync(context, COMMANDEXECUTOR_DISALLOWED_CHANNEL, ReplyType.Error);
+                return false;
             }
-            var subCalls = CheckSubcommands(calls);
+            var subCalls = CheckSubcommands(context, calls);
             if (subCalls.Count() == 0)
             {
-                await ReplyAsync(COMMANDEXECUTOR_SUBCALL_UNKNOWN, ReplyType.Error, Context.Prefix, Context.CommandText);
-                return;
+                ReplyAsync(context, COMMANDEXECUTOR_SUBCALL_UNKNOWN, ReplyType.Error, context.Prefix, context.CommandText);
+                return false;
             }
             foreach (var subCall in subCalls)
             {
-                response = await MatchArguments(subCall.CallInfo, subCall.CallName);
+                response = MatchArguments(context, subCall.CallInfo, subCall.CallName).Result;
                 if (response.SuccessStatus == ArgumentCheckResult.Successful)
                 {
-                    var permCheck = PermissionManager.CheckAllowed(Context, new CallInfo[] { subCall.CallInfo });
+                    var permCheck = PermissionManager.CheckAllowed(context, new CallInfo[] { subCall.CallInfo });
                     if (!permCheck.IsSuccess)
                     {
                         if (permCheck.ErrorMessage != null)
-                            await ReplyAsync(permCheck.ErrorMessage, ReplyType.Error, Context.Prefix, Context.CommandText);
+                            ReplyAsync(context, permCheck.ErrorMessage, ReplyType.Error, context.Prefix, context.CommandText);
                     }
                     else
                     {
-                        instance.Install(Context, DependencyFactory);
+                        instance.Install(context, DependencyFactory);
                         foreach (var buildEvent in Owner.GetBuildEvents(instance.GetType()))
                             buildEvent.Invoke(instance);
-                        LogCommand(subCall.CallInfo);
+                        LogCommand(context, subCall.CallInfo);
                         if (subCall.CallInfo.ShowTyping)
-                            await Context.Channel.TriggerTypingAsync();
-                        await (Task)subCall.CallInfo.Method.Invoke(instance, response.CallArguments);
+                            context.Channel.TriggerTypingAsync().Wait();
+
+                        call = () => (Task)subCall.CallInfo.Method.Invoke(instance, response.CallArguments);
+                        return true;
                     }
-                    return;
+                    return false;
                 }
             }
-            await ReplyAsync(response.ErrorMessage.message, ReplyType.Error, new object[] { Context.Prefix, Context.CommandText }
-                                                                                            .Concat(response.ErrorMessage.values.Select(v => v(TextResource)))
+            ReplyAsync(context, response.ErrorMessage.message, ReplyType.Error, new object[] { context.Prefix, context.CommandText }
+                                                                                            .Concat(response.ErrorMessage.values.Select(v => v(context.TextResource)))
                                                                                             .ToArray());
+            return false;
         }
 
-        private void LogCommand(CallInfo call)
+        private void LogCommand(ICommandContext context, CallInfo call)
         {
             var record = new CommandRecord
             {
-                AuthorId = Context.Author.Id,
-                MessageId = Context.Message.Id,
-                ChannelId = Context.Channel.Id,
-                GuildId = Context.Guild?.Id,
-                MessageContent = Context.Message.Content,
-                UserName = Context.Author.Username,
-                ChannelName = Context.Channel.Name,
-                GuildName = Context.Guild?.Name,
-                TimeStamp = Context.Message.Timestamp,
-                Prefix = Context.Prefix,
-                CommandName = Context.Command?.Name
+                AuthorId = context.Author.Id,
+                MessageId = context.Message.Id,
+                ChannelId = context.Channel.Id,
+                GuildId = context.Guild?.Id,
+                MessageContent = context.Message.Content,
+                UserName = context.Author.Username,
+                ChannelName = context.Channel.Name,
+                GuildName = context.Guild?.Name,
+                TimeStamp = context.Message.Timestamp,
+                Prefix = context.Prefix,
+                CommandName = context.Command?.Name
             };
             Logger.Log(Logging.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
             Database.Insert(record);
         }
 
-        private (string CallName, CallInfo CallInfo)[] CheckSubcommands(CallInfo[] calls)
+        private (string CallName, CallInfo CallInfo)[] CheckSubcommands(ICommandContext context, CallInfo[] calls)
         {
             var allCalls = calls.Select(c => (CallName: c.SubCall, CallInfo: c))
                                 .Concat(calls.Where(c => c.Aliases != null)
@@ -176,19 +176,19 @@ namespace TitanBot.Commands
                                    .OrderByDescending(g => g.Key.Length);
             foreach (var group in subcalls)
             {
-                if (Context.Message.Content.Substring(Context.ArgPos).ToLower().Trim().StartsWith(group.Key.ToLower()))
+                if (context.Message.Content.Substring(context.ArgPos).ToLower().Trim().StartsWith(group.Key.ToLower()))
                     return group.ToArray();
             }
             return noSubcalls.ToArray();
         }
 
-        private async ValueTask<ArgumentCheckResponse> MatchArguments(CallInfo call, string callName)
+        private async ValueTask<ArgumentCheckResponse> MatchArguments(ICommandContext context, CallInfo call, string callName)
         {
             var reader = Readers.NewCache();
             var responses = new List<ArgumentCheckResponse>();
             foreach (var argPattern in call.ArgumentPermatations.OrderByDescending(p => p.Count(a => !a.UseDefault)))
             {
-                var readResult = await ReadArguments(reader, argPattern, call, callName);
+                var readResult = await ReadArguments(context, reader, argPattern, call, callName);
                 if (readResult.SuccessStatus == ArgumentCheckResult.Successful)
                     return readResult;
                 responses.Add(readResult);
@@ -196,13 +196,13 @@ namespace TitanBot.Commands
             return responses.OrderBy(r => r.SuccessStatus).First();
         }
 
-        private async ValueTask<ArgumentCheckResponse> ReadArguments(ITypeReaderCollection reader, ArgumentInfo[] argPattern, CallInfo call, string callName)
+        private async ValueTask<ArgumentCheckResponse> ReadArguments(ICommandContext context, ITypeReaderCollection reader, ArgumentInfo[] argPattern, CallInfo call, string callName)
         {
             int? denseIndex = argPattern.IndexOf(p => p.IsDense);
             if (denseIndex == -1) denseIndex = null;
             if (callName != null) denseIndex++;
             var maxLength = denseIndex.HasValue ? argPattern.Count(a => !a.UseDefault) + (callName != null ? 1 : 0) : (int?)null;
-            var stringArgs = Context.SplitArguments(call.Flags.Count() == 0, out var flags, maxLength, denseIndex);
+            var stringArgs = context.SplitArguments(call.Flags.Count() == 0, out var flags, maxLength, denseIndex);
             var argStrings = stringArgs.Select(s => s.Trim()).ToArray();
 
             if (callName != null)
@@ -227,12 +227,12 @@ namespace TitanBot.Commands
                 if (argPattern[i].UseDefault)
                     argResults[i] = argPattern[i].DefaultValue;
                 else if (argPattern[i].IsRawArgument)
-                    argResults[i] = Context.Message.Content.Substring(Context.ArgPos);
+                    argResults[i] = context.Message.Content.Substring(context.ArgPos);
                 else
                 {
                     if (!argIterator.MoveNext())
                         return ArgumentCheckResponse.FromError(ArgumentCheckResult.NotEnoughArguments, COMMANDEXECUTOR_ARGUMENTS_TOOFEW);
-                    var readRes = await reader.Read(argPattern[i].Type, Context, (string)argIterator.Current);
+                    var readRes = await reader.Read(argPattern[i].Type, context, (string)argIterator.Current);
                     if (!readRes.IsSuccess)
                         return ArgumentCheckResponse.FromError(readRes);
                     argResults[i] = readRes.Best;
@@ -251,7 +251,7 @@ namespace TitanBot.Commands
                         flagResults[i] = true;
                     else
                     {
-                        var readResult = await reader.Read(flag.Type, Context, val.Value);
+                        var readResult = await reader.Read(flag.Type, context, val.Value);
                         if (readResult.IsSuccess)
                         {
                             flagResults[i] = readResult.Best;

@@ -7,8 +7,8 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
-using TitanBot.Logging;
 using TitanBot.Helpers;
+using TitanBot.Logging;
 using TitanBot.Storage;
 
 namespace TitanBot.Scheduling
@@ -73,7 +73,7 @@ namespace TitanBot.Scheduling
             {
                 var records = GetActive(e.SignalTime);
                 var completed = new List<SchedulerRecord>();
-                foreach (var record in records)
+                Parallel.ForEach(records, record =>
                 {
                     if (record.EndTime < e.SignalTime)
                         completed.Add(record);
@@ -82,20 +82,17 @@ namespace TitanBot.Scheduling
                         var absDelta = (e.SignalTime - record.StartTime).Ticks;
                         var intervalDelta = (e.SignalTime - record.StartTime).Ticks % record.Interval.Ticks;
                         if (absDelta < record.Interval.Ticks || intervalDelta / 10000 > PollingPeriod || CachedHandlers[record.Callback] == null)
-                            continue;
-                        Task.Run(() =>
+                            return;
+                        try
                         {
-                            try
-                            {
-                                CachedHandlers[record.Callback].Handle(new SchedulerContext(record, Client, e, DependencyFactory), e.SignalTime.AddTicks(-intervalDelta));
-                            }
-                            catch (Exception ex)
-                            {
-                                Log(ex);
-                            }
-                        }).DontWait();
+                            CachedHandlers[record.Callback].Handle(new SchedulerContext(record, Client, e, DependencyFactory), e.SignalTime.AddTicks(-intervalDelta));
+                        }
+                        catch (Exception ex)
+                        {
+                            Log(ex);
+                        }
                     }
-                }
+                });
                 Complete(completed, e, false);
             }
             catch (Exception ex)
@@ -176,17 +173,14 @@ namespace TitanBot.Scheduling
             {
                 record.CompleteTime = completeTime;
                 if (CachedHandlers[record.Callback] != null)
-                    Task.Run(() =>
+                    try
                     {
-                        try
-                        {
-                            CachedHandlers[record.Callback].Complete(new SchedulerContext(record, Client, e, DependencyFactory), wasCancelled);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log(ex);
-                        }
-                    }).DontWait();
+                        CachedHandlers[record.Callback].Complete(new SchedulerContext(record, Client, e, DependencyFactory), wasCancelled);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log(ex);
+                    }
             }
             Database.Upsert(records).Wait();
             return records.ToArray();
@@ -212,6 +206,13 @@ namespace TitanBot.Scheduling
             initial = initial.OrderByDescending(r => r.EndTime)
                              .ThenByDescending(r => r.StartTime);
             return initial.FirstOrDefault();
+        }
+
+        public void PreRegister<T>(T handler) where T : ISchedulerCallback
+        {
+            CachedHandlers[typeof(T).Name] = CachedHandlers[typeof(T).FullName] = handler;
+            CachedTypes[typeof(T).Name] = CachedTypes[typeof(T).FullName] = typeof(T);
+
         }
     }
 }
