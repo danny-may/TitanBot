@@ -66,7 +66,7 @@ namespace TitanBot.Commands
                     return false;
                 else if (!context.IsCommand)
                     ReplyAsync(context, COMMANDEXECUTOR_COMMAND_UNKNOWN, ReplyType.Error, context.Prefix, context.CommandText);
-                return TryExecute(context, out call);
+                return TryGetExecutor(context, out call);
             }
             catch (Exception ex)
             {
@@ -89,7 +89,7 @@ namespace TitanBot.Commands
             }
         }
 
-        private bool TryExecute(ICommandContext context, out Func<Task> call)
+        private bool TryGetExecutor(ICommandContext context, out Func<Task> call)
         {
             call = null;
             if (context.Command == null)
@@ -126,14 +126,17 @@ namespace TitanBot.Commands
                     }
                     else
                     {
-                        instance.Install(context, DependencyFactory);
-                        foreach (var buildEvent in Owner.GetBuildEvents(instance.GetType()))
-                            buildEvent.Invoke(instance);
-                        LogCommand(context, subCall.CallInfo);
-                        if (subCall.CallInfo.ShowTyping)
-                            context.Channel.TriggerTypingAsync().Wait();
+                        call = () =>
+                        {
+                            instance.Install(context, DependencyFactory);
+                            foreach (var buildEvent in Owner.GetBuildEvents(instance.GetType()))
+                                buildEvent.Invoke(instance);
+                            LogCommand(context, subCall.CallInfo);
+                            if (subCall.CallInfo.ShowTyping)
+                                context.Channel.TriggerTypingAsync().Wait();
 
-                        call = () => (Task)subCall.CallInfo.Method.Invoke(instance, response.CallArguments);
+                            return (Task)subCall.CallInfo.Method.Invoke(instance, response.CallArguments);
+                        };
                         return true;
                     }
                     return false;

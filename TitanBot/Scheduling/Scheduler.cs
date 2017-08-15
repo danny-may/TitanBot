@@ -68,7 +68,7 @@ namespace TitanBot.Scheduling
         {
             if (e.Slowdown > sender.Interval)
                 Logger.Log(LogSeverity.Critical, LogType.Scheduler, $"Scheduler is overburdened. Lost {e.Slowdown.TotalMilliseconds - sender.Interval.TotalMilliseconds}ms", "MainLoop");
-            //Logger.Log(LogSeverity.Info, LogType.Scheduler, $"{e.SignalTime} Slowdown: {e.Slowdown}", "SchedulerCycle");
+            Logger.Log(LogSeverity.Verbose, LogType.Scheduler, $"{e.SignalTime} Slowdown: {e.Slowdown}", "SchedulerCycle");
             try
             {
                 var records = GetActive(e.SignalTime);
