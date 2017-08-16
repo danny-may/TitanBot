@@ -29,7 +29,7 @@ namespace TitanBot.Logging
         }
 
         protected virtual bool ShouldLog(LogSeverity severity)
-            => (LogLevel & severity) != 0;
+            => LogLevel > severity;
 
         public void Log(LogSeverity severity, LogType type, string message, string source)
             => Log(new LogEntry(severity, type, message, source));
