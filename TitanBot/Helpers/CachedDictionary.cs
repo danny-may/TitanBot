@@ -70,7 +70,7 @@ namespace TitanBot.Helpers
         {
             if (NeedsUpdating(key))
                 return Update(key).Result;
-            return Cache.GetOrAdd(key, (Source(key).Result, DateTime.Now)).Value;
+            return Cache.GetOrAdd(key, k => (Source(k).Result, DateTime.Now)).Value;
         }
 
         public TValue this[TKey key]

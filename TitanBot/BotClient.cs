@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using TitanBot.Commands;
-using TitanBot.Commands.DefaultCommands.Owner;
 using TitanBot.Contexts;
 using TitanBot.Dependencies;
 using TitanBot.DiscordHandlers;
@@ -60,23 +59,21 @@ namespace TitanBot
             mapper(DependencyFactory);
 
             Logger = DependencyFactory.GetOrStore<ILogger>();
-            DiscordClient = DependencyFactory.GetOrStore<DiscordSocketClient>();
-            TypeReaders = DependencyFactory.GetOrStore<ITypeReaderCollection>();
+            DependencyFactory.GetOrStore<IDownloader>();
+            DependencyFactory.GetOrStore<IReplier>();
+            DependencyFactory.GetOrStore<ValueFormatter>();
             Database = DependencyFactory.GetOrStore<IDatabase>();
             SettingsManager = DependencyFactory.GetOrStore<ISettingManager>();
+            DependencyFactory.GetOrStore<IPermissionManager>();
+            DiscordClient = DependencyFactory.GetOrStore<DiscordSocketClient>();
+            TypeReaders = DependencyFactory.GetOrStore<ITypeReaderCollection>();
             Scheduler = DependencyFactory.GetOrStore<IScheduler>();
             CommandService = DependencyFactory.GetOrStore<ICommandService>();
-            DependencyFactory.GetOrStore<IDownloader>();
-            DependencyFactory.GetOrStore<ValueFormatter>();
-            DependencyFactory.GetOrStore<IReplier>();
-            DependencyFactory.GetOrStore<IPermissionManager>();
             TextResourceManager = DependencyFactory.GetOrStore<ITextResourceManager>();
 
             SetupFeatures();
             InstallSettingEditors();
             SubscribeEvents();
-
-            var x = Scheduler.GetMostRecent<TestCommand.SchedulerTestHandler>(null, null);
 
             InstallHandlers(Assembly.GetExecutingAssembly());
         }
