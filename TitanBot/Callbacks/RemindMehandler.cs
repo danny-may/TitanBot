@@ -20,9 +20,9 @@ namespace TitanBot.Callbacks
             await context.Replier.Reply(channel, context.Author).WithMessage(new RawString("{0} ago you asked me to remind you this:\n{1}", timespan, message)).SendAsync();
         }
 
-        public void Handle(ISchedulerContext context, DateTime eventTime)
+        public void Handle(ISchedulerContext context)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Tick " + context.Record.Id);
         }
     }
 }

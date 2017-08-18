@@ -363,6 +363,7 @@
     <Compile Include="Util\NumericUtil.cs" />
     <Compile Include="Util\PerformanceUtil.cs" />
     <Compile Include="Util\StringUtils.cs" />
+    <Compile Include="Util\SystemUtil.cs" />
     <Compile Include="Util\TaskUtil.cs" />
   </ItemGroup>
   <ItemGroup>

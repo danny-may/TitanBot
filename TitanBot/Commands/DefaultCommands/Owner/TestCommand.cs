@@ -11,10 +11,10 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     class TestCommand : Command
     {
         [Call("Scheduler")]
-        async Task TestSchedulerAsync()
+        async Task TestSchedulerAsync(int delay = 1)
         {
             for (int i = 0; i < 50; i++)
-                Scheduler.Queue<SchedulerTestHandler>(BotUser.Id, null, DateTime.Now, new TimeSpan(0, 0, 1), DateTime.Now.AddSeconds(33));
+                Scheduler.Queue<SchedulerTestHandler>(BotUser.Id, null, DateTime.Now, new TimeSpan(0, 0, delay), DateTime.Now.AddSeconds(33));
 
             await ReplyAsync((RawString)"Queued uccessfully");
         }
@@ -22,9 +22,9 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         public class SchedulerTestHandler : ISchedulerCallback
         {
             public void Complete(ISchedulerContext context, bool wasCancelled)
-                => Handle(null, DateTime.MinValue);
+                => Handle(null);
 
-            public void Handle(ISchedulerContext context, DateTime eventTime)
+            public void Handle(ISchedulerContext context)
             {
                 var endAt = DateTime.Now.AddMilliseconds(200);
                 while (DateTime.Now < endAt) { }

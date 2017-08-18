@@ -71,30 +71,22 @@ namespace TitanBot.Scheduling
             Logger.Log(LogSeverity.Debug, LogType.Scheduler, $"{e.SignalTime} Slowdown: {e.Slowdown}", "SchedulerCycle");
             try
             {
-                var records = GetActive(e.SignalTime);
+                var cycleTime = DateTime.Now;
+                var records = GetActive(e.SignalTime, e.Slowdown + sender.Interval);
                 var completed = new List<SchedulerRecord>();
-                Parallel.ForEach(records, record =>
+                var ticked = new List<SchedulerRecord>();
+                foreach (var r in records)
                 {
-                    if (record.EndTime < e.SignalTime)
-                        completed.Add(record);
-                    else
-                    {
-                        var absDelta = (e.SignalTime - record.StartTime).Ticks;
-                        var intervalDelta = (e.SignalTime - record.StartTime).Ticks % record.Interval.Ticks;
-                        if (absDelta < record.Interval.Ticks || intervalDelta / 10000 > PollingPeriod || CachedHandlers[record.Callback] == null)
-                            return;
-                        try
-                        {
-                            CachedHandlers[record.Callback].Handle(new SchedulerContext(record, Client, e, DependencyFactory), e.SignalTime.AddTicks(-intervalDelta));
-                        }
-                        catch (Exception ex)
-                        {
-                            Log(ex);
-                        }
-                    }
-                });
+                    if (r.EndTime < e.SignalTime + e.Slowdown)
+                        completed.Add(r);
+                    else if (r.Interval < sender.Interval + e.Slowdown ||
+                             ((e.SignalTime - r.StartTime).Ticks % r.Interval.Ticks).Between(0, (e.Slowdown + sender.Interval).Ticks))
+                        ticked.Add(r);
+                }
                 if (completed.Count > 0)
                     Complete(completed.ToArray(), e, false);
+                if (ticked.Count > 0)
+                    Tick(ticked.ToArray(), e);
             }
             catch (Exception ex)
             {
@@ -127,8 +119,8 @@ namespace TitanBot.Scheduling
             return Database.Find(predicate).Result.ToArray();
         }
 
-        private List<SchedulerRecord> GetActive(DateTime atTime)
-            => CachedRecords.Value.Where(r => r.StartTime < atTime && (r.CompleteTime ?? DateTime.MaxValue) > atTime).ToList();
+        private List<SchedulerRecord> GetActive(DateTime atTime, TimeSpan range)
+            => CachedRecords.Value.Where(r => r.StartTime < atTime.Add(range) && (r.CompleteTime ?? DateTime.MaxValue) > atTime).ToList();
 
         public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), ulong? message = null, ulong? channel = null, string data = null) where T : ISchedulerCallback
         {
@@ -169,19 +161,20 @@ namespace TitanBot.Scheduling
         {
             var completeTime = DateTime.Now;
             records = records.Where(r => r != null).ToArray();
-            foreach (var record in records)
+            Parallel.ForEach(records, r =>
             {
-                record.CompleteTime = completeTime;
-                if (CachedHandlers[record.Callback] != null)
+
+                r.CompleteTime = completeTime;
+                if (CachedHandlers[r.Callback] != null)
                     try
                     {
-                        CachedHandlers[record.Callback].Complete(new SchedulerContext(record, Client, e, DependencyFactory), wasCancelled);
+                        CachedHandlers[r.Callback].Complete(new SchedulerContext(r, Client, e, DependencyFactory), wasCancelled);
                     }
                     catch (Exception ex)
                     {
                         Log(ex);
                     }
-            }
+            });
             Database.Upsert<SchedulerRecord>(records).Wait();
             return records.ToArray();
         }
@@ -195,7 +188,7 @@ namespace TitanBot.Scheduling
 
 
         public int ActiveCount()
-            => GetActive(DateTime.Now).Count;
+            => GetActive(DateTime.Now, new TimeSpan()).Count;
 
         public ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userid) where T : ISchedulerCallback
         {
@@ -219,6 +212,21 @@ namespace TitanBot.Scheduling
         public void Cancel(Expression<Func<ISchedulerRecord, bool>> predicate)
         {
             Complete(Find(Expression.Lambda<Func<SchedulerRecord, bool>>(predicate.Body, Expression.Parameter(typeof(SchedulerRecord)))).ToArray(), null, true);
+        }
+
+        private void Tick(SchedulerRecord[] records, ClockTimerElapsedEventArgs e)
+        {
+            Parallel.ForEach(records, r =>
+            {
+                try
+                {
+                    CachedHandlers[r.Callback]?.Handle(new SchedulerContext(r, Client, e, DependencyFactory));
+                }
+                catch (Exception ex)
+                {
+                    Log(ex);
+                }
+            });
         }
     }
 }
