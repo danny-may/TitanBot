@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TitanBot.Replying;
 
@@ -34,7 +35,16 @@ namespace TitanBot.Formatting
         }
 
         public string Format(string key, params object[] items)
-            => string.Format(GetResource(key), items.Select(i => Formatter.Beautify(FormatType, i)).ToArray());
+        {
+            try
+            {
+                return string.Format(GetResource(key), items.Select(i => Formatter.Beautify(FormatType, i)).ToArray());
+            }
+            catch (FormatException ex)
+            {
+                throw new ArgumentException($"Key \"{key}\" ({GetResource(key)}) accepts more values than supplied ({items.Length})", ex);
+            }
+        }
 
         public string Format(string key, ReplyType replyType, params object[] items)
             => GetReplyType(replyType) + Format(key, items);
