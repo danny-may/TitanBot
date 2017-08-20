@@ -16,7 +16,7 @@ namespace TitanBot.Commands
         private CommandInfo Command { get; }
         private ICommandContext Context { get; }
         private IEnumerable<CallInfo> Permitted { get; }
-        
+
         private string Prefix => Context.Prefix;
         private IUser BotUser => Context.Client.CurrentUser;
 
@@ -53,7 +53,7 @@ namespace TitanBot.Commands
         }
 
         public ILocalisable<EmbedBuilder> GetEmbed()
-        { 
+        {
             var builder = new LocalisedEmbedBuilder
             {
                 Color = System.Drawing.Color.LightSkyBlue.ToDiscord(),
@@ -67,7 +67,7 @@ namespace TitanBot.Commands
                 builder.AddInlineField(f => f.WithName(TBLocalisation.ALIASES).WithRawValue(Format.Sanitize(Aliases)));
             builder.AddField(f => f.WithName(TBLocalisation.USAGE).WithValue(Usage));
             if (Flags.Count != 0)
-                builder.AddField(f => f.WithName(TBLocalisation.FLAGS).WithValue(Flags));
+                builder.AddField(f => f.WithName(TBLocalisation.FLAGS).WithValue(Flag));
             if (Notes != null && !string.IsNullOrWhiteSpace(Notes.Key))
                 builder.AddField(f => f.WithName(TBLocalisation.NOTES).WithValue(tr => Notes.Localise(tr) + (Usages.Count > 0 ? NotesFooter.Localise(tr) : "")));
             else if (Usages.Count > 0)
