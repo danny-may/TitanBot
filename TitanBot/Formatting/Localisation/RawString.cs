@@ -11,11 +11,13 @@ namespace TitanBot.Formatting
         public RawString(string text, ReplyType replyType) : base(text, replyType) { }
         public RawString(string text, ReplyType replyType, params object[] values) : base(text, replyType, values) { }
 
-        public override string Localise(ITextResourceCollection textResource)
+        public override string Localise(ITextResourceCollection tr)
         {
             if (Key == null) return null;
-            var prepped = Values.Select(v => v is ILocalisable ls ? ls.Localise(textResource) : v).ToArray();
-            return textResource.GetReplyType(ReplyType) + string.Format(Key, prepped);
+            var prepped = Values.Select(v => v is ILocalisable ls ? ls.Localise(tr) : v)
+                                .Select(v => tr.Formatter.Beautify(tr.FormatType, v))
+                                .ToArray();
+            return tr.GetReplyType(ReplyType) + string.Format(Key, prepped);
         }
 
         public static implicit operator RawString(string text)

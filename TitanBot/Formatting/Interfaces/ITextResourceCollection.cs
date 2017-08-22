@@ -11,5 +11,7 @@ namespace TitanBot.Formatting
         string GetReplyType(ReplyType replyType);
         string this[string index] { get; }
         double Coverage { get; }
+        ValueFormatter Formatter { get; }
+        FormatType FormatType { get; }
     }
 }

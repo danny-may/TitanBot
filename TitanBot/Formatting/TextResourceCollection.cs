@@ -8,8 +8,8 @@ namespace TitanBot.Formatting
     class TextResourceCollection : ITextResourceCollection
     {
         private Dictionary<string, string> Values { get; }
-        private ValueFormatter Formatter { get; }
-        private FormatType FormatType { get; }
+        public ValueFormatter Formatter { get; }
+        public FormatType FormatType { get; }
         public double Coverage { get; }
 
         public string this[string key] => GetResource(key);
