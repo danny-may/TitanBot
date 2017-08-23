@@ -251,7 +251,7 @@ namespace TitanBot.Commands
                 foreach (var val in flagVals)
                 {
                     if (!flag.RequiresInput)
-                        flagResults[i] = true;
+                        flagResults[i] = !(bool)flag.DefaultValue;
                     else
                     {
                         var readResult = await reader.Read(flag.Type, context, val.Value);

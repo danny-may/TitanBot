@@ -213,7 +213,6 @@
     <Compile Include="Commands\DefaultCommands\General\PrefixCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Models\Help\HelpCommandEmbeddable.cs" />
     <Compile Include="Commands\DefaultCommands\Models\Help\HelpGeneralEmbedable.cs" />
-    <Compile Include="Commands\DefaultCommands\Models\Help\TutorialModel.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\DbPurgeCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\ExceptionCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\ExecCommand.cs" />
@@ -223,7 +222,7 @@
     <Compile Include="Commands\DefaultCommands\Owner\SudoCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\TestCommand.cs" />
     <Compile Include="Commands\Embedable.cs" />
-    <Compile Include="Commands\FlagDefinition.cs" />
+    <Compile Include="Commands\Models\FlagDefinition.cs" />
     <Compile Include="Debugging\Timer.cs" />
     <Compile Include="Formatting\Interfaces\ILocalisable.cs" />
     <Compile Include="Formatting\Localisation\RawString.cs" />
