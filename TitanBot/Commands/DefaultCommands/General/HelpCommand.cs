@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using TitanBot.Commands.Responses;
 using TitanBot.Replying;
-using static TitanBot.TBLocalisation.Help;
 using static TitanBot.TBLocalisation.Commands;
+using static TitanBot.TBLocalisation.Help;
 
 namespace TitanBot.Commands.DefautlCommands.General
 {
@@ -12,7 +11,6 @@ namespace TitanBot.Commands.DefautlCommands.General
     public class HelpCommand : Command
     {
         private IPermissionManager PermissionManager { get; }
-        public Dictionary<string, TutorialModel> Tutorials { get; } = new Dictionary<string, TutorialModel>();
 
         public HelpCommand(IPermissionManager checker)
         {
@@ -28,14 +26,6 @@ namespace TitanBot.Commands.DefautlCommands.General
             else
                 await HelpCommandAsync(command);
         }
-
-        [Call("Tutorial")]
-        [Usage(Usage.HELP_TUTORIAL)]
-        async Task TutorialAsync(string tutorialArea)
-        {
-            await Task.Delay(0);
-        }
-
 
         CommandInfo[] FindPermitted()
             => CommandService.CommandList.Where(c => FindPermitted(c).IsSuccess).ToArray();
@@ -63,7 +53,7 @@ namespace TitanBot.Commands.DefautlCommands.General
             }
 
             var permitted = permCheckResponse.Permitted.Where(c => !c.Hidden);
-            
+
             await ReplyAsync(new HelpCommandEmbeddable(cmd.Value, permitted, name, Context));
         }
     }

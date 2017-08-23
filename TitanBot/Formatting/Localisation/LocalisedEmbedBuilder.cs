@@ -1,7 +1,4 @@
 ﻿using Discord;
-using Discord.Rest;
-using Discord.Rpc;
-using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +55,7 @@ namespace TitanBot.Formatting
             ThumbnailUrl = thumbnailUrl;
             return this;
         }
-        
+
         public LocalisedEmbedBuilder WithImageUrl(ILocalisable<string> imageUrl)
         {
             ImageUrl = imageUrl;
@@ -138,7 +135,7 @@ namespace TitanBot.Formatting
             action(field);
             return AddField(field);
         }
-        
+
         object ILocalisable.Localise(ITextResourceCollection textResource)
             => Localise(textResource);
         public EmbedBuilder Localise(ITextResourceCollection textResource)
@@ -157,12 +154,12 @@ namespace TitanBot.Formatting
             };
 
         public static implicit operator LocalisedEmbedBuilder(EmbedBuilder builder)
-            => new LocalisedEmbedBuilder
+            => builder == null ? null : new LocalisedEmbedBuilder
             {
                 Author = builder?.Author,
                 Color = builder?.Color,
                 Description = (RawString)builder?.Description,
-                Fields = builder?.Fields?.Cast<LocalisedFieldBuilder>().ToList(),
+                Fields = builder?.Fields?.Select(f => (LocalisedFieldBuilder)f).ToList(),
                 Footer = builder?.Footer,
                 ImageUrl = (RawString)builder?.ImageUrl,
                 ThumbnailUrl = (RawString)builder?.ThumbnailUrl,
@@ -234,12 +231,12 @@ namespace TitanBot.Formatting
         public ILocalisable<string> Name { get; set; }
         public ILocalisable<string> Url { get; set; }
         public ILocalisable<string> IconUrl { get; set; }
-        
+
         public LocalisedAuthorBuilder WithName(ILocalisable<string> name)
         {
             Name = name;
             return this;
-        }        
+        }
         public LocalisedAuthorBuilder WithUrl(ILocalisable<string> url)
         {
             Url = url;
@@ -262,7 +259,7 @@ namespace TitanBot.Formatting
             };
 
         public static implicit operator LocalisedAuthorBuilder(EmbedAuthorBuilder builder)
-            => new LocalisedAuthorBuilder
+            => builder == null ? null : new LocalisedAuthorBuilder
             {
                 IconUrl = (RawString)builder.IconUrl,
                 Name = (RawString)builder.Name,
@@ -338,7 +335,7 @@ namespace TitanBot.Formatting
             };
 
         public static implicit operator LocalisedFooterBuilder(EmbedFooterBuilder builder)
-            => new LocalisedFooterBuilder
+            => builder == null ? null : new LocalisedFooterBuilder
             {
                 IconUrl = (RawString)builder.IconUrl,
                 Text = (RawString)builder.Text
@@ -385,7 +382,7 @@ namespace TitanBot.Formatting
             Value = value;
             return this;
         }
-        
+
         public LocalisedFieldBuilder WithIsInline(bool isInline)
         {
             IsInline = isInline;
@@ -403,7 +400,7 @@ namespace TitanBot.Formatting
             };
 
         public static implicit operator LocalisedFieldBuilder(EmbedFieldBuilder builder)
-            => new LocalisedFieldBuilder
+            => builder == null ? null : new LocalisedFieldBuilder
             {
                 IsInline = builder.IsInline,
                 Name = (RawString)builder.Name,

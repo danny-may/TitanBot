@@ -13,6 +13,8 @@ namespace TitanBot.Commands
         public Type Type { get; }
         public object DefaultValue { get; }
         public bool RequiresInput { get; }
+        public ParameterInfo Parameter { get; }
+        public string ParamName { get; }
 
         internal FlagDefinition(CallFlagAttribute attribute, ParameterInfo param)
         {
@@ -23,18 +25,23 @@ namespace TitanBot.Commands
             LongKey = attribute.LongKey;
             Description = attribute.Description;
             Type = param.ParameterType;
-            RequiresInput = !(Type == typeof(bool) &&
-                             (bool)param.DefaultValue == false);
+            RequiresInput = Type != typeof(bool);
+            Parameter = param;
+            ParamName = NameAttribute.GetFor(param);
         }
 
         object ILocalisable.Localise(ITextResourceCollection textResource)
             => Localise(textResource);
         public string Localise(ITextResourceCollection textResource)
         {
+            string Format(string key)
+                => $"`{key}{(RequiresInput ? $" <{ParamName}>" : "")}`";
+
+            var text = Format($"-{ShortKey}");
             if (LongKey != null)
-                return $"`-{ShortKey}` / `--{LongKey}` = {textResource.GetResource(Description)}";
-            else
-                return $"`-{ShortKey}` = {textResource.GetResource(Description)}";
+                text += " / " + Format($"--{LongKey}");
+
+            return text + $" = {textResource.GetResource(Description)}";
         }
     }
 }

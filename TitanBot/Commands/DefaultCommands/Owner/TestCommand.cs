@@ -10,6 +10,14 @@ namespace TitanBot.Commands.DefaultCommands.Owner
     [RequireOwner]
     class TestCommand : Command
     {
+        [Call("Flag")]
+        async Task TestFlagsAsync([CallFlag('a', "aflag", "Bool flag")]bool a = false, [CallFlag('b', "Bool flag")]bool b = true, [CallFlag('c', "cflag", "String flag")]string c = "Not provided")
+        {
+            await ReplyAsync(new EmbedBuilder().AddField("a", a)
+                                               .AddField("b", b)
+                                               .AddField("c", c));
+        }
+
         [Call("Scheduler")]
         async Task TestSchedulerAsync(int delay = 1)
         {
