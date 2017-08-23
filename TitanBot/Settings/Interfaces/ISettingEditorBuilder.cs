@@ -21,6 +21,8 @@ namespace TitanBot.Settings
         ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<IMessageContext, TAccept, ILocalisable<string>> validator);
         ISettingEditorBuilder<TStore, TAccept> SetValidator(Func<TAccept, ILocalisable<string>> validator);
 
+        ISettingEditorBuilder<TStore, TAccept> AllowGroups(bool allow = true);
+
         ISettingEditor Build();
     }
 }

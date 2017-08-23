@@ -21,17 +21,17 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
         [Call]
         [Usage(Usage.GLOBALSETTINGS_DEFAULT)]
-        new Task ListSettingsAsync([Dense]string settingGroup = null)
-            => base.ListSettingsAsync(settingGroup);
+        Task ListSettingsAsync([Dense]string settingGroup = null)
+            => ListSettingsAsync(settingGroup, 0);
 
         [Call("Toggle")]
         [Usage(Usage.GLOBALSETTINGS_TOGGLE)]
-        new Task ToggleSettingAsync(string key)
-            => base.ToggleSettingAsync(key);
+        Task ToggleSettingAsync(string key)
+            => ToggleSettingAsync(key, 0);
 
         [Call("Set")]
         [Usage(Usage.GLOBALSETTINGS_SET)]
-        new Task SetSettingAsync(string key, [Dense]string value = null)
-            => base.SetSettingAsync(key, value);
+        Task SetSettingAsync(string key, [Dense]string value = null)
+            => SetSettingAsync(key, value, 0);
     }
 }
