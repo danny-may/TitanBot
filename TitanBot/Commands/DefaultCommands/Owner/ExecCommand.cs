@@ -150,6 +150,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 }
             }.AddField(f => f.WithName(TBLocalisation.INPUT).WithValue(ExecText.INPUT_FORMAT, code));
 
+            string resAsFile = null;
+
             if (result is Exception exception)
             {
                 builder.WithTitle(ExecText.TITLE_EXCEPTION);
@@ -177,11 +179,20 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                         resString = "[" + string.Join(", ", (result as IEnumerable<object>) ?? new List<string>()) + "]";
                     else
                         resString = result?.ToString();
-                    builder.AddField(f => f.WithName(TBLocalisation.OUTPUT).WithValue(ExecText.OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
+                    if (resString.Length > EmbedFieldBuilder.MaxFieldValueLength - 30)
+                    {
+                        resAsFile = resString;
+                        builder.AddField(f => f.WithName(TBLocalisation.OUTPUT).WithValue(ExecText.OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), "Output too long."));
+                    }
+                    else
+                        builder.AddField(f => f.WithName(TBLocalisation.OUTPUT).WithValue(ExecText.OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
                 }
             }
 
-            await ReplyAsync(builder);
+            if (resAsFile == null)
+                await ReplyAsync(builder);
+            else
+                await Reply().WithEmbedable(Embedable.FromEmbed(builder)).WithAttachment(() => resAsFile.ToStream(), "ExecResult.txt").SendAsync();
         }
 
         public class ExecGlobals
@@ -230,6 +241,16 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                 => Client.GetUser(userId);
             public IGuild GetGuild(ulong guildId)
                 => Client.GetGuild(guildId);
+
+            public string ViewProperties(object obj)
+                => string.Join("\n", obj.GetType().GetProperties().Select(p => $"{p.PropertyType.Name} {p.Name}: {p.GetValue(obj)}"));
+            public string ViewFields(object obj)
+                => string.Join("\n", obj.GetType().GetFields().Select(f => $"{f.FieldType.Name} {f.Name}: {f.GetValue(obj)}"));
+            public string ViewMethods(object obj)
+                => string.Join("\n", obj.GetType().GetMethods().Select(m => $"{m.ReturnType.Name} {m.Name}({string.Join(", ", m.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})"));
+
+            public string ViewAll(object obj)
+                    => $"Properties:\n{ViewProperties(obj)}\n\nFields:\n{ViewFields(obj)}\n\nMethods:\n{ViewMethods(obj)}";
 
             public ExecGlobals(ExecCommand parent)
             {
