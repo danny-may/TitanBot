@@ -141,17 +141,17 @@ namespace TitanBot.Scheduling
             return record.Id;
         }
 
-        public ISchedulerRecord[] Cancel<T>(ulong? guildId, ulong? userId)
+        public ISchedulerRecord[] Cancel<T>(ulong? guildId, ulong? userId, Func<string, bool> predicate = null)
             where T : ISchedulerCallback
         {
             var type = JsonConvert.SerializeObject(typeof(T));
-            Expression<Func<SchedulerRecord, bool>> predicate;
+            var initial = Find(r => !r.IsComplete && r.GuildId == guildId).ToArray() as IEnumerable<SchedulerRecord>;
             if (userId != null)
-                predicate = r => !r.IsComplete && r.GuildId == guildId && r.Callback == type && r.UserId == userId;
-            else
-                predicate = r => !r.IsComplete && r.GuildId == guildId && r.Callback == type;
+                initial = initial.Where(r => r.UserId == userId);
+            if (predicate != null)
+                initial = initial.Where(r => predicate(r.Data));
 
-            return Complete(Find(predicate), null, true);
+            return Complete(initial.ToArray(), null, true);
         }
         public ISchedulerRecord Cancel(ulong id)
             => Cancel(new ulong[] { id })[0];
@@ -190,12 +190,14 @@ namespace TitanBot.Scheduling
         public int ActiveCount()
             => GetActive(DateTime.Now, new TimeSpan()).Count;
 
-        public ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userid) where T : ISchedulerCallback
+        public ISchedulerRecord GetMostRecent<T>(ulong? guildId, ulong? userid, Func<string, bool> predicate = null) where T : ISchedulerCallback
         {
             var type = JsonConvert.SerializeObject(typeof(T));
-            var initial = Find(r => r.Callback == type && r.GuildId == guildId);
+            var initial = Find(r => r.Callback == type && r.GuildId == guildId) as IEnumerable<SchedulerRecord>;
             if (userid != null)
-                initial = initial.Where(r => r.UserId == userid).ToArray();
+                initial = initial.Where(r => r.UserId == userid);
+            if (predicate != null)
+                initial = initial.Where(r => predicate(r.Data));
             return initial.OrderByDescending(r => r.CompleteTime)
                           .ThenByDescending(r => r.StartTime)
                           .FirstOrDefault();
@@ -207,11 +209,6 @@ namespace TitanBot.Scheduling
             CachedHandlers[key] = handler;
             CachedTypes[key] = typeof(T);
 
-        }
-
-        public void Cancel(Expression<Func<ISchedulerRecord, bool>> predicate)
-        {
-            Complete(Find(Expression.Lambda<Func<SchedulerRecord, bool>>(predicate.Body, Expression.Parameter(typeof(SchedulerRecord)))).ToArray(), null, true);
         }
 
         private void Tick(SchedulerRecord[] records, ClockTimerElapsedEventArgs e)
