@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TitanBot
 {
@@ -34,7 +30,7 @@ namespace TitanBot
                         { FOOTER_SUCCESS, "Constructed in: {0}ms | Compiled in: {1}ms | Executed in: {2}ms" },
                         { INPUT_FORMAT, "```csharp\n{0}\n```" },
                         { OUTPUT_NULL, "No output from execution..." },
-                        { OUTPUT_FORMAT, "Type: {0}\n```csharp\n{1)}\n```" },
+                        { OUTPUT_FORMAT, "Type: {0}\n```csharp\n{1}\n```" },
                         { TITLE_EXCEPTION, ":no_entry_sign: Execution Result" },
                         { TITLE_SUCCESS, ":white_check_mark: Execution Result" }
                     }.ToImmutableDictionary();
