@@ -13,15 +13,15 @@ using System.Threading.Tasks;
 using TitanBot.Contexts;
 using TitanBot.Downloader;
 using TitanBot.Formatting;
+using TitanBot.Formatting.Interfaces;
 using TitanBot.Logging;
 using TitanBot.Replying;
 using TitanBot.Scheduling;
 using TitanBot.Settings;
 using TitanBot.Storage;
 using TitanBot.Util;
-using static TitanBot.TBLocalisation.Help;
 using static TitanBot.TBLocalisation.Commands;
-using TitanBot.Formatting.Interfaces;
+using static TitanBot.TBLocalisation.Help;
 
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
@@ -59,7 +59,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
         bool TryConstruct(string code, Assembly[] assemblies, Type globals, out TimeSpan constructTime, out object result)
         {
-            (result, constructTime) = MiscUtil.TimeExecution<object>(() => {
+            (result, constructTime) = MiscUtil.TimeExecution<object>(() =>
+            {
                 try
                 {
                     return CSharpScript.Create(code, ScriptOptions.Default.WithReferences(assemblies), globals);
@@ -74,7 +75,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
         protected virtual bool TryCompile(Script<object> script, out TimeSpan compileTime, out object result)
         {
-            (result, compileTime) = MiscUtil.TimeExecution<object>(() => {
+            (result, compileTime) = MiscUtil.TimeExecution<object>(() =>
+            {
                 try
                 {
                     return script.Compile();
@@ -89,7 +91,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
 
         protected virtual bool TryExecute(Script<object> script, object globals, out TimeSpan execTime, out object result)
         {
-            (result, execTime) = MiscUtil.TimeExecution(() => {
+            (result, execTime) = MiscUtil.TimeExecution(() =>
+            {
                 try
                 {
                     return script.RunAsync(globals).Result?.ReturnValue;
@@ -123,20 +126,20 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             if (!TryConstruct(codeWithUsings, assemblies.ToArray(), globals.GetType(), out var constructTime, out var constructRes))
             {
                 result = constructRes;
-                footerText = new LocalisedString(ExecText.FOOTER_CONSTRUCTFAILED, constructTime);
+                footerText = new LocalisedString(ExecText.FOOTER_CONSTRUCTFAILED, constructTime.TotalMilliseconds);
             }
             else if (!TryCompile(constructRes as Script<object>, out var compileTime, out var compileRes))
             {
                 result = compileRes;
-                footerText = new LocalisedString(ExecText.FOOTER_COMPILEFAILED, constructTime, compileTime);
+                footerText = new LocalisedString(ExecText.FOOTER_COMPILEFAILED, constructTime.TotalMilliseconds, compileTime.TotalMilliseconds);
             }
             else if (!TryExecute(constructRes as Script<object>, globals, out var execTime, out result))
             {
-                footerText = new LocalisedString(ExecText.FOOTER_EXECUTEFAILED, constructTime, compileTime, execTime);
+                footerText = new LocalisedString(ExecText.FOOTER_EXECUTEFAILED, constructTime.TotalMilliseconds, compileTime.TotalMilliseconds, execTime.TotalMilliseconds);
             }
             else
             {
-                footerText = new LocalisedString(ExecText.FOOTER_SUCCESS, constructTime, compileTime, execTime);
+                footerText = new LocalisedString(ExecText.FOOTER_SUCCESS, constructTime.TotalMilliseconds, compileTime.TotalMilliseconds, execTime.TotalMilliseconds);
             }
 
             var builder = new LocalisedEmbedBuilder
@@ -174,10 +177,10 @@ namespace TitanBot.Commands.DefaultCommands.Owner
                         resString = "[" + string.Join(", ", (result as IEnumerable<object>) ?? new List<string>()) + "]";
                     else
                         resString = result?.ToString();
-                    builder.AddField(f => f.WithName(TBLocalisation.OUTPUT).WithName(ExecText.OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
+                    builder.AddField(f => f.WithName(TBLocalisation.OUTPUT).WithValue(ExecText.OUTPUT_FORMAT, Format.Sanitize(result?.GetType().ToString() ?? ""), Format.Sanitize(resString ?? "")));
                 }
             }
-            
+
             await ReplyAsync(builder);
         }
 
@@ -208,13 +211,25 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             private Func<IUserMessage, IModifyContext> ModifyBase { get; }
             private Func<IUserMessage, IUser, IModifyContext> ModifyUser { get; }
 
+            public async ValueTask<IUserMessage> QuickReply(string message)
+                => await Reply().WithMessage((RawString)message).SendAsync();
+            public async ValueTask<IUserMessage> QuickReply(ulong channel, string message)
+                => await Reply(Client.GetChannel(channel) as IMessageChannel ?? Context.Channel).WithMessage((RawString)message).SendAsync();
+
             public IReplyContext Reply() => ReplyBase();
             public IReplyContext Reply(IMessageChannel channel) => ReplyChannel(channel);
             public IReplyContext Reply(IUser user) => ReplyUser(user);
-            public IReplyContext Reply(IMessageChannel channel, IUser user)  => ReplyBoth(channel, user);
+            public IReplyContext Reply(IMessageChannel channel, IUser user) => ReplyBoth(channel, user);
 
             public IModifyContext Modify(IUserMessage message) => ModifyBase(message);
             public IModifyContext Modify(IUserMessage message, IUser user) => ModifyUser(message, user);
+
+            public IChannel GetChannel(ulong channelId)
+                => Client.GetChannel(channelId);
+            public IUser GetUser(ulong userId)
+                => Client.GetUser(userId);
+            public IGuild GetGuild(ulong guildId)
+                => Client.GetGuild(guildId);
 
             public ExecGlobals(ExecCommand parent)
             {
