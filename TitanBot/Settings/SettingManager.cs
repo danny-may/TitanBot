@@ -116,7 +116,7 @@ namespace TitanBot.Settings
         public void SetGroup(ulong entity, int value, string[] keys)
         {
             var record = CachedGroups[entity] ?? new GroupingMap { Id = entity };
-            record.Mapping[value] = keys;
+            record.Mapping[value] = keys.Select(k => k.ToLower()).Distinct().ToArray();
             Database.Upsert(record).Wait();
         }
 
