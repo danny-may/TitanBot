@@ -32,12 +32,12 @@ namespace System
         public static string RegexReplace(this string text, string pattern, MatchEvaluator evaluator, RegexOptions options, TimeSpan matchTimeout)
             => Regex.Replace(text, pattern, evaluator, options, matchTimeout);
 
-        private static IEnumerable<(int From, int To)> GetBlockRanges(this string text)
+        public static IEnumerable<(int From, int To)> GetBlockRanges(this string text)
         {
             bool isEscaped = false;
             bool isQuote = false;
             bool isArray = false;
-            bool prevWasSpace = false;
+            bool prevWasSpace = true;
             bool isFlag = false;
             int previousSplit = 0;
             for (int i = 0; i < text.Length; i++)
@@ -75,7 +75,7 @@ namespace System
                     case ' ':
                         if (!isArray && !isQuote)
                             prevWasSpace = true;
-                        if (!isArray && !isQuote && !isFlag && (i + 1 == text.Length || text[i+1] != ' '))
+                        if (!isArray && !isQuote && !isFlag && (i + 1 == text.Length || text[i + 1] != ' '))
                         {
                             yield return (previousSplit, i);
                             previousSplit = i + 1;
@@ -182,12 +182,12 @@ namespace System
                 {
                     var flagCount = split[0].Substring(1).Length;
                     var flagValues = new string[flagCount];
-                    flagValues[flagCount-1] = split.Length == 2 ? split[1] : null;
+                    flagValues[flagCount - 1] = split.Length == 2 ? split[1] : null;
                     flagKeyValues.AddRange(flagValues.Zip(split[0].Substring(1), (v, k) => (k.ToString(), v)));
                 }
             }
             flags = flagKeyValues.ToArray();
-            
+
             if (maxLength == 0)
                 return new string[0];
 

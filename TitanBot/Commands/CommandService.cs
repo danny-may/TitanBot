@@ -98,8 +98,9 @@ namespace TitanBot.Commands
         public void ParseAndExecute(IUserMessage message)
         {
             var context = DependencyFactory.WithInstance(message)
+                                           .WithInstance(SettingsManager.GetContext(SettingsManager.Global).Get<GeneralGlobalSetting>().DefaultPrefix)
                                            .Construct<ICommandContext>();
-            context.CheckCommand(this, SettingsManager.GetContext(SettingsManager.Global).Get<GeneralGlobalSetting>().DefaultPrefix);
+            //context.CheckCommand(this, SettingsManager.GetContext(SettingsManager.Global).Get<GeneralGlobalSetting>().DefaultPrefix);
             if (Processor.ShouldRun(context, out var call))
                 CommandQueue.Run(call);
         }

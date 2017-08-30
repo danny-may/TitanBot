@@ -260,6 +260,7 @@
     <Compile Include="Models\Range.cs" />
     <Compile Include="Contexts\Interfaces\ISchedulerContext.cs" />
     <Compile Include="Contexts\SchedulerContext.cs" />
+    <Compile Include="Settings\Models\GroupingMap.cs" />
     <Compile Include="Settings\SettingEditorBuilder.cs" />
     <Compile Include="Settings\Default\GeneralGlobalSetting.cs" />
     <Compile Include="Settings\Default\GeneralGuildSetting.cs" />

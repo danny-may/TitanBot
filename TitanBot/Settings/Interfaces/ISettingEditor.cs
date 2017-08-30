@@ -9,9 +9,10 @@ namespace TitanBot.Settings
     {
         string Name { get; }
         string[] Aliases { get; }
+        bool AllowGroups { get; }
         Type Type { get; }
-        bool TrySet(ICommandContext context, IEntity<ulong> entity, object value, out ILocalisable<string> errors);
-        ILocalisable<string> Display(ICommandContext context, IEntity<ulong> entity);
-        object Get(IEntity<ulong> entity);
+        bool TrySet(ICommandContext context, IEntity<ulong> entity, int group, object value, out ILocalisable<string> errors);
+        ILocalisable<string> Display(ICommandContext context, IEntity<ulong> entity, int group);
+        object Get(IEntity<ulong> entity, int group);
     }
 }

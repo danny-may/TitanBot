@@ -11,7 +11,7 @@ namespace TitanBot.Contexts
         bool IsCommand { get; }
         bool ExplicitPrefix { get; }
 
-        void CheckCommand(ICommandService commandService, string defaultPrefix);
+        //void CheckCommand(ICommandService commandService, string defaultPrefix);
         string[] SplitArguments(bool ignoreFlags, out (string Key, string Value)[] flags, int? maxLength = null, int? densePos = null);
     }
 }

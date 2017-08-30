@@ -19,6 +19,8 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
         protected abstract IReadOnlyList<ISettingEditorCollection> Settings { get; }
         protected abstract IEntity<ulong> SettingContext { get; }
 
+        protected virtual Color EmbedColour { get; } = System.Drawing.Color.SkyBlue.ToDiscord();
+
         public SettingCommand(ITypeReaderCollection readers)
         {
             Readers = readers;
@@ -34,11 +36,55 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             return editor;
         }
 
-        protected async Task ListSettingsAsync(string settingGroup = null)
+        protected int GetGroup(string groupName)
+        {
+            if (groupName == null)
+                return 0;
+            return SettingsManager.GetGroups(SettingContext)
+                                  .Select(g => new { Key = g.Key, Values = g.Value })
+                                  .FirstOrDefault(g => g.Values.Contains(groupName.ToLower()))?.Key ?? -1;
+        }
+        protected async Task SetGroup(int groupId, string[] names)
+        {
+            SettingsManager.SetGroup(SettingContext, groupId, names);
+            await ReplyAsync(SettingText.GROUP_SET, ReplyType.Success, groupId, string.Join(", ", names));
+        }
+        protected async Task RemoveGroup(int groupid)
+        {
+            SettingsManager.RemoveGroup(SettingContext, groupid);
+            await ReplyAsync(SettingText.GROUP_REMOVED, ReplyType.Success, groupid);
+        }
+
+        protected async Task ListGroups()
+        {
+            var groups = SettingsManager.GetGroups(SettingContext);
+            if (groups.Count == 0)
+            {
+                await ReplyAsync(SettingText.NO_GROUPS, ReplyType.Error, Prefix, CommandName);
+                return;
+            }
+
+            var builder = new LocalisedEmbedBuilder
+            {
+                Color = EmbedColour,
+                Timestamp = DateTime.Now,
+                Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl())
+                                                     .WithText(SettingText.FOOTERTEXT, BotUser.Username)
+            };
+
+            foreach (var group in groups)
+                builder.AddInlineField(f => f.WithName(SettingText.GROUP_ID, group.Key).WithRawValue(string.Join(", ", group.Value)));
+            await ReplyAsync(builder);
+        }
+
+        private bool AllowGroup(int group, ISettingEditor settings)
+            => settings.AllowGroups || group == 0;
+
+        protected async Task ListSettingsAsync(string settingGroup, int group)
         {
             var builder = new LocalisedEmbedBuilder
             {
-                Color = System.Drawing.Color.SkyBlue.ToDiscord(),
+                Color = EmbedColour,
                 Timestamp = DateTime.Now,
                 Footer = new LocalisedFooterBuilder().WithRawIconUrl(BotUser.GetAvatarUrl())
                                                      .WithText(SettingText.FOOTERTEXT, BotUser.Username)
@@ -64,15 +110,22 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 await ReplyAsync(SettingText.INVALIDGROUP, ReplyType.Error, settingGroup);
                 return;
             }
-            
-            builder.WithTitle(SettingText.TITLE_GROUP, groups.First().Name);
-            foreach (var setting in groups.SelectMany(s => s))
+
+            var editors = groups.SelectMany(s => s).Where(e => e.AllowGroups || group == 0);
+            if (editors.Count() == 0)
             {
-                var value = setting.Display(Context, SettingContext);
+                await ReplyAsync(SettingText.GROUP_DISALLOWED, ReplyType.Error);
+                return;
+            }
+
+            builder.WithTitle(SettingText.TITLE_GROUP, groups.First().Name);
+            foreach (var editor in editors)
+            {
+                var value = editor.Display(Context, SettingContext, group);
                 if (value == null)
-                    builder.AddInlineField(f => f.WithRawName(setting.Name).WithValue(SettingText.NOTSET));
+                    builder.AddInlineField(f => f.WithRawName(editor.Name).WithValue(SettingText.NOTSET));
                 else
-                    builder.AddInlineField(f => f.WithRawName(setting.Name).WithValue(value));
+                    builder.AddInlineField(f => f.WithRawName(editor.Name).WithValue(value));
             }
             var descriptions = LocalisedString.JoinEnumerable("\n", groups.Where(g => g.Description != null).Select(g => g.Description));
             var notes = LocalisedString.JoinEnumerable("\n", groups.Where(g => g.Notes != null).Select(g => g.Notes));
@@ -92,28 +145,30 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
                 return x;
             });
 
-        protected async Task ToggleSettingAsync(string key)
+        protected async Task ToggleSettingAsync(string key, int group)
         {
             var setting = Find(key);
             if (setting == null)
                 await ReplyAsync(SettingText.KEY_NOTFOUND, ReplyType.Error, key);
             else if (setting.Type != typeof(bool))
                 await ReplyAsync(SettingText.UNABLE_TOGGLE, ReplyType.Error, key);
+            else if (!setting.AllowGroups && group != 0)
+                await ReplyAsync(SettingText.GROUP_DISALLOWED, ReplyType.Error);
             else
             {
-                var oldValue = (bool)setting.Get(SettingContext);
-                var oldDisplay = setting.Display(Context, SettingContext);
-                if (!setting.TrySet(Context, SettingContext, !oldValue, out var errors))
+                var oldValue = (bool)setting.Get(SettingContext, group);
+                var oldDisplay = setting.Display(Context, SettingContext, group);
+                if (!setting.TrySet(Context, SettingContext, group, !oldValue, out var errors))
                     await ReplyAsync(errors);
                 else
                 {
-                    var newDisplay = setting.Display(Context, SettingContext);
+                    var newDisplay = setting.Display(Context, SettingContext, group);
                     var builder = new LocalisedEmbedBuilder
                     {
                         Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl())
                                                              .WithText(BotUser.Username),
                         Timestamp = DateTime.Now,
-                        Color = System.Drawing.Color.SkyBlue.ToDiscord(),
+                        Color = EmbedColour,
                     }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
                      .AddField(f => f.WithName(SettingText.VALUE_OLD)
                                      .WithValue(ValueViewer(oldDisplay)))
@@ -124,34 +179,36 @@ namespace TitanBot.Commands.DefaultCommands.Abstract
             }
         }
 
-        protected async Task SetSettingAsync(string key, string value = null)
+        protected async Task SetSettingAsync(string key, string value, int group)
         {
             var setting = Find(key);
             if (setting == null)
                 await ReplyAsync(SettingText.KEY_NOTFOUND, ReplyType.Error, key);
+            else if (!setting.AllowGroups && group != 0)
+                await ReplyAsync(SettingText.GROUP_DISALLOWED, ReplyType.Error);
             else
             {
                 var readerResult = await Readers.Read(setting.Type, Context, value);
-            
+
                 if (!readerResult.IsSuccess)
                 {
                     await ReplyAsync(SettingText.VALUE_INVALID, ReplyType.Error, setting.Name, value);
                     return;
                 }
-            
-                var oldValue = setting.Display(Context, SettingContext);
-            
-                if (!setting.TrySet(Context, SettingContext, readerResult.Best, out var errors))
+
+                var oldValue = setting.Display(Context, SettingContext, group);
+
+                if (!setting.TrySet(Context, SettingContext, group, readerResult.Best, out var errors))
                     await ReplyAsync(errors);
                 else
                 {
-                    var newValue = setting.Display(Context, SettingContext);
+                    var newValue = setting.Display(Context, SettingContext, group);
                     var builder = new LocalisedEmbedBuilder
                     {
                         Footer = new LocalisedFooterBuilder().WithIconUrl(BotUser.GetAvatarUrl())
                                                              .WithText(BotUser.Username),
                         Timestamp = DateTime.Now,
-                        Color = System.Drawing.Color.SkyBlue.ToDiscord(),
+                        Color = EmbedColour,
                     }.WithTitle(SettingText.VALUE_CHANGED_TITLE, setting.Name)
                      .AddField(f => f.WithName(SettingText.VALUE_OLD)
                                      .WithValue(ValueViewer(oldValue)))

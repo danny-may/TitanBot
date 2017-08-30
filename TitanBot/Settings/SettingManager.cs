@@ -2,8 +2,10 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using TitanBot.Dependencies;
+using TitanBot.Helpers;
 using TitanBot.Storage;
 
 namespace TitanBot.Settings
@@ -20,13 +22,16 @@ namespace TitanBot.Settings
         private IDatabase Database { get; }
         private IDependencyFactory Factory { get; }
         private Dictionary<SettingScope, Dictionary<Type, ISettingEditorCollection>> _settingEditors { get; } = new Dictionary<SettingScope, Dictionary<Type, ISettingEditorCollection>>();
-        private Dictionary<ulong, ISettingContext> Cached { get; } = new Dictionary<ulong, ISettingContext>();
+        private CachedDictionary<ulong, SettingContext> CachedContexts { get; }
+        private CachedDictionary<ulong, GroupingMap> CachedGroups { get; }
 
         public SettingManager(IDatabase database, IDependencyFactory factory)
         {
             Global = new GlobalEntity();
             Database = database;
             Factory = factory;
+            CachedContexts = CachedDictionary.FromSource((ulong e) => new SettingContext(Database, e));
+            CachedGroups = CachedDictionary.FromSource((ulong e) => Database.FindById<GroupingMap>(e).Result ?? new GroupingMap { Id = e });
         }
 
         public ISettingContext GetContext(IEntity<ulong> entity)
@@ -37,11 +42,7 @@ namespace TitanBot.Settings
         }
 
         public ISettingContext GetContext(ulong entity)
-        {
-            if (!Cached.ContainsKey(entity))
-                Cached[entity] = new SettingContext(Database, entity);
-            return Cached[entity];
-        }
+            => CachedContexts[entity];
 
         public ISettingEditorCollection<T> GetEditorCollection<T>(SettingScope scope)
         {
@@ -99,6 +100,36 @@ namespace TitanBot.Settings
                     record.Serialized = parsed.ToString();
             }
             await Database.Upsert(records);
+        }
+
+
+        public IReadOnlyDictionary<int, string[]> GetGroups(IEntity<ulong> entity)
+            => entity == null ? null : GetGroups(entity.Id);
+        public IReadOnlyDictionary<int, string[]> GetGroups(ulong entity)
+            => CachedGroups[entity].Mapping.ToImmutableDictionary();
+
+        public void SetGroup(IEntity<ulong> entity, int value, string[] keys)
+        {
+            if (entity != null)
+                SetGroup(entity.Id, value, keys);
+        }
+        public void SetGroup(ulong entity, int value, string[] keys)
+        {
+            var record = CachedGroups[entity] ?? new GroupingMap { Id = entity };
+            record.Mapping[value] = keys.Select(k => k.ToLower()).Concat(new[] { value.ToString() }).Distinct().ToArray();
+            Database.Upsert(record).Wait();
+        }
+
+        public void RemoveGroup(IEntity<ulong> entity, int value)
+        {
+            if (entity != null)
+                RemoveGroup(entity.Id, value);
+        }
+        public void RemoveGroup(ulong entity, int value)
+        {
+            var record = CachedGroups[entity] ?? new GroupingMap { Id = entity };
+            record.Mapping.Remove(value);
+            Database.Upsert(record).Wait();
         }
     }
 }

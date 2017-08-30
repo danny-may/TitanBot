@@ -10,8 +10,8 @@ namespace TitanBot.Settings
 {
     class SettingEditor<TSetting, TStore, TAccept> : ISettingEditor
     {
-        Func<IEntity<ulong>, TSetting> SettingGetter { get; }
-        Action<IEntity<ulong>, Action<TSetting>> Editor { get; }
+        Func<IEntity<ulong>, int, TSetting> SettingGetter { get; }
+        Action<IEntity<ulong>, int, Action<TSetting>> Editor { get; }
         Func<IMessageContext, TAccept, TStore> Converter { get; }
         Func<IMessageContext, TStore, ILocalisable<string>> Viewer { get; }
         Func<IMessageContext, TAccept, ILocalisable<string>> Validator { get; }
@@ -22,19 +22,22 @@ namespace TitanBot.Settings
         public string Name { get; }
         public string[] Aliases { get; }
         public Type Type => typeof(TAccept);
+        public bool AllowGroups { get; }
 
-        public SettingEditor(Func<IEntity<ulong>, TSetting> getter, 
-                             Action<IEntity<ulong>, Action<TSetting>> editor, 
+        public SettingEditor(Func<IEntity<ulong>, int, TSetting> getter,
+                             Action<IEntity<ulong>, int, Action<TSetting>> editor,
                              string name,
                              string[] aliases,
                              Expression<Func<TSetting, TStore>> property,
                              Func<IMessageContext, TAccept, TStore> converter,
                              Func<IMessageContext, TStore, ILocalisable<string>> viewer,
-                             Func<IMessageContext, TAccept, ILocalisable<string>> validator)
+                             Func<IMessageContext, TAccept, ILocalisable<string>> validator,
+                             bool allowGroups)
         {
             Name = name;
             Aliases = aliases;
             SettingGetter = getter;
+            AllowGroups = allowGroups;
             Editor = editor;
             Converter = converter;
             Viewer = viewer ?? ((c, s) => (RawString)s?.ToString());
@@ -44,22 +47,38 @@ namespace TitanBot.Settings
             Getter = property.Compile();
         }
 
-        public object Get(IEntity<ulong> entity)
-            => Getter(SettingGetter(entity));
+        private bool CheckGroup(int group)
+            => !(AllowGroups || group == 0) ? throw new InvalidOperationException("This editable setting does not permit groups") : true;
 
-        public ILocalisable<string> Display(ICommandContext context, IEntity<ulong> entity)
-            => Viewer(context, (TStore)Get(entity));
+        public object Get(IEntity<ulong> entity, int group)
+        {
+            if (CheckGroup(group))
+                return Getter(SettingGetter(entity, group));
+            return null;
+        }
 
-        public bool TrySet(ICommandContext context, IEntity<ulong> entity, object value, out ILocalisable<string> error)
-            => TrySet(context, entity, (TAccept)value, out error);
+        public ILocalisable<string> Display(ICommandContext context, IEntity<ulong> entity, int group)
+        {
+            if (CheckGroup(group))
+                return Viewer(context, (TStore)Get(entity, group));
+            return null;
+        }
 
-        private bool TrySet(ICommandContext context, IEntity<ulong> entity, TAccept value, out ILocalisable<string> error)
+        public bool TrySet(ICommandContext context, IEntity<ulong> entity, int group, object value, out ILocalisable<string> error)
+        {
+            error = null;
+            if (CheckGroup(group))
+                return TrySet(context, entity, group, (TAccept)value, out error);
+            return false;
+        }
+
+        private bool TrySet(ICommandContext context, IEntity<ulong> entity, int group, TAccept value, out ILocalisable<string> error)
         {
             error = Validator(context, value);
             if (error != null)
                 return false;
 
-            Editor(entity, s => Setter(s, Converter(context, value)));
+            Editor(entity, group, s => Setter(s, Converter(context, value)));
             return true;
         }
 

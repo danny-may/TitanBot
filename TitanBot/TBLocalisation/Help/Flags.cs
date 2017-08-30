@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TitanBot
 {
@@ -16,11 +12,13 @@ namespace TitanBot
                 private const string BASE_PATH = Help.BASE_PATH + "FLAG_";
 
                 public const string EXCEPTION_F = BASE_PATH + nameof(EXCEPTION_F);
+                public const string PREFERENCES_G = BASE_PATH + nameof(PREFERENCES_G);
 
                 public static IReadOnlyDictionary<string, string> Defaults { get; }
                     = new Dictionary<string, string>
                     {
-                        { EXCEPTION_F, "Returns the full exception in a file" }
+                        { EXCEPTION_F, "Returns the full exception in a file" },
+                        { PREFERENCES_G, "Specifies what group you are interested in" }
                     }.ToImmutableDictionary();
             }
         }

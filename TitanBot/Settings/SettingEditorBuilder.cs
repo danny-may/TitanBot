@@ -3,13 +3,13 @@ using System.Linq.Expressions;
 using System.Reflection;
 using TitanBot.Contexts;
 using TitanBot.Formatting.Interfaces;
-using TitanBot.Util;
 
 namespace TitanBot.Settings
 {
     class SettingEditorBuilder<TSetting, TStore, TAccept> : ISettingEditorBuilder<TStore, TAccept>
     {
         public string Name { get; private set; }
+        public bool AllowGroups { get; private set; }
         public string[] Aliases { get; private set; }
         public Func<IMessageContext, TAccept, TStore> Converter { get; }
         public Func<IMessageContext, TAccept, ILocalisable<string>> Validator { get; private set; }
@@ -29,8 +29,8 @@ namespace TitanBot.Settings
         {
             if (Converter == null)
                 throw new InvalidOperationException($"No method of conversion from {typeof(TAccept)} to {typeof(TStore)} has been specified!");
-            return new SettingEditor<TSetting, TStore, TAccept>(e => Parent.GetContext(e).Get<TSetting>(), (e, s) => Parent.GetContext(e).Edit(s),
-                                                            string.IsNullOrWhiteSpace(Name) ? GetName(Property) : Name, Aliases, Property, Converter, Viewer, Validator);
+            return new SettingEditor<TSetting, TStore, TAccept>((e, g) => Parent.GetContext(e).Get<TSetting>(g), (e, g, s) => Parent.GetContext(e).Edit(g, s),
+                                                            string.IsNullOrWhiteSpace(Name) ? GetName(Property) : Name, Aliases, Property, Converter, Viewer, Validator, AllowGroups);
         }
 
         public ISettingEditorBuilder<TStore, TAccept> SetName(string name)
@@ -61,6 +61,12 @@ namespace TitanBot.Settings
         public ISettingEditorBuilder<TStore, TAccept> SetAlias(params string[] aliases)
         {
             Aliases = aliases;
+            return this;
+        }
+
+        ISettingEditorBuilder<TStore, TAccept> ISettingEditorBuilder<TStore, TAccept>.AllowGroups(bool allow)
+        {
+            AllowGroups = allow;
             return this;
         }
     }

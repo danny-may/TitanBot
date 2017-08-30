@@ -50,7 +50,7 @@ namespace TitanBot.Contexts
         private Lazy<ISettingContext> _guildSettings { get; }
 
 
-        internal CommandContext(IUserMessage message, IDependencyFactory factory)
+        internal CommandContext(IUserMessage message, IDependencyFactory factory, ICommandService commandService, string defaultPrefix)
         {
             Client = factory.Get<DiscordSocketClient>();
             Message = message;
@@ -68,11 +68,13 @@ namespace TitanBot.Contexts
             _formatter = new Lazy<ValueFormatter>(() => factory.GetOrStore<ValueFormatter>());
             _textResource = new Lazy<ITextResourceCollection>(() => TextManager.GetForLanguage(GeneralGuildSetting?.PreferredLanguage ?? GeneralUserSetting.Language, GeneralUserSetting.FormatType));
             _replier = new Lazy<IReplier>(() => factory.GetOrStore<IReplier>());
+
+            CheckCommand(commandService, defaultPrefix);
         }
 
-        public void CheckCommand(ICommandService commandService, string defaultPrefix)
+        private void CheckCommand(ICommandService commandService, string defaultPrefix)
         {
-            if ((GeneralGuildSetting?.Prefix != null && Message.HasStringPrefix(GeneralGuildSetting.Prefix, out int prefixLength, StringComparison.InvariantCultureIgnoreCase)) || 
+            if ((GeneralGuildSetting?.Prefix != null && Message.HasStringPrefix(GeneralGuildSetting.Prefix, out int prefixLength, StringComparison.InvariantCultureIgnoreCase)) ||
                 Message.HasStringPrefix(defaultPrefix, out prefixLength, StringComparison.InvariantCultureIgnoreCase))
                 ExplicitPrefix = true;
             else if (Message.HasStringPrefix(Client.CurrentUser.Username + " ", out prefixLength, StringComparison.InvariantCultureIgnoreCase) ||
