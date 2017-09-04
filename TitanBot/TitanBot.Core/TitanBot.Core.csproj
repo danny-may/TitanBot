@@ -5,11 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.1" />
+    <Compile Remove="Services\Command\**" />
+    <EmbeddedResource Remove="Services\Command\**" />
+    <None Remove="Services\Command\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Messaging\" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

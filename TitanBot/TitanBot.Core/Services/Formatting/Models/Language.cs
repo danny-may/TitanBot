@@ -1,41 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace TitanBot.Core.Services.Formatting.Models
 {
-    public struct Language
+    public struct Language : IDisplayable<string>
     {
-        public static readonly Language DEFAULT = "English";
+        #region Statics
+
+        public static readonly Language DEFAULT = 0;
 
         public static readonly HashSet<Language> KnownLanguages = new HashSet<Language>();
 
-        private readonly string _id;
-        private readonly string _idUpper;
+        public static string GetNameKey(int id)
+            => $"LANUGAGE_{id}_NAME";
 
-        private Language(string id)
+        #endregion Statics
+
+        #region Fields
+
+        private readonly int _id;
+
+        #endregion Fields
+
+        #region Constructors
+
+        private Language(int id)
         {
             _id = id;
-            _idUpper = id.ToUpperInvariant();
             KnownLanguages.Add(this);
         }
 
+        #endregion Constructors
+
+        #region Methods
+
+        public string GetNameKey()
+            => GetNameKey(this);
+
+        #endregion Methods
+
+        #region Overrides
+
         public override bool Equals(object obj)
-            => obj is Language other && other._idUpper == _idUpper;
+            => obj is Language other && other._id == _id;
 
         public override int GetHashCode()
-            => _idUpper.GetHashCode();
+            => _id.GetHashCode();
 
-        public static implicit operator Language(string id)
+        #endregion Overrides
+
+        #region Operators
+
+        public static implicit operator Language(int id)
             => new Language(id);
 
-        public static implicit operator string(Language lang)
+        public static implicit operator int(Language lang)
             => lang._id;
 
         public static bool operator ==(Language l1, Language l2)
-            => l1._idUpper == l2._idUpper;
+            => l1._id == l2._id;
 
         public static bool operator !=(Language l1, Language l2)
-             => l1._idUpper != l2._idUpper;
+             => l1._id != l2._id;
+
+        #endregion Operators
+
+        #region IDisplayable
+
+        object IDisplayable.Display(ITranslationSet translations, IValueFormatter formatter)
+            => Display(translations, formatter);
+
+        public string Display(ITranslationSet translations, IValueFormatter formatter)
+            => TransKey.From(GetNameKey(this)).Display(translations, formatter);
+
+        #endregion IDisplayable
     }
 }

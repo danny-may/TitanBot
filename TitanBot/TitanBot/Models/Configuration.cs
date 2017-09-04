@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using TitanBot.Core.Models;
 
 namespace TitanBot.Models
@@ -20,7 +18,9 @@ namespace TitanBot.Models
         private static FileInfo _file => new FileInfo(Path.Combine(AppContext.BaseDirectory, FileName));
 
         public string Token { get; set; } = "";
+
         public string Prefix { get; set; } = "t$";
+
         public ulong[] Owners { get; set; } = new ulong[0];
 
         public void Save()
@@ -34,21 +34,15 @@ namespace TitanBot.Models
                     property.SetValue(this, property.GetValue(updated));
         }
 
-        private static void EnsureDirectory()
-        {
-            if (!_file.Directory.Exists)
-                _file.Directory.Create();
-        }
-
         public static void Save(Configuration<T> config)
         {
-            EnsureDirectory();
+            FileExtensions.EnsureDirectory(_file.Directory);
             File.WriteAllText(_file.FullName, JsonConvert.SerializeObject(config, Formatting.Indented));
         }
 
         public static Configuration<T> Load()
         {
-            EnsureDirectory();
+            FileExtensions.EnsureDirectory(_file.Directory);
             if (!_file.Exists)
                 Save(new T());
             var config = JsonConvert.DeserializeObject<T>(_file.OpenText().ReadToEnd());

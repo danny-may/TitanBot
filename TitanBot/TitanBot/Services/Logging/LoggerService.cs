@@ -1,30 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
-using TitanBot.Core.Services.Logging;
-using Discord.WebSocket;
+﻿using Discord;
+using System;
 using System.IO;
+using System.Threading.Tasks;
+using TitanBot.Core.Services.Logging;
 using TitanBot.Utility;
 
 namespace TitanBot.Services.Logging
 {
     public class LoggerService : ILoggerService
     {
-        protected readonly DiscordSocketClient Discord;
+        #region Fields
 
         protected readonly string LogPath = $"./logs/{DateTime.UtcNow.ToString("yyyy-MM-dd-hh-mm-ss")}.txt";
+
         protected FileInfo LogFile => new FileInfo(Path.Combine(AppContext.BaseDirectory, LogPath));
 
         protected readonly ProcessingQueue Queue = new ProcessingQueue();
 
-        public LoggerService(DiscordSocketClient discord)
-        {
-            Discord = discord;
+        #endregion Fields
 
-            Discord.Log += LogAsync;
-        }
+        #region Methods
+
+        private Task LogString(string message)
+            => Queue.Run(async () =>
+            {
+                if (!LogFile.Directory.Exists)
+                    LogFile.Directory.Create();
+                if (!LogFile.Exists)
+                    LogFile.Create().Dispose();
+
+                File.AppendAllText(LogFile.FullName, message + "\n");
+
+                await Console.Out.WriteLineAsync(message);
+            });
+
+        #endregion Methods
+
+        #region ILoggerService
 
         public async void Log(ILoggable entry)
             => await LogAsync(entry);
@@ -56,17 +68,6 @@ namespace TitanBot.Services.Logging
         public Task LogAsync(LogMessage message)
             => LogString($"{DateTime.UtcNow.ToString("hh:mm:ss")} [{message.Severity}] {message.Source}: {message.Exception?.ToString() ?? message.Message}");
 
-        private Task LogString(string message)
-            => Queue.Run(async () =>
-            {
-                if (!LogFile.Directory.Exists)
-                    LogFile.Directory.Create();
-                if (!LogFile.Exists)
-                    LogFile.Create().Dispose();
-
-                File.AppendAllText(LogFile.FullName, message + "\n");
-
-                await Console.Out.WriteLineAsync(message);
-            });
+        #endregion ILoggerService
     }
 }
