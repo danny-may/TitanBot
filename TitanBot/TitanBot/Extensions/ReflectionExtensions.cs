@@ -27,5 +27,8 @@ namespace System.Reflection
 
         public static string GetMemberName<T, TValue>(Expression<Func<T, TValue>> memberAccess)
             => ((MemberExpression)memberAccess.Body).Member.Name;
+
+        public static Type GetInterface<TInterface>(this Type type)
+            => type.GetInterfaces().FirstOrDefault(i => i == typeof(TInterface));
     }
 }

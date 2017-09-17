@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Command\**" />
-    <EmbeddedResource Remove="Services\Command\**" />
-    <None Remove="Services\Command\**" />
+    <Compile Remove="Services\Command\Attributes\**" />
+    <EmbeddedResource Remove="Services\Command\Attributes\**" />
+    <None Remove="Services\Command\Attributes\**" />
   </ItemGroup>
 
   <ItemGroup>

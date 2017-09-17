@@ -4,13 +4,17 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using TitanBot.Core.Models;
+using TitanBot.Core.Models.Contexts;
 using TitanBot.Core.Services;
+using TitanBot.Core.Services.Command;
 using TitanBot.Core.Services.Database;
 using TitanBot.Core.Services.Formatting;
 using TitanBot.Core.Services.Logging;
 using TitanBot.Core.Services.Messaging;
 using TitanBot.Models;
+using TitanBot.Models.Contexts;
 using TitanBot.Services;
+using TitanBot.Services.Command.Models;
 using TitanBot.Services.Database;
 using TitanBot.Services.Formatting;
 using TitanBot.Services.Logging;
@@ -25,8 +29,9 @@ namespace TitanBot.Console
 
         public async Task StartAsync()
         {
-            var services = new ServiceCollection()
-                .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+            var factory = new ServiceFactory(services =>
+            {
+                services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     LogLevel = LogSeverity.Debug,
                     MessageCacheSize = 1000
@@ -38,13 +43,15 @@ namespace TitanBot.Console
                 .AddSingleton<IDatabaseService, DatabaseService>()
                 .AddSingleton<IFormatterService, FormatterService>()
                 .AddSingleton<IConfiguration>(TBConfig.Load())
+                .AddSingleton<ICommandService, CommandService>()
+                .AddSingleton<ICommandContext, CommandContext>()
                 .AddSingleton(new Random());
+            });
 
-            var provider = services.BuildServiceProvider();
-
-            provider.GetRequiredService<ILoggerService>();
-            var messager = provider.GetRequiredService<IMessageService>();
-            var startup = provider.GetRequiredService<IStartupService>();
+            factory.GetRequiredService<ILoggerService>();
+            factory.GetRequiredService<IMessageService>();
+            factory.GetRequiredService<ICommandService>();
+            var startup = factory.GetRequiredService<IStartupService>();
 
             await startup.StartAsync();
             await startup.WhileRunning;

@@ -6,10 +6,15 @@
 
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TitanBot.Core\TitanBot.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Command\Attributes\" />
   </ItemGroup>
 
 </Project>
