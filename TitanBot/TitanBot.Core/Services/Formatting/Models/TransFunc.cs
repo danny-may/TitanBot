@@ -26,6 +26,13 @@ namespace TitanBot.Core.Services.Formatting.Models
 
         #endregion Constructors
 
+        #region Overrides
+
+        public override string ToString()
+            => Localisation.ToString();
+
+        #endregion Overrides
+
         #region Operators
 
         public static implicit operator TransFunc(Func<ITranslationSet, IValueFormatter, string> func)

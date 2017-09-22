@@ -36,6 +36,13 @@ namespace TitanBot.Core.Services.Formatting.Models
 
         #endregion Constructors
 
+        #region Overrides
+
+        public override string ToString()
+            => Key;
+
+        #endregion Overrides
+
         #region IDisplayable
 
         object IDisplayable.Display(ITranslationSet translations, IValueFormatter formatter)

@@ -45,11 +45,18 @@ namespace TitanBot.Core.Services.Formatting.Models
 
         private TransText(string format, IEnumerable<object> values)
         {
-            Format = Format ?? throw new ArgumentNullException(nameof(format));
+            Format = format ?? throw new ArgumentNullException(nameof(format));
             _values = values?.ToArray() ?? new object[0];
         }
 
         #endregion Constructors
+
+        #region Overrides
+
+        public override string ToString()
+            => Format;
+
+        #endregion Overrides
 
         #region IDisplayable
 
