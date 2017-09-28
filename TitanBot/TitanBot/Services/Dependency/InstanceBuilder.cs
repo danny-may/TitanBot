@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TitanBot.Services.Dependency
 {
@@ -20,6 +21,9 @@ namespace TitanBot.Services.Dependency
 
             foreach (var ctor in type.GetConstructors())
             {
+                if (ctor.GetParameters().Any(p => p.ParameterType == type))
+                    continue;
+
                 var paramCount = 0;
                 var ctorArgs = new List<object>();
 

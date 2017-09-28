@@ -17,27 +17,27 @@ namespace TitanBot.Utility
                 Task.Run((Action)DoWork);
             else
                 DoWork();
+        }
 
-            async void DoWork()
+        private async void DoWork()
+        {
+            lock (_syncLock)
             {
-                lock (_syncLock)
-                {
-                    if (IsProcessing)
-                        return;
-                    else
-                        IsProcessing = true;
-                }
+                if (IsProcessing)
+                    return;
+                else
+                    IsProcessing = true;
+            }
 
-                while (ExecutionQueue.TryDequeue(out var task))
-                {
-                    task.Start();
-                    await task;
-                }
+            while (ExecutionQueue.TryDequeue(out var task))
+            {
+                task.Start();
+                await task;
+            }
 
-                lock (_syncLock)
-                {
-                    IsProcessing = false;
-                }
+            lock (_syncLock)
+            {
+                IsProcessing = false;
             }
         }
 

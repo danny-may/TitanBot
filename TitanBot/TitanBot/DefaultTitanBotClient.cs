@@ -28,13 +28,14 @@ namespace TitanBot
 {
     public class DefaultTitanBotClient
     {
-        public static IInstanceProvider GetDefaultInjector()
+        public static IInstanceProvider GetDefaultInjector(LogSeverity logLevel)
             => new InstanceProvider()
             .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Debug,
+                LogLevel = logLevel,
                 MessageCacheSize = 1000
             }))
+            .AddSingleton<IDiscordClient>(s => s.GetRequiredInstance<DiscordSocketClient>())
             .AddSingleton<IStartupService, StartupService>()
             .AddSingleton<ILoggerService, LoggerService>()
             .AddSingleton<IMessageService, MessageService>()
@@ -45,6 +46,7 @@ namespace TitanBot
             .AddSingleton<ICommandService, CommandService>()
             .AddTransient<ICommandContext, CommandContext>()
             .AddSingleton<ITypeReaderService, TypeReaderService>()
+            .AddSingleton(s => s)
             .AddSingleton(new Random());
 
         public List<Type> RequiredInstances { get; } = new List<Type>
@@ -57,9 +59,9 @@ namespace TitanBot
         private IInstanceProvider _factory;
         private IStartupService _startup => _factory.GetRequiredInstance<IStartupService>();
 
-        public DefaultTitanBotClient()
+        public DefaultTitanBotClient(LogSeverity logLevel)
         {
-            _factory = GetDefaultInjector();
+            _factory = GetDefaultInjector(logLevel);
         }
 
         public async Task StartAsync()

@@ -58,8 +58,6 @@ namespace TitanBot.Services.Dependency
             implimentationType = descriptor.ImplimentationType ?? descriptor.InstanceType;
 
             return TryGetAndStore(descriptor, withObjects, out instance);
-
-            throw new NotImplementedException();
         }
 
         private bool TryGetAndStore(InstanceDescriptor descriptor, object[] withObjects, out object instance)
@@ -121,6 +119,15 @@ namespace TitanBot.Services.Dependency
             {
                 if (typeMap.TryGetValue(type, out value))
                     return true;
+                foreach (var row in typeMap)
+                {
+                    if (row.Key.IsSubclassOf(type) ||
+                        (type.IsInterface && row.Key.GetInterface(type.Name) != null))
+                    {
+                        value = row.Value;
+                        return true;
+                    }
+                }
                 return TryGetInstance(type, withObjects, out _, out value);
             }
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Discord;
+using System.Threading.Tasks;
 
 namespace TitanBot.Console
 {
@@ -9,7 +10,7 @@ namespace TitanBot.Console
 
         public async Task StartAsync()
         {
-            var client = new DefaultTitanBotClient();
+            var client = new DefaultTitanBotClient(LogSeverity.Debug);
             await client.StartAsync();
             await client.WhileRunning;
         }
