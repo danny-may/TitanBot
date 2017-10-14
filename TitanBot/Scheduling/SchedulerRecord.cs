@@ -3,7 +3,7 @@ using TitanBot.Storage;
 
 namespace TitanBot.Scheduling
 {
-    sealed class SchedulerRecord : IDbRecord, ISchedulerRecord
+    internal sealed class SchedulerRecord : IDbRecord, ISchedulerRecord
     {
         public ulong Id { get; set; }
         public ulong? GuildId { get; set; }
@@ -17,5 +17,6 @@ namespace TitanBot.Scheduling
         public TimeSpan Interval { get; set; }
         public string Callback { get; set; }
         public string Data { get; set; }
+        public string DataType { get; set; }
     }
 }

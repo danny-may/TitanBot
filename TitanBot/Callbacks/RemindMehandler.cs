@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using TitanBot.Contexts;
 using TitanBot.Formatting;
 using TitanBot.Scheduling;
 
 namespace TitanBot.Callbacks
 {
-    class RemindMeHandler : ISchedulerCallback
+    internal class RemindMeHandler : ISchedulerCallback
     {
         public async void Complete(ISchedulerContext context, bool wasCancelled)
         {
-            var message = context.Record.Data;
+            var message = JsonConvert.DeserializeObject<string>(context.Record.Data);
             if (string.IsNullOrWhiteSpace(message))
                 return;
             var channel = await context.Author?.GetOrCreateDMChannelAsync();

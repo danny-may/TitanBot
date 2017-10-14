@@ -58,7 +58,6 @@ namespace TitanBot.Scheduling
             }
             catch { }
             return null;
-
         }
 
         private async ValueTask<List<SchedulerRecord>> GetRecords()
@@ -122,7 +121,7 @@ namespace TitanBot.Scheduling
         private List<SchedulerRecord> GetActive(DateTime atTime, TimeSpan range)
             => CachedRecords.Value.Where(r => r.StartTime < atTime.Add(range) && (r.CompleteTime ?? DateTime.MaxValue) > atTime).ToList();
 
-        public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), ulong? message = null, ulong? channel = null, string data = null) where T : ISchedulerCallback
+        public ulong Queue<T>(ulong userId, ulong? guildID, DateTime from, TimeSpan? period = default(TimeSpan?), DateTime? to = default(DateTime?), ulong? message = null, ulong? channel = null, object data = null) where T : ISchedulerCallback
         {
             var record = new SchedulerRecord
             {
@@ -134,7 +133,8 @@ namespace TitanBot.Scheduling
                 Interval = period ?? TimeSpan.MaxValue,
                 MessageId = message,
                 ChannelId = channel,
-                Data = data
+                Data = JsonConvert.SerializeObject(data),
+                DataType = JsonConvert.SerializeObject(data?.GetType())
             };
             Database.Insert(record).Wait();
             CachedRecords.Value.Add(record);
@@ -163,7 +163,6 @@ namespace TitanBot.Scheduling
             records = records.Where(r => r != null).ToArray();
             Parallel.ForEach(records, r =>
             {
-
                 r.CompleteTime = completeTime;
                 if (CachedHandlers[r.Callback] != null)
                     try
@@ -186,7 +185,6 @@ namespace TitanBot.Scheduling
             return res;
         }
 
-
         public int ActiveCount()
             => GetActive(DateTime.Now, new TimeSpan()).Count;
 
@@ -208,7 +206,6 @@ namespace TitanBot.Scheduling
             var key = JsonConvert.SerializeObject(typeof(T));
             CachedHandlers[key] = handler;
             CachedTypes[key] = typeof(T);
-
         }
 
         private void Tick(SchedulerRecord[] records, ClockTimerElapsedEventArgs e)
