@@ -17,7 +17,7 @@ namespace TitanBot.Services.Database
         #endregion Statics
     }
 
-    internal class DbTable<TRecord, TId> : DbTable, IDbTable<TRecord, TId> where TRecord : IDbRecord<TId>
+    internal class DbTable<TRecord> : DbTable, IDbTable<TRecord> where TRecord : IDbRecord
     {
         #region Fields
 
@@ -29,17 +29,21 @@ namespace TitanBot.Services.Database
 
         internal DbTable(LiteCollection<TRecord> collection)
         {
-            _mapped.GetOrAdd(typeof(TRecord), t =>
-            {
-                BsonMapper.Global.Entity<TRecord>()
-                                 .Ignore(r => r.Id)
-                                 .Id(r => r._id, true);
-                return true;
-            });
             _collection = collection;
         }
 
         #endregion Constructors
+
+        #region Methods
+
+        private static BsonValue ToBsonValue<T>(T value)
+        {
+            if (value is ulong v)
+                return v;
+            return new BsonValue(value);
+        }
+
+        #endregion Methods
 
         #region IDbTable
 
@@ -52,31 +56,31 @@ namespace TitanBot.Services.Database
         public bool Delete(TRecord row)
             => Delete(row.Id);
 
-        public bool Delete(TId id)
-            => _collection.Delete(new BsonValue(id));
+        public bool Delete(ulong id)
+            => _collection.Delete(id);
 
         public int Delete(IEnumerable<TRecord> rows)
             => Delete(rows.Select(r => r.Id));
 
-        public int Delete(IEnumerable<TId> ids)
-            => _collection.Delete(Query.In(DatabaseService.IdName, ids.ToBson()));
+        public int Delete(IEnumerable<ulong> ids)
+            => ids.Select(i => Delete(i)).Count(d => d);//_collection.Delete(Query.In(DbRecord.IdName, ids.Select(i => (BsonValue)i).ToArray()));
 
         public IEnumerable<TRecord> Find(Expression<Func<TRecord, bool>> predicate, int skip = 0, int limit = int.MaxValue)
             => _collection.Find(predicate, skip, limit);
 
-        public TRecord FindById(TId id)
-            => _collection.FindById(new BsonValue(id));
+        public TRecord FindById(ulong id)
+            => _collection.FindById(id);
 
-        public IEnumerable<TRecord> FindById(IEnumerable<TId> ids)
-            => _collection.Find(Query.In(DatabaseService.IdName, ids.ToBson()));
+        public IEnumerable<TRecord> FindById(IEnumerable<ulong> ids)
+            => ids.Select(i => FindById(i)); //_collection.Find(Query.In(DbRecord.IdName, ids.Select(i => (BsonValue)i).ToArray()));
 
         public TRecord FindOne(Expression<Func<TRecord, bool>> predicate)
             => FindOne(predicate);
 
-        public TRecord GetOrAdd(TId id, Func<TId, TRecord> func)
+        public TRecord GetOrAdd(ulong id, Func<ulong, TRecord> func)
             => GetOrAdd(new[] { id }, func).First();
 
-        public IEnumerable<TRecord> GetOrAdd(IEnumerable<TId> ids, Func<TId, TRecord> func)
+        public IEnumerable<TRecord> GetOrAdd(IEnumerable<ulong> ids, Func<ulong, TRecord> func)
         {
             var existing = FindById(ids).ToList();
             var created = ids.Where(i => !existing.Exists(r => Equals(i, r.Id)))

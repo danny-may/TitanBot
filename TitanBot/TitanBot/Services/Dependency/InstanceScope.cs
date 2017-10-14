@@ -40,7 +40,7 @@ namespace TitanBot.Services.Dependency
         #region Methods
 
         private Type[] GetDescribedTypes()
-            => _descriptors.Select(d => d.Key.GetType())
+            => _descriptors.Select(d => d.Key)
                            .Concat(_parentScope?.GetDescribedTypes() ?? new Type[0])
                            .Distinct()
                            .ToArray();
@@ -128,7 +128,9 @@ namespace TitanBot.Services.Dependency
                         return true;
                     }
                 }
-                return TryGetInstance(type, withObjects, out _, out value);
+                if (GetDescribedTypes().Contains(type))
+                    return TryGetInstance(type, withObjects, out _, out value);
+                return false;
             }
 
             return TryGet;

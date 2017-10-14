@@ -1,10 +1,14 @@
-﻿using TitanBot.Core.Services.Database;
+﻿using LiteDB;
+using System.Reflection;
+using TitanBot.Core.Services.Database;
 
 namespace TitanBot.Services.Database
 {
-    public abstract class DbRecord<TId> : IDbRecord<TId>
+    public abstract class DbRecord : IDbRecord
     {
-        public TId Id { get => (TId)_id; set => _id = value; }
-        public object _id { get; set; }
+        [BsonId(true)]
+        public ulong Id { get; set; }
+
+        public static string IdName = ReflectionExtensions.GetMemberName<IDbRecord, ulong>(r => r.Id);
     }
 }

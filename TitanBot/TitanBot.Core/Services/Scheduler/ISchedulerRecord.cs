@@ -3,7 +3,7 @@ using TitanBot.Core.Services.Database;
 
 namespace TitanBot.Core.Services.Scheduler
 {
-    public interface ISchedulerRecord : IDbRecord<ulong>
+    public interface ISchedulerRecord : IDbRecord
     {
         bool IsComplete { get; }
         DateTime? CompleteTime { get; set; }

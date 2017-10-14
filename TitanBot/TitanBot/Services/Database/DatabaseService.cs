@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 using TitanBot.Core.Services.Database;
 using TitanBot.Core.Services.Logging;
 using TitanBot.Utility;
@@ -11,12 +10,6 @@ namespace TitanBot.Services.Database
 {
     public class DatabaseService : IDatabaseService
     {
-        #region Statics
-
-        public static readonly string IdName = ReflectionExtensions.GetMemberName<IDbRecord<object>, object>(r => r.Id);
-
-        #endregion Statics
-
         #region Fields
 
         private readonly LiteDatabase _database;
@@ -37,12 +30,6 @@ namespace TitanBot.Services.Database
             _file = new FileInfo(Path.Combine(AppContext.BaseDirectory, dbLocation));
             FileExtensions.EnsureDirectory(_file.Directory);
 
-            BsonMapper.Global.RegisterAutoId(u => u == 0, (e, s) =>
-            {
-                var max = e.Max(s, "_id");
-                return max.IsMaxValue ? 1 : (ulong)(max.AsInt64 + 1);
-            });
-
             _database = new LiteDatabase(_file.FullName);
             _logger = logger;
         }
@@ -58,6 +45,19 @@ namespace TitanBot.Services.Database
 
         #endregion Finalisers
 
+        #region Methods
+
+        private TResult RunQuery<TRecord, TResult>(Func<IDbTable<TRecord>, TResult> action) where TRecord : IDbRecord
+        {
+            var table = _database.GetCollection<TRecord>();
+            return action(new DbTable<TRecord>(table));
+        }
+
+        private void RunQuery<TRecord>(Action<IDbTable<TRecord>> action) where TRecord : IDbRecord
+            => RunQuery<TRecord, bool>(t => { action(t); return true; });
+
+        #endregion Methods
+
         #region IDatabaseService
 
         public int TotalCalls { get; private set; }
@@ -65,53 +65,20 @@ namespace TitanBot.Services.Database
         public void Dispose()
             => _database.Dispose();
 
-        public Task Drop<TRecord, TId>() where TRecord : IDbRecord<TId>
+        public void Drop<TRecord>() where TRecord : IDbRecord
             => Drop(typeof(TRecord).Name);
 
-        public Task Drop(string table)
-            => _processor.Run(() => _database.DropCollection(table));
+        public void Drop(string tableName)
+            => _database.DropCollection(tableName);
 
-        public void Query(Action<IDbTransaction> query)
-            => QueryAsync(query).Wait();
+        public void Query<TRecord>(Action<IDbTable<TRecord>> action) where TRecord : IDbRecord
+            => RunQuery(action);
 
-        public TReturn Query<TReturn>(Func<IDbTransaction, TReturn> query)
-            => QueryAsync(query).Result;
+        public TResult Query<TRecord, TResult>(Func<IDbTable<TRecord>, TResult> action) where TRecord : IDbRecord
+            => RunQuery(action);
 
-        public async Task QueryAsync(Action<IDbTransaction> query)
-            => await QueryAsync(conn => { query(conn); return 0; });
-
-        public async ValueTask<TReturn> QueryAsync<TReturn>(Func<IDbTransaction, TReturn> query)
-            => await _processor.Run(() =>
-            {
-                var result = default(TReturn);
-                TotalCalls++;
-                using (var conn = new DbTransaction(_database))
-                {
-                    try
-                    {
-                        result = query(conn);
-                        conn.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Log(ex, "DatabaseService");
-                        conn.Rollback();
-                    }
-                }
-                return result;
-            });
-
-        public void QueryTable<TRecord, TId>(Action<IDbTable<TRecord, TId>> query) where TRecord : IDbRecord<TId>
-            => QueryTableAsync(query).Wait();
-
-        public TReturn QueryTable<TRecord, TId, TReturn>(Func<IDbTable<TRecord, TId>, TReturn> query) where TRecord : IDbRecord<TId>
-            => QueryTableAsync(query).Result;
-
-        public async Task QueryTableAsync<TRecord, TId>(Action<IDbTable<TRecord, TId>> query) where TRecord : IDbRecord<TId>
-            => await QueryTableAsync<TRecord, TId, int>(conn => { query(conn); return 0; });
-
-        public async ValueTask<TReturn> QueryTableAsync<TRecord, TId, TReturn>(Func<IDbTable<TRecord, TId>, TReturn> query) where TRecord : IDbRecord<TId>
-            => await QueryAsync(conn => query(conn.GetTable<TRecord, TId>()));
+        public TRecord Query<TRecord>(Func<IDbTable<TRecord>, TRecord> action) where TRecord : IDbRecord
+            => RunQuery(action);
 
         #endregion IDatabaseService
     }

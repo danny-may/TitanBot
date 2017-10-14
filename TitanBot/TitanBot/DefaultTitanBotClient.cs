@@ -12,6 +12,7 @@ using TitanBot.Core.Services.Dependency;
 using TitanBot.Core.Services.Formatting;
 using TitanBot.Core.Services.Logging;
 using TitanBot.Core.Services.Messaging;
+using TitanBot.Core.Services.Setting;
 using TitanBot.Core.Services.TypeReader;
 using TitanBot.Models;
 using TitanBot.Models.Contexts;
@@ -22,6 +23,7 @@ using TitanBot.Services.Dependency;
 using TitanBot.Services.Formatting;
 using TitanBot.Services.Logging;
 using TitanBot.Services.Messaging;
+using TitanBot.Services.Setting;
 using TitanBot.Services.TypeReader;
 
 namespace TitanBot
@@ -46,6 +48,7 @@ namespace TitanBot
             .AddSingleton<ICommandService, CommandService>()
             .AddTransient<ICommandContext, CommandContext>()
             .AddSingleton<ITypeReaderService, TypeReaderService>()
+            .AddSingleton<ISettingService, SettingService>()
             .AddSingleton(s => s)
             .AddSingleton(new Random());
 
