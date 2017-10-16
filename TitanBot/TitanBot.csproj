@@ -197,6 +197,7 @@
     <Compile Include="Commands\DefaultCommands\General\LanguageCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\RemindMeCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\LogoutCommand.cs" />
+    <Compile Include="Commands\DefaultCommands\Owner\PingsCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\SchedulerCommand.cs" />
     <Compile Include="Formatting\Localisation\DynamicString.cs" />
     <Compile Include="Formatting\Localisation\LocalisedEmbedBuilder.cs" />

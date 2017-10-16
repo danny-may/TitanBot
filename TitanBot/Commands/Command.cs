@@ -21,9 +21,11 @@ namespace TitanBot.Commands
     public abstract class Command
     {
         //locks
-        static ConcurrentDictionary<Type, object> CommandLocks { get; } = new ConcurrentDictionary<Type, object>();
-        static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> GuildLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
-        static ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>> ChannelLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>>();
+        private static ConcurrentDictionary<Type, object> CommandLocks { get; } = new ConcurrentDictionary<Type, object>();
+        private static ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>> GuildLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong?, object>>();
+        private static ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>> ChannelLocks { get; } = new ConcurrentDictionary<Type, ConcurrentDictionary<ulong, object>>();
+        protected internal static bool DisablePings;
+
         protected object GlobalCommandLock => CommandLocks.GetOrAdd(GetType(), new object());
         protected object GuildCommandLock => GuildLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong?, object>()).GetOrAdd(Context.Guild?.Id, new object());
         protected object ChannelCommandLock => ChannelLocks.GetOrAdd(GetType(), new ConcurrentDictionary<ulong, object>()).GetOrAdd(Context.Channel.Id, new object());
@@ -81,6 +83,9 @@ namespace TitanBot.Commands
         {
             Context = context;
 
+            if (Replier is Replier r)
+                r.DisablePings = DisablePings;
+
             Logger = factory.Get<ILogger>();
             Database = factory.Get<IDatabase>();
             Bot = factory.Get<BotClient>();
@@ -113,7 +118,6 @@ namespace TitanBot.Commands
         {
             lock (InstanceCommandLock)
             {
-
                 HasReplied = true;
                 if (AwaitMessage != null)
                 {

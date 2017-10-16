@@ -8,10 +8,16 @@ using TitanBot.Scheduling;
 namespace TitanBot.Commands.DefaultCommands.Owner
 {
     [RequireOwner]
-    class TestCommand : Command
+    internal class TestCommand : Command
     {
+        [Call("Echo")]
+        private async Task EchoAsync([Dense, RawArguments]string text)
+        {
+            await ReplyAsync(new RawString(text));
+        }
+
         [Call("Flag")]
-        async Task TestFlagsAsync([CallFlag('a', "aflag", "Bool flag")]bool a = false, [CallFlag('b', "Bool flag")]bool b = true, [CallFlag('c', "cflag", "String flag")]string c = "Not provided")
+        private async Task TestFlagsAsync([CallFlag('a', "aflag", "Bool flag")]bool a = false, [CallFlag('b', "Bool flag")]bool b = true, [CallFlag('c', "cflag", "String flag")]string c = "Not provided")
         {
             await ReplyAsync(new EmbedBuilder().AddField("a", a)
                                                .AddField("b", b)
@@ -19,7 +25,7 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         }
 
         [Call("Scheduler")]
-        async Task TestSchedulerAsync(int delay = 1)
+        private async Task TestSchedulerAsync(int delay = 1)
         {
             for (int i = 0; i < 50; i++)
                 Scheduler.Queue<SchedulerTestHandler>(BotUser.Id, null, DateTime.Now, new TimeSpan(0, 0, delay), DateTime.Now.AddSeconds(33));
@@ -40,9 +46,8 @@ namespace TitanBot.Commands.DefaultCommands.Owner
         }
 
         [Call("Embed")]
-        async Task TestEmbedAsync()
+        private async Task TestEmbedAsync()
         {
-
             var builder = new EmbedBuilder()
             {
                 Author = new EmbedAuthorBuilder

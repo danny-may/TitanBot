@@ -14,7 +14,7 @@ using static TitanBot.TBLocalisation.Logic;
 
 namespace TitanBot.Replying
 {
-    class ReplyContext : IReplyContext
+    internal class ReplyContext : IReplyContext
     {
         private IMessageChannel Channel { get; set; }
         private IUser User { get; }
@@ -25,6 +25,8 @@ namespace TitanBot.Replying
 
         private GeneralUserSetting GeneralUserSetting { get; }
         private ITextResourceCollection TextResource { get; }
+
+        internal bool DisablePings;
 
         private ILocalisable<string> Message { get; set; } = (RawString)"";
         private bool IsTTS { get; set; }
@@ -73,9 +75,9 @@ namespace TitanBot.Replying
                 IsTTS = IsTTS && Channel.UserHasPermission(me, ChannelPermission.SendTTSMessages);
                 if (Attachment == null)
                     if (GeneralUserSetting.UseEmbeds && Channel.UserHasPermission(me, ChannelPermission.EmbedLinks))
-                        msg = await Channel.SendMessageAsync(Localised, IsTTS, Embedable?.GetEmbed().Localise(TextResource), Options);
+                        msg = await SendAsync(Localised, IsTTS, Embedable?.GetEmbed().Localise(TextResource), Options);
                     else
-                        msg = await Channel.SendMessageAsync(Localised + "\n" + Embedable?.GetString(), IsTTS, null, Options);
+                        msg = await SendAsync(Localised + "\n" + Embedable?.GetString(), IsTTS, null, Options);
                 else
                     msg = await Channel.SendFileAsync(Attachment(), AttachmentName, Localised + "\n" + Embedable?.GetString().Localise(TextResource), IsTTS, Options);
             }
@@ -107,6 +109,13 @@ namespace TitanBot.Replying
                 await OnSend(this, msg);
             Logger.Log(Logging.LogSeverity.Verbose, LogType.Message, $"Sent Message | Channel: {Channel} | Guild: {Guild} | Content: {msg.Content}", "Replier");
             return msg;
+        }
+
+        private async Task<IUserMessage> SendAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        {
+            if (DisablePings)
+                text = text.Replace("@", "@\u200B");
+            return await Channel.SendMessageAsync(text, isTTS, embed, options);
         }
 
         public IReplyContext WithErrorHandler(MessageSendErrorHandler handler)
