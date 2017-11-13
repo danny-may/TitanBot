@@ -6,6 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Net.Core" Version="1.0.2" />
+    <PackageReference Include="LiteDB" Version="4.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Titansmasher.Utilities\Titansmasher.Utilities.csproj" />
   </ItemGroup>
 
 </Project>
