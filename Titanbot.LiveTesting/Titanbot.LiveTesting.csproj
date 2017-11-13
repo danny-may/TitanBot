@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Titanbot.Core\Titanbot.Core.csproj" />
-    <ProjectReference Include="..\Titanbot.Websocket\Titanbot.Websocket.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Titanbot.Core.Database.Interfaces;
+using Titansmasher.Services.Database.Interfaces;
 
-namespace Titanbot.Core.Database
+namespace Titansmasher.Services.Database.LiteDb
 {
-    internal class DatabaseTable<TRecord> : IDatabaseTable<TRecord> where TRecord : IDatabaseRecord
+    internal class LiteDbTable<TRecord> : IDatabaseTable<TRecord> where TRecord : IDatabaseRecord
     {
         #region Fields
 
@@ -17,7 +17,7 @@ namespace Titanbot.Core.Database
 
         #region Constructors
 
-        internal DatabaseTable(LiteCollection<TRecord> collection)
+        internal LiteDbTable(LiteCollection<TRecord> collection)
         {
             _collection = collection;
         }

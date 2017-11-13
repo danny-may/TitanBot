@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Titanbot.Core.Logging.Interfaces;
 using Titansmasher.Extensions;
+using Titansmasher.Services.Logging.Interfaces;
 using Titansmasher.Utilities;
 
-namespace Titanbot.Core.Logging
+namespace Titansmasher.Services.Logging
+
 {
-    public class Logger : ILogger
+    public class LoggerService : ILoggerService
     {
         #region Fields
 
@@ -16,17 +17,17 @@ namespace Titanbot.Core.Logging
 
         private SynchronisedExecutor _processor = new SynchronisedExecutor();
 
-        public LogSeverity Scope
+        public LogLevel Scope
         {
             get => _scope;
             set
             {
                 _scope = value;
-                _logger.Log(LogSeverity.Always, $"Logger scope set to {Enum.GetName(typeof(LogSeverity), value)}");
+                _logger.Log(LogLevel.Always, $"Logger scope set to {Enum.GetName(typeof(LogLevel), value)}");
             }
         }
 
-        private LogSeverity _scope;
+        private LogLevel _scope = LogLevel.Debug;
 
         private IAreaLogger _logger;
 
@@ -34,7 +35,7 @@ namespace Titanbot.Core.Logging
 
         #region Constructors
 
-        public Logger(string location, bool timestamp = true)
+        public LoggerService(string location, bool timestamp = true)
         {
             Location = new FileInfo(location);
             if (timestamp)
@@ -43,13 +44,14 @@ namespace Titanbot.Core.Logging
             Location.EnsureExists();
 
             OnLog += LogToFile;
+            OnLog += Console.Write;
 
-            _logger = CreateAreaLogger<Logger>();
+            _logger = CreateAreaLogger<LoggerService>();
 
-            _logger.Log(LogSeverity.Info, "Initialised");
+            _logger.Log(LogLevel.Info, "Initialised");
         }
 
-        public Logger() : this("./logs/log.txt")
+        public LoggerService() : this("./logs/log.txt")
         {
         }
 
@@ -69,14 +71,14 @@ namespace Titanbot.Core.Logging
 
         public event Action<string> OnLog;
 
-        public void Log(LogSeverity severity, string area, string message)
+        public void Log(LogLevel severity, string area, string message)
         {
-            if ((severity & Scope) != severity)
+            if (severity > Scope)
                 return;
 
             var builder = new StringBuilder();
             builder.Append($"[{DateTime.UtcNow.ToString(TimestampStyle)}]");
-            builder.Append($"[{Enum.GetName(typeof(LogSeverity), severity)}]");
+            builder.Append($"[{Enum.GetName(typeof(LogLevel), severity)}]");
             builder.Append($"[{area}] ");
             builder.Append(message);
             builder.Append(Environment.NewLine);
@@ -86,11 +88,11 @@ namespace Titanbot.Core.Logging
             _processor.Run(() => OnLog(logString));
         }
 
-        public void Log(LogSeverity severity, string area, object message)
+        public void Log(LogLevel severity, string area, object message)
             => Log(severity, area, message.ToString());
 
         public void Log(string area, Exception exception)
-            => Log(LogSeverity.Critical, area, exception.ToString());
+            => Log(LogLevel.Critical, area, exception.ToString());
 
         public IAreaLogger CreateAreaLogger<TArea>()
             => new AreaLogger(this, typeof(TArea).Name);

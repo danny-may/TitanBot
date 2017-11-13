@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Titanbot.Core.Database.Interfaces
+namespace Titansmasher.Services.Database.Interfaces
 {
-    public interface IDatabase
+    public interface IDatabaseService
     {
         IDatabaseTable<TRecord> GetTable<TRecord>() where TRecord : IDatabaseRecord;
         void DropTable<TRecord>() where TRecord : IDatabaseRecord;
@@ -13,6 +13,6 @@ namespace Titanbot.Core.Database.Interfaces
         void BackupClear(DateTime before = default(DateTime));
         void Shrink();
 
-        IDatabase SetForeignKey<TRecord, TKey>(Expression<Func<TRecord, TKey>> property) where TRecord : IDatabaseRecord where TKey : IDatabaseRecord;
+        IDatabaseService SetForeignKey<TRecord, TKey>(Expression<Func<TRecord, TKey>> property) where TRecord : IDatabaseRecord where TKey : IDatabaseRecord;
     }
 }

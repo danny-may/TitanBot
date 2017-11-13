@@ -1,4 +1,4 @@
-﻿namespace Titanbot.Core.Database.Interfaces
+﻿namespace Titansmasher.Services.Database.Interfaces
 {
     public interface IDatabaseRecord
     {

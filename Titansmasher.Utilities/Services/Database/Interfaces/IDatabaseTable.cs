@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Titanbot.Core.Database.Interfaces
+namespace Titansmasher.Services.Database.Interfaces
 {
     public interface IDatabaseTable<TRecord>
         where TRecord : IDatabaseRecord

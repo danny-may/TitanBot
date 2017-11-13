@@ -3,15 +3,14 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq.Expressions;
-using Titanbot.Core.Configuration;
-using Titanbot.Core.Database.Interfaces;
-using Titanbot.Core.Logging.Interfaces;
 using Titansmasher.Extensions;
-using static Titanbot.Core.Logging.LogSeverity;
+using Titansmasher.Services.Database.Interfaces;
+using Titansmasher.Services.Logging;
+using Titansmasher.Services.Logging.Interfaces;
 
-namespace Titanbot.Core.Database
+namespace Titansmasher.Services.Database.LiteDb
 {
-    public class Database : IDatabase
+    public class LiteDbService : IDatabaseService
     {
         #region Fields
 
@@ -27,22 +26,22 @@ namespace Titanbot.Core.Database
 
         #region Constructors
 
-        public Database(Config config, ILogger logger)
+        public LiteDbService(LiteDbConfig config, ILoggerService logger)
         {
-            _location = new FileInfo(config.Database_Location);
-            _logger = logger.CreateAreaLogger<Database>();
+            _location = new FileInfo(config.Location);
+            _logger = logger.CreateAreaLogger<LiteDbService>();
 
             _location.EnsureExists();
 
-            _liteLogger = new Logger(config.Database_LogLevel);
+            _liteLogger = new Logger(config.LogLevel);
             _mapper = new BsonMapper();
             _db = new LiteDatabase(_location.FullName, _mapper, _liteLogger);
 
             _mapper.RegisterType(o => (ulong)o, d => (decimal)d);
 
-            _liteLogger.Logging += m => _logger.Log(Verbose, m);
+            _liteLogger.Logging += m => _logger.Log(LogLevel.Verbose, m);
 
-            _logger.Log(Info, "Initialised");
+            _logger.Log(LogLevel.Info, "Initialised");
         }
 
         #endregion Constructors
@@ -73,12 +72,12 @@ namespace Titanbot.Core.Database
             => _db.DropCollection(tableName);
 
         public IDatabaseTable<TRecord> GetTable<TRecord>() where TRecord : IDatabaseRecord
-            => _tableCache.GetOrAdd(typeof(TRecord), new DatabaseTable<TRecord>(_db.GetCollection<TRecord>())) as DatabaseTable<TRecord>;
+            => _tableCache.GetOrAdd(typeof(TRecord), new LiteDbTable<TRecord>(_db.GetCollection<TRecord>())) as LiteDbTable<TRecord>;
 
-        public IDatabase SetForeignKey<TRecord, TKey>(Expression<Func<TRecord, TKey>> property) where TRecord : IDatabaseRecord where TKey : IDatabaseRecord
+        public IDatabaseService SetForeignKey<TRecord, TKey>(Expression<Func<TRecord, TKey>> property) where TRecord : IDatabaseRecord where TKey : IDatabaseRecord
         {
             _mapper.Entity<TRecord>().DbRef(property);
-            (GetTable<TRecord>() as DatabaseTable<TRecord>).Reference(property);
+            (GetTable<TRecord>() as LiteDbTable<TRecord>).Reference(property);
             return this;
         }
 
