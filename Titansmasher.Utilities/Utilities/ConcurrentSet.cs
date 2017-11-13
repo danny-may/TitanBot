@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace System.Collections.Concurrent
+namespace Titansmasher.Utilities
 {
     /// <summary>
     /// Class for concurrent storage of a distinct collection of objects.

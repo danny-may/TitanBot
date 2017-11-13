@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Titansmasher.Utilities.Extensions
+namespace Titansmasher.Extensions
 {
     public static class FileInfoExtensions
     {

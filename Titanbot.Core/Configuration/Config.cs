@@ -1,24 +1,24 @@
 ﻿using LiteDB;
 using Newtonsoft.Json;
 using System.IO;
-using Titansmasher.Utilities.Extensions;
+using Titansmasher.Extensions;
 
-namespace Titanbot.Core
+namespace Titanbot.Core.Configuration
 {
-    public class Configuration
+    public class Config
     {
         #region Statics
 
         public static FileInfo Location = new FileInfo("./config.json");
 
-        public static Configuration Load()
-            => Load<Configuration>();
+        public static Config Load()
+            => Load<Config>();
 
-        public static TConfiguation Load<TConfiguation>()
-            where TConfiguation : Configuration, new()
+        public static TConfig Load<TConfig>()
+            where TConfig : Config, new()
         {
             Location.EnsureExists("{}");
-            return JsonConvert.DeserializeObject<TConfiguation>(Location.ReadAllText());
+            return JsonConvert.DeserializeObject<TConfig>(Location.ReadAllText());
         }
 
         #endregion Statics
@@ -27,7 +27,7 @@ namespace Titanbot.Core
 
         #region Database
 
-        public string Database_Location { get; set; } = "./database/bot.db4";
+        public string Database_Location { get; set; } = "./database/titanbot.db4";
         public byte Database_LogLevel { get; set; } = Logger.FULL;
 
         #endregion Database
@@ -48,7 +48,7 @@ namespace Titanbot.Core
 
         #region Constructors
 
-        public Configuration()
+        public Config()
         {
         }
 

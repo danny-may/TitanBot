@@ -11,6 +11,8 @@ namespace Titanbot.Core.Logging.Interfaces
         IAreaLogger CreateAreaLogger(string area);
         IAreaLogger CreateAreaLogger<TArea>();
 
+        void ClearOld(DateTime before = default(DateTime));
+
         event Action<string> OnLog;
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Titansmasher.Utilities.Utilities
+namespace Titansmasher.Utilities
 {
     public class EnumUtil<TEnum>
     {

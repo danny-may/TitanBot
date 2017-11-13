@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Titanbot.Core;
+using Titanbot.Core.Configuration;
 using Titanbot.Core.Database;
 using Titanbot.Core.Database.Interfaces;
 using Titanbot.Core.Logging;
@@ -19,7 +19,7 @@ namespace Titanbot.LiveTesting
 
             var services = new ServiceCollection();
 
-            services.AddSingleton(Configuration.Load())
+            services.AddSingleton(Config.Load())
                     .AddSingleton<ILogger, Logger>()
                     .AddSingleton<IDatabase, Database>()
                     .AddSingleton<Random>();

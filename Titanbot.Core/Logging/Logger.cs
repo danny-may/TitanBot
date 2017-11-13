@@ -2,8 +2,8 @@
 using System.IO;
 using System.Text;
 using Titanbot.Core.Logging.Interfaces;
-using Titansmasher.Utilities.Extensions;
-using Titansmasher.Utilities.Utilities;
+using Titansmasher.Extensions;
+using Titansmasher.Utilities;
 
 namespace Titanbot.Core.Logging
 {
@@ -96,6 +96,9 @@ namespace Titanbot.Core.Logging
             => new AreaLogger(this, typeof(TArea).Name);
         public IAreaLogger CreateAreaLogger(string area)
             => new AreaLogger(this, area);
+
+        public void ClearOld(DateTime before = default(DateTime))
+            => Location.Directory.CleanDirectory(before);
 
         #endregion ILogger
     }

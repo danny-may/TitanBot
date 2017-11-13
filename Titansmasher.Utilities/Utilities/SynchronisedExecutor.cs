@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Titansmasher.Utilities.Utilities
+namespace Titansmasher.Utilities
 {
     public class SynchronisedExecutor
     {

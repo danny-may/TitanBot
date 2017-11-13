@@ -3,9 +3,10 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq.Expressions;
+using Titanbot.Core.Configuration;
 using Titanbot.Core.Database.Interfaces;
 using Titanbot.Core.Logging.Interfaces;
-using Titansmasher.Utilities.Extensions;
+using Titansmasher.Extensions;
 using static Titanbot.Core.Logging.LogSeverity;
 
 namespace Titanbot.Core.Database
@@ -26,7 +27,7 @@ namespace Titanbot.Core.Database
 
         #region Constructors
 
-        public Database(Configuration config, ILogger logger)
+        public Database(Config config, ILogger logger)
         {
             _location = new FileInfo(config.Database_Location);
             _logger = logger.CreateAreaLogger<Database>();
@@ -59,6 +60,11 @@ namespace Titanbot.Core.Database
 
             File.Copy(_location.FullName, target.FullName, true);
         }
+
+        public void BackupClear(DateTime before = default(DateTime))
+            => _location.ModifyDirectory(d => Path.Combine(d, "backup"))
+                        .Directory
+                        .CleanDirectory(before);
 
         public void DropTable<TRecord>() where TRecord : IDatabaseRecord
             => DropTable(typeof(TRecord).Name);
