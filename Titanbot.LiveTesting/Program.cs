@@ -4,6 +4,8 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Titanbot.Core.Command;
+using Titanbot.Core.Command.Interfaces;
 using Titanbot.Core.Config;
 using Titanbot.Core.Startup;
 using Titanbot.Core.Startup.Interfaces;
@@ -41,6 +43,7 @@ namespace Titanbot.LiveTesting
                     .AddSingleton<DiscordSocketClient>()
                     .AddSingleton<ILoggerService, LoggerService>()
                     .AddSingleton<IDatabaseService, LiteDbService>()
+                    .AddSingleton<ICommandService, CommandService>()
                     .AddSingleton<ITitanbotController, TitanbotController>()
                     .AddSingleton<Random>();
 

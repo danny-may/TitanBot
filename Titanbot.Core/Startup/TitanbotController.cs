@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
+using Titanbot.Core.Command.Interfaces;
 using Titanbot.Core.Config;
 using Titanbot.Core.Extensions;
 using Titanbot.Core.Startup.Interfaces;
@@ -17,6 +18,7 @@ namespace Titanbot.Core.Startup
         private DiscordSocketClient _client;
         private BotConfig _config;
         private ILoggerService _logger;
+        private ICommandService _cmdService;
 
         private EventAwaiter _logoutEvent = new EventAwaiter();
 
@@ -26,11 +28,13 @@ namespace Titanbot.Core.Startup
 
         public TitanbotController(DiscordSocketClient client,
                                   BotConfig config,
-                                  ILoggerService logger)
+                                  ILoggerService logger,
+                                  ICommandService commandService)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _cmdService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             _client.Log += m => _logger.LogAsync(m);
 

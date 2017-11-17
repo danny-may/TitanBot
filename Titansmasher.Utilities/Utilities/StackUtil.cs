@@ -10,6 +10,6 @@ namespace Titansmasher.Utilities
             => GetCaller().DeclaringType;
 
         public static MethodBase GetCaller()
-            => new StackFrame(1).GetMethod();
+            => new StackFrame(2).GetMethod();
     }
 }
