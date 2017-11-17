@@ -35,8 +35,8 @@ namespace Titanbot.LiveTesting
             var services = new ServiceCollection();
 
             services.AddSingletonConfigService()
-                    .AddSingleton(p => p.GetRequiredService<DiscordConfig>().SocketConfig())
-                    .AddSingletonConfig<DiscordConfig>()
+                    .AddSingleton(p => p.GetRequiredService<BotConfig>().SocketConfig())
+                    .AddSingletonConfig<BotConfig>()
                     .AddSingletonConfig<LiteDbConfig>()
                     .AddSingleton<DiscordSocketClient>()
                     .AddSingleton<ILoggerService, LoggerService>()
@@ -52,12 +52,6 @@ namespace Titanbot.LiveTesting
             var startup = provider.GetRequiredService<ITitanbotController>();
 
             await startup.StartAsync();
-
-            Task.Run(async () =>
-            {
-                await Task.Delay(10000);
-                await startup.StopAsync();
-            }).GetAwaiter();
 
             await startup.WhileConnected;
         }

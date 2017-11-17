@@ -17,8 +17,9 @@ namespace Titansmasher.Services.Database.LiteDb
         private LiteDatabase _db;
         private BsonMapper _mapper;
         private Logger _liteLogger;
-        private IAreaLogger _logger;
+        private ILoggerService _logger;
         private FileInfo _location;
+        private LiteDbConfig _config;
 
         private ConcurrentDictionary<Type, object> _tableCache = new ConcurrentDictionary<Type, object>();
 
@@ -28,12 +29,13 @@ namespace Titansmasher.Services.Database.LiteDb
 
         public LiteDbService(LiteDbConfig config, ILoggerService logger)
         {
-            _location = new FileInfo(config.Location);
-            _logger = logger.CreateAreaLogger<LiteDbService>();
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
+            _location = new FileInfo(_config.Location);
             _location.EnsureExists();
 
-            _liteLogger = new Logger(config.LogLevel);
+            _liteLogger = new Logger(_config.LogLevel);
             _mapper = new BsonMapper();
             _db = new LiteDatabase(_location.FullName, _mapper, _liteLogger);
 

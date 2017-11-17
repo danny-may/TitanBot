@@ -4,12 +4,9 @@ namespace Titansmasher.Services.Logging.Interfaces
 {
     public interface ILoggerService
     {
-        void Log(LogLevel severity, string area, string message);
-        void Log(LogLevel severity, string area, object message);
-        void Log(string area, Exception exception);
-
-        IAreaLogger CreateAreaLogger(string area);
-        IAreaLogger CreateAreaLogger<TArea>();
+        void Log(LogLevel severity, string message, string area = null);
+        void Log(LogLevel severity, object message, string area = null);
+        void Log(Exception exception, string area = null);
 
         void ClearOld(DateTime before = default(DateTime));
 

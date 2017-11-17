@@ -3,9 +3,10 @@ using Discord.WebSocket;
 
 namespace Titanbot.Core.Config
 {
-    public class DiscordConfig
+    public class BotConfig
     {
         public string Token { get; set; } = "";
+        public string DefaultPrefix { get; set; } = "";
         public string GatewayHost { get; set; } = null;
         public int ConnectionTimeout { get; set; } = 30000;
         public int? ShardId { get; set; } = null;

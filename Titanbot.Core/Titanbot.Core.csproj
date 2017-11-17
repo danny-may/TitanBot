@@ -6,12 +6,17 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Net.WebSocket" Version="1.0.2" />
+    <PackageReference Include="LinqToRegex" Version="2.5.0" />
     <PackageReference Include="LiteDB" Version="4.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Titansmasher.Utilities\Titansmasher.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Command\Attributes\" />
   </ItemGroup>
 
 </Project>

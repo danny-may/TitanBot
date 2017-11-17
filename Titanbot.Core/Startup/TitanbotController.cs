@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Titanbot.Core.Config;
 using Titanbot.Core.Extensions;
 using Titanbot.Core.Startup.Interfaces;
-using Titansmasher.Services.Configuration.Interfaces;
 using Titansmasher.Services.Logging;
 using Titansmasher.Services.Logging.Interfaces;
 using Titansmasher.Utilities;
@@ -15,12 +14,8 @@ namespace Titanbot.Core.Startup
     {
         #region Fields
 
-        private DiscordSocketClient _socketClient;
-        private DiscordShardedClient _shardedClient;
-
-        private IConfigService _configService;
-        private DiscordConfig _config;
-        private IAreaLogger _areaLogger;
+        private DiscordSocketClient _client;
+        private BotConfig _config;
         private ILoggerService _logger;
 
         private EventAwaiter _logoutEvent = new EventAwaiter();
@@ -29,68 +24,26 @@ namespace Titanbot.Core.Startup
 
         #region Constructors
 
-        public TitanbotController(DiscordSocketClient client, IConfigService config, ILoggerService logger)
+        public TitanbotController(DiscordSocketClient client,
+                                  BotConfig config,
+                                  ILoggerService logger)
         {
-            _socketClient = client ?? throw new ArgumentNullException(nameof(client));
-            _configService = config ?? throw new ArgumentNullException(nameof(config));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _areaLogger = logger.CreateAreaLogger<TitanbotController>();
-            _config = _configService.Request<DiscordConfig>();
+            _client.Log += m => _logger.LogAsync(m);
 
-            _socketClient.Log += m => { _logger.Log("Discord", m); return Task.CompletedTask; };
-
-            _areaLogger.Log(LogLevel.Info, "Initialised Socket Client");
-        }
-
-        public TitanbotController(DiscordShardedClient client, IConfigService config, ILoggerService logger)
-        {
-            _shardedClient = client ?? throw new ArgumentNullException(nameof(client));
-            _configService = config ?? throw new ArgumentNullException(nameof(config));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _areaLogger = logger.CreateAreaLogger<TitanbotController>();
-            _config = _configService.Request<DiscordConfig>();
-
-            _shardedClient.Log += m => { _logger.Log("Discord", m); return Task.CompletedTask; };
-
-            _areaLogger.Log(LogLevel.Info, "Initialised Sharded Client");
+            _logger.Log(LogLevel.Info, "Initialised");
         }
 
         #endregion Constructors
 
         #region Methods
 
-        private async Task StartSocketClient()
-        {
-            await _socketClient.LoginAsync(Discord.TokenType.Bot, _config.Token);
-            await _socketClient.StartAsync();
-
-            _socketClient.LoggedOut += OnLogout;
-        }
-
-        private Task StartShardedClient()
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task StopSocketClient()
-        {
-            await _socketClient.StopAsync();
-            await _socketClient.LogoutAsync();
-        }
-
-        private Task StopShardedClient()
-        {
-            throw new NotImplementedException();
-        }
-
         private Task OnLogout()
         {
-            if (_socketClient != null)
-                _socketClient.LoggedOut -= OnLogout;
-            else if (_shardedClient != null)
-                _shardedClient.LoggedOut -= OnLogout;
+            _client.LoggedOut -= OnLogout;
 
             _logoutEvent.EventFired();
 
@@ -107,21 +60,20 @@ namespace Titanbot.Core.Startup
         {
             _logoutEvent.ResetEvent();
 
-            _areaLogger.Log(LogLevel.Info, "Starting up Client");
-            if (_socketClient != null)
-                await StartSocketClient();
-            else if (_shardedClient != null)
-                await StartShardedClient();
+            _logger.Log(LogLevel.Info, "Starting up Client");
+
+            await _client.LoginAsync(Discord.TokenType.Bot, _config.Token);
+            await _client.StartAsync();
+
+            _client.LoggedOut += OnLogout;
         }
 
         public async Task StopAsync()
         {
-            _areaLogger.Log(LogLevel.Info, "Stopping Client");
+            _logger.Log(LogLevel.Info, "Stopping Client");
 
-            if (_socketClient != null)
-                await StopSocketClient();
-            else if (_shardedClient != null)
-                await StopShardedClient();
+            await _client.StopAsync();
+            await _client.LogoutAsync();
         }
 
         #region IDisposable
