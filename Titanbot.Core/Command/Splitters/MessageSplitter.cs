@@ -3,7 +3,6 @@ using Pihrtsoft.Text.RegularExpressions.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Titanbot.Core.Command.Interfaces;
 using Titanbot.Core.Command.Models;
 using Titanbot.Core.Config;
@@ -64,19 +63,6 @@ namespace Titanbot.Core.Command.Splitters
                                    .Where(p => !string.IsNullOrWhiteSpace(p))
                                    .Distinct()
                                    .ToArray();
-        }
-
-        protected virtual string[] GetQuoteChars()
-            => new string[] { "\"", "'", "`" };
-
-        protected virtual string[] SplitArguments(string argBlock)
-        {
-            return null;
-        }
-
-        protected virtual CommandFlag[] SplitFlags(string flagBlock)
-        {
-            return null;
         }
 
         #region Builder Methods
@@ -198,47 +184,6 @@ namespace Titanbot.Core.Command.Splitters
             flags = flagMatches.Where(m => m.Success)
                                .Select(m => new CommandFlag(m.Groups[Key_FlagKey].Value, m.Groups[Key_FlagValue].Value))
                                .ToArray();
-
-            return true;
-        }
-
-        public virtual bool TryParseMessage_old(SocketUserMessage message, out string prefix, out string commandName, out string[] args, out CommandFlag[] flags)
-        {
-            prefix = commandName = null;
-            args = null;
-            flags = null;
-
-            var pfxKey = "pfx";
-            var cmdKey = "cmd";
-            var argKey = "arg";
-            var flgKey = "flg";
-
-            var prefixes = GetPrefixes((message?.Channel as SocketGuildChannel)?.Guild).Select(p => Regex.Escape(p));
-
-            var pfxGroup = $@"(?<{pfxKey}>(?:{string.Join('|', prefixes)}))";
-            var cmdGroup = $@"(?<{cmdKey}>\S+)";
-            var argGroup = $@"(?<{argKey}>(?<quote>[{string.Join("", GetQuoteChars())}])(?:(?=(?<escape>\\?))(?k<escape>).)*?(?k<quote>)|(?:(?!\s+--?[a-zA-Z]).)+)";
-            var flgGroup = $@"(?<{flgKey}>-.*)";
-
-            var regex = $@"^{pfxGroup}" + //Start string with a prefix
-                        $@"(?:\s*)" + //Gobble any spaces between the prefix and command name
-                        $@"{cmdGroup}" + //Match command name
-                        $@"(?:\s*$|\s+)" + //Either require 0+ whitespace then end of line, or 1+ whitespace and more text. Ensures a space before the arguments start
-                        $@"(?:{argGroup}" +
-                        $@"(?:\s*$|\s+))?" + //Either require 0+ whitespace then end of line, or 1+ whitespace and more text. Ensures a space before the flags start
-                        $@"(?:{flgGroup}" +
-                        $@"(?:\s*))?$"; //Gobble any trailing whitespace
-            ;
-
-            var match = Regex.Match(message.Content, regex, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-
-            if (!match.Success)
-                return false;
-
-            prefix = match.Groups[pfxKey].Value;
-            commandName = match.Groups[cmdKey].Value;
-            args = SplitArguments(match.Groups[argKey].Value);
-            flags = SplitFlags(match.Groups[flgKey].Value);
 
             return true;
         }
