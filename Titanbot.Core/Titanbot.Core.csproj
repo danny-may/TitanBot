@@ -4,6 +4,14 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Discord.Net.WebSocket" Version="1.0.2" />
     <PackageReference Include="LinqToRegex" Version="2.5.0" />
@@ -13,10 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Titansmasher.Utilities\Titansmasher.Utilities.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Command\Attributes\" />
   </ItemGroup>
 
 </Project>

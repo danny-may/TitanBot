@@ -2,7 +2,7 @@
 
 namespace Titanbot.Core.Command.Models
 {
-    public struct CommandFlag
+    public struct FlagValue
     {
         #region Fields
 
@@ -13,7 +13,7 @@ namespace Titanbot.Core.Command.Models
 
         #region Constructors
 
-        public CommandFlag(string key, string text)
+        public FlagValue(string key, string text)
         {
             Key = key ?? throw new ArgumentNullException(nameof(key));
             RawValue = text ?? throw new ArgumentNullException(nameof(text));
@@ -23,8 +23,11 @@ namespace Titanbot.Core.Command.Models
 
         #region Methods
 
-        public T ReadAs<T>()
-            => (T)Convert.ChangeType(RawValue, typeof(T)); //TODO: Impliment using typereaders
+        public bool ReadAs<T>(out T result)
+        {
+            result = default(T);
+            return false;
+        }
 
         #endregion Methods
 

@@ -5,6 +5,6 @@ namespace Titanbot.Core.Command.Interfaces
 {
     public interface IMessageSplitter
     {
-        bool TryParseMessage(SocketUserMessage message, out string prefix, out string commandName, out string[] args, out CommandFlag[] flags);
+        bool TryParseMessage(SocketUserMessage message, out string prefix, out string commandName, out string rawArg, out string[] args, out FlagValue[] flags);
     }
 }

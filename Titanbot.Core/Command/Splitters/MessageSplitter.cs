@@ -78,7 +78,7 @@ namespace Titanbot.Core.Command.Splitters
             var id = Rand.Next((int)1e8, (int)1e9 - 1);
             var quoteId = $"quote_{id}";
             var escapeId = $"escape_{id}";
-            return Group(NamedGroup(quoteId, AssertBack(Any(Character('"'), Character('\''), Character('`').Count(1, 3)))) +
+            return Group(NamedGroup(quoteId, Any(Character('"'), Character('\''), Character('`').Count(1, 3))) +
                          Group(Assert(NamedGroup(escapeId, Character('\\').Maybe())) +
                                GroupReference(escapeId) +
                                Any())
@@ -152,9 +152,9 @@ namespace Titanbot.Core.Command.Splitters
 
         #region IMessageSplitter
 
-        public virtual bool TryParseMessage(SocketUserMessage message, out string prefix, out string commandName, out string[] args, out CommandFlag[] flags)
+        public virtual bool TryParseMessage(SocketUserMessage message, out string prefix, out string commandName, out string rawArgs, out string[] args, out FlagValue[] flags)
         {
-            prefix = commandName = null;
+            prefix = commandName = rawArgs = null;
             args = null;
             flags = null;
 
@@ -168,8 +168,8 @@ namespace Titanbot.Core.Command.Splitters
             prefix = match.Groups[Key_Prefix].Value;
             commandName = match.Groups[Key_CommandName].Value;
 
-            var rawArgs = match.Groups[Key_Arguments].Value;
-            var rawFlags = match.Groups[Key_Flags].Value;
+            rawArgs = match.Groups[Key_Arguments].Value.Trim();
+            var rawFlags = match.Groups[Key_Flags].Value.Trim();
 
             var argRegex = Argument();
             var flagRegex = Flag();
@@ -182,7 +182,7 @@ namespace Titanbot.Core.Command.Splitters
                              .ToArray();
 
             flags = flagMatches.Where(m => m.Success)
-                               .Select(m => new CommandFlag(m.Groups[Key_FlagKey].Value, m.Groups[Key_FlagValue].Value))
+                               .Select(m => new FlagValue(m.Groups[Key_FlagKey].Value, m.Groups[Key_FlagValue].Value))
                                .ToArray();
 
             return true;

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Titanbot.Core.Startup.Interfaces
 {
-    public interface ITitanbotController : IDisposable
+    public interface IStartup : IDisposable
     {
         Task WhileConnected { get; }
 

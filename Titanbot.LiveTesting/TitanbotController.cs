@@ -1,5 +1,6 @@
 ﻿using Discord.WebSocket;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Titanbot.Core.Command.Interfaces;
 using Titanbot.Core.Config;
@@ -9,9 +10,9 @@ using Titansmasher.Services.Logging;
 using Titansmasher.Services.Logging.Interfaces;
 using Titansmasher.Utilities;
 
-namespace Titanbot.Core.Startup
+namespace Titanbot.LiveTesting
 {
-    public class TitanbotController : ITitanbotController
+    public class TitanbotController : IStartup
     {
         #region Fields
 
@@ -37,6 +38,8 @@ namespace Titanbot.Core.Startup
             _cmdService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             _client.Log += m => _logger.LogAsync(m);
+            _cmdService.Install(Assembly.GetExecutingAssembly());
+            _cmdService.Install(Assembly.GetAssembly(typeof(IStartup)));
 
             _logger.Log(LogLevel.Info, "Initialised");
         }

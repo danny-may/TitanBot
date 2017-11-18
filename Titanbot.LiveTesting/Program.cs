@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Titanbot.Core.Command;
 using Titanbot.Core.Command.Interfaces;
 using Titanbot.Core.Config;
-using Titanbot.Core.Startup;
 using Titanbot.Core.Startup.Interfaces;
 using Titansmasher.Services.Configuration.Extensions;
 using Titansmasher.Services.Database.Interfaces;
@@ -44,7 +43,7 @@ namespace Titanbot.LiveTesting
                     .AddSingleton<ILoggerService, LoggerService>()
                     .AddSingleton<IDatabaseService, LiteDbService>()
                     .AddSingleton<ICommandService, CommandService>()
-                    .AddSingleton<ITitanbotController, TitanbotController>()
+                    .AddSingleton<IStartup, TitanbotController>()
                     .AddSingleton<Random>();
 
             return services.BuildServiceProvider();
@@ -52,7 +51,7 @@ namespace Titanbot.LiveTesting
 
         private async Task StartBot(IServiceProvider provider)
         {
-            var startup = provider.GetRequiredService<ITitanbotController>();
+            var startup = provider.GetRequiredService<IStartup>();
 
             await startup.StartAsync();
 
