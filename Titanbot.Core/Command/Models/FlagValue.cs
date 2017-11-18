@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Titanbot.Core.Command.Models
+namespace Titanbot.Command.Models
 {
     public struct FlagValue
     {

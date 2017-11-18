@@ -1,4 +1,4 @@
-﻿namespace Titanbot.Core.Command
+﻿namespace Titanbot.Command
 {
     public enum ContextType
     {

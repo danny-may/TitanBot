@@ -2,10 +2,10 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Titanbot.Core.Command.Interfaces;
-using Titanbot.Core.Config;
-using Titanbot.Core.Extensions;
-using Titanbot.Core.Startup.Interfaces;
+using Titanbot.Command.Interfaces;
+using Titanbot.Config;
+using Titanbot.Extensions;
+using Titanbot.Startup.Interfaces;
 using Titansmasher.Services.Logging;
 using Titansmasher.Services.Logging.Interfaces;
 using Titansmasher.Utilities;

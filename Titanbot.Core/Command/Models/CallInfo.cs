@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Titansmasher.Extensions;
 
-namespace Titanbot.Core.Command.Models
+namespace Titanbot.Command.Models
 {
     public class CallInfo //: ILocalisable<string>
     {

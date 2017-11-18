@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Titansmasher.Services.Logging;
 using Titansmasher.Services.Logging.Interfaces;
 
-namespace Titanbot.Core.Extensions
+namespace Titanbot.Extensions
 {
     public static class LoggerExtensions
     {

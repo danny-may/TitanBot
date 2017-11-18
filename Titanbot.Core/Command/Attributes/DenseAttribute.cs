@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
     public class DenseAttribute : Attribute

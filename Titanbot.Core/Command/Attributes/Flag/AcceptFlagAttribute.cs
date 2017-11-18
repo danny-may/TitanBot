@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Titanbot.Core.Command.Models;
+using Titanbot.Command.Models;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class AcceptFlagAttribute : Attribute

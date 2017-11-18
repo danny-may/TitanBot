@@ -5,17 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Titanbot.Core.Command.Interfaces;
-using Titanbot.Core.Command.Models;
-using Titanbot.Core.Command.Splitters;
-using Titanbot.Core.Config;
+using Titanbot.Command.Interfaces;
+using Titanbot.Command.Models;
+using Titanbot.Command.Splitters;
+using Titanbot.Config;
 using Titansmasher.Services.Configuration;
 using Titansmasher.Services.Configuration.Interfaces;
 using Titansmasher.Services.Database.Interfaces;
 using Titansmasher.Services.Database.LiteDb;
 using Titansmasher.Services.Logging.Interfaces;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     public class CommandService : ICommandService
     {

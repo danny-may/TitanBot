@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class RequireContextAttribute : Attribute

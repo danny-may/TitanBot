@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titanbot.LiveTesting", "Titanbot.LiveTesting\Titanbot.LiveTesting.csproj", "{D87BB81F-63CC-476F-B903-EB1DC399F5D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titanbot.Core", "Titanbot.Core\Titanbot.Core.csproj", "{47ECCD6F-11E1-4C90-B158-ADFF02AF6CE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titanbot", "Titanbot.Core\Titanbot.csproj", "{47ECCD6F-11E1-4C90-B158-ADFF02AF6CE5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titansmasher.Utilities", "Titansmasher.Utilities\Titansmasher.Utilities.csproj", "{30DD7B84-F16A-479B-9FAB-25A918D6740C}"
 EndProject

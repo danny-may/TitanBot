@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Titanbot.Core.Command.Models
+namespace Titanbot.Command.Models
 {
     public class CommandInfo //: ILocalisable<string>
     {

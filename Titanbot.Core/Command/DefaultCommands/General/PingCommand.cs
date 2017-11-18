@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Titanbot.Core.Command.DefaultCommands.General
+namespace Titanbot.Command.DefaultCommands.General
 {
     public class PingCommand : Command
     {

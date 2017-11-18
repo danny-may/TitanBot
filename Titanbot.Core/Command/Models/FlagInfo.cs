@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Titanbot.Core.Command.Models
+namespace Titanbot.Command.Models
 {
     public class FlagInfo //: ILocalisable<string>
     {

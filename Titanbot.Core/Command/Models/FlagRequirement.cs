@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Titanbot.Core.Command.Models
+namespace Titanbot.Command.Models
 {
     public class FlagRequirement
     {

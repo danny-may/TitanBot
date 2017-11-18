@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace Titanbot.Core.Config
+namespace Titanbot.Config
 {
     public class BotConfig
     {

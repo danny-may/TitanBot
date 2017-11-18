@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Titanbot.Core.Startup.Interfaces
+namespace Titanbot.Startup.Interfaces
 {
     public interface IStartup : IDisposable
     {

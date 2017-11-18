@@ -3,13 +3,13 @@ using Pihrtsoft.Text.RegularExpressions.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Titanbot.Core.Command.Interfaces;
-using Titanbot.Core.Command.Models;
-using Titanbot.Core.Config;
+using Titanbot.Command.Interfaces;
+using Titanbot.Command.Models;
+using Titanbot.Config;
 using static Pihrtsoft.Text.RegularExpressions.Linq.Patterns;
 using static System.Text.RegularExpressions.RegexOptions;
 
-namespace Titanbot.Core.Command.Splitters
+namespace Titanbot.Command.Splitters
 {
     public class MessageSplitter : IMessageSplitter
     {

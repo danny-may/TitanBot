@@ -4,7 +4,7 @@ using Titansmasher.Services.Configuration.Interfaces;
 using Titansmasher.Services.Database.Interfaces;
 using Titansmasher.Services.Logging.Interfaces;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     public abstract class Command : IDisposable
     {

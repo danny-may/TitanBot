@@ -1,7 +1,7 @@
 ﻿using Discord.WebSocket;
-using Titanbot.Core.Command.Models;
+using Titanbot.Command.Models;
 
-namespace Titanbot.Core.Command.Interfaces
+namespace Titanbot.Command.Interfaces
 {
     public interface IMessageSplitter
     {

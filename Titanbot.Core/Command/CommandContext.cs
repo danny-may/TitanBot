@@ -1,8 +1,8 @@
 ﻿using Discord.WebSocket;
-using Titanbot.Core.Command.Interfaces;
-using Titanbot.Core.Command.Models;
+using Titanbot.Command.Interfaces;
+using Titanbot.Command.Models;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     public class CommandContext
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class NoReplyAttribute : Attribute

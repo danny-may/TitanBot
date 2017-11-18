@@ -2,7 +2,7 @@
 using System.Reflection;
 using Titansmasher.Extensions;
 
-namespace Titanbot.Core.Command
+namespace Titanbot.Command
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
     public class NameAttribute : Attribute
