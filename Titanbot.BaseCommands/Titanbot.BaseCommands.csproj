@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Admin\" />
+    <Folder Include="Abstract\" />
+    <Folder Include="Embedables\" />
+    <Folder Include="Owner\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Titanbot\Titanbot.csproj" />
+  </ItemGroup>
+
+</Project>

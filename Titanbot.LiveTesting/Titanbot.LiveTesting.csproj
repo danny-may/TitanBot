@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Titanbot.BaseCommands\Titanbot.BaseCommands.csproj" />
     <ProjectReference Include="..\Titanbot\Titanbot.csproj" />
   </ItemGroup>
 

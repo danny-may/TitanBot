@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Titanbot.Command.Interfaces;
+using Titanbot.Commands.Interfaces;
 using Titanbot.Config;
 using Titanbot.Extensions;
 using Titanbot.Startup.Interfaces;
@@ -38,8 +38,9 @@ namespace Titanbot.LiveTesting
             _cmdService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             _client.Log += m => _logger.LogAsync(m);
-            _cmdService.Install(Assembly.GetExecutingAssembly());
-            _cmdService.Install(Assembly.GetAssembly(typeof(IStartup)));
+
+            foreach (var assembly in Assembly.GetEntryAssembly().GetReferencedAssemblies())
+                _cmdService.Install(Assembly.Load(assembly));
 
             _logger.Log(LogLevel.Info, "Initialised");
         }

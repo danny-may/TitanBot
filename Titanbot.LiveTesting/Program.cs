@@ -4,8 +4,8 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Titanbot.Command;
-using Titanbot.Command.Interfaces;
+using Titanbot.Commands;
+using Titanbot.Commands.Interfaces;
 using Titanbot.Config;
 using Titanbot.Startup.Interfaces;
 using Titansmasher.Services.Configuration.Extensions;
@@ -25,6 +25,8 @@ namespace Titanbot.LiveTesting
         {
             //Temproary fix for a bug in .netcore 2.0 https://github.com/dotnet/project-system/issues/2239
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+
+            Titanbot.BaseCommands.ForceLoad.Load();
 
             var provider = BuildServiceProvider();
 
