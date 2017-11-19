@@ -1,5 +1,13 @@
 ﻿{
   "assemblyName": [
     "Titanbot.BaseCommands"
-  ]
+  ],
+  "commands": {
+    "pingcommand": {
+      "usage": {
+        "sendpongasync": "Replies with a pong and what the current delay is."
+      },
+      "description": "Basic command for calculating my delay."
+    }
+  }
 }

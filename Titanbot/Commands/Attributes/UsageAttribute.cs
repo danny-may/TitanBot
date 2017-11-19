@@ -15,7 +15,7 @@ namespace Titanbot.Commands
                 ?? DisplayType.Key.BuildFor(DefaultKey(info));
 
         private static string DefaultKey(MethodInfo info)
-            => GetTranslationKey(info.DeclaringType, "Usage", info.Name);
+            => GetTranslationKey(info.DeclaringType, "usage", info.Name);
 
         #endregion Statics
 

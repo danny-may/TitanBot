@@ -43,7 +43,7 @@ namespace Titanbot.Commands
         #region Methods
 
         private IDisplayable<string> GetNote(Type info)
-            => DisplayType.BuildFor(Note ?? GetTranslationKey(info, "Note"));
+            => DisplayType.BuildFor(Note ?? GetTranslationKey(info, "note"));
 
         #endregion Methods
     }

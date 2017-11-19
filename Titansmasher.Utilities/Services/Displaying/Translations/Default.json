@@ -1,5 +1,14 @@
 ﻿{
   "assemblyName": [
     "Titansmasher.Utilities"
-  ]
+  ],
+  "format": [
+    {
+      "name": "Default",
+      "description": "This is the default format type available"
+    }
+  ],
+  "language": {
+    "default": "The default language available, currently it is UK English"
+  }
 }
