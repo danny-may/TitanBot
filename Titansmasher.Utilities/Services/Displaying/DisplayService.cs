@@ -21,9 +21,14 @@ namespace Titansmasher.Services.Display
         #region Fields
 
         private readonly Dictionary<Language, JObject> _translations = new Dictionary<Language, JObject>();
-        private readonly Dictionary<Format, Dictionary<Type, BeautifyDelegate>> _formatters = new Dictionary<Format, Dictionary<Type, BeautifyDelegate>>();
-        private readonly DirectoryInfo _translationDirectory;
+        private readonly Dictionary<Language, JObject> _embeddedTranslations = new Dictionary<Language, JObject>();
         private readonly Dictionary<Language, FileInfo> _translationFiles = new Dictionary<Language, FileInfo>();
+        private readonly DirectoryInfo _translationDirectory;
+        private readonly Dictionary<Format, Dictionary<Type, BeautifyDelegate>> _formatters = new Dictionary<Format, Dictionary<Type, BeautifyDelegate>>();
+        private readonly JsonMergeSettings _mergeSettings = new JsonMergeSettings
+        {
+            MergeArrayHandling = MergeArrayHandling.Union
+        };
 
         #endregion Fields
 
@@ -32,8 +37,6 @@ namespace Titansmasher.Services.Display
         public DisplayService(DirectoryInfo translationsFolder = null)
         {
             _translationDirectory = translationsFolder ?? new DirectoryInfo("./Translations/");
-            LoadFromAssemblies();
-            DiscoverLanguages();
             ReloadLanguages();
         }
 
@@ -41,22 +44,32 @@ namespace Titansmasher.Services.Display
 
         #region Methods
 
-        private void LoadFromAssemblies()
+        private void DiscorverStoredTranslations()
         {
-            var assemblies = Assembly.GetEntryAssembly()
-                                     .GetReferencedAssemblies()
-                                     .Select(n => Assembly.Load(n));
-            foreach (var assembly in assemblies)
+            _translationFiles.Clear();
+            _translationDirectory.EnsureExists();
+
+            foreach (var file in _translationDirectory.GetFiles())
+                if (file.Extension == ".json")
+                    _translationFiles.Add(Language.Get(file.GetFileNameWithoutExtension()), file);
+        }
+
+        private void LoadFromAssemby(Assembly assembly)
+        {
+            var resourceNames = assembly.GetManifestResourceNames();
+            var translationResources = resourceNames.Where(r => r.EndsWith(".json") && r.ToLower().Contains("translation"));
+
+            foreach (var resource in translationResources)
             {
-                var resources = assembly.GetManifestResourceNames()
-                                        .Where(r => r.EndsWith(".json") &&
-                                                    r.ToLower().Contains("translation"));
-                foreach (var resource in resources)
-                {
-                    var language = Language.Get(resource.RemoveEnd(".json").Split('.').Last());
-                    using (var sr = new StreamReader(assembly.GetManifestResourceStream(resource)))
-                        Import(language, JsonConvert.DeserializeObject(sr.ReadToEnd()) as JObject ?? new JObject());
-                }
+                var language = Language.Get(resource.RemoveEnd(".json").Split('.').Last());
+                JObject json;
+                using (var sr = new StreamReader(assembly.GetManifestResourceStream(resource)))
+                    json = JsonConvert.DeserializeObject(sr.ReadToEnd()) as JObject ?? new JObject();
+
+                if (!_embeddedTranslations.ContainsKey(language))
+                    _embeddedTranslations[language] = new JObject();
+
+                _embeddedTranslations[language].Merge(json, _mergeSettings);
             }
         }
 
@@ -68,44 +81,49 @@ namespace Titansmasher.Services.Display
 
         public Language[] KnownLanguages => _translations.Keys.ToArray();
 
+        public void LoadTranslationsFromAssembly(Assembly assembly)
+        {
+            LoadFromAssemby(assembly);
+            ReloadLanguages();
+        }
+
+        public void LoadTranslationsFromAssembly(IEnumerable<Assembly> assemblies)
+        {
+            foreach (var assembly in assemblies)
+                LoadFromAssemby(assembly);
+            ReloadLanguages();
+        }
+
         public void Import(Language language, JObject json)
         {
-            FileInfo languageFile;
-            if (_translations.TryGetValue(language, out var stored))
-                languageFile = _translationFiles[language];
-            else
-            {
-                stored = new JObject();
-                languageFile = new FileInfo(Path.Combine(_translationDirectory.FullName, language + ".json"));
-                _translationFiles[language] = languageFile;
-                _translations[language] = stored;
-            }
+            if (!_translations.ContainsKey(language))
+                _translations[language] = new JObject();
 
-            stored.Merge(json);
+            if (!_translationFiles.ContainsKey(language))
+                _translationFiles[language] = new FileInfo(Path.Combine(_translationDirectory.FullName, language + ".json"));
 
-            languageFile.EnsureDirectory();
-            languageFile.WriteAllText(stored.ToString(Formatting.Indented));
-            ReloadLanguages();
+            _translations[language].Merge(json, _mergeSettings);
+            _translationFiles[language].WriteAllText(_translations[language].ToString(Formatting.Indented));
         }
 
         public void ReloadLanguages()
         {
+            DiscorverStoredTranslations();
             _translations.Clear();
-            _translationDirectory.EnsureExists();
 
-            foreach (var language in _translationFiles)
-                if (language.Value.Exists)
-                    _translations.Add(language.Key, (JObject)JsonConvert.DeserializeObject(language.Value.ReadAllText()) ?? new JObject());
-        }
+            foreach (var stored in _translationFiles)
+            {
+                var json = JsonConvert.DeserializeObject(stored.Value.ReadAllText()) as JObject ?? new JObject();
+                if (!_translations.ContainsKey(stored.Key))
+                    _translations[stored.Key] = _embeddedTranslations.TryGetValue(stored.Key, out var current)
+                                                    ? current.DeepClone() as JObject
+                                                    : new JObject();
 
-        public void DiscoverLanguages()
-        {
-            _translationFiles.Clear();
-            _translationDirectory.EnsureExists();
+                _translations[stored.Key].Merge(json, _mergeSettings);
+            }
 
-            foreach (var file in _translationDirectory.GetFiles())
-                if (file.Extension == ".json")
-                    _translationFiles.Add(Language.Get(file.GetFileNameWithoutExtension()), file);
+            foreach (var stored in _translationFiles)
+                stored.Value.WriteAllText(_translations[stored.Key].ToString(Formatting.Indented));
         }
 
         public JObject Export(Language language)

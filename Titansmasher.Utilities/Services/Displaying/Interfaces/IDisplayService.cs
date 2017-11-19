@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Titansmasher.Services.Display.Interfaces
 {
@@ -12,11 +13,12 @@ namespace Titansmasher.Services.Display.Interfaces
 
         Language[] KnownLanguages { get; }
 
+        void LoadTranslationsFromAssembly(Assembly assembly);
+        void LoadTranslationsFromAssembly(IEnumerable<Assembly> assemblies);
         void Import(Language language, JObject json);
         JObject Export(Language language);
 
         void ReloadLanguages();
-        void DiscoverLanguages();
 
         string GetTranslation(string key, IEnumerable<object> values, DisplayOptions options = default);
 

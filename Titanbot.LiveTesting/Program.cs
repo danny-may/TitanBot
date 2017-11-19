@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Titanbot.BaseCommands.General;
 using Titanbot.Commands;
 using Titanbot.Commands.Interfaces;
 using Titanbot.Config;
@@ -28,9 +29,14 @@ namespace Titanbot.LiveTesting
             //Temproary fix for a bug in .netcore 2.0 https://github.com/dotnet/project-system/issues/2239
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
 
-            BaseCommands.ForceLoad.Load();
-
             var display = new DisplayService();
+
+            display.LoadTranslationsFromAssembly(new[]{
+                Assembly.GetAssembly(typeof(DisplayService)),
+                Assembly.GetAssembly(typeof(CommandService)),
+                Assembly.GetAssembly(typeof(PingCommand)),
+                Assembly.GetEntryAssembly()
+                });
 
             display.AddFormatter<int>((v, d, o) => (v * 2).ToString());
 
@@ -40,13 +46,13 @@ namespace Titanbot.LiveTesting
 
             display.Import(Language.Default, JObject.Parse("{\"test\":{\"obj\":{\"value2\":\"Test 2 {0}\"}}}"));
 
-            w1 = new Translation("test.array[0]", 10).Display(display);
-            w2 = new Translation("test.obj.value", 10).Display(display);
-            w3 = new Translation("test.obj.value2", 10).Display(display);
+            var w4 = new Translation("test.array[0]", 10).Display(display);
+            var w5 = new Translation("test.obj.value", 10).Display(display);
+            var w6 = new Translation("test.obj.value2", 10).Display(display);
 
-            //var provider = BuildServiceProvider();
-            //
-            //await StartBot(provider);
+            var provider = BuildServiceProvider();
+
+            await StartBot(provider);
         }
 
         private IServiceProvider BuildServiceProvider()
