@@ -13,6 +13,7 @@ using Titansmasher.Services.Configuration;
 using Titansmasher.Services.Configuration.Interfaces;
 using Titansmasher.Services.Database.Interfaces;
 using Titansmasher.Services.Database.LiteDb;
+using Titansmasher.Services.Display.Interfaces;
 using Titansmasher.Services.Logging.Interfaces;
 
 namespace Titanbot.Commands
@@ -26,6 +27,7 @@ namespace Titanbot.Commands
         private readonly IConfigService _config;
         private readonly IDatabaseService _database;
         private readonly IMessageSplitter _msgSplitter;
+        private readonly IDisplayService _displayer;
 
         private readonly List<CommandInfo> _commands = new List<CommandInfo>();
         private readonly List<ServiceDescriptor> _services = new List<ServiceDescriptor>();
@@ -37,6 +39,7 @@ namespace Titanbot.Commands
 
         public CommandService(DiscordSocketClient client,
                               ILoggerService logger,
+                              IDisplayService displayer,
                               IConfigService config = null,
                               IDatabaseService database = null,
                               IMessageSplitter messageSplitter = null,
@@ -44,7 +47,7 @@ namespace Titanbot.Commands
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
+            _displayer = displayer ?? throw new ArgumentNullException(nameof(displayer));
             _config = config ?? new ConfigService();
             _database = database ?? new LiteDbService(_config.Request<LiteDbConfig>(), _logger);
             _msgSplitter = messageSplitter ?? new MessageSplitter(_client, _config.Request<BotConfig>());
@@ -52,6 +55,7 @@ namespace Titanbot.Commands
             _client.MessageReceived += HandleMessage;
 
             _services.Add(ServiceDescriptor.Singleton(_logger));
+            _services.Add(ServiceDescriptor.Singleton(_displayer));
             _services.Add(ServiceDescriptor.Singleton(_client));
             _services.Add(ServiceDescriptor.Singleton(_config));
             _services.Add(ServiceDescriptor.Singleton(_database));

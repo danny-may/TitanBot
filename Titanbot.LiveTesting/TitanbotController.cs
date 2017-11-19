@@ -6,6 +6,7 @@ using Titanbot.Commands.Interfaces;
 using Titanbot.Config;
 using Titanbot.Extensions;
 using Titanbot.Startup.Interfaces;
+using Titansmasher.Services.Display.Interfaces;
 using Titansmasher.Services.Logging;
 using Titansmasher.Services.Logging.Interfaces;
 using Titansmasher.Utilities;
@@ -20,6 +21,7 @@ namespace Titanbot.LiveTesting
         private BotConfig _config;
         private ILoggerService _logger;
         private ICommandService _cmdService;
+        private IDisplayService _displayer;
 
         private EventAwaiter _logoutEvent = new EventAwaiter();
 
@@ -30,11 +32,13 @@ namespace Titanbot.LiveTesting
         public TitanbotController(DiscordSocketClient client,
                                   BotConfig config,
                                   ILoggerService logger,
+                                  IDisplayService displayer,
                                   ICommandService commandService)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _displayer = displayer ?? throw new ArgumentNullException(nameof(displayer));
             _cmdService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             _client.Log += m => _logger.LogAsync(m);
@@ -42,12 +46,19 @@ namespace Titanbot.LiveTesting
             foreach (var assembly in Assembly.GetEntryAssembly().GetReferencedAssemblies())
                 _cmdService.Install(Assembly.Load(assembly));
 
+            LoadDisplay();
+
             _logger.Log(LogLevel.Info, "Initialised");
         }
 
         #endregion Constructors
 
         #region Methods
+
+        private void LoadDisplay()
+        {
+            _displayer.LoadAllAssemblyTranslations();
+        }
 
         private Task OnLogout()
         {

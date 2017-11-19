@@ -15,6 +15,7 @@ namespace Titansmasher.Services.Display.Interfaces
 
         void LoadTranslationsFromAssembly(Assembly assembly);
         void LoadTranslationsFromAssembly(IEnumerable<Assembly> assemblies);
+        void LoadAllAssemblyTranslations();
         void Import(Language language, JObject json);
         JObject Export(Language language);
 

@@ -1,11 +1,9 @@
 ﻿using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Titanbot.BaseCommands.General;
 using Titanbot.Commands;
 using Titanbot.Commands.Interfaces;
 using Titanbot.Config;
@@ -14,6 +12,7 @@ using Titansmasher.Services.Configuration.Extensions;
 using Titansmasher.Services.Database.Interfaces;
 using Titansmasher.Services.Database.LiteDb;
 using Titansmasher.Services.Display;
+using Titansmasher.Services.Display.Interfaces;
 using Titansmasher.Services.Logging;
 using Titansmasher.Services.Logging.Interfaces;
 
@@ -28,27 +27,6 @@ namespace Titanbot.LiveTesting
         {
             //Temproary fix for a bug in .netcore 2.0 https://github.com/dotnet/project-system/issues/2239
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-
-            var display = new DisplayService();
-
-            display.LoadTranslationsFromAssembly(new[]{
-                Assembly.GetAssembly(typeof(DisplayService)),
-                Assembly.GetAssembly(typeof(CommandService)),
-                Assembly.GetAssembly(typeof(PingCommand)),
-                Assembly.GetEntryAssembly()
-                });
-
-            display.AddFormatter<int>((v, d, o) => (v * 2).ToString());
-
-            var w1 = new Translation("test.array[0]", 10).Display(display);
-            var w2 = new Translation("test.obj.value", 10).Display(display);
-            var w3 = new Translation("test.obj.value2", 10).Display(display);
-
-            display.Import(Language.Default, JObject.Parse("{\"test\":{\"obj\":{\"value2\":\"Test 2 {0}\"}}}"));
-
-            var w4 = new Translation("test.array[0]", 10).Display(display);
-            var w5 = new Translation("test.obj.value", 10).Display(display);
-            var w6 = new Translation("test.obj.value2", 10).Display(display);
 
             var provider = BuildServiceProvider();
 
@@ -68,6 +46,7 @@ namespace Titanbot.LiveTesting
                     .AddSingleton<IDatabaseService, LiteDbService>()
                     .AddSingleton<ICommandService, CommandService>()
                     .AddSingleton<IStartup, TitanbotController>()
+                    .AddSingleton<IDisplayService, DisplayService>()
                     .AddSingleton<Random>();
 
             return services.BuildServiceProvider();

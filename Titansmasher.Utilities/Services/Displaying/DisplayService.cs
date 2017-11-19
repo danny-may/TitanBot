@@ -94,6 +94,12 @@ namespace Titansmasher.Services.Display
             ReloadLanguages();
         }
 
+        public void LoadAllAssemblyTranslations()
+            => LoadTranslationsFromAssembly(Assembly.GetEntryAssembly()
+                                                    .GetReferencedAssemblies()
+                                                    .Select(n => Assembly.Load(n))
+                                                    .Concat(new[] { Assembly.GetEntryAssembly() }));
+
         public void Import(Language language, JObject json)
         {
             if (!_translations.ContainsKey(language))
