@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Services.Display.Interfaces;
 
 namespace Titanbot.Commands
 {

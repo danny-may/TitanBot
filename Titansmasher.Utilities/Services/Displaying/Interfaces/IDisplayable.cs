@@ -1,4 +1,4 @@
-﻿namespace Titansmasher.Services.Displaying.Interfaces
+﻿namespace Titansmasher.Services.Display.Interfaces
 {
     public interface IDisplayable
     {

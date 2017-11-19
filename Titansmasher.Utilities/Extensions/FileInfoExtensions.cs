@@ -36,8 +36,7 @@ namespace Titansmasher.Extensions
 
         public static FileInfo EnsureDirectory(this FileInfo file)
         {
-            if (!file.Directory.Exists)
-                file.Directory.Create();
+            file.Directory.EnsureExists();
             return file;
         }
 

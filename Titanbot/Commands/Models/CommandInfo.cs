@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Services.Display.Interfaces;
 
 namespace Titanbot.Commands.Models
 {
@@ -52,7 +52,7 @@ namespace Titanbot.Commands.Models
             PermissionKey = DefaultPermissionAttribute.GetKeyFor(CommandType);
             RequireReply = !NoReplyAttribute.ExistsOn(CommandType);
             RequiredContexts = RequireContextAttribute.GetFor(CommandType);
-            Note = NotesAttribute.GetFor(CommandType);
+            Note = IncludeNotesAttribute.GetFor(CommandType);
             RequireOwner = RequireOwnerAttribute.ExistsOn(CommandType);
             RequireGuild = RequireGuildAttribute.GetFor(CommandType);
             Hidden = HiddenAttribute.ExistsOn(CommandType);

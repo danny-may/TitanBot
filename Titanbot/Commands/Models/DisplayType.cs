@@ -1,5 +1,5 @@
-﻿using Titansmasher.Services.Displaying;
-using Titansmasher.Services.Displaying.Interfaces;
+﻿using Titansmasher.Services.Display;
+using Titansmasher.Services.Display.Interfaces;
 
 namespace Titanbot.Commands
 {

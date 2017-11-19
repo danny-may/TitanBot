@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Titansmasher.Extensions;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Services.Display.Interfaces;
 
 namespace Titanbot.Commands.Models
 {

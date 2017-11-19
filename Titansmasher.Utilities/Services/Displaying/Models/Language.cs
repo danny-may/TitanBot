@@ -1,48 +1,53 @@
-﻿using System.Collections.Generic;
-using Titansmasher.Services.Displaying.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Titansmasher.Services.Display.Interfaces;
 
-namespace Titansmasher.Services.Displaying
+namespace Titansmasher.Services.Display
 {
-    public struct Language : IDisplayable<string>
+    public sealed class Language : IDisplayable<string>
     {
         #region Statics
 
-        public static readonly Language DEFAULT = 0;
+        private readonly static HashSet<Language> _known = new HashSet<Language>();
 
-        public static readonly HashSet<Language> KnownLanguages = new HashSet<Language>();
+        public static Language Default { get; } = nameof(Default);
 
-        public static string GetNameKey(int id)
-            => $"LANUGAGE_{id}_NAME";
+        public static Language Get(string s)
+            => _known.FirstOrDefault(l => string.Equals(l, s, StringComparison.InvariantCultureIgnoreCase)) ?? new Language(s);
 
         #endregion Statics
 
         #region Fields
 
-        private readonly int _id;
+        private string _id;
+        private Translation _display;
 
         #endregion Fields
 
         #region Constructors
 
-        private Language(int id)
+        private Language(string id)
         {
-            _id = id;
-            KnownLanguages.Add(this);
+            _id = !string.IsNullOrWhiteSpace(id)
+                        ? id.ToLower()
+                        : throw new ArgumentException("Argument must not be an empty string", nameof(id));
+            _id = Regex.Replace(_id, @"[^a-zA-Z]", "");
+            _display = new Translation($"language.{id}.name");
+            _known.Add(this);
         }
 
         #endregion Constructors
 
-        #region Methods
-
-        public string GetNameKey()
-            => GetNameKey(this);
-
-        #endregion Methods
-
         #region Overrides
 
         public override bool Equals(object obj)
-            => obj is Language other && other._id == _id;
+            => (obj is Language l && string.Equals(l._id, _id, StringComparison.InvariantCultureIgnoreCase)) ||
+               (obj is string s && string.Equals(s, _id, StringComparison.InvariantCultureIgnoreCase));
+
+        public override string ToString()
+            => _id;
 
         public override int GetHashCode()
             => _id.GetHashCode();
@@ -51,27 +56,25 @@ namespace Titansmasher.Services.Displaying
 
         #region Operators
 
-        public static implicit operator Language(int id)
-            => new Language(id);
+        #region Implicit
 
-        public static implicit operator int(Language lang)
-            => lang._id;
+        public static implicit operator string(Language l)
+            => l._id;
 
-        public static bool operator ==(Language l1, Language l2)
-            => l1._id == l2._id;
+        public static implicit operator Language(string s)
+            => Get(s);
 
-        public static bool operator !=(Language l1, Language l2)
-             => l1._id != l2._id;
+        #endregion Implicit
 
         #endregion Operators
 
         #region IDisplayable
 
-        object IDisplayable.Display(IDisplayService display, DisplayOptions options)
-            => Display(display, options);
+        public string Display(IDisplayService service, DisplayOptions options = default)
+            => _display.Display(service, options);
 
-        public string Display(IDisplayService display, DisplayOptions options = default)
-            => new Translation(GetNameKey(this)).Display(display, options);
+        object IDisplayable.Display(IDisplayService service, DisplayOptions options)
+            => Display(service, options);
 
         #endregion IDisplayable
     }

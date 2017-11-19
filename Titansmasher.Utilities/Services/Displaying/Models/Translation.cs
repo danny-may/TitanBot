@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Services.Display.Interfaces;
 
-namespace Titansmasher.Services.Displaying
+namespace Titansmasher.Services.Display
 {
     public class Translation : IDisplayable<string>
     {

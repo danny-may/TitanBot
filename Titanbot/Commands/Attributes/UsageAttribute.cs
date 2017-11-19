@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Reflection;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Extensions;
+using Titansmasher.Services.Display.Interfaces;
 
 namespace Titanbot.Commands
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public class UsageAttribute : Attribute
+    public class UsageAttribute : DisplayableBaseAttribute
     {
         #region Statics
 
         public static IDisplayable<string> GetFor(MethodInfo info)
-            => info.GetCustomAttribute<UsageAttribute>()?.GetUsage();
-        public bool ExistsOn(MethodInfo info)
-            => info.GetCustomAttribute<UsageAttribute>() != null;
+            => info.GetCustomAttribute<UsageAttribute>()?.GetUsage(info)
+                ?? DisplayType.Key.BuildFor(DefaultKey(info));
+
+        private static string DefaultKey(MethodInfo info)
+            => GetTranslationKey(info.DeclaringType, "Usage", info.Name);
 
         #endregion Statics
 
@@ -27,7 +30,7 @@ namespace Titanbot.Commands
 
         public UsageAttribute(string usage, DisplayType displayType = DisplayType.Key)
         {
-            Usage = usage;
+            Usage = usage.NullIfWhitespace() ?? throw new ArgumentException("Argument cannot be null or whitespace", nameof(usage));
             displayType = DisplayType;
         }
 
@@ -35,8 +38,8 @@ namespace Titanbot.Commands
 
         #region Methods
 
-        private IDisplayable<string> GetUsage()
-            => DisplayType.BuildFor(Usage);
+        private IDisplayable<string> GetUsage(MethodInfo info)
+            => DisplayType.BuildFor(Usage ?? DefaultKey(info));
 
         #endregion Methods
     }

@@ -1,8 +1,8 @@
-﻿namespace Titansmasher.Services.Displaying
+﻿namespace Titansmasher.Services.Display
 {
-    public struct DisplayOptions
+    public class DisplayOptions
     {
-        public Language Language { get; set; }
-        public FormatType Format { get; set; }
+        public Language Language { get; set; } = Language.Default;
+        public Format Format { get; set; } = Format.Default;
     }
 }

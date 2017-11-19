@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Services.Display.Interfaces;
 
 namespace Titanbot.Commands.Models
 {

@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Reflection;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Extensions;
+using Titansmasher.Services.Display.Interfaces;
 
 namespace Titanbot.Commands
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class DescriptionAttribute : Attribute
+    public class DescriptionAttribute : DisplayableBaseAttribute
     {
         #region Statics
 
         public static IDisplayable<string> GetFor(Type info)
-            => info.GetCustomAttribute<DescriptionAttribute>()?.GetDescription();
-        public bool ExistsOn(Type info)
-            => info.GetCustomAttribute<DescriptionAttribute>() != null;
+            => info.GetCustomAttribute<DescriptionAttribute>()?.GetDescription(info)
+                ?? DisplayType.Key.BuildFor(DefaultKey(info));
+
+        private static string DefaultKey(Type info)
+            => GetTranslationKey(info, "Description");
 
         #endregion Statics
 
@@ -27,7 +30,7 @@ namespace Titanbot.Commands
 
         public DescriptionAttribute(string description, DisplayType displayType = DisplayType.Key)
         {
-            Description = description;
+            Description = description.NullIfWhitespace() ?? throw new ArgumentException("Argument cannot be null or whitespace", nameof(description));
             DisplayType = displayType;
         }
 
@@ -35,8 +38,8 @@ namespace Titanbot.Commands
 
         #region Methods
 
-        private IDisplayable<string> GetDescription()
-            => DisplayType.BuildFor(Description);
+        private IDisplayable<string> GetDescription(Type info)
+            => DisplayType.BuildFor(Description ?? DefaultKey(info));
 
         #endregion Methods
     }

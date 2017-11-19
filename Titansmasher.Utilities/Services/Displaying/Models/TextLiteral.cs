@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Titansmasher.Services.Displaying.Interfaces;
+using Titansmasher.Services.Display.Interfaces;
 
-namespace Titansmasher.Services.Displaying
+namespace Titansmasher.Services.Display
 {
     public class TextLiteral : IDisplayable<string>
     {
@@ -45,7 +45,7 @@ namespace Titansmasher.Services.Displaying
             => Display(service, options);
 
         public string Display(IDisplayService service, DisplayOptions options = default)
-            => string.Format(_format, _values.Select(v => v is IDisplayable d ? d.Display(service, options) : v));
+            => string.Format(_format, service.Beautify(_values));
 
         #endregion IDisplayable
     }

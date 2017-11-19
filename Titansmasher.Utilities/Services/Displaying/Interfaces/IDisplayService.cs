@@ -1,24 +1,41 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
-namespace Titansmasher.Services.Displaying.Interfaces
+namespace Titansmasher.Services.Display.Interfaces
 {
     public delegate string BeautifyDelegate<T>(T value, IDisplayService service, DisplayOptions options = default);
 
     public interface IDisplayService
     {
-        IDisplayService AddTranslation(string key, string text);
-        IDisplayService AddTranslation(string key, Language language, string text);
+        #region Translation
 
-        IDisplayService AddFormatter<T>(BeautifyDelegate<T> formatter);
-        IDisplayService AddFormatter<T>(BeautifyDelegate<T> formatter, FormatType format);
+        Language[] KnownLanguages { get; }
 
         void Import(Language language, JObject json);
         JObject Export(Language language);
 
         void ReloadLanguages();
+        void DiscoverLanguages();
 
         string GetTranslation(string key, IEnumerable<object> values, DisplayOptions options = default);
+
+        #endregion Translation
+
+        #region Formatting
+
+        Format[] KnownFormats { get; }
+
+        IDisplayService AddFormatter<T>(BeautifyDelegate<T> formatter);
+        IDisplayService AddFormatter<T>(Format format, BeautifyDelegate<T> formatter);
+        IDisplayService AddFormatter<T>(Func<T, string> formatter);
+        IDisplayService AddFormatter<T>(Format format, Func<T, string> formatter);
+
+        string Beautify(object value, DisplayOptions options = default);
+        string Beautify(object value, Type formatAs, DisplayOptions options = default);
         string Beautify<T>(T value, DisplayOptions options = default);
+        string[] Beautify(IEnumerable<object> values, DisplayOptions options = default);
+
+        #endregion Formatting
     }
 }

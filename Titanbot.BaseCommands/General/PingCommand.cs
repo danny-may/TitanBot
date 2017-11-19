@@ -3,11 +3,9 @@ using Titanbot.Commands;
 
 namespace Titanbot.BaseCommands.General
 {
-    [Description("Ping Description")]
     public class PingCommand : CommandBase
     {
         [Call]
-        [Usage("Ping usage")]
         [HideTyping]
         public async Task SendPongAsync()
         {
