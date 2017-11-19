@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Titansmasher.Services.Displaying.Interfaces;
 
 namespace Titanbot.Commands.Models
 {
-    public class CommandInfo //: ILocalisable<string>
+    public class CommandInfo
     {
         #region Statics
 
@@ -24,14 +25,12 @@ namespace Titanbot.Commands.Models
         public string Group { get; }
         public string Name { get; }
         public string[] Alias { get; }
-        //public ILocalisable<string> Description { get; }
-        public string Description { get; }
+        public IDisplayable<string> Description { get; }
         public ulong DefaultPermissions { get; }
         public string PermissionKey { get; }
         public bool RequireReply { get; }
         public ContextType RequiredContexts { get; }
-        //public ILocalisable<string> Note { get; }
-        public string Note { get; }
+        public IDisplayable<string> Note { get; }
         public bool RequireOwner { get; }
         public ulong[] RequireGuild { get; }
         public bool Hidden { get; }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Titanbot.Commands;
 
 namespace Titanbot.BaseCommands.General
@@ -20,6 +21,7 @@ namespace Titanbot.BaseCommands.General
         public override void Dispose()
         {
             throw new System.NotImplementedException();
+            var x = new TimeSpan(TimeSpan.TicksPerMillisecond * 5);
         }
 
         #endregion IDisposable

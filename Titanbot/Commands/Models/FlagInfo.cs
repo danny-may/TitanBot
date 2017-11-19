@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Titansmasher.Services.Displaying.Interfaces;
 
 namespace Titanbot.Commands.Models
 {
-    public class FlagInfo //: ILocalisable<string>
+    public class FlagInfo
     {
         #region Statics
 
@@ -24,8 +25,7 @@ namespace Titanbot.Commands.Models
         private CommandFlagAttribute _cmdAttr { get; }
         public char Id => _cmdAttr.Id;
         public string Name => _cmdAttr.Name;
-        //public ILocalisable<string> Description => _cmdAttr.GetDescription();
-        public string Description => _cmdAttr.GetDescription();
+        public IDisplayable<string> Description => _cmdAttr.GetDescription();
         public CommandInfo Parent { get; }
 
         #endregion Fields

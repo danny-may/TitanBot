@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Titansmasher.Services.Displaying.Interfaces;
 
 namespace Titanbot.Commands
 {
@@ -8,7 +9,7 @@ namespace Titanbot.Commands
     {
         #region Statics
 
-        public static string /*ILocalisable<string>*/ GetFor(Type info)
+        public static IDisplayable<string> GetFor(Type info)
             => info.GetCustomAttribute<NotesAttribute>()?.GetNote();
         public bool ExistsOn(Type info)
             => info.GetCustomAttribute<NotesAttribute>() != null;
@@ -18,27 +19,24 @@ namespace Titanbot.Commands
         #region Fields
 
         public string Note { get; }
-        //public LocalisationType LocalisationType { get; }
+        public DisplayType DisplayType { get; }
 
         #endregion Fields
 
         #region Constructors
 
-        public NotesAttribute(string note)//, LocalisationType localisationType = LocalisationType.Key)
+        public NotesAttribute(string note, DisplayType displayType = DisplayType.Key)
         {
             Note = note;
-            //LocalisationType = LocalisationType;
+            DisplayType = displayType;
         }
 
         #endregion Constructors
 
         #region Methods
 
-        //private ILocalisable<string> GetNote()
-        //    => LocalisationType.BuildNew(Note);
-
-        private string GetNote()
-            => Note;
+        private IDisplayable<string> GetNote()
+            => DisplayType.BuildFor(Note);
 
         #endregion Methods
     }

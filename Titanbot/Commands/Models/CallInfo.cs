@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Titansmasher.Extensions;
+using Titansmasher.Services.Displaying.Interfaces;
 
 namespace Titanbot.Commands.Models
 {
@@ -27,8 +28,7 @@ namespace Titanbot.Commands.Models
 
         public MethodInfo Method { get; }
         public CommandInfo Parent { get; }
-        //public ILocalisable<string> Usage { get; }
-        public string Usage { get; }
+        public IDisplayable<string> Usage { get; }
         public ulong DefaultPermissions { get; }
         public string PermissionKey { get; }
         public ContextType RequiredContexts { get; }

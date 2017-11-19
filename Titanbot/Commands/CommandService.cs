@@ -105,6 +105,8 @@ namespace Titanbot.Commands
             }
 
             return;
+
+            //ToDo: Finish off this method
         }
 
         public ICommandService Install<TCommand>() where TCommand : CommandBase

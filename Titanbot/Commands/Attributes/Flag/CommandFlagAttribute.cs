@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Titansmasher.Services.Displaying.Interfaces;
 
 namespace Titanbot.Commands
 {
@@ -21,7 +22,7 @@ namespace Titanbot.Commands
         public char Id { get; }
         public string Name { get; }
         public string Description { get; }
-        //public LocalisationType LocalisationType { get; }
+        public DisplayType DisplayType { get; }
 
         #endregion Fields
 
@@ -35,21 +36,21 @@ namespace Titanbot.Commands
         {
         }
 
-        public CommandFlagAttribute(char id, string name, string description)//, LocalisationType localisationType = LocalisationType.Key)
+        public CommandFlagAttribute(char id, string name, string description, DisplayType displayType = DisplayType.Key)
         {
             Id = Regex.IsMatch($"{id}", "[a-zA-Z]") ? id : throw new ArgumentException("Field must be a letter character", nameof(id));
             Name = name;
             Description = description;
-            //LocalisationType = LocalisationType;
+            DisplayType = displayType;
         }
 
-        public CommandFlagAttribute(string name, string description) ://, LocalisationType localisationType = LocalisationType.Key) :
+        public CommandFlagAttribute(string name, string description, DisplayType displayType = DisplayType.Key) :
             this(!string.IsNullOrWhiteSpace(name) ?
                     name[0] :
                     throw new ArgumentException("Field cannot be null or whitespace", nameof(name)),
                  name,
-                 description)//,
-                             //localisationType)
+                 description,
+                 displayType)
         {
         }
 
@@ -61,11 +62,8 @@ namespace Titanbot.Commands
 
         #region Methods
 
-        //public ILocalisable<string> GetDescription()
-        //    => LocalisationType.BuildNew(Description);
-
-        public string GetDescription()
-            => Description;
+        public IDisplayable<string> GetDescription()
+            => DisplayType.BuildFor(Description);
 
         #endregion Methods
     }
