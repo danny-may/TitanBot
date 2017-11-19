@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Translations\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Admin\" />
     <Folder Include="Abstract\" />
     <Folder Include="Embedables\" />
@@ -22,5 +26,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Titanbot\Titanbot.csproj" />
   </ItemGroup>
-
 </Project>

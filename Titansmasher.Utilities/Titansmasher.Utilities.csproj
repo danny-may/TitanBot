@@ -15,6 +15,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Services\Displaying\Translations\Default.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Services\Displaying\Translations\Default.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LiteDB" Version="4.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

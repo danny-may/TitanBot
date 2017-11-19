@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Titansmasher.Extensions;
 using Titansmasher.Services.Display.Interfaces;
 
@@ -31,11 +32,35 @@ namespace Titansmasher.Services.Display
         public DisplayService(DirectoryInfo translationsFolder = null)
         {
             _translationDirectory = translationsFolder ?? new DirectoryInfo("./Translations/");
+            LoadFromAssemblies();
             DiscoverLanguages();
             ReloadLanguages();
         }
 
         #endregion Constructors
+
+        #region Methods
+
+        private void LoadFromAssemblies()
+        {
+            var assemblies = Assembly.GetEntryAssembly()
+                                     .GetReferencedAssemblies()
+                                     .Select(n => Assembly.Load(n));
+            foreach (var assembly in assemblies)
+            {
+                var resources = assembly.GetManifestResourceNames()
+                                        .Where(r => r.EndsWith(".json") &&
+                                                    r.ToLower().Contains("translation"));
+                foreach (var resource in resources)
+                {
+                    var language = Language.Get(resource.RemoveEnd(".json").Split('.').Last());
+                    using (var sr = new StreamReader(assembly.GetManifestResourceStream(resource)))
+                        Import(language, JsonConvert.DeserializeObject(sr.ReadToEnd()) as JObject ?? new JObject());
+                }
+            }
+        }
+
+        #endregion Methods
 
         #region IDisplayService
 
@@ -58,6 +83,7 @@ namespace Titansmasher.Services.Display
 
             stored.Merge(json);
 
+            languageFile.EnsureDirectory();
             languageFile.WriteAllText(stored.ToString(Formatting.Indented));
             ReloadLanguages();
         }
