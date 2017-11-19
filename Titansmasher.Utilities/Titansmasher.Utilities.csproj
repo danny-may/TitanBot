@@ -15,11 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Services\Displaying\Translations\Default.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Services\Displaying\Translations\Default.json" />
+    <EmbeddedResource Include="Services\Displaying\Translations\*.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,5 +24,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
   </ItemGroup>
-
 </Project>
