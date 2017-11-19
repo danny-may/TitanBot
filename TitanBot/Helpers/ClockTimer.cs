@@ -15,6 +15,7 @@ namespace TitanBot.Helpers
         /// The time between calls
         /// </summary>
         public TimeSpan Interval { get => _interval; set { _interval = value; UpdateBaseline(); } }
+        public TimeSpan MinInterval { get => _minInterval; set => _minInterval = value; }
         public bool Enabled { get => _enabled; set { _enabled = value; Task.Run(() => RunClock()); } }
 
         public DateTime BaseTime { get; private set; }
@@ -23,6 +24,7 @@ namespace TitanBot.Helpers
 
         private TimeSpan _offset;
         private TimeSpan _interval;
+        private TimeSpan _minInterval = new TimeSpan(TimeSpan.TicksPerMillisecond * 5);
         private bool _enabled;
 
         private void UpdateBaseline()
@@ -48,8 +50,8 @@ namespace TitanBot.Helpers
                 var thisCycle = NextInterval;
                 Elapsed?.Invoke(this, new ClockTimerElapsedEventArgs(previous));
                 var delay = (thisCycle - DateTime.Now).Add(new TimeSpan(10000));
-                if (delay < new TimeSpan())
-                    delay = new TimeSpan();
+                if (delay < _minInterval)
+                    delay = _minInterval;
                 await Task.Delay(delay);
                 previous = thisCycle;
             }
