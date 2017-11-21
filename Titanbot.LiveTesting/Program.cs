@@ -28,7 +28,16 @@ namespace Titanbot.LiveTesting
             //Temproary fix for a bug in .netcore 2.0 https://github.com/dotnet/project-system/issues/2239
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
 
+            //needed because unreferenced libraries arent included in compilation by default
+            var reference = typeof(BaseCommands.General.PingCommand);
+
             var provider = BuildServiceProvider();
+
+            var test = new TextLiteral("Type: {0}", typeof(int));
+
+            var display = provider.GetRequiredService<IDisplayService>();
+            display.LoadAllAssemblyTranslations();
+            var result = test.Display(display);
 
             await StartBot(provider);
         }

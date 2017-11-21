@@ -6,5 +6,11 @@
     "success": "✅ **Got it!** {0}",
     "info": "⛔ **Oops!** {0}",
     "error": "ℹ {0}"
+  },
+  "settings": {
+    "editor": {
+      "nogroups": "Groups are not allowed for the {0} setting",
+      "typemismatch": "The value you gave was incorrect. I was expecting {1} but got {2}"
+    }
   }
 }

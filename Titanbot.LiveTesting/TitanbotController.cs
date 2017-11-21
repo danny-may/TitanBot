@@ -46,6 +46,8 @@ namespace Titanbot.LiveTesting
             foreach (var assembly in Assembly.GetEntryAssembly().GetReferencedAssemblies())
                 _cmdService.Install(Assembly.Load(assembly));
 
+            _displayer.LoadAllAssemblyTranslations();
+
             LoadDisplay();
 
             _logger.Log(LogLevel.Info, "Initialised");
