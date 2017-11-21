@@ -1,5 +1,10 @@
 ﻿{
   "assemblyName": [
     "Titanbot"
-  ]
+  ],
+  "replytype": {
+    "success": "✅ **Got it!** {0}",
+    "info": "⛔ **Oops!** {0}",
+    "error": "ℹ {0}"
+  }
 }
