@@ -20,7 +20,6 @@
     <Folder Include="Admin\" />
     <Folder Include="Abstract\" />
     <Folder Include="Embedables\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Owner\" />
   </ItemGroup>
 
