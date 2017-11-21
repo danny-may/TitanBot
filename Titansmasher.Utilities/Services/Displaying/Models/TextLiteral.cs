@@ -7,6 +7,13 @@ namespace Titansmasher.Services.Display
 {
     public class TextLiteral : IDisplayable<string>
     {
+        #region Statics
+
+        public static TextLiteral Join(string separator, IEnumerable<object> values)
+            => new TextLiteral(string.Join(separator, values.Select((v, i) => $"{{{i}}}")), values);
+
+        #endregion Statics
+
         #region Fields
 
         public string Format => _format;
@@ -39,13 +46,20 @@ namespace Titansmasher.Services.Display
 
         #endregion Overrides
 
+        #region Operators
+
+        public static implicit operator TextLiteral(string text)
+            => new TextLiteral(text);
+
+        #endregion Operators
+
         #region IDisplayable
 
         object IDisplayable.Display(IDisplayService service, DisplayOptions options)
             => Display(service, options);
 
         public string Display(IDisplayService service, DisplayOptions options = default)
-            => string.Format(_format, service.Beautify(_values));
+            => string.Format(_format, service.Beautify(_values as IEnumerable<object>));
 
         #endregion IDisplayable
     }

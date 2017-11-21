@@ -10,5 +10,8 @@
   ],
   "language": {
     "default": "The default language available, currently it is UK English"
+  },
+  "types": {
+    "system.int32": "an integer"
   }
 }

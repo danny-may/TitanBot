@@ -37,6 +37,7 @@ namespace Titansmasher.Services.Display
         public DisplayService(DirectoryInfo translationsFolder = null)
         {
             _translationDirectory = translationsFolder ?? new DirectoryInfo("./Translations/");
+            _embeddedTranslations[Language.Default] = new JObject();
             ReloadLanguages();
         }
 
@@ -144,7 +145,7 @@ namespace Titansmasher.Services.Display
                 language = new JObject();
 
             if (!_translations.TryGetValue(Language.Default, out var defaultLang))
-                defaultLang = new JObject();
+                defaultLang = _embeddedTranslations[Language.Default];
 
             var token = language.SelectToken(key) as JValue ??
                         defaultLang.SelectToken(key) as JValue;
@@ -199,7 +200,10 @@ namespace Titansmasher.Services.Display
             => Beautify(value, typeof(T), options);
 
         public string[] Beautify(IEnumerable<object> values, DisplayOptions options = default)
-            => values.Select(v => v is IDisplayable d
+            => values.Select(v => v is Type t
+                                    ? new Translation($"types['{t.FullName}']")
+                                    : v)
+                     .Select(v => v is IDisplayable d
                                     ? d.Display(this, options)
                                     : v)
                      .Select(v => Beautify(v, options))
