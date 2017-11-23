@@ -41,6 +41,8 @@ namespace TitanBot.Scheduling
             PollingPeriod = 1000;
 
             MainLoop.Elapsed += Cycle;
+
+            Database.Delete<SchedulerRecord>(r => r.IsComplete);
         }
 
         private ISchedulerCallback GetCallback(string callbackType)
