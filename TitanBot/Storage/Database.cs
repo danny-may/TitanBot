@@ -38,7 +38,7 @@ namespace TitanBot.Storage
             {
                 while (true)
                 {
-                    await QueryAsync(t => LiteDatabase.Shrink());
+                    LiteDatabase.Shrink();
                     await Task.Delay(new TimeSpan(0, 10, 0));
                 }
             });
