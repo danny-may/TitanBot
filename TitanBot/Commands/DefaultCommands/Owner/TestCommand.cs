@@ -38,10 +38,11 @@ namespace TitanBot.Commands.DefaultCommands.Owner
             public void Complete(ISchedulerContext context, bool wasCancelled)
                 => Handle(null);
 
-            public void Handle(ISchedulerContext context)
+            public bool Handle(ISchedulerContext context)
             {
                 var endAt = DateTime.Now.AddMilliseconds(200);
                 while (DateTime.Now < endAt) { }
+                return false;
             }
         }
 

@@ -175,7 +175,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotClient.cs" />
-    <Compile Include="Callbacks\RemindMeHandler.cs" />
     <Compile Include="Commands\Attributes\AliasAttribute.cs" />
     <Compile Include="Commands\Attributes\HideTypingAttribute.cs" />
     <Compile Include="Commands\Attributes\CallAttribute.cs" />
@@ -195,7 +194,6 @@
     <Compile Include="Commands\Attributes\UsageAttribute.cs" />
     <Compile Include="Commands\DefaultCommands\General\FormattingCommand.cs" />
     <Compile Include="Commands\DefaultCommands\General\LanguageCommand.cs" />
-    <Compile Include="Commands\DefaultCommands\General\RemindMeCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\LogoutCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\PingsCommand.cs" />
     <Compile Include="Commands\DefaultCommands\Owner\SchedulerCommand.cs" />
@@ -381,6 +379,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Callbacks\" />
     <Folder Include="Scheduling\Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

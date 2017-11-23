@@ -165,7 +165,7 @@ namespace TitanBot.Commands
                 CommandName = context.Command?.Name
             };
             Logger.Log(Logging.LogSeverity.Debug, LogType.Command, $"{(record.GuildName != null ? $"{record.GuildName} ({record.GuildId}) \n" : "")}#{record.ChannelName} ({record.ChannelId})\n{record.UserName} ({record.AuthorId})\n{record.CommandName}", "CommandService");
-            Database.Insert(record);
+            //Database.Insert(record);
         }
 
         private (string CallName, CallInfo CallInfo)[] CheckSubcommands(ICommandContext context, CallInfo[] calls)

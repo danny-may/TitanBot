@@ -157,6 +157,7 @@ namespace TitanBot.Scheduling
             => Cancel(new ulong[] { id })[0];
         public ISchedulerRecord[] Cancel(ulong[] ids)
             => Complete(FindById(ids), null, true);
+
         private ISchedulerRecord[] Complete(SchedulerRecord[] records, ClockTimerElapsedEventArgs e, bool wasCancelled)
         {
             var completeTime = DateTime.Now;
@@ -174,7 +175,7 @@ namespace TitanBot.Scheduling
                         Log(ex);
                     }
             });
-            Database.Upsert<SchedulerRecord>(records).Wait();
+            Database.Delete<SchedulerRecord>(records).Wait();
             return records.ToArray();
         }
 
@@ -210,17 +211,23 @@ namespace TitanBot.Scheduling
 
         private void Tick(SchedulerRecord[] records, ClockTimerElapsedEventArgs e)
         {
+            var errored = new List<SchedulerRecord>();
             Parallel.ForEach(records, r =>
             {
+                bool successful;
                 try
                 {
-                    CachedHandlers[r.Callback]?.Handle(new SchedulerContext(r, Client, e, DependencyFactory));
+                    successful = CachedHandlers[r.Callback]?.Handle(new SchedulerContext(r, Client, e, DependencyFactory)) ?? false;
                 }
                 catch (Exception ex)
                 {
                     Log(ex);
+                    successful = false;
                 }
+                if (!successful)
+                    errored.Add(r);
             });
+            Database.Delete<SchedulerRecord>(errored);
         }
     }
 }

@@ -5,20 +5,22 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using TitanBot.Logging;
 using TitanBot.Helpers;
+using TitanBot.Logging;
 
 namespace TitanBot.Storage
 {
     public class Database : IDatabase
     {
-        LiteDatabase LiteDatabase { get; }
-        ILogger Logger { get; }
-        SynchronisedExecutor SyncExec { get; } = new SynchronisedExecutor();
+        private LiteDatabase LiteDatabase { get; }
+        private ILogger Logger { get; }
+        private SynchronisedExecutor SyncExec { get; } = new SynchronisedExecutor();
 
         public int TotalCalls { get; private set; } = 0;
 
-        public Database(ILogger logger) : this(@".\database\bot.db", logger) { }
+        public Database(ILogger logger) : this(@".\database\bot.db", logger)
+        {
+        }
         public Database(string connectionString, ILogger logger)
         {
             FileUtil.EnsureDirectory(connectionString);
@@ -31,6 +33,15 @@ namespace TitanBot.Storage
 
             LiteDatabase = new LiteDatabase(connectionString);
             Logger = logger;
+
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await QueryAsync(t => LiteDatabase.Shrink());
+                    await Task.Delay(new TimeSpan(0, 10, 0));
+                }
+            });
         }
 
         public Task QueryAsync(Action<IDbTransaction> query)
