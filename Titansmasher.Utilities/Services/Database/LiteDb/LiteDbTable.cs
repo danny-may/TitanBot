@@ -64,7 +64,7 @@ namespace Titansmasher.Services.Database.LiteDb
         {
             var existing = Find(ids);
             var added = ids.Where(i => !existing.Exists(r => r.Id == i))
-                           .Select(i => records(i));
+                           .Select(i => { var r = records(i); r.Id = i; return r; });
 
             Upsert(added);
 

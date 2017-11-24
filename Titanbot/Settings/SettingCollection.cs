@@ -11,9 +11,7 @@ namespace Titanbot.Settings
         #region Fields
 
         private readonly IDatabaseTable<SettingCollectionRecord> _table;
-
-        private SettingCollectionRecord _record
-            => _table.Find(ContextId);
+        private readonly SettingCollectionRecord _record;
 
         #endregion Fields
 
@@ -23,6 +21,7 @@ namespace Titanbot.Settings
         {
             ContextId = id;
             _table = table ?? throw new ArgumentNullException(nameof(table));
+            _record = _table.AddOrGet(ContextId, () => new SettingCollectionRecord { Id = ContextId });
         }
 
         #endregion Constructors

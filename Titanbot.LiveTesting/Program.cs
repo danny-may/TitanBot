@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Titanbot.Commands;
 using Titanbot.Commands.Interfaces;
 using Titanbot.Config;
+using Titanbot.Settings;
+using Titanbot.Settings.Interfaces;
 using Titanbot.Startup.Interfaces;
 using Titansmasher.Services.Configuration.Extensions;
 using Titansmasher.Services.Database.Interfaces;
@@ -56,6 +58,7 @@ namespace Titanbot.LiveTesting
                     .AddSingleton<ICommandService, CommandService>()
                     .AddSingleton<IStartup, TitanbotController>()
                     .AddSingleton<IDisplayService, DisplayService>()
+                    .AddSingleton<ISettingService, SettingService>()
                     .AddSingleton<Random>();
 
             return services.BuildServiceProvider();
