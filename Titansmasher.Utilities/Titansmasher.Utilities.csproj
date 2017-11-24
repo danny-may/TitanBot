@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>Titansmasher.Utilities</AssemblyName>
-    <RootNamespace>Titansmasher</RootNamespace>
+    <RootNamespace>Titansmasher.Utilities</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

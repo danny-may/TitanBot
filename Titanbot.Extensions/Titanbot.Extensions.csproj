@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <AssemblyName>Titanbot.Extensions</AssemblyName>
+    <RootNamespace>Titanbot.Extensions</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -15,13 +15,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <ProjectReference Include="..\Titanbot\Titanbot.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Titanbot.BaseCommands\Titanbot.BaseCommands.csproj" />
-    <ProjectReference Include="..\Titanbot.Extensions\Titanbot.Extensions.csproj" />
-    <ProjectReference Include="..\Titanbot\Titanbot.csproj" />
+    <Folder Include="Settings\" />
   </ItemGroup>
 
 </Project>
