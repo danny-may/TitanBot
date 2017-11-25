@@ -29,8 +29,7 @@ namespace Titanbot.Commands.Models
         public MethodInfo Method { get; }
         public CommandInfo Parent { get; }
         public IDisplayable<string> Usage { get; }
-        public ulong DefaultPermissions { get; }
-        public string PermissionKey { get; }
+        public DefaultPermissionAttribute DefaultPermission { get; }
         public ContextType RequiredContexts { get; }
         public bool RequireOwner { get; }
         public bool ShowTyping { get; }
@@ -51,8 +50,7 @@ namespace Titanbot.Commands.Models
             Method = method ?? throw new ArgumentNullException(nameof(method));
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             Usage = UsageAttribute.GetFor(Method);
-            DefaultPermissions = DefaultPermissionAttribute.GetPermFor(Method);
-            PermissionKey = DefaultPermissionAttribute.GetKeyFor(Method);
+            DefaultPermission = DefaultPermissionAttribute.GetFor(Method);
             RequiredContexts = RequireContextAttribute.GetFor(Method);
             RequireOwner = RequireOwnerAttribute.ExistsOn(Method);
             ShowTyping = !HideTypingAttribute.ExistsOn(Method);

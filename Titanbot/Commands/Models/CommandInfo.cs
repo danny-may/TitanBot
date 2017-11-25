@@ -26,8 +26,7 @@ namespace Titanbot.Commands.Models
         public string Name { get; }
         public string[] Alias { get; }
         public IDisplayable<string> Description { get; }
-        public ulong DefaultPermissions { get; }
-        public string PermissionKey { get; }
+        public DefaultPermissionAttribute DefaultPermission { get; }
         public bool RequireReply { get; }
         public ContextType RequiredContexts { get; }
         public IDisplayable<string> Note { get; }
@@ -48,8 +47,7 @@ namespace Titanbot.Commands.Models
             Name = NameAttribute.GetFor(CommandType);
             Alias = AliasAttribute.GetFor(CommandType);
             Description = DescriptionAttribute.GetFor(CommandType);
-            DefaultPermissions = DefaultPermissionAttribute.GetPermFor(CommandType);
-            PermissionKey = DefaultPermissionAttribute.GetKeyFor(CommandType);
+            DefaultPermission = DefaultPermissionAttribute.GetFor(CommandType);
             RequireReply = !NoReplyAttribute.ExistsOn(CommandType);
             RequiredContexts = RequireContextAttribute.GetFor(CommandType);
             Note = IncludeNotesAttribute.GetFor(CommandType);
