@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Titanbot.Commands.Models;
 
 namespace Titanbot.Commands
 {
@@ -14,11 +15,16 @@ namespace Titanbot.Commands
         public static bool ExistsOn(Type type)
             => type.GetCustomAttribute<DefaultPermissionAttribute>() != null;
 
-        public static DefaultPermissionAttribute GetFor(MethodInfo method)
-            => method.GetCustomAttribute<DefaultPermissionAttribute>() ?? GetFor(method.DeclaringType);
+        public static PermissionModel GetFor(MethodInfo method)
+        {
+            var methodAttr = method.GetCustomAttribute<DefaultPermissionAttribute>();
+            var typeAttr = method.DeclaringType.GetCustomAttribute<DefaultPermissionAttribute>();
 
-        public static DefaultPermissionAttribute GetFor(Type type)
-            => type.GetCustomAttribute<DefaultPermissionAttribute>() ?? new DefaultPermissionAttribute(0, type.FullName);
+            var key = (typeAttr?.PermissionKey ?? method.DeclaringType.Name) + "." + (methodAttr?.PermissionKey ?? method.Name);
+            var perm = methodAttr?.DefaultPerm ?? typeAttr?.DefaultPerm ?? 0;
+
+            return new PermissionModel(key, perm);
+        }
 
         #endregion Statics
 

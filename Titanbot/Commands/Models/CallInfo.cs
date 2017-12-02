@@ -29,7 +29,7 @@ namespace Titanbot.Commands.Models
         public MethodInfo Method { get; }
         public CommandInfo Parent { get; }
         public IDisplayable<string> Usage { get; }
-        public DefaultPermissionAttribute DefaultPermission { get; }
+        public PermissionModel DefaultPermission { get; }
         public ContextType RequiredContexts { get; }
         public bool RequireOwner { get; }
         public bool ShowTyping { get; }

@@ -4,7 +4,7 @@ using Titanbot.Commands.Models;
 
 namespace Titanbot.Commands
 {
-    public class CommandContext
+    public class MessageContext
     {
         #region Fields
 
@@ -23,7 +23,7 @@ namespace Titanbot.Commands
 
         #region Constructors
 
-        public CommandContext(SocketUserMessage message,
+        public MessageContext(SocketUserMessage message,
                               IMessageSplitter splitter)
         {
             Message = message;

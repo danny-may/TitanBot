@@ -1,5 +1,6 @@
 ﻿using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +8,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Titanbot.Commands.Interfaces;
 using Titanbot.Commands.Models;
-using Titanbot.Commands.Splitters;
-using Titanbot.Config;
-using Titansmasher.Services.Configuration;
-using Titansmasher.Services.Configuration.Interfaces;
-using Titansmasher.Services.Database.Interfaces;
-using Titansmasher.Services.Database.LiteDb;
-using Titansmasher.Services.Display.Interfaces;
-using Titansmasher.Services.Logging.Interfaces;
+using Titanbot.Permissions.Interfaces;
 
 namespace Titanbot.Commands
 {
@@ -23,14 +17,13 @@ namespace Titanbot.Commands
         #region Fields
 
         private readonly DiscordSocketClient _client;
-        private readonly ILoggerService _logger;
-        private readonly IConfigService _config;
-        private readonly IDatabaseService _database;
+        private readonly CommandConfig _config;
         private readonly IMessageSplitter _msgSplitter;
-        private readonly IDisplayService _displayer;
+        private readonly IPermissionManager _permManager;
 
         private readonly List<CommandInfo> _commands = new List<CommandInfo>();
-        private readonly List<ServiceDescriptor> _services = new List<ServiceDescriptor>();
+        private readonly IServiceCollection _internalServices = new ServiceCollection();
+        private readonly ICollection<ServiceDescriptor> _externalServices;
         private IServiceProvider _provider;
 
         #endregion Fields
@@ -38,28 +31,25 @@ namespace Titanbot.Commands
         #region Constructors
 
         public CommandService(DiscordSocketClient client,
-                              ILoggerService logger,
-                              IDisplayService displayer,
-                              IConfigService config = null,
-                              IDatabaseService database = null,
-                              IMessageSplitter messageSplitter = null,
-                              IServiceCollection collection = null)
+                              IMessageSplitter splitter,
+                              IPermissionManager permManager,
+                              IOptions<CommandConfig> config,
+                              IServiceCollection services = null)
+            : this(client, splitter, permManager, config.Value, services) { }
+
+        public CommandService(DiscordSocketClient client,
+                              IMessageSplitter splitter,
+                              IPermissionManager permManager,
+                              CommandConfig config,
+                              IServiceCollection services = null)
         {
+            _config = config;
             _client = client ?? throw new ArgumentNullException(nameof(client));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _displayer = displayer ?? throw new ArgumentNullException(nameof(displayer));
-            _config = config ?? new ConfigService();
-            _database = database ?? new LiteDbService(_config.Request<LiteDbConfig>(), _logger);
-            _msgSplitter = messageSplitter ?? new MessageSplitter(_client, _config.Request<BotConfig>());
+            _msgSplitter = splitter ?? throw new ArgumentNullException(nameof(splitter));
+            _permManager = permManager ?? throw new ArgumentNullException(nameof(permManager));
+            _externalServices = services;
 
             _client.MessageReceived += HandleMessage;
-
-            _services.Add(ServiceDescriptor.Singleton(_logger));
-            _services.Add(ServiceDescriptor.Singleton(_displayer));
-            _services.Add(ServiceDescriptor.Singleton(_client));
-            _services.Add(ServiceDescriptor.Singleton(_config));
-            _services.Add(ServiceDescriptor.Singleton(_database));
-            _services.Add(ServiceDescriptor.Singleton(_msgSplitter));
 
             UpdateProvider();
         }
@@ -72,8 +62,10 @@ namespace Titanbot.Commands
         {
             IServiceCollection collection = new ServiceCollection();
 
-            foreach (var desc in _services)
-                collection.Add(desc);
+            var allDescriptors = _internalServices.Concat(_externalServices);
+
+            foreach (var descriptor in allDescriptors)
+                collection.Add(descriptor);
 
             foreach (var command in _commands)
                 collection.AddTransient(command.CommandType);
@@ -83,7 +75,7 @@ namespace Titanbot.Commands
 
         private ICommandService RegisterService(ServiceDescriptor desc)
         {
-            _services.Add(desc);
+            _internalServices.Add(desc);
             UpdateProvider();
             return this;
         }
@@ -97,7 +89,7 @@ namespace Titanbot.Commands
             if (!(message is SocketUserMessage msg) || msg.Author.IsBot)
                 return;
 
-            var context = new CommandContext(msg, _msgSplitter);
+            var context = new MessageContext(msg, _msgSplitter);
 
             if (context.IsCommand)
             {

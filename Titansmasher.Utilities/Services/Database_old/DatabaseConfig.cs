@@ -2,6 +2,6 @@
 {
     public class DatabaseConfig
     {
-        public string Location { get; set; } = "./database.db";
+        public string ConnectionString { get; set; }
     }
 }

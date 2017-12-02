@@ -1,9 +1,8 @@
 ﻿using LiteDB;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Linq.Expressions;
-using Titansmasher.Extensions;
 using Titansmasher.Services.Database.Interfaces;
 using Titansmasher.Services.Logging;
 using Titansmasher.Services.Logging.Interfaces;
@@ -16,10 +15,8 @@ namespace Titansmasher.Services.Database.LiteDb
 
         private LiteDatabase _db;
         private BsonMapper _mapper;
-        private Logger _liteLogger;
         private ILoggerService _logger;
-        private FileInfo _location;
-        private LiteDbConfig _config;
+        private DatabaseConfig _config;
 
         private ConcurrentDictionary<Type, object> _tableCache = new ConcurrentDictionary<Type, object>();
 
@@ -27,21 +24,20 @@ namespace Titansmasher.Services.Database.LiteDb
 
         #region Constructors
 
-        public LiteDbService(LiteDbConfig config, ILoggerService logger)
+        public LiteDbService(IOptions<DatabaseConfig> config, ILoggerService logger)
+            : this(config.Value, logger) { }
+
+        public LiteDbService(DatabaseConfig config, ILoggerService logger)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _location = new FileInfo(_config.Location);
-            _location.EnsureExists();
-
-            _liteLogger = new Logger(_config.LogLevel);
             _mapper = new BsonMapper();
-            _db = new LiteDatabase(_location.FullName, _mapper, _liteLogger);
+            _db = new LiteDatabase(_config.ConnectionString);
 
             _mapper.RegisterType(o => (ulong)o, d => (decimal)d);
 
-            _liteLogger.Logging += m => _logger.Log(LogLevel.Verbose, m);
+            _db.Log.Logging += m => _logger.Log(LogLevel.Verbose, m);
 
             _logger.Log(LogLevel.Info, "Initialised");
         }
@@ -50,22 +46,23 @@ namespace Titansmasher.Services.Database.LiteDb
 
         #region IDatabase
 
-        public void Backup(DateTime time = default(DateTime))
+        public void Backup(DateTime time = default)
         {
             Shrink();
 
-            var target = _location.WithTimestamp(time)
-                                  .ModifyDirectory(d => Path.Combine(d, "backup"));
-
-            target.EnsureDirectory();
-
-            File.Copy(_location.FullName, target.FullName, true);
+            //var target = _location.WithTimestamp(time)
+            //                      .ModifyDirectory(d => Path.Combine(d, "backup"));
+            //
+            //target.EnsureDirectory();
+            //
+            //File.Copy(_location.FullName, target.FullName, true);
         }
 
-        public void BackupClear(DateTime before = default(DateTime))
-            => _location.ModifyDirectory(d => Path.Combine(d, "backup"))
-                        .Directory
-                        .CleanDirectory(before);
+        public void BackupClear(DateTime before = default)
+        { }
+        //=> _location.ModifyDirectory(d => Path.Combine(d, "backup"))
+        //            .Directory
+        //            .CleanDirectory(before);
 
         public void DropTable<TRecord>() where TRecord : IDatabaseRecord
             => DropTable(typeof(TRecord).Name);

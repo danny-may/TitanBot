@@ -1,21 +1,21 @@
 ﻿using Discord.WebSocket;
+using Microsoft.Extensions.Options;
 using Pihrtsoft.Text.RegularExpressions.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Titanbot.Commands.Interfaces;
 using Titanbot.Commands.Models;
-using Titanbot.Config;
 using static Pihrtsoft.Text.RegularExpressions.Linq.Patterns;
 using static System.Text.RegularExpressions.RegexOptions;
 
-namespace Titanbot.Commands.Splitters
+namespace Titanbot.Commands
 {
-    public class MessageSplitter : IMessageSplitter
+    public class RegexSplitter : IMessageSplitter
     {
         #region Fields
 
-        protected BotConfig Config { get; }
+        protected CommandConfig Config { get; }
         protected DiscordSocketClient Client { get; }
 
         protected virtual string Key_Prefix { get; } = "prefix";
@@ -33,7 +33,10 @@ namespace Titanbot.Commands.Splitters
 
         #region Constructors
 
-        public MessageSplitter(DiscordSocketClient client, BotConfig config)
+        public RegexSplitter(DiscordSocketClient client, IOptions<CommandConfig> config)
+            : this(client, config.Value) { }
+
+        public RegexSplitter(DiscordSocketClient client, CommandConfig config)
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             Client = client ?? throw new ArgumentNullException(nameof(client));

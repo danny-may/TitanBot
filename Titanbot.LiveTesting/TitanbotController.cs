@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Microsoft.Extensions.Options;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -30,13 +31,13 @@ namespace Titanbot.LiveTesting
         #region Constructors
 
         public TitanbotController(DiscordSocketClient client,
-                                  BotConfig config,
+                                  IOptions<BotConfig> config,
                                   ILoggerService logger,
                                   IDisplayService displayer,
                                   ICommandService commandService)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _displayer = displayer ?? throw new ArgumentNullException(nameof(displayer));
             _cmdService = commandService ?? throw new ArgumentNullException(nameof(commandService));
