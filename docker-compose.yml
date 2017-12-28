@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  titanbot.livetesting:
+    image: titanbot.livetesting
+    build:
+      context: .
+      dockerfile: Titanbot.LiveTesting/Dockerfile
